@@ -1,0 +1,58 @@
+# Runs the upstream remote-vector-index-builder at the pinned commit
+# (3a02e64, as the api-snapshot image of that digest) against LocalStack,
+# and a runner that builds every input in INPUTS RUNS times.
+#
+# From the repository root:
+#   INPUTS=fixtures/inputs OUT=target/baseline/small RUNS=5 \
+#     docker compose -f tools/baseline/docker-compose.yml up --abort-on-container-exit --exit-code-from runner
+#   docker compose -f tools/baseline/docker-compose.yml logs service > "$OUT/service.log"
+#   docker compose -f tools/baseline/docker-compose.yml down
+#
+# Never use the api-latest tag: it is release 1.2.0, which builds different
+# graphs (graph degree m x 2, libcuvs 25.08).
+name: knn-builder-baseline
+
+x-image: &image opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
+x-aws: &aws
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_DEFAULT_REGION: us-east-1
+
+services:
+  localstack:
+    # 4.14, the version upstream's e2e test uses.
+    image: localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a
+    environment:
+      SERVICES: s3
+      <<: *aws
+
+  service:
+    image: *image
+    environment:
+      S3_ENDPOINT_URL: http://localstack:4566
+      LOG_LEVEL: DEBUG
+      <<: *aws
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      - localstack
+
+  runner:
+    image: *image
+    entrypoint: ["python", "/work/tools/baseline/run_baseline.py"]
+    environment:
+      S3_ENDPOINT_URL: http://localstack:4566
+      SERVICE_URL: http://service:1025
+      INPUTS: /work/${INPUTS:?set INPUTS}
+      OUT: /work/${OUT:?set OUT}
+      RUNS: ${RUNS:-5}
+      <<: *aws
+    volumes:
+      - ../..:/work
+    depends_on:
+      - service
