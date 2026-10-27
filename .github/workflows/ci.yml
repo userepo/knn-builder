@@ -1,5 +1,6 @@
 # Every push and pull request: format and lints on Linux, the test suite
-# on Linux and Windows, and the dependency policy. The toolchain comes
+# on Linux and Windows, knn-store's transfers against LocalStack, and the
+# dependency policy. The toolchain comes
 # from rust-toolchain.toml. The runners have no GPU, so knn-gpu builds
 # without its `gpu` feature here; the GPU code is linted and tested on a
 # machine with a GPU and the conda environment in environment.yml.
@@ -35,6 +36,31 @@ jobs:
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Test
         run: cargo test --workspace --locked
+
+  s3:
+    name: S3 transfers (LocalStack)
+    runs-on: ubuntu-latest
+    # The build and a few seconds of tests; a hang fails here, not after
+    # GitHub's six hours.
+    timeout-minutes: 20
+    services:
+      localstack:
+        # localstack/localstack:4.14, the version upstream's e2e test uses,
+        # pinned by digest as in tools/baseline. The image's own health
+        # check holds the job until S3 is up.
+        image: localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a
+        ports:
+          - 4566:4566
+    env:
+      S3_ENDPOINT_URL: http://localhost:4566
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - name: Test
+        run: cargo test -p knn-store --locked -- --ignored
 
   deny:
     name: Dependency policy

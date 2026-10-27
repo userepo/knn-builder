@@ -8,4 +8,9 @@ allow-panic-in-tests = true
 allow-indexing-slicing-in-tests = true
 
 # Names that are not code and need no backticks in docs.
-doc-valid-idents = ["OpenSearch", "Faiss", "CAGRA", "cuVS", "HNSW", "IVF-PQ", "CMake", ".."]
+doc-valid-idents = ["OpenSearch", "Faiss", "CAGRA", "cuVS", "HNSW", "IVF-PQ", "CMake", "LocalStack", ".."]
+
+# Duplicate versions the AWS SDK's own crates pull, which nothing here can
+# unify (windows-sys on Windows only); any other duplicate still fails
+# `clippy::multiple_crate_versions`.
+allowed-duplicate-crates = ["block-buffer", "cpufeatures", "crypto-common", "digest", "sha1", "syn", "windows-sys"]
