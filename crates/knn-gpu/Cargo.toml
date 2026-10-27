@@ -11,18 +11,31 @@ publish.workspace = true
 
 [features]
 # The cuVS build. Off by default, so the crate builds anywhere; on, it
-# needs Linux and the conda environment in environment.yml (libcuvs and
-# the CUDA runtime).
-gpu = ["dep:cuvs", "dep:cuvs-sys"]
+# needs Linux, a C++20 compiler and the conda environment in
+# environment.yml (libcuvs, the CUDA runtime, CMake).
+gpu = ["dep:cmake"]
 
 [dependencies]
-cuvs = { workspace = true, optional = true }
-# Not used directly: listed only to hold cuvs-sys at the libcuvs version
-# (see the workspace manifest).
-cuvs-sys = { workspace = true, optional = true }
+thiserror.workspace = true
+
+[build-dependencies]
+cmake = { workspace = true, optional = true }
+
+[dev-dependencies]
+# The parity example writes each graph out as the service would.
+knn-write.workspace = true
+serde_json.workspace = true
 
 [[test]]
-name = "cagra_smoke"
+name = "cagra_build"
+required-features = ["gpu"]
+
+[[test]]
+name = "leak"
+required-features = ["gpu"]
+
+[[example]]
+name = "build_inputs"
 required-features = ["gpu"]
 
 [lints]

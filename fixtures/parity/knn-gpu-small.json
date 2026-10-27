@@ -1,0 +1,534 @@
+{
+  "knn_inspect": "knn-inspect 0.17.0",
+  "recall": {
+    "seed": 1,
+    "k": 10,
+    "queries": "the input's queries.f32"
+  },
+  "inputs": {
+    "ip-1000x64": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 64,
+        "space_type": "innerproduct",
+        "data_type": "float",
+        "blob_dtype": "<f4",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 1000,
+        "distribution": "standard normal, unit length",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 1.27,
+            "write": 0.026
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.155,
+            "write": 0.018
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.174,
+            "write": 0.025
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.158,
+            "write": 0.012
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.165,
+            "write": 0.026
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.155,
+        "max": 1.27,
+        "mean": 0.3844
+      }
+    },
+    "l2-1000x64": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 64,
+        "space_type": "l2",
+        "data_type": "float",
+        "blob_dtype": "<f4",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 1001,
+        "distribution": "standard normal",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.287,
+            "write": 0.023
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.162,
+            "write": 0.016
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.156,
+            "write": 0.017
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.165,
+            "write": 0.02
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 535737,
+          "seconds": {
+            "build": 0.164,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.156,
+        "max": 0.287,
+        "mean": 0.1868
+      }
+    },
+    "l2-1000x64-fp16": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 64,
+        "space_type": "l2",
+        "data_type": "half_float",
+        "blob_dtype": "<f2",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 1002,
+        "distribution": "standard normal",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.181,
+            "write": 0.016
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.163,
+            "write": 0.017
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.16,
+            "write": 0.013
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.147,
+            "write": 0.016
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.166,
+            "write": 0.014
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.147,
+        "max": 0.181,
+        "mean": 0.1634
+      }
+    },
+    "l2-1000x64-fp16from32": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 64,
+        "space_type": "l2",
+        "data_type": "half_float",
+        "blob_dtype": "<f4",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 1003,
+        "distribution": "standard normal",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.152,
+            "write": 0.015
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.16,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.158,
+            "write": 0.019
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.17,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407773,
+          "seconds": {
+            "build": 0.176,
+            "write": 0.013
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.152,
+        "max": 0.176,
+        "mean": 0.1632
+      }
+    },
+    "l2-1000x64-skip": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 64,
+        "space_type": "l2",
+        "data_type": "float",
+        "blob_dtype": "<f4",
+        "skip_stored_vectors": true,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 1004,
+        "distribution": "standard normal",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279696,
+          "seconds": {
+            "build": 0.162,
+            "write": 0.012
+          },
+          "out_of_range": 0,
+          "verify": "clean"
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279696,
+          "seconds": {
+            "build": 0.15,
+            "write": 0.016
+          },
+          "out_of_range": 0,
+          "verify": "clean"
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279696,
+          "seconds": {
+            "build": 0.163,
+            "write": 0.015
+          },
+          "out_of_range": 0,
+          "verify": "clean"
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279696,
+          "seconds": {
+            "build": 0.163,
+            "write": 0.015
+          },
+          "out_of_range": 0,
+          "verify": "clean"
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279696,
+          "seconds": {
+            "build": 0.155,
+            "write": 0.008
+          },
+          "out_of_range": 0,
+          "verify": "clean"
+        }
+      ],
+      "build_seconds": {
+        "min": 0.15,
+        "max": 0.163,
+        "mean": 0.1586
+      }
+    },
+    "l2-150x64": {
+      "input": {
+        "doc_count": 150,
+        "dimension": 64,
+        "space_type": "l2",
+        "data_type": "float",
+        "blob_dtype": "<f4",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 1005,
+        "distribution": "standard normal",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 59177,
+          "seconds": {
+            "build": 0.177,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 59177,
+          "seconds": {
+            "build": 0.147,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 59177,
+          "seconds": {
+            "build": 0.147,
+            "write": 0.012
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 59177,
+          "seconds": {
+            "build": 0.146,
+            "write": 0.017
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 59177,
+          "seconds": {
+            "build": 0.158,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.146,
+        "max": 0.177,
+        "mean": 0.155
+      }
+    }
+  }
+}

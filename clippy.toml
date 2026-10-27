@@ -8,4 +8,4 @@ allow-panic-in-tests = true
 allow-indexing-slicing-in-tests = true
 
 # Names that are not code and need no backticks in docs.
-doc-valid-idents = ["OpenSearch", "Faiss", "CAGRA", "cuVS", "HNSW", "IVF-PQ", ".."]
+doc-valid-idents = ["OpenSearch", "Faiss", "CAGRA", "cuVS", "HNSW", "IVF-PQ", "CMake", ".."]

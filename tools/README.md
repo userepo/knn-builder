@@ -62,4 +62,20 @@ $RUN $BASE tools/oracle/levels.py "fixtures/service/l2-1000x64*.faiss"
 $RUN $BASE tools/oracle/level_tables.py crates/knn-write/tests/data/level_tables.txt
 ```
 
+`oracle/build_tables.py` writes `knn-gpu`'s test data from the service's own code: the IVF-PQ list count and lowered m for every vector count up to 3,000, a stride of 97 to 60,000 (where m = 128 stops being lowered) and a spread to 2^31 - 1, the PQ dimension, and numpy's fp32 to fp16 conversion of 7,000 values. Run it in the api image, where the service's package is importable:
+
+```sh
+$RUN $API tools/oracle/build_tables.py crates/knn-gpu/tests/data
+```
+
+## Parity
+
+`knn-gpu`'s `build_inputs` example builds inputs as the service does, with `knn-gpu` and `knn-write`, and writes a `runs.json` that `baseline/score.py` scores like the service's (it carries its own timings and has no log). In WSL, in the conda environment:
+
+```sh
+cargo run --release -p knn-gpu --features gpu --example build_inputs -- target/inputs-large target/rust-baseline/large20 20
+```
+
+Then, from Windows or Linux, `python tools/baseline/score.py target/rust-baseline/large20 target/inputs-large ../knn-inspect/target/release/knn-inspect`, and the service's own 20 builds with `RUNS=20` as above.
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

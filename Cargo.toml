@@ -17,23 +17,23 @@ repository = "https://github.com/userepo/knn-builder"
 publish = false
 
 [workspace.dependencies]
-# knn-write: its error type.
+# knn-gpu's parity example writes each graph with it.
+knn-write = { path = "crates/knn-write" }
+
+# knn-write and knn-gpu: their error types.
 thiserror = "2.0.21"
+# knn-write's tests: fp32 to fp16, rounding to nearest even as numpy does.
+half = "2.7.1"
 
 # knn-write's tests: knn-inspect's reader and checks, at a pinned commit,
 # read back what the writer writes; fixtures and generated cases.
 knn-format = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
 knn-check = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
 proptest = "1.12.0"
-half = "2.7.1"
 serde_json = "1.0.154"
 
-# knn-gpu: the CAGRA build. Both crates are pinned exactly: their version
-# must match libcuvs 26.08.01, the one the upstream service's base image
-# installs (environment.yml). cuvs asks for cuvs-sys with a caret, which
-# would resolve to a newer cuvs-sys, so cuvs-sys is pinned here as well.
-cuvs = "=26.8.1"
-cuvs-sys = "=26.8.1"
+# knn-gpu's build script: builds its C++ shim over cuVS with CMake.
+cmake = "0.1.58"
 
 [workspace.lints.rust]
 ambiguous_negative_literals = "warn"
@@ -67,6 +67,6 @@ string_slice = "deny"
 indexing_slicing = "deny"
 exit = "deny"
 
-# `unsafe` is confined to the FFI with cuVS and the CUDA runtime; every
-# block carries a SAFETY comment.
+# `unsafe` is confined to the FFI with knn-gpu's C++ shim over cuVS and
+# with the CUDA runtime; every block carries a SAFETY comment.
 undocumented_unsafe_blocks = "deny"

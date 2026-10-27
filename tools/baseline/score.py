@@ -3,7 +3,9 @@ build, and knn-inspect `verify` and `recall` on every index file.
 
 Usage: python score.py OUT_DIR INPUTS_DIR KNN_INSPECT
   OUT_DIR      what run_baseline.py wrote (runs.json, <input>/run-<k>.faiss)
-               plus service.log, the service container's log
+               plus service.log, the service container's log; or what
+               knn-gpu's build_inputs example wrote, whose runs.json carries
+               each build's seconds itself and which has no log
   INPUTS_DIR   the inputs the run built (for queries.f32 and input.json)
   KNN_INSPECT  path to the knn-inspect binary
 
@@ -72,7 +74,8 @@ def spread(values):
 def main():
     out, inputs, binary = map(pathlib.Path, sys.argv[1:4])
     runs = json.loads((out / "runs.json").read_text())
-    steps = timings((out / "service.log").read_text(encoding="utf-8", errors="replace"))
+    log = out / "service.log"
+    steps = timings(log.read_text(encoding="utf-8", errors="replace")) if log.exists() else {}
 
     summary = {}
     builds_seen = {}
@@ -85,7 +88,9 @@ def main():
         builds_seen[path] = nth + 1
         row = {k: record[k] for k in ("run", "task_status", "wall_seconds", "size", "sha256") if k in record}
         slots = steps.get(path, [])
-        row["seconds"] = slots[nth] if nth < len(slots) else {}
+        row["seconds"] = slots[nth] if nth < len(slots) else record.get("seconds", {})
+        if "out_of_range" in record:
+            row["out_of_range"] = record["out_of_range"]
         if record["task_status"] == "COMPLETED_INDEX_BUILD":
             index = out / name / f"run-{run}.faiss"
             row["verify"] = knn_inspect(binary, "verify", str(index))["status"]
@@ -104,7 +109,9 @@ def main():
         builds = [r["seconds"]["build"] for r in entry["runs"] if "build" in r["seconds"]]
         if builds:
             entry["build_seconds"] = spread(builds)
-        entry["distinct_files"] = len({r.get("sha256") for r in entry["runs"]})
+        hashes = {r["sha256"] for r in entry["runs"] if "sha256" in r}
+        if hashes:
+            entry["distinct_files"] = len(hashes)
 
     report = {"knn_inspect": knn_inspect_version(binary), "recall": RECALL, "inputs": summary}
     # Bytes, not text: write_text would give CRLF line endings on Windows.
@@ -115,7 +122,7 @@ def main():
             "recall", entry.get("recall_at_10"),
             "build s", entry.get("build_seconds"),
             "verify", sorted({r.get("verify") for r in entry["runs"]}),
-            "distinct files", entry["distinct_files"],
+            "distinct files", entry.get("distinct_files", "-"),
         )
 
 
