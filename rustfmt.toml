@@ -1,0 +1,3 @@
+# Pin the style edition so direct rustfmt invocations (editors, hooks) match
+# `cargo fmt`, which infers it from `edition = "2024"` in Cargo.toml.
+style_edition = "2024"

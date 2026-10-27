@@ -1,0 +1,16 @@
+# The GPU build environment for knn-gpu: the libcuvs and CUDA versions of
+# the upstream remote-vector-index-builder base image at 3a02e64, plus the
+# CMake and DLPack that cuvs-sys uses to find libcuvs.
+#
+#   conda env create -f environment.yml
+#   conda activate knn-builder
+name: knn-builder
+channels:
+  - rapidsai
+  - conda-forge
+  - nvidia
+dependencies:
+  - libcuvs=26.08.01
+  - cuda-version=12.9
+  - cmake=4.4.4
+  - dlpack=1.3

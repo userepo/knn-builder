@@ -1,0 +1,11 @@
+# Test code keeps `unwrap` and indexing: the panic-hygiene denials in the
+# workspace lints target production code, where every panic site must
+# carry a written justification. In tests, panicking IS the failure
+# mechanism.
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+allow-indexing-slicing-in-tests = true
+
+# Names that are not code and need no backticks in docs.
+doc-valid-idents = ["OpenSearch", "Faiss", "CAGRA", "cuVS", "HNSW", "IVF-PQ", ".."]

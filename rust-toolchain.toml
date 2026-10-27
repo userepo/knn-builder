@@ -1,0 +1,5 @@
+# Every machine builds with this minor release; patch releases arrive
+# with `rustup update`. Move to a new minor release deliberately.
+[toolchain]
+channel = "1.99"
+components = ["rustfmt", "clippy"]

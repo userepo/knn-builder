@@ -1,0 +1,13 @@
+[package]
+name = "knn-store"
+description = "Object store transfers for a remote vector index build: vector download and index upload"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

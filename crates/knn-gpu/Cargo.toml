@@ -1,0 +1,29 @@
+[package]
+name = "knn-gpu"
+description = "CAGRA graph builds on the GPU through cuVS for a remote vector index build"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[features]
+# The cuVS build. Off by default, so the crate builds anywhere; on, it
+# needs Linux and the conda environment in environment.yml (libcuvs and
+# the CUDA runtime).
+gpu = ["dep:cuvs", "dep:cuvs-sys"]
+
+[dependencies]
+cuvs = { workspace = true, optional = true }
+# Not used directly: listed only to hold cuvs-sys at the libcuvs version
+# (see the workspace manifest).
+cuvs-sys = { workspace = true, optional = true }
+
+[[test]]
+name = "cagra_smoke"
+required-features = ["gpu"]
+
+[lints]
+workspace = true

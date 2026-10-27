@@ -1,0 +1,4 @@
+# Shell scripts break with CRLF line endings, which a Windows clone with
+# core.autocrlf=true would give them, and they are run from such clones
+# under WSL.
+*.sh text eol=lf
