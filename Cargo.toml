@@ -17,6 +17,17 @@ repository = "https://github.com/userepo/knn-builder"
 publish = false
 
 [workspace.dependencies]
+# knn-write: its error type.
+thiserror = "2.0.21"
+
+# knn-write's tests: knn-inspect's reader and checks, at a pinned commit,
+# read back what the writer writes; fixtures and generated cases.
+knn-format = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
+knn-check = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
+proptest = "1.12.0"
+half = "2.7.1"
+serde_json = "1.0.154"
+
 # knn-gpu: the CAGRA build. Both crates are pinned exactly: their version
 # must match libcuvs 26.08.01, the one the upstream service's base image
 # installs (environment.yml). cuvs asks for cuvs-sys with a caret, which

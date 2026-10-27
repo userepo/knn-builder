@@ -56,4 +56,10 @@ $RUN $BASE tools/oracle/oracle.py check target/baseline/small fixtures/inputs
 $RUN $BASE tools/oracle/levels.py "fixtures/service/l2-1000x64*.faiss"
 ```
 
+`oracle/level_tables.py` writes `knn-write`'s level-table test data from it: the probabilities and neighbor counts for every even M from 2 to 4,096 and level histograms over 2,100,000 nodes. Run it in the image, for glibc's `exp`:
+
+```sh
+$RUN $BASE tools/oracle/level_tables.py crates/knn-write/tests/data/level_tables.txt
+```
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

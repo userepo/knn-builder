@@ -8,8 +8,10 @@ Usage: python levels.py FILE_GLOB...
   computed assign_probas, cum_nneighbor_per_level, levels and offsets.
   Exits non-zero on any difference.
 
-Needs numpy (any version: only its MT19937 stream and float32 rounding
-are used, no float32 math).
+Needs numpy (any version: it uses only numpy's MT19937 stream and IEEE
+float32 conversion and division, which the standard requires to be
+correctly rounded, so every platform gives the same results; the exp goes
+through Python's math.exp, the C library's).
 """
 
 import glob
@@ -61,17 +63,20 @@ def level_table(n, m):
     probas, cum = default_probas(m)
     # numpy's legacy seeding is std::mt19937's; drawing the full 32-bit
     # range returns the raw outputs.
-    raw = np.random.RandomState(12345).randint(0, 2**32, size=n, dtype=np.uint64)
-    levels = np.empty(n, dtype=np.int32)
-    for i, r in enumerate(raw):
-        f = float(np.float32(r) / np.float32(4294967295))
-        level = len(probas) - 1
-        for j, p in enumerate(probas):
-            if f < p:
-                level = j
-                break
-            f -= p
-        levels[i] = level + 1
+    raw = np.random.RandomState(12345).randint(0, 2**32, size=n, dtype=np.uint64).astype(np.uint32)
+    # One float32 rounding of the draw and one of the quotient, then double.
+    rem = (raw.astype(np.float32) / np.float32(4294967295)).astype(np.float64)
+    # random_level, for every node at once with the same double arithmetic:
+    # the first level whose probability exceeds what is left, subtracting
+    # each one passed; past them all, the last.
+    level = np.full(n, len(probas) - 1, dtype=np.int32)
+    undecided = np.ones(n, dtype=bool)
+    for j, p in enumerate(probas):
+        hit = undecided & (rem < p)
+        level[hit] = j
+        undecided &= ~hit
+        rem = np.where(undecided, rem - p, rem)
+    levels = level + 1
     offsets = np.concatenate([[0], np.cumsum(np.array(cum)[levels])]).astype(np.uint64)
     return np.array(probas), np.array(cum, dtype=np.int32), levels, offsets
 

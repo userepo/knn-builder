@@ -27,3 +27,5 @@ yanked = "deny"
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
+# knn-write's tests read its output back with knn-inspect's crates.
+allow-git = ["https://github.com/userepo/knn-inspect"]

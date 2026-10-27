@@ -9,5 +9,17 @@ license.workspace = true
 repository.workspace = true
 publish.workspace = true
 
+[dependencies]
+thiserror.workspace = true
+
+[dev-dependencies]
+knn-format.workspace = true
+knn-check.workspace = true
+proptest.workspace = true
+# fp32 to fp16: for the fixture whose service build converted them, and
+# for the round trip's fp16 vectors.
+half.workspace = true
+serde_json.workspace = true
+
 [lints]
 workspace = true

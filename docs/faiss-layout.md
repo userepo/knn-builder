@@ -59,8 +59,10 @@ Every node gets an HNSW level, even though nothing but level 0 is used, and the 
 
 The same n and M give the same levels on every build, which is why the files' first bytes agree across runs while the graphs differ. For M = 32 the probabilities are 0.96875, 0.0302734..., six levels in all; the 20,000-vector baseline files hold levels 1 to 4 (19,372, 614, 13 and 1 nodes).
 
-`tools/oracle/levels.py` computes the whole table this way, without Faiss, and matches every baseline file. A Rust port must match the C library's double `exp` on these few arguments (the files were written with glibc; a port may also tabulate the probabilities for the degrees it supports) and the float32 rounding of the 32-bit draws, bit for bit. The golden files check both.
+`tools/oracle/levels.py` computes the whole table this way, without Faiss, and matches every baseline file. A port must match the C library's double `exp` on these few arguments (the files were written with glibc) and the float32 rounding of the 32-bit draws, bit for bit. `knn-write` computes the probabilities at run time; its tests hold them to glibc's values, from `tools/oracle/level_tables.py`, for every even M from 2 to 4,096 (a field's m up to 2,048) on Linux and Windows, and hold the draws to level histograms over 2,100,000 nodes, far enough to reach nodes where a draw computed in double instead of float lands on another level (the first is node 1,089,903 for M = 2). k-NN accepts any m above 0; a larger M is computed the same way but unverified.
 
 ## Order of the graph rows
 
 cuVS returns the graph as an n x degree array of `uint32`, row i for the i-th input vector; `copyTo` copies row i, in cuVS's order, to node i's level-0 slots (`GpuIndexCagra.cu`, end of `copyTo`). Node i is the i-th vector of the input and the i-th entry of `id_map`; the service never reorders.
+
+The ids pass through unchecked: `get_knngraph` widens cuVS's `uint32` ids to 64-bit `idx_t` (`impl/CuvsCagra.cu:349-369`), and `copyTo` stores them in Faiss's 32-bit signed neighbor slots, which keep the low 32 bits. An id from n up to 2^31 - 1 would land in the file as an invalid neighbor, and a larger one as a negative value, `u32::MAX` as -1, Faiss's empty slot. No baseline build held such an id. `knn-write` refuses one instead (`Error::NeighborOutOfRange`): the build fails and k-NN builds the segment on CPU.

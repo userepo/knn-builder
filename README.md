@@ -2,7 +2,7 @@
 
 A remote vector index build service for [OpenSearch k-NN](https://github.com/opensearch-project/k-NN), written in Rust. It is meant as a drop-in replacement for [remote-vector-index-builder](https://github.com/opensearch-project/remote-vector-index-builder): the same HTTP API, the same index files, and the same cuVS CAGRA build on the GPU, with less host memory per build and a GPU that stays busy while vectors download and indexes upload.
 
-**Status:** early development. The workspace builds, and a test checks that the GPU toolchain builds a CAGRA graph; the service itself does not exist yet.
+**Status:** early development. `knn-write` writes the index file the upstream service writes, identical to it on every test file; the GPU build, the storage transfers and the service itself do not exist yet.
 
 ## Building
 
