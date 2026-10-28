@@ -1191,6 +1191,14 @@ dependencies = [
 [[package]]
 name = "knn-builder"
 version = "0.1.0"
+dependencies = [
+ "aws-sdk-s3",
+ "knn-gpu",
+ "knn-store",
+ "knn-write",
+ "thiserror",
+ "tokio",
+]
 
 [[package]]
 name = "knn-check"

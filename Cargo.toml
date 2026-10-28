@@ -17,8 +17,12 @@ repository = "https://github.com/userepo/knn-builder"
 publish = false
 
 [workspace.dependencies]
-# knn-gpu's parity example writes each graph with it.
+# knn-gpu's parity example writes each graph with it; the service writes
+# every index with it.
 knn-write = { path = "crates/knn-write" }
+# The service's pipeline: the build, and the transfers around it.
+knn-gpu = { path = "crates/knn-gpu" }
+knn-store = { path = "crates/knn-store" }
 
 # knn-write and knn-gpu: their error types.
 thiserror = "2.0.21"
@@ -48,11 +52,15 @@ tokio = "1.54.1"
 [workspace.lints.rust]
 ambiguous_negative_literals = "warn"
 missing_debug_implementations = "warn"
+missing_docs = "warn"
 redundant_imports = "warn"
 redundant_lifetimes = "warn"
 trivial_numeric_casts = "warn"
 unsafe_op_in_unsafe_fn = "warn"
 unused_lifetimes = "warn"
+# `unsafe` lives in knn-gpu's FFI module and the GPU test that reads the
+# CUDA runtime's memory counters; each opts out with an `expect`.
+unsafe_code = "deny"
 
 [workspace.lints.clippy]
 cargo = { level = "warn", priority = -1 }
@@ -77,6 +85,6 @@ string_slice = "deny"
 indexing_slicing = "deny"
 exit = "deny"
 
-# `unsafe` is confined to the FFI with knn-gpu's C++ shim over cuVS and
-# with the CUDA runtime; every block carries a SAFETY comment.
+# Every `unsafe` block, in the places `unsafe_code` allows, carries a
+# SAFETY comment.
 undocumented_unsafe_blocks = "deny"

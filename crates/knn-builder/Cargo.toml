@@ -9,5 +9,22 @@ license.workspace = true
 repository.workspace = true
 publish.workspace = true
 
+[features]
+# Builds on the GPU through knn-gpu's cuVS shim; without it, only the
+# fake builder exists. Needs what knn-gpu's `gpu` feature needs.
+gpu = ["knn-gpu/gpu"]
+
+[dependencies]
+knn-gpu.workspace = true
+knn-store.workspace = true
+knn-write.workspace = true
+thiserror.workspace = true
+tokio = { workspace = true, features = ["rt", "rt-multi-thread", "sync", "macros"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["time"] }
+# The LocalStack tests set up and inspect their bucket with the SDK.
+aws-sdk-s3.workspace = true
+
 [lints]
 workspace = true

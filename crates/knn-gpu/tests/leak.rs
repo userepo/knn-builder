@@ -11,6 +11,10 @@
     clippy::indexing_slicing,
     reason = "test crate"
 )]
+#![expect(
+    unsafe_code,
+    reason = "reads the device's free memory through the CUDA runtime's C API"
+)]
 
 use std::ffi::c_int;
 

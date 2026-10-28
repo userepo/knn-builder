@@ -153,6 +153,12 @@ impl Graph {
         &self.neighbors
     }
 
+    /// The neighbor ids, row-major, without a copy.
+    #[must_use]
+    pub fn into_neighbors(self) -> Vec<u32> {
+        self.neighbors
+    }
+
     /// Neighbors per vector.
     #[must_use]
     pub fn degree(&self) -> usize {

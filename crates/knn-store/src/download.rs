@@ -2,7 +2,7 @@ use std::iter::Enumerate;
 use std::pin::pin;
 use std::slice::ChunksMut;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex, PoisonError};
+use std::sync::{Arc, Mutex};
 use std::thread;
 
 use aws_sdk_s3::types::ChecksumMode;
@@ -49,9 +49,8 @@ impl Cancel {
         self.0.set.load(Ordering::SeqCst)
     }
 
-    /// Resolves once the flag is set, for a transfer to race its waits
-    /// against.
-    pub(crate) async fn canceled(&self) {
+    /// Resolves once the flag is set: what a wait races to end early.
+    pub async fn canceled(&self) {
         let mut notified = pin!(self.0.notify.notified());
         // Registered before the flag is read, so a cancel in between still
         // wakes it.
@@ -94,7 +93,8 @@ impl Store {
     ///
     /// # Panics
     ///
-    /// When called in an async context.
+    /// When called in an async context; when `decode` panics, once the
+    /// other threads end their ranges; and, a bug, on a poisoned lock.
     pub fn download<T, D, const N: usize>(
         &self,
         bucket: &str,
@@ -156,13 +156,17 @@ impl Store {
                 });
             }
         });
-        let work = work.lock().unwrap_or_else(PoisonError::into_inner);
+        let work = work.lock().expect(POISONED);
         match &work.error {
             Some(error) => Err(error.clone()),
             None => Ok(()),
         }
     }
 }
+
+/// A download's lock is held only to take a range or record an error,
+/// neither of which can panic; a poisoned lock is a bug.
+const POISONED: &str = "download work lock poisoned: a holder panicked";
 
 /// The ranges a download's threads share, and its first error.
 struct Work<'a, T> {
@@ -174,7 +178,7 @@ impl<'a, T> Work<'a, T> {
     /// The next range and its index, until the ranges run out or one
     /// fails.
     fn next(work: &Mutex<Self>) -> Option<(usize, &'a mut [T])> {
-        let mut work = work.lock().unwrap_or_else(PoisonError::into_inner);
+        let mut work = work.lock().expect(POISONED);
         if work.error.is_some() {
             return None;
         }
@@ -183,7 +187,7 @@ impl<'a, T> Work<'a, T> {
 
     /// Records an error; the first one stands.
     fn fail(work: &Mutex<Self>, error: Error) {
-        let mut work = work.lock().unwrap_or_else(PoisonError::into_inner);
+        let mut work = work.lock().expect(POISONED);
         work.error.get_or_insert(error);
     }
 }

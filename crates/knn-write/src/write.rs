@@ -99,7 +99,8 @@ pub struct IndexSpec<'a> {
     /// Neighbors per node; even, as the service's m x 4 always is.
     pub graph_degree: usize,
     /// The vectors. Their type is recorded even when they are not
-    /// written.
+    /// written; with `skip_stored_vectors`, only the type counts, and they
+    /// may be empty, so a caller can free them before the write.
     pub vectors: Vectors<'a>,
     /// The doc ids, one per vector, in node order.
     pub ids: &'a [i32],
@@ -187,7 +188,7 @@ impl<'a> IndexFile<'a> {
             });
         }
         let expected = len.checked_mul(spec.dimension).ok_or(Error::TooLarge)?;
-        if spec.vectors.len() != expected {
+        if !spec.skip_stored_vectors && spec.vectors.len() != expected {
             return Err(Error::VectorsLength {
                 actual: spec.vectors.len(),
                 expected,
@@ -493,6 +494,36 @@ mod tests {
             file.write_to(&mut out).unwrap();
             assert_eq!(out.len() as u64, file.size());
         }
+    }
+
+    #[test]
+    fn needs_only_the_type_of_skipped_vectors() {
+        let halves = [0_u16; 10];
+        for (full, empty) in [
+            (Vectors::F32(&VECTORS), Vectors::F32(&[])),
+            (Vectors::F16(&halves), Vectors::F16(&[])),
+        ] {
+            let bytes = |vectors| {
+                let file = IndexFile::new(IndexSpec {
+                    vectors,
+                    skip_stored_vectors: true,
+                    ..spec()
+                })
+                .unwrap();
+                let mut out = Vec::new();
+                file.write_to(&mut out).unwrap();
+                out
+            };
+            assert_eq!(bytes(empty), bytes(full));
+        }
+        // Written, they must all be there.
+        assert!(matches!(
+            error(IndexSpec {
+                vectors: Vectors::F32(&[]),
+                ..spec()
+            }),
+            Error::VectorsLength { .. }
+        ));
     }
 
     #[test]
