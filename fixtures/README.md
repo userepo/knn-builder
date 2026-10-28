@@ -27,4 +27,6 @@ Synthetic inputs and the files the upstream service built from them, at commit 3
 | `parity/knn-gpu-small.json` | 5 builds of every committed input by the same example |
 | `parity/c-api-20000x128.json` | 20 builds of the 20,000 x 128 inputs by an earlier `knn-gpu` that called cuVS's C API, which cannot pass two IVF-PQ search settings (`docs/params.md`) |
 
+`peak/l2-1000000x768.json` holds one build of the 1M x 768 fp32 input (`make_inputs.py peak`) by each service, on LocalStack: the whole job through `knn-builder`'s pipeline on the GPU (its `e2e` example) and through the service, with stage times, knn-inspect `verify` and `recall`, and the building process's peak resident memory (`VmHWM`). `knn-builder` peaked at 4.24 GB, the service at 8.28 GB; both index files are 3,352,129,561 bytes and verify clean.
+
 Builds are not reproducible: the five files of one input share their headers and level tables but differ in their graphs, so `knn-gpu` is held to the recall spread, and `knn-write` to the oracle, which rebuilds each of these files exactly from its own graph.

@@ -12,9 +12,12 @@ Each input is a directory holding
 The doc ids are a shuffled, spread-out set rather than 0..n, so a writer
 that confuses positions and ids cannot pass by accident.
 
-Usage: python make_inputs.py {small,large} OUT_DIR
+Usage: python make_inputs.py {small,large,peak} OUT_DIR
   small  the committed fixtures (fixtures/inputs)
   large  the inputs for measuring recall spread (not committed)
+  peak   1M x 768 fp32, for measuring peak host memory (not committed;
+         3 GB of vectors, drawn in float32 chunks so writing it takes
+         little memory)
 
 Runs in the remote-vector-index-builder image, for its numpy.
 """
@@ -52,7 +55,16 @@ SETS = {
         "ip-20000x128": (1000, 20000, 128, "innerproduct", "float", "<f4", False),
         "l2-20000x128": (1001, 20000, 128, "l2", "float", "<f4", False),
     },
+    "peak": {
+        "l2-1000000x768": (1006, 1_000_000, 768, "l2", "float", "<f4", False),
+    },
 }
+
+# Above this many values an input's vectors are drawn in float32 chunks and
+# written as they are drawn: a float64 draw of 1M x 768 alone takes 6 GB.
+# The smaller sets keep their float64 draws, and so their data.
+CHUNKED_VALUES = 100_000_000
+CHUNK_ROWS = 10_000
 
 
 def draw(rng, rows, dim, unit):
@@ -62,17 +74,31 @@ def draw(rng, rows, dim, unit):
     return x
 
 
+def draw32(rng, rows, dim, unit):
+    x = rng.standard_normal((rows, dim), dtype=np.float32)
+    if unit:
+        x /= np.linalg.norm(x, axis=1, keepdims=True)
+    return x
+
+
 def write_input(out, name, spec):
     seed, doc_count, dim, space, data_type, blob_dtype, skip = spec
     rng = np.random.default_rng(seed)
     unit = space == "innerproduct"
-    vectors = draw(rng, doc_count, dim, unit)
-    queries = draw(rng, QUERIES, dim, unit)
-    doc_ids = (rng.permutation(doc_count).astype(np.int64) * 3 + 7).astype("<i4")
-
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
-    (d / "vectors.knnvec").write_bytes(vectors.astype(blob_dtype).tobytes())
+    if doc_count * dim > CHUNKED_VALUES:
+        with (d / "vectors.knnvec").open("wb") as f:
+            for start in range(0, doc_count, CHUNK_ROWS):
+                rows = min(CHUNK_ROWS, doc_count - start)
+                f.write(draw32(rng, rows, dim, unit).astype(blob_dtype).tobytes())
+        queries = draw32(rng, QUERIES, dim, unit)
+    else:
+        vectors = draw(rng, doc_count, dim, unit)
+        queries = draw(rng, QUERIES, dim, unit)
+        (d / "vectors.knnvec").write_bytes(vectors.astype(blob_dtype).tobytes())
+    doc_ids = (rng.permutation(doc_count).astype(np.int64) * 3 + 7).astype("<i4")
+
     (d / "doc_ids.knndid").write_bytes(doc_ids.tobytes())
     (d / "queries.f32").write_bytes(queries.astype("<f4").tobytes())
     meta = {
@@ -85,7 +111,8 @@ def write_input(out, name, spec):
         **ALGORITHM_PARAMETERS,
         "queries": QUERIES,
         "seed": seed,
-        "distribution": "standard normal" + (", unit length" if unit else ""),
+        "distribution": "standard normal" + (", unit length" if unit else "")
+        + (", float32 draws in chunks" if doc_count * dim > CHUNKED_VALUES else ""),
         "doc_ids": "permutation of 0..doc_count, times 3 plus 7",
     }
     (d / "input.json").write_bytes((json.dumps(meta, indent=2) + "\n").encode())

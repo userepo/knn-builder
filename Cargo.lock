@@ -1196,6 +1196,7 @@ dependencies = [
  "knn-gpu",
  "knn-store",
  "knn-write",
+ "serde_json",
  "thiserror",
  "tokio",
 ]

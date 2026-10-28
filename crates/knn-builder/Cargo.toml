@@ -25,6 +25,12 @@ tokio = { workspace = true, features = ["rt", "rt-multi-thread", "sync", "macros
 tokio = { workspace = true, features = ["time"] }
 # The LocalStack tests set up and inspect their bucket with the SDK.
 aws-sdk-s3.workspace = true
+# The e2e example reads the inputs' input.json and writes runs.json.
+serde_json.workspace = true
+
+[[example]]
+name = "e2e"
+required-features = ["gpu"]
 
 [lints]
 workspace = true

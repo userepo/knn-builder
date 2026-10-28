@@ -1,0 +1,58 @@
+{
+  "input": {
+    "doc_count": 1000000,
+    "dimension": 768,
+    "space_type": "l2",
+    "data_type": "float",
+    "blob_dtype": "<f4",
+    "skip_stored_vectors": false,
+    "m": 16,
+    "ef_construction": 100,
+    "ef_search": 100,
+    "queries": 100,
+    "seed": 1006,
+    "distribution": "standard normal, float32 draws in chunks",
+    "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+  },
+  "knn_inspect": "knn-inspect 0.17.0",
+  "recall": {
+    "seed": 1,
+    "k": 10,
+    "queries": "the input's queries.f32"
+  },
+  "host": "RTX 4070 Laptop (8 GB), 32 GB RAM, WSL2 and Docker Desktop on one 16 GB VM",
+  "peak_rss": "VmHWM of the building process after one job: knn-builder's e2e example, the service's fastapi process (PID 1 in its container)",
+  "knn_builder": {
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "wall_seconds": 30.017,
+    "size": 3352129561,
+    "seconds": {
+      "build": 16.613,
+      "download": 6.885,
+      "upload": 6.519
+    },
+    "verify": "clean",
+    "recall_at_10": 0.044,
+    "peak_rss_bytes": 4242571264,
+    "peak_rss_after_gpu_init_bytes": 252833792
+  },
+  "service": {
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "wall_seconds": 40.909,
+    "size": 3352129561,
+    "sha256": "50d93f70938f9b179b582c44866e1aa3b74b67ca144d3b251fa0dddb0816616b",
+    "seconds": {
+      "download": 6.61,
+      "build": 17.25,
+      "conversion": 1.93,
+      "write": 1.18,
+      "upload": 13.65
+    },
+    "verify": "clean",
+    "recall_at_10": 0.049,
+    "peak_rss_bytes": 8281792512,
+    "peak_rss_at_rest_bytes": 290766848
+  }
+}

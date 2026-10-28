@@ -78,4 +78,19 @@ cargo run --release -p knn-gpu --features gpu --example build_inputs -- target/i
 
 Then, from Windows or Linux, `python tools/baseline/score.py target/rust-baseline/large20 target/inputs-large ../knn-inspect/target/release/knn-inspect`, and the service's own 20 builds with `RUNS=20` as above.
 
+## Peak memory
+
+`knn-builder`'s `e2e` example runs whole jobs through its pipeline on the GPU against LocalStack: `put` uploads inputs, `build` runs them and appends each job's stage times and peak resident memory (`VmHWM`, reset before each job: what is resident when the job starts, the CUDA runtime and whatever the allocator kept from earlier jobs, plus the job's own peak; one job per invocation gives a job's figure alone) to `runs.json`, `get` streams the index files to disk for `score.py`. Each runs as a process of its own, so `put` and `get` stay out of the measured peak. In WSL, in the conda environment, with LocalStack on port 4566 and the S3 settings the service reads:
+
+```sh
+$RUN $API tools/make_inputs.py peak target/inputs-peak
+E2E="cargo run --release -p knn-builder --features gpu --example e2e --"
+$E2E put e2e target/inputs-peak l2-1000000x768
+$E2E build e2e target/inputs-peak target/e2e/peak l2-1000000x768
+$E2E get e2e target/e2e/peak
+python tools/baseline/score.py target/e2e/peak target/inputs-peak ../knn-inspect/target/release/knn-inspect
+```
+
+For the service, start `localstack` and `service` with `docker compose ... up -d`, run the runner with `docker compose ... run --rm runner` (`INPUTS=target/inputs-peak`, `RUNS=1`), and read the service's peak from `/proc/1/status` in its container (`VmHWM`) before taking it down. `fixtures/peak/` holds the result.
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.
