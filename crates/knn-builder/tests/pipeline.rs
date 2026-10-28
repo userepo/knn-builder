@@ -14,121 +14,22 @@
     reason = "test crate"
 )]
 
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+mod common;
 
-use aws_sdk_s3::Client;
-use aws_sdk_s3::primitives::ByteStream;
-use aws_sdk_s3::types::{
-    BucketLocationConstraint, CreateBucketConfiguration, ServerSideEncryption,
-};
+use std::time::Duration;
+
+use common::{S3, ids, le_ids};
 use knn_builder::{Builder, Built, DataType, FakeBuilder, Job, JobError, Pipeline, SpaceType};
 use knn_gpu::{BuildParams, fp16};
-use knn_store::{Settings, Store, Transfers};
 use knn_write::{IndexFile, IndexSpec, Vectors};
 
-const NEEDS_S3: &str = "needs LocalStack: set S3_ENDPOINT_URL and credentials (see the README)";
-
-struct S3 {
-    store: Store,
-    bucket: String,
+/// What the pipeline tests do with their bucket.
+trait Inputs {
+    async fn put_inputs(&self, job: &Job, values: &[f32], blob: Blob, kms_key: Option<&str>);
+    fn pipeline(&self, builder: impl Builder) -> Pipeline;
 }
 
-impl S3 {
-    async fn new(test: &str) -> Self {
-        let settings = Settings::from_env();
-        assert!(settings.endpoint_url.is_some(), "{NEEDS_S3}");
-        let store = Store::new(&settings, Transfers::default()).await;
-        let nanos = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
-        let bucket = format!("knn-builder-{test}-{nanos}");
-        let client = store.sdk_client();
-        let region = client.config().region().unwrap().to_string();
-        let mut create = client.create_bucket().bucket(&bucket);
-        if region != "us-east-1" {
-            create = create.create_bucket_configuration(
-                CreateBucketConfiguration::builder()
-                    .location_constraint(BucketLocationConstraint::from(region.as_str()))
-                    .build(),
-            );
-        }
-        create.send().await.unwrap();
-        Self { store, bucket }
-    }
-
-    fn client(&self) -> &Client {
-        self.store.sdk_client()
-    }
-
-    /// Deletes the bucket and everything in it.
-    async fn remove(self) {
-        let client = self.client();
-        let objects = client
-            .list_objects_v2()
-            .bucket(&self.bucket)
-            .send()
-            .await
-            .unwrap();
-        for object in objects.contents() {
-            client
-                .delete_object()
-                .bucket(&self.bucket)
-                .key(object.key().unwrap())
-                .send()
-                .await
-                .unwrap();
-        }
-        client
-            .delete_bucket()
-            .bucket(&self.bucket)
-            .send()
-            .await
-            .unwrap();
-    }
-
-    async fn put(&self, key: &str, bytes: Vec<u8>, kms_key: Option<&str>) {
-        let mut put = self
-            .client()
-            .put_object()
-            .bucket(&self.bucket)
-            .key(key)
-            .body(ByteStream::from(bytes));
-        if let Some(kms_key) = kms_key {
-            put = put
-                .server_side_encryption(ServerSideEncryption::AwsKms)
-                .ssekms_key_id(kms_key);
-        }
-        put.send().await.unwrap();
-    }
-
-    async fn get(&self, key: &str) -> Option<Vec<u8>> {
-        let object = self
-            .client()
-            .get_object()
-            .bucket(&self.bucket)
-            .key(key)
-            .send()
-            .await
-            .ok()?;
-        Some(object.body.collect().await.unwrap().to_vec())
-    }
-
-    async fn kms_key(&self, key: &str) -> Option<String> {
-        self.store.head(&self.bucket, key).await.unwrap().kms_key
-    }
-
-    async fn pending_uploads(&self) -> usize {
-        self.client()
-            .list_multipart_uploads()
-            .bucket(&self.bucket)
-            .send()
-            .await
-            .unwrap()
-            .uploads()
-            .len()
-    }
-
+impl Inputs for S3 {
     /// Puts a job's blobs: `values` encoded as `blob` says, and doc ids
     /// counting down from 9,999.
     async fn put_inputs(&self, job: &Job, values: &[f32], blob: Blob, kms_key: Option<&str>) {
@@ -144,9 +45,9 @@ impl S3 {
             .await;
     }
 
-    /// A pipeline on this store.
+    /// A pipeline on this store, with no host-memory budget to speak of.
     fn pipeline(&self, builder: impl Builder) -> Pipeline {
-        Pipeline::start(self.store.clone(), builder)
+        Pipeline::start(self.store.clone(), builder, u64::MAX)
     }
 }
 
@@ -184,16 +85,6 @@ fn halves(values: &[f32]) -> Vec<u16> {
     let mut out = vec![0; values.len()];
     fp16::convert(values, &mut out);
     out
-}
-
-fn ids(count: u32) -> Vec<i32> {
-    (0..i32::try_from(count).unwrap())
-        .map(|i| 9_999 - i)
-        .collect()
-}
-
-fn le_ids(ids: &[i32]) -> Vec<u8> {
-    ids.iter().flat_map(|v| v.to_le_bytes()).collect()
 }
 
 /// The file the pipeline must store for `job`: knn-write's, from the
@@ -304,6 +195,78 @@ async fn overlaps_the_stages() {
     // The third waits for the second's slot: it cannot download before
     // the builder, done with the first, has taken the second.
     assert!(third.download.start >= first.build.end);
+    s3.remove().await;
+}
+
+/// 2 MiB: two small jobs (1 MiB each, rounded up) fit at once, and a
+/// large one (about 7.7 MB) takes all of it.
+const BUDGET: u64 = 2 << 20;
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn keeps_the_jobs_in_memory_within_the_budget() {
+    let s3 = S3::new("budget").await;
+    let jobs = [
+        job(&s3.bucket, "small1", 600, 16),
+        job(&s3.bucket, "small2", 600, 16),
+        job(&s3.bucket, "large", 20_000, 32),
+        job(&s3.bucket, "small3", 600, 16),
+    ];
+    for job in &jobs {
+        s3.put_inputs(job, &values(job), Blob::F32, None).await;
+    }
+    let builder = FakeBuilder::new(Duration::from_millis(400));
+    let pipeline = Pipeline::start(s3.store.clone(), builder, BUDGET);
+    let handles: Vec<_> = jobs
+        .iter()
+        .map(|job| pipeline.submit(job.clone()))
+        .collect();
+    let mut timings = Vec::new();
+    for handle in handles {
+        timings.push(handle.outcome().await.unwrap().timings);
+    }
+    pipeline.close().await;
+    let [small1, small2, large, small3] = [0, 1, 2, 3].map(|i| timings[i]);
+
+    // Two small jobs fit: the second downloads while the first builds.
+    assert!(small2.download.start < small1.build.end);
+    // The large one waits until both have ended, and the next small one
+    // until it has: neither downloads while the builder works.
+    assert!(large.download.start >= small2.upload.end);
+    assert!(small3.download.start >= large.upload.end);
+    s3.remove().await;
+}
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn cancels_a_job_waiting_for_memory() {
+    let s3 = S3::new("budget-cancel").await;
+    let first = job(&s3.bucket, "first", 600, 16);
+    let waiting = job(&s3.bucket, "waiting", 20_000, 32);
+    let after = job(&s3.bucket, "after", 600, 16);
+    for job in [&first, &waiting, &after] {
+        s3.put_inputs(job, &values(job), Blob::F32, None).await;
+    }
+    let builder = FakeBuilder::new(Duration::from_secs(1));
+    let pipeline = Pipeline::start(s3.store.clone(), builder.clone(), BUDGET);
+    let first = pipeline.submit(first);
+    // The large one waits for the first's memory, through its build, and
+    // the small one behind it waits in the queue.
+    let second = pipeline.submit(waiting.clone());
+    let third = pipeline.submit(after);
+    tokio::time::sleep(Duration::from_millis(300)).await;
+    second.cancel();
+    let ended = tokio::time::timeout(Duration::from_millis(300), second.outcome()).await;
+    assert_eq!(ended, Ok(Err(JobError::Canceled)));
+    let first = first.outcome().await.unwrap().timings;
+    let third = third.outcome().await.unwrap().timings;
+    // Once the large one is gone, the small one fits beside the first,
+    // and downloads while the first still builds.
+    assert!(third.download.start < first.build.end);
+    // The large one was never built.
+    assert_eq!(builder.builds(), 2);
+    pipeline.close().await;
+    assert_eq!(s3.get(&waiting.index_key()).await, None);
     s3.remove().await;
 }
 

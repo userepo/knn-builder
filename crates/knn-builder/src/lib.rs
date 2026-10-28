@@ -2,7 +2,9 @@
 //! [`Job`] is downloaded from S3 into host memory, its CAGRA graph built
 //! by a [`Builder`] (the GPU, or [`FakeBuilder`] in tests), and its index
 //! file written straight into an upload, with no temporary file; a
-//! [`Pipeline`] overlaps those three stages across jobs.
+//! [`Pipeline`] overlaps those three stages across jobs. [`request`]
+//! reads a build request as the upstream service does, and [`service`]
+//! holds the jobs and feeds them to a pipeline.
 
 mod builder;
 mod error;
@@ -10,6 +12,7 @@ mod job;
 mod load;
 mod pipeline;
 pub mod request;
+pub mod service;
 mod write;
 
 pub use builder::{BuildError, Builder, FakeBuilder, Vectors};

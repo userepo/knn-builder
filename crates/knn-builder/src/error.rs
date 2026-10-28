@@ -32,7 +32,7 @@ pub enum JobError {
         values: u64,
     },
     /// A request parameter the service accepts but no build can take:
-    /// a count past 32 bits, say. The service fails such a job too.
+    /// an m below 0, say. The service fails such a job too.
     #[error("{name} {value} is outside {min} to {max}")]
     OutOfRange {
         /// The request's name for the parameter.

@@ -6,6 +6,12 @@
 //! stage has room, and at most three jobs hold host memory: one
 //! downloading, one building, one uploading, or one in each stage's slot
 //! while the stage ahead finishes.
+//!
+//! Those jobs share a budget of host memory too: a job takes its
+//! buffers' share (vectors, doc ids, graph; not the transfers' own
+//! buffers) before it downloads and gives it back when it ends, so
+//! a large job waits until the ones ahead of it have made room. A job
+//! larger than the whole budget takes all of it, and runs alone.
 
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::Arc;
@@ -16,7 +22,7 @@ use std::time::{Duration, Instant};
 use knn_gpu::BuildParams;
 use knn_store::{Cancel, Store};
 use tokio::runtime::Handle;
-use tokio::sync::{mpsc, oneshot};
+use tokio::sync::{OwnedSemaphorePermit, Semaphore, mpsc, oneshot};
 use tokio::task::JoinHandle;
 
 use crate::load::{Dataset, load};
@@ -36,17 +42,23 @@ impl Pipeline {
     /// Starts the stages: the download and upload stages on the current
     /// Tokio runtime, which must be multi-threaded (the transfers block
     /// threads of their own and run their requests on it), and `builder`
-    /// on a thread of its own.
+    /// on a thread of its own. The jobs' buffers, their vectors, doc ids
+    /// and graphs, take `host_memory` bytes at most at once, counted in
+    /// whole MiB. The transfers' own buffers come on top: the one upload's
+    /// parts in memory, up to [`knn_store::Transfers`]'s
+    /// `upload_concurrency` plus two, of `part_size` or more (80 MiB at
+    /// least by default).
     ///
     /// # Panics
     ///
     /// When called outside a Tokio runtime.
-    pub fn start<B: Builder>(store: Store, builder: B) -> Self {
+    pub fn start<B: Builder>(store: Store, builder: B, host_memory: u64) -> Self {
         let runtime = Handle::current();
         let (queue, queued) = mpsc::unbounded_channel();
         let (to_build, loaded) = mpsc::channel(1);
         let (to_upload, graphed) = mpsc::channel(1);
-        let downloads = runtime.spawn(downloads(store.clone(), queued, to_build));
+        let budget = Budget::new(host_memory);
+        let downloads = runtime.spawn(downloads(store.clone(), queued, to_build, budget));
         let builds = {
             let runtime = runtime.clone();
             thread::spawn(move || builds(builder, loaded, &to_upload, &runtime))
@@ -167,6 +179,15 @@ impl Canceler {
         self.claim.withdraw();
         self.cancel.cancel();
     }
+
+    /// A canceler of no job, for tests of what holds one.
+    #[cfg(test)]
+    pub(crate) fn detached() -> Self {
+        Self {
+            cancel: Cancel::new(),
+            claim: Arc::default(),
+        }
+    }
 }
 
 /// Whether the download stage has started a job, or a cancel withdrew it
@@ -261,11 +282,46 @@ impl Queued {
     }
 }
 
+/// The host memory the jobs' buffers may take at once, in MiB.
+struct Budget {
+    mib: Arc<Semaphore>,
+    total: u32,
+}
+
+impl Budget {
+    const MIB: u64 = 1 << 20;
+
+    fn new(bytes: u64) -> Self {
+        // Whole MiB, at least one, and a count one permit can take.
+        let max = u32::try_from(Semaphore::MAX_PERMITS).unwrap_or(u32::MAX);
+        let total = u32::try_from(bytes / Self::MIB)
+            .unwrap_or(u32::MAX)
+            .clamp(1, max);
+        Self {
+            mib: Arc::new(Semaphore::new(total as usize)),
+            total,
+        }
+    }
+
+    /// Waits for `job`'s share: its buffers rounded up to whole MiB, or
+    /// the whole budget when they are larger.
+    async fn take(&self, job: &Job) -> OwnedSemaphorePermit {
+        let mib = job.host_bytes().div_ceil(Self::MIB);
+        let share = u32::try_from(mib).map_or(self.total, |mib| mib.clamp(1, self.total));
+        Arc::clone(&self.mib)
+            .acquire_many_owned(share)
+            .await
+            .expect("the budget is never closed")
+    }
+}
+
 /// A job downloaded, waiting to build.
 struct Loaded {
     queued: Queued,
     dataset: Dataset,
     download: Span,
+    /// Its share of the budget, given back when it ends.
+    memory: OwnedSemaphorePermit,
 }
 
 /// A job built, waiting to upload.
@@ -281,6 +337,7 @@ async fn downloads(
     store: Store,
     mut queued: mpsc::UnboundedReceiver<Queued>,
     to_build: mpsc::Sender<Loaded>,
+    budget: Budget,
 ) {
     while let Some(job) = queued.recv().await {
         // Its handle has ended it; no need to wait for a slot.
@@ -294,6 +351,15 @@ async fn downloads(
             job.fail(JobError::Stopped);
             continue;
         };
+        // Room for its buffers; a cancel meanwhile ends it, as it would in
+        // the queue.
+        let memory = tokio::select! {
+            memory = budget.take(&job.job) => memory,
+            () = job.cancel.canceled() => {
+                job.fail(JobError::Canceled);
+                continue;
+            }
+        };
         // From here on a cancel stops the transfers instead.
         if !job.claim.start() {
             job.fail(JobError::Canceled);
@@ -305,6 +371,7 @@ async fn downloads(
                 queued: job,
                 dataset,
                 download: Span::since(start),
+                memory,
             }),
             Err(error) => job.fail(error),
         }
@@ -387,6 +454,7 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
                     queued,
                     dataset,
                     download,
+                    memory,
                 },
             graph,
             degree,
@@ -413,6 +481,40 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
             // The runtime is shutting down.
             Err(_) => Err(JobError::Stopped),
         };
+        // The buffers are freed; the share goes back before the job ends,
+        // so the next one may start downloading at once.
+        drop(memory);
         _ = queued.report.send(outcome);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Budget;
+    use crate::job::tests::job;
+
+    #[test]
+    fn counts_the_budget_in_whole_mib() {
+        assert_eq!(Budget::new(0).total, 1, "never none");
+        assert_eq!(Budget::new((3 << 20) + 5).total, 3);
+        assert_eq!(Budget::new(32_000_000_000).total, 30_517);
+        assert!(Budget::new(u64::MAX).total > 30_517);
+    }
+
+    #[tokio::test]
+    async fn gives_a_job_its_share_or_all_of_it() {
+        let budget = Budget::new(4 << 20);
+        // About 0.18 MB, rounded up.
+        let small = job("bucket", 600, 16);
+        assert_eq!(budget.take(&small).await.num_permits(), 1);
+        // Between 1 and 2 MiB: rounded up, to 2.
+        let mid = job("bucket", 4_000, 32);
+        assert!((1 << 20..2 << 20).contains(&mid.host_bytes()));
+        assert_eq!(budget.take(&mid).await.num_permits(), 2);
+        // About 31 MB: larger than the budget, so all of it.
+        let large = job("bucket", 80_000, 64);
+        assert_eq!(budget.take(&large).await.num_permits(), 4);
+        // Given back when dropped.
+        assert_eq!(budget.mib.available_permits(), 4);
     }
 }

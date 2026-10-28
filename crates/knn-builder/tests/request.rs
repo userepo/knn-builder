@@ -122,7 +122,7 @@ fn answers_as_the_service_does() {
             200 => {
                 let parsed = parsed.unwrap_or_else(|r| panic!("{name}: {r:?}"));
                 assert_eq!(parsed.to_json(), case["parsed"], "{name}");
-                assert_eq!(parsed.job_id(), case["job_id"], "{name}");
+                assert_eq!(parsed.job_id().as_str(), case["job_id"], "{name}");
             }
             400 | 422 => {
                 let rejection = parsed.err().unwrap_or_else(|| panic!("{name}: accepted"));
@@ -269,7 +269,7 @@ fn derives_the_job_id_from_path_and_tenant() {
     };
     // printf 'p.knnvec-t' | sha256sum
     assert_eq!(
-        parse("t").job_id(),
+        parse("t").job_id().as_str(),
         "91f2e75221ddc094120b8234ee5b4af7a9b43caf860990ac9ec1c13f91812261"
     );
     assert_ne!(parse("t").job_id(), parse("u").job_id());

@@ -19,7 +19,7 @@
 //! 422 `json_invalid`, or with 400 where it is not UTF-8, as the service
 //! answers a body it cannot decode.
 
-use std::fmt::Write as _;
+use std::fmt::{self, Write as _};
 
 use serde_json::{Map, Value, json};
 use sha2::{Digest, Sha256};
@@ -117,17 +117,43 @@ impl Rejection {
     }
 }
 
+/// A job's id: the 64 hex digits [`BuildRequest::job_id`] derives, or
+/// whatever id a status request names, unchecked.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JobId(String);
+
+impl JobId {
+    /// The id as the service writes it.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+/// The id a status request names, which may be of no job.
+impl From<&str> for JobId {
+    fn from(id: &str) -> Self {
+        Self(id.to_owned())
+    }
+}
+
+impl fmt::Display for JobId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
 impl BuildRequest {
     /// The job id: the SHA-256 of the vector path and tenant id joined by
     /// a dash, in hex, as the service derives it. A request repeated, as
     /// k-NN retries one, finds its job.
     #[must_use]
-    pub fn job_id(&self) -> String {
+    pub fn job_id(&self) -> JobId {
         let digest = Sha256::digest(format!("{}-{}", self.vector_path, self.tenant_id));
-        digest.iter().fold(String::new(), |mut hex, b| {
+        JobId(digest.iter().fold(String::new(), |mut hex, b| {
             let _ = write!(hex, "{b:02x}");
             hex
-        })
+        }))
     }
 
     /// The parameters with defaults filled in, as the service's model

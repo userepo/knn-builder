@@ -74,6 +74,12 @@ $RUN $API tools/oracle/build_tables.py crates/knn-gpu/tests/data
 $RUN $API tools/oracle/requests.py crates/knn-builder/tests/data/requests.json
 ```
 
+`oracle/capacity.py` records how the service sizes a request, for `knn-builder`'s job store: the GPU and CPU memory estimates of its `calculate_memory_requirements` for some 400 requests, many on either side of a limit, whether each passes the default limits and a smaller GPU's, a few requests under limits equal to their own estimates (the service's comparison at its edge), the messages of its two 507s from its own `JobService`, and its defaults for the store and the limits. Run it in the api image:
+
+```sh
+$RUN $API tools/oracle/capacity.py crates/knn-builder/tests/data/capacity.json
+```
+
 ## Parity
 
 `knn-gpu`'s `build_inputs` example builds inputs as the service does, with `knn-gpu` and `knn-write`, and writes a `runs.json` that `baseline/score.py` scores like the service's (it carries its own timings and has no log). In WSL, in the conda environment:

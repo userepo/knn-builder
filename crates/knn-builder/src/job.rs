@@ -90,6 +90,31 @@ impl Job {
             .map_or(key.as_str(), |(_, name)| name)
             .to_owned()
     }
+
+    /// The host memory the job's buffers take, in bytes: the vectors as
+    /// downloaded (fp16 for `half_float`, whatever the blob holds), the
+    /// doc ids, and the graph. Saturating, past any memory.
+    pub(crate) fn host_bytes(&self) -> u64 {
+        let (doc_count, dimension) = (u64::from(self.doc_count), u64::from(self.dimension));
+        let value_size = match self.data_type {
+            DataType::Float => 4,
+            DataType::HalfFloat => 2,
+        };
+        // No graph when the parameters fail; the job fails before one.
+        let degree = knn_gpu::BuildParams::new(
+            self.doc_count,
+            self.dimension,
+            self.m,
+            self.space_type.build_metric(),
+        )
+        .map_or(0, |params| u64::from(params.graph_degree));
+        let vectors = doc_count
+            .saturating_mul(dimension)
+            .saturating_mul(value_size);
+        let ids = doc_count * 4;
+        let graph = doc_count.saturating_mul(degree).saturating_mul(4);
+        vectors.saturating_add(ids).saturating_add(graph)
+    }
 }
 
 #[cfg(test)]
@@ -127,6 +152,27 @@ pub(crate) mod tests {
             SpaceType::InnerProduct.file_metric(),
             knn_write::Metric::InnerProduct
         );
+    }
+
+    #[test]
+    fn sizes_the_buffers_a_job_holds() {
+        // The degree is knn-gpu's to derive (m 16 is lowered at 600).
+        let mut job = job("bucket", 600, 16);
+        let degree = knn_gpu::BuildParams::new(600, 16, 16, knn_gpu::Metric::L2)
+            .unwrap()
+            .graph_degree;
+        let (ids, graph) = (600 * 4, 600 * u64::from(degree) * 4);
+        assert_eq!(job.host_bytes(), 600 * 16 * 4 + ids + graph);
+        job.data_type = DataType::HalfFloat;
+        assert_eq!(job.host_bytes(), 600 * 16 * 2 + ids + graph);
+        job.m = 0;
+        assert_eq!(job.host_bytes(), 600 * 16 * 2 + ids, "no graph");
+        let large = Job {
+            doc_count: u32::MAX,
+            dimension: u32::MAX,
+            ..job
+        };
+        assert_eq!(large.host_bytes(), u64::MAX);
     }
 
     #[test]

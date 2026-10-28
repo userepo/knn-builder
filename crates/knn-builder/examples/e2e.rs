@@ -125,7 +125,8 @@ fn reset_peak_rss() {
 async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, names: &[String]) {
     let gpu = Gpu::new().unwrap();
     let after_init = peak_rss();
-    let pipeline = Pipeline::start(store.clone(), gpu);
+    // One job at a time, so no budget is needed.
+    let pipeline = Pipeline::start(store.clone(), gpu, u64::MAX);
     let runs_path = out.join("runs.json");
     let mut runs: Vec<Value> = fs::read(&runs_path)
         .ok()

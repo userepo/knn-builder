@@ -1,0 +1,5063 @@
+{
+ "defaults": {
+  "max_jobs": 10000,
+  "ttl_seconds": 1800,
+  "gpu_memory_limit": 24000000000.0,
+  "cpu_memory_limit": 32000000000.0
+ },
+ "limits": [
+  {
+   "gpu": 24000000000.0,
+   "cpu": 32000000000.0
+  },
+  {
+   "gpu": 8000000000.0,
+   "cpu": 64000000000.0
+  }
+ ],
+ "estimates": [
+  {
+   "dimension": 768,
+   "doc_count": 4854366,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8543684160.000001,
+   "cpu": 31999980672.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4854367,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8543685920.000001,
+   "cpu": 31999987264.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4854368,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8543687680.000001,
+   "cpu": 31999993856.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4854369,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8543689440.000001,
+   "cpu": 32000000448.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4854370,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8543691200.000001,
+   "cpu": 32000007040.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9708735,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 17087373600.000002,
+   "cpu": 63999981120.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9708736,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 17087375360.000002,
+   "cpu": 63999987712.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9708737,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 17087377120.000002,
+   "cpu": 63999994304.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9708738,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 17087378880.000002,
+   "cpu": 64000000896.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9708739,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 17087380640.000002,
+   "cpu": 64000007488.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 13636361,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 23999995360.000004,
+   "cpu": 89890891712.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 13636362,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 23999997120.000004,
+   "cpu": 89890898304.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 13636363,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 23999998880.000004,
+   "cpu": 89890904896.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 13636364,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 24000000640.000004,
+   "cpu": 89890911488.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 13636365,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 24000002400.000004,
+   "cpu": 89890918080.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4545452,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 7999995520.000001,
+   "cpu": 29963619584.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4545453,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 7999997280.000001,
+   "cpu": 29963626176.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4545454,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 7999999040.000001,
+   "cpu": 29963632768.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4545455,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8000000800.000001,
+   "cpu": 29963639360.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 4545456,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8000002560.000001,
+   "cpu": 29963645952.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9505701,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8699617555.2,
+   "cpu": 31999991846.4,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9505702,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8699618470.4,
+   "cpu": 31999995212.8,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9505703,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8699619385.6,
+   "cpu": 31999998579.2,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9505704,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8699620300.800001,
+   "cpu": 32000001945.600002,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 9505705,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8699621216.0,
+   "cpu": 32000005312.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 19011404,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 17399236940.8,
+   "cpu": 63999990425.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 19011405,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 17399237856.0,
+   "cpu": 63999993792.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 19011406,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 17399238771.2,
+   "cpu": 63999997158.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 19011407,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 17399239686.4,
+   "cpu": 64000000524.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 19011408,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 17399240601.600002,
+   "cpu": 64000003891.200005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 26223774,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 23999997964.800003,
+   "cpu": 88279712793.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 26223775,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 23999998880.0,
+   "cpu": 88279716160.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 26223776,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 23999999795.2,
+   "cpu": 88279719526.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 26223777,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 24000000710.4,
+   "cpu": 88279722892.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 26223778,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 24000001625.600002,
+   "cpu": 88279726259.20001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 8741256,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 7999997491.200001,
+   "cpu": 29426564198.4,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 8741257,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 7999998406.400001,
+   "cpu": 29426567564.800003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 8741258,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 7999999321.6,
+   "cpu": 29426570931.2,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 8741259,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8000000236.8,
+   "cpu": 29426574297.6,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 8741260,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8000001152.0,
+   "cpu": 29426577664.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 23584903,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 9962263027.2,
+   "cpu": 31999996390.4,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 23584904,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 9962263449.6,
+   "cpu": 31999997747.2,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 23584905,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 9962263872.0,
+   "cpu": 31999999104.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 23584906,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 9962264294.400002,
+   "cpu": 32000000460.800003,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 23584907,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 9962264716.800001,
+   "cpu": 32000001817.600002,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 47169809,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 19924527321.600002,
+   "cpu": 63999996851.200005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 47169810,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 19924527744.0,
+   "cpu": 63999998208.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 47169811,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 19924528166.4,
+   "cpu": 63999999564.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 47169812,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 19924528588.800003,
+   "cpu": 64000000921.600006,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 47169813,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 19924529011.2,
+   "cpu": 64000002278.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 56818179,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 23999998809.600002,
+   "cpu": 77090905267.20001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 56818180,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 23999999232.000004,
+   "cpu": 77090906624.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 56818181,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 23999999654.4,
+   "cpu": 77090907980.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 56818182,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 24000000076.800003,
+   "cpu": 77090909337.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 56818183,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 24000000499.2,
+   "cpu": 77090910694.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 18939391,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 7999998758.400001,
+   "cpu": 25696965708.800003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 18939392,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 7999999180.8,
+   "cpu": 25696967065.6,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 18939393,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 7999999603.200001,
+   "cpu": 25696968422.4,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 18939394,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 8000000025.6,
+   "cpu": 25696969779.2,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 18939395,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 8000000448.000001,
+   "cpu": 25696971136.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4906769,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8463195171.200001,
+   "cpu": 31999984710.4,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4906770,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8463196896.000001,
+   "cpu": 31999991232.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4906771,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8463198620.800001,
+   "cpu": 31999997753.600002,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4906772,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8463200345.600001,
+   "cpu": 32000004275.200005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4906773,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8463202070.400001,
+   "cpu": 32000010796.800003,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 9813540,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 16926393792.000002,
+   "cpu": 63999982464.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 9813541,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 16926395516.800001,
+   "cpu": 63999988985.600006,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 9813542,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 16926397241.600002,
+   "cpu": 63999995507.200005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 9813543,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 16926398966.400002,
+   "cpu": 64000002028.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 9813544,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 16926400691.200003,
+   "cpu": 64000008550.40001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 13914654,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 23999995219.2,
+   "cpu": 90745807526.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 13914655,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 23999996944.000004,
+   "cpu": 90745814048.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 13914656,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 23999998668.800003,
+   "cpu": 90745820569.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 13914657,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 24000000393.600002,
+   "cpu": 90745827091.20001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 13914658,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 24000002118.4,
+   "cpu": 90745833612.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4638216,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 7999994956.800001,
+   "cpu": 30248589465.600002,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4638217,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 7999996681.6,
+   "cpu": 30248595987.2,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4638218,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 7999998406.400001,
+   "cpu": 30248602508.800003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4638219,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8000000131.200001,
+   "cpu": 30248609030.4,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 4638220,
+   "data_type": "half_float",
+   "m": 8,
+   "gpu": 8000001856.000001,
+   "cpu": 30248615552.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1269841267,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8380952362.200001,
+   "cpu": 31999999928.4,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1269841268,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8380952368.800001,
+   "cpu": 31999999953.600002,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1269841269,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8380952375.400001,
+   "cpu": 31999999978.800003,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1269841270,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8380952382.000001,
+   "cpu": 32000000004.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1269841271,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8380952388.6,
+   "cpu": 32000000029.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 2539682537,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 16761904744.2,
+   "cpu": 63999999932.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 2539682538,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 16761904750.800001,
+   "cpu": 63999999957.600006,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 2539682539,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 16761904757.400002,
+   "cpu": 63999999982.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 2539682540,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 16761904764.000002,
+   "cpu": 64000000008.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 2539682541,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 16761904770.600002,
+   "cpu": 64000000033.200005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 3636363634,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 23999999984.4,
+   "cpu": 91636363576.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 3636363635,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 23999999991.000004,
+   "cpu": 91636363602.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 3636363636,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 23999999997.600002,
+   "cpu": 91636363627.20001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 3636363637,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 24000000004.2,
+   "cpu": 91636363652.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 3636363638,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 24000000010.800003,
+   "cpu": 91636363677.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1212121210,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 7999999986.000001,
+   "cpu": 30545454492.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1212121211,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 7999999992.6,
+   "cpu": 30545454517.2,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1212121212,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 7999999999.200001,
+   "cpu": 30545454542.4,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1212121213,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8000000005.8,
+   "cpu": 30545454567.6,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1212121214,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 8000000012.400001,
+   "cpu": 30545454592.800003,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 6,
+   "doc_count": 50,
+   "data_type": "float",
+   "m": 72727267,
+   "gpu": 15999999400.0,
+   "cpu": 32000000000.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 12,
+   "doc_count": 25,
+   "data_type": "float",
+   "m": 145454534,
+   "gpu": 15999999400.0,
+   "cpu": 32000000000.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 797528054091,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 2691497676946307.0,
+   "cpu": 1.0283007718227718e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 16896.0,
+   "cpu": 44032.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 682.0,
+   "cpu": 2644.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 136400.0,
+   "cpu": 528800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 1019702223,
+   "gpu": 4486689783400000.5,
+   "cpu": 8973379570800001.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -895344709,
+   "gpu": -3939516713000.0005,
+   "cpu": -7879033414000.001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 844800.0000000001,
+   "cpu": 3225600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 19712.000000000004,
+   "cpu": 54784.00000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 11968.000000000002,
+   "cpu": 44416.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 2252800000.0,
+   "cpu": 8601600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2675200000.0000005,
+   "cpu": 6118400000.000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 211200.00000000003,
+   "cpu": 678400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 1804.0,
+   "cpu": 5608.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 1685200.0,
+   "cpu": 6442400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 360800000.0,
+   "cpu": 1121600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 22.0,
+   "cpu": 84.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 901371972,
+   "data_type": "float",
+   "m": 1721539271,
+   "gpu": 6.82768789528659e+18,
+   "cpu": 1.3655375801389644e+19,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 22528.0,
+   "cpu": 65536.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 1655144797,
+   "gpu": 7282646118000.001,
+   "cpu": 14565308620000.002,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 754155879834,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 1.3326236059018714e+16,
+   "cpu": 5.078546027272542e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 672673321,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 3027837152485.2007,
+   "cpu": 11566214150602.402,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 20452230,
+   "gpu": 449971588.00000006,
+   "cpu": 899984136.0000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 2165750585,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 159615818114.5,
+   "cpu": 332226139739.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1054220386129,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 519519806284371.25,
+   "cpu": 1848680869115814.5,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8800.000000000002,
+   "cpu": 32960.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1683786148,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1422462537830.4001,
+   "cpu": 5431220598988.801,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": -722091748,
+   "gpu": -3177202564800000.0,
+   "cpu": -6354403081600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 410202804,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 691273765300.8,
+   "cpu": 2642690544489.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -824407508,
+   "gpu": -3627391345600.0005,
+   "cpu": -7254779619200.001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 2252800000.0,
+   "cpu": 8601600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 250800.0,
+   "cpu": 701600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 6758400000.000001,
+   "cpu": 21708800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 11968.000000000002,
+   "cpu": 25216.000000000004,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 1100.0,
+   "cpu": 4200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 2880968246,
+   "data_type": "float",
+   "m": 1013308964,
+   "gpu": 1.2844977909520988e+19,
+   "cpu": 2.568997351971088e+19,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -876121870,
+   "gpu": -19274675508.0,
+   "cpu": -38549340776.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 1631953457,
+   "gpu": 7180596055600000.0,
+   "cpu": 1.43611936472e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 2626047247,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 9243686309440.002,
+   "cpu": 34621806904448.004,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 3928035958,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 3301121419103.2,
+   "cpu": 12635706069694.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1279953651,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1081304844364.8,
+   "cpu": 4128618496665.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1244049494,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 350324337510.4,
+   "cpu": 1337602015948.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": -16.5,
+   "cpu": -23.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1559182516,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 1426963838643.2,
+   "cpu": 5248832021862.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": -2200.0,
+   "cpu": -400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 35340800.0,
+   "cpu": 134681600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 4202.0,
+   "cpu": 16084.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 1196800.0000000002,
+   "cpu": 4441600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 9152.0,
+   "cpu": 33664.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 3379200.0000000005,
+   "cpu": 8806400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2675200.0000000005,
+   "cpu": 6118400.000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 377045852634,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 316869334553613.6,
+   "cpu": 1212881098753051.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 110000000.00000001,
+   "cpu": 420000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 9152.0,
+   "cpu": 33664.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1196625041,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 3201211309683.2,
+   "cpu": 7321430650854.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 3374800000.0,
+   "cpu": 12893600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 359074684026,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 101115431021721.61,
+   "cpu": 386077100264755.25,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 216240493413,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 1004739828594163.4,
+   "cpu": 3780921779227623.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 384638046,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 460334813452.80005,
+   "cpu": 1708408345113.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 180400.0,
+   "cpu": 560800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 571194169908,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 965089669476556.9,
+   "cpu": 3684887828910490.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 720.5000000000001,
+   "cpu": 1471.0000000000002,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 363.00000000000006,
+   "cpu": 746.0000000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 3449600000.0000005,
+   "cpu": 13043200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 6758400000.000001,
+   "cpu": 21708800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 1830400.0,
+   "cpu": 6732800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 9011200000.0,
+   "cpu": 34406400000.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 767066980788,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 2.7054759239185076e+16,
+   "cpu": 1.0320180524880214e+17,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1065908171832,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 3.75199676484864e+16,
+   "cpu": 1.432580582942208e+17,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 3300.0000000000005,
+   "cpu": 12600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 45408.0,
+   "cpu": 172736.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 2200.0,
+   "cpu": 8400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 9006800.000000002,
+   "cpu": 34397600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 985600000.0000001,
+   "cpu": 3507200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 376723056507,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 27350093902408.203,
+   "cpu": 56207080030844.41,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 894479267,
+   "gpu": 19678543885.000004,
+   "cpu": 39357087790.00001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 3112259455,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 5244779633566.0,
+   "cpu": 20050420312892.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 713346442845,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 1.260511698364829e+16,
+   "cpu": 4.803732013833658e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 82215028549,
+   "data_type": "float",
+   "m": -1196413014,
+   "gpu": -4.327977029953265e+20,
+   "cpu": -8.65595279708369e+20,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 3891070931,
+   "data_type": "half_float",
+   "m": -105593206,
+   "gpu": -1.8078275920851346e+18,
+   "cpu": -3.615649207485319e+18,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 492800000.00000006,
+   "cpu": 1753600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 22506.000000000004,
+   "cpu": 85972.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 2734258365,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 12319474489344.002,
+   "cpu": 35838471241728.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 574098261877,
+   "data_type": "half_float",
+   "m": 1184293750,
+   "gpu": 2.991564328340912e+21,
+   "cpu": 5.983128658978217e+21,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2253900000.0,
+   "cpu": 4509800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1835247628,
+   "gpu": -8075088718400001.0,
+   "cpu": -1.6150175900800002e+16,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1882162883,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 269149292269.0,
+   "cpu": 545827236070.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 606882783,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": -2002713183.9,
+   "cpu": -2791660801.8,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 35200000.0,
+   "cpu": 134400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 220000.00000000003,
+   "cpu": 840000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 1122000.0,
+   "cpu": 4292000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 45056.0,
+   "cpu": 172032.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 3390709427,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 7459560739.400001,
+   "cpu": 28481959186.800003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 559237927202,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 3779553607201997.0,
+   "cpu": 1.2140384314042778e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 704715773,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 3224779377248.0,
+   "cpu": 12222590366912.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 17600.000000000004,
+   "cpu": 65920.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1100.0000000000002,
+   "cpu": 4200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 2930521414,
+   "data_type": "float",
+   "m": 1603471054,
+   "gpu": 2.0675627558989357e+19,
+   "cpu": 4.135125514142288e+19,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 6758400000.000001,
+   "cpu": 21708800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 107468816262,
+   "data_type": "float",
+   "m": -1935499940,
+   "gpu": -9.15225723099365e+20,
+   "cpu": -1.8304511160545263e+21,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 2892843252,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 1221936989644.8,
+   "cpu": 4665577596825.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 213567378909,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 30775059300786.906,
+   "cpu": 62831522875027.81,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 422400000.00000006,
+   "cpu": 1356800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -117622136,
+   "gpu": -517534019200000.06,
+   "cpu": -1035061894400000.1,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 427488876155,
+   "data_type": "half_float",
+   "m": -1217930334,
+   "gpu": -2.2908654206597923e+21,
+   "cpu": -4.581727339330711e+21,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 180400.0,
+   "cpu": 560800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 277200.00000000006,
+   "cpu": 1066400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -738045413,
+   "gpu": -3247399597200000.5,
+   "cpu": -6494798794400001.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 985600000.0000001,
+   "cpu": 3507200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 528.0,
+   "cpu": 2056.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 846286085509,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 120087995533727.11,
+   "cpu": 241868563238472.22,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 1685200.0,
+   "cpu": 6442400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2256100.0000000005,
+   "cpu": 4518200.000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": -11.0,
+   "cpu": -2.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 136400000.0,
+   "cpu": 528800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 180400.0,
+   "cpu": 560800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 11968.000000000002,
+   "cpu": 44416.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 840400.0000000001,
+   "cpu": 3216800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 440485194269,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 62020315353075.2,
+   "cpu": 236804840439014.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 11286.000000000002,
+   "cpu": 22612.000000000004,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 4231787051,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 5362520551027.2,
+   "cpu": 19391740982502.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1953178441,
+   "gpu": -42969880646.0,
+   "cpu": -85939679372.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -482413727,
+   "gpu": -2122620396600.0002,
+   "cpu": -4245240789200.0005,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": -2200.0,
+   "cpu": -400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 2200000.0,
+   "cpu": 8400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 4093839111,
+   "data_type": "float",
+   "m": 569411346,
+   "gpu": 1.0256782019811594e+19,
+   "cpu": 2.0513631113083183e+19,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 915200000.0,
+   "cpu": 3366400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 2200000.0,
+   "cpu": 8400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 11.0,
+   "cpu": 42.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 3449600.0000000005,
+   "cpu": 13043200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 1696364659,
+   "gpu": 7464005344400001.0,
+   "cpu": 1.4928012224800002e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 569513892244,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 1002344450349440.1,
+   "cpu": 3754235577672448.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 146867673481,
+   "data_type": "half_float",
+   "m": 1508725404,
+   "gpu": 9.749677409025653e+20,
+   "cpu": 1.949940181570682e+21,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 964907400,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 33964740480000.0,
+   "cpu": 129683554560000.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 250800000.0,
+   "cpu": 701600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 140800000.0,
+   "cpu": 409600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1906643064,
+   "gpu": -8389229477200.001,
+   "cpu": -16778458946400.002,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 537966461975,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 3029827113843200.0,
+   "cpu": 9364920170060800.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 281600000.0,
+   "cpu": 819200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 809812564531,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 110458433802028.4,
+   "cpu": 428228884123992.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": -2200000.0,
+   "cpu": -400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 22.0,
+   "cpu": 84.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 840400.0000000001,
+   "cpu": 3216800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 3480702129,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 490082859763.2,
+   "cpu": 1425695592038.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 915931312525,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2192373189659840.2,
+   "cpu": 4619224795326080.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -243770948,
+   "gpu": -5362952408.000001,
+   "cpu": -10725889456.000002,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1270670873,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 4293851014041.6006,
+   "cpu": 16394703871795.201,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 9081600.0,
+   "cpu": 34547200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 3650114474,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 1525747850132.0002,
+   "cpu": 5854783616296.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 2993897684,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 750869539147.2001,
+   "cpu": 2100518615094.4001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 9011200000.0,
+   "cpu": 34406400000.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1843796415,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 4161817267938.0005,
+   "cpu": 8338384907196.001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 281600000.0,
+   "cpu": 1075200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 17600.000000000004,
+   "cpu": 65920.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 211200000.00000003,
+   "cpu": 678400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 2042434323,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 440348840038.80005,
+   "cpu": 1697671409277.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 74800000.00000001,
+   "cpu": 157600000.00000003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 1689600000.0000002,
+   "cpu": 6451200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 498567540,
+   "gpu": 2193697178200.0002,
+   "cpu": 4387394360400.0005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1986676091,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 6853237843513.601,
+   "cpu": 25912613590131.203,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 9081600.0,
+   "cpu": 34547200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 87709084002,
+   "data_type": "half_float",
+   "m": -1257328026,
+   "gpu": -4.852279839342133e+20,
+   "cpu": -9.704559503266099e+20,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -520930022,
+   "gpu": -11460449220.0,
+   "cpu": -22920877960.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 902002726,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 2286035708774.4,
+   "cpu": 5033896813260.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 276467095070,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": -608227609154.0,
+   "cpu": -110586838028.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 3225548503,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 454157229222.4,
+   "cpu": 1734054875212.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1408535281,
+   "gpu": -30987731126.000004,
+   "cpu": -61975380332.00001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 2171192485,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 783366248588.0,
+   "cpu": 2435209491176.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -107723922,
+   "gpu": -473981877600.0,
+   "cpu": -947957611200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 0.0,
+   "cpu": 8000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 915860436030,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 2059220604369852.0,
+   "cpu": 7869805554718584.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 363822631427,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 665940944563980.9,
+   "cpu": 2449545012871706.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 952347285,
+   "data_type": "float",
+   "m": -1323275146,
+   "gpu": -5.54495616290176e+18,
+   "cpu": -1.108991086299809e+19,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 3414174355,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 751118358100.0001,
+   "cpu": 2867906458200.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 5.5,
+   "cpu": 21.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 1830400.0,
+   "cpu": 6732800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -756844714,
+   "gpu": -3330116737200.0005,
+   "cpu": -6660233466400.001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 1100.0,
+   "cpu": 4200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 458439857594,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 100856768670680.02,
+   "cpu": 385089480378960.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 597364354928,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2355049232868147.5,
+   "cpu": 6545201764075111.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 74800.00000000001,
+   "cpu": 157600.00000000003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 3942400.0000000005,
+   "cpu": 10956800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 319732264098,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 315128119494988.8,
+   "cpu": 1121364996644505.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 1142162537,
+   "gpu": 5025515444400001.0,
+   "cpu": 1.0051031400800002e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 167441222755,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 23759909508934.5,
+   "cpu": 47854701463379.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 136400.0,
+   "cpu": 528800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1054199622623,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 7124702729535284.0,
+   "cpu": 2.2885408767598184e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 1830400.0,
+   "cpu": 6732800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 2970181823,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 1045504001696.0,
+   "cpu": 3611741096768.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 66000.0,
+   "cpu": 260000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 2323200.0000000005,
+   "cpu": 8742400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1307877473,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 2955018362496.2,
+   "cpu": 5925731254668.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 555643931425,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 39117332772320.0,
+   "cpu": 149357088767040.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 3034193674,
+   "data_type": "float",
+   "m": 1349563100,
+   "gpu": 1.8017287864156115e+19,
+   "cpu": 3.6034594370398163e+19,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 913322423553,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 835872682035705.6,
+   "cpu": 3074608606648819.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 774898126578,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 1854796155777101.0,
+   "cpu": 3907966231958170.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 22506.000000000004,
+   "cpu": 85972.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 19712.000000000004,
+   "cpu": 54784.00000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 769160718759,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 54148914600633.6,
+   "cpu": 206750401202419.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1188957958,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 999200267903.2001,
+   "cpu": 3824639959294.4004,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 17595600.000000004,
+   "cpu": 67191200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 776312796,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1707888151.2,
+   "cpu": 6521027486.4,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1885456436,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8627848651136.0,
+   "cpu": 32701356425984.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1819542028,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 8326224320128.0,
+   "cpu": 31558136933632.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 3097600.0000000005,
+   "cpu": 7731200.000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 2463340402,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 5896251586227.201,
+   "cpu": 12423118315366.402,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 3123867167,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 3078883479795.2,
+   "cpu": 10956026928102.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 985951356,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 4581124380518.4,
+   "cpu": 17239162269388.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 147400000.0,
+   "cpu": 306800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 836043734031,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 702611154079652.5,
+   "cpu": 2689385483630921.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 35270400000.0,
+   "cpu": 134540800000.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 2675200.0000000005,
+   "cpu": 6118400.000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 3513590286,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 8301911127760.801,
+   "cpu": 17306540312721.602,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 2026373674,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 427970119948.80005,
+   "cpu": 1115316070169.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 747998947414,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 1790410280530150.8,
+   "cpu": 3772308291598285.5,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 215600.00000000003,
+   "cpu": 831200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1861456793,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 266188321399.0,
+   "cpu": 539822469970.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 1451254027,
+   "gpu": 6385518563600000.0,
+   "cpu": 1.27710386632e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 340246354,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 814413672934.4001,
+   "cpu": 1715930412492.8003,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 229135619758,
+   "data_type": "half_float",
+   "m": 926770909,
+   "gpu": 9.343676551709223e+20,
+   "cpu": 1.8687357796115937e+21,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 700947902132,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 589076616951732.9,
+   "cpu": 2254809211578218.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 667376479837,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 2.3585618698623452e+16,
+   "cpu": 8.988333210681491e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 473070202433,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 66608284502566.41,
+   "cpu": 254322540827980.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1079037380641,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1823141558331033.8,
+   "cpu": 6961085949991220.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 45760.0,
+   "cpu": 173440.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 2252800000.0,
+   "cpu": 8601600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 342896757244,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 144839590259865.62,
+   "cpu": 465242320228659.25,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 492800.00000000006,
+   "cpu": 1753600.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 136400000.0,
+   "cpu": 528800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 915200.0,
+   "cpu": 3366400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 352000.0,
+   "cpu": 1216000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 77000000.0,
+   "cpu": 166000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 2257200.0000000005,
+   "cpu": 4522400.000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 2393600000.0000005,
+   "cpu": 8883200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1408.0,
+   "cpu": 5376.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": -2121355084,
+   "gpu": -9333944769600000.0,
+   "cpu": -1.86678575392e+16,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 684113768575,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 48914134453112.5,
+   "cpu": 99196496443375.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 764699820099,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 1890949715140807.2,
+   "cpu": 4087779358321214.5,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 250800000.0,
+   "cpu": 701600000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 180400.0,
+   "cpu": 560800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 720.5000000000001,
+   "cpu": 1471.0000000000002,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 1072187072,
+   "gpu": 4717623123400.001,
+   "cpu": 9435246258800.002,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 4576000.0,
+   "cpu": 17344000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1473130173,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 3480711972764.4004,
+   "cpu": 7256049980128.801,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": -1892115185,
+   "gpu": -41626534064.5,
+   "cpu": -83253068119.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1451262618,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 523615552574.4,
+   "cpu": 1627736152348.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 290400000.00000006,
+   "cpu": 980800000.0000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 1055838304,
+   "gpu": 23228442721.000004,
+   "cpu": 46456885502.00001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 744135283208,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 1681299258880155.2,
+   "cpu": 3371528141158806.5,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1662550868,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 3657611909.6000004,
+   "cpu": 13965427291.2,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 947252325749,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 4401313206360154.0,
+   "cpu": 1.6562517465256116e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 15488.000000000002,
+   "cpu": 38656.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 4505600.0,
+   "cpu": 13107200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 1830400000.0,
+   "cpu": 6732800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1027588847710,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 1012791568302976.1,
+   "cpu": 3603959606688512.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 1760000.0000000002,
+   "cpu": 6592000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 77562842832,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 65525089624473.6,
+   "cpu": 250186705838899.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 4501200.000000001,
+   "cpu": 17194400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1494023237,
+   "gpu": -6573667042800000.0,
+   "cpu": -1.31472700856e+16,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": -1,
+   "gpu": 1122000000.0,
+   "cpu": 4292000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 715.0,
+   "cpu": 1450.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 656587622,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 24591044889241.6,
+   "cpu": 91203697586483.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1142850081,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 2582155473011.4,
+   "cpu": 5178025146994.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 384,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 4202.0,
+   "cpu": 16084.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 735926352151,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 1.29523037978576e+16,
+   "cpu": 4.94542508645472e+16,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 1056.0,
+   "cpu": 3392.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 896505647059,
+   "data_type": "half_float",
+   "m": -1870610895,
+   "gpu": -7.378858089369402e+21,
+   "cpu": -1.4757715949233359e+22,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 128,
+   "doc_count": 1055776691123,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 2675760445982131.5,
+   "cpu": 5892078557819239.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 313801183981,
+   "data_type": "float",
+   "m": 1618274906,
+   "gpu": 2.2343957863672117e+21,
+   "cpu": 4.4687967140530215e+21,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 471183265050,
+   "data_type": "half_float",
+   "m": 185848753,
+   "gpu": 3.8530286970380753e+20,
+   "cpu": 7.70605833644268e+20,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 4505600.0,
+   "cpu": 17203200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 73700000.0,
+   "cpu": 153400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 60151403,
+   "data_type": "float",
+   "m": 32,
+   "gpu": 8866316802.2,
+   "cpu": 18454450440.4,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1062431197504,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 149590312608563.22,
+   "cpu": 571163011778150.5,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 3942400000.0000005,
+   "cpu": 10956800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 9081600000.0,
+   "cpu": 34547200000.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 0.0,
+   "cpu": 8000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 486055847065,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 70040647562066.51,
+   "cpu": 142997630206523.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 22.0,
+   "cpu": 84.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 0.0,
+   "cpu": 8000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 620442190030,
+   "data_type": "float",
+   "m": -1347096349,
+   "gpu": -3.6774997966719544e+21,
+   "cpu": -7.354999588380372e+21,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 74800000.00000001,
+   "cpu": 157600000.00000003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "float",
+   "m": -2097824379,
+   "gpu": -9230427263200.0,
+   "cpu": -18460854518400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 16000,
+   "doc_count": 995757685553,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 3.72939134454794e+16,
+   "cpu": 1.383163187663508e+17,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 592906413244,
+   "data_type": "float",
+   "m": -1,
+   "gpu": 999165887598788.9,
+   "cpu": 3819740276683146.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 1190033809,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 2178237883993.6,
+   "cpu": 8012259629235.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 11.0,
+   "cpu": 42.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 1100.0000000000002,
+   "cpu": 4200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 70400000.0,
+   "cpu": 268800000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 89570882279,
+   "data_type": "half_float",
+   "m": 16,
+   "gpu": 6404318082948.5,
+   "cpu": 12987777930455.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 1000,
+   "data_type": "half_float",
+   "m": 32,
+   "gpu": 143000.0,
+   "cpu": 290000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 100,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 0,
+   "gpu": 220000000.00000003,
+   "cpu": 840000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 94170799640,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 424295954857984.06,
+   "cpu": 1234315505041408.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 5,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 11269.5,
+   "cpu": 22549.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 1100000.0,
+   "cpu": 4200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 3835450933,
+   "data_type": "half_float",
+   "m": 0,
+   "gpu": 6480377896396.801,
+   "cpu": 24743261058969.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 775075809971,
+   "data_type": "float",
+   "m": 1185699263,
+   "gpu": 4.043629996678002e+21,
+   "cpu": 8.08725999955661e+21,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 768,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 8800.000000000002,
+   "cpu": 32960.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 2,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": 512,
+   "gpu": 11286.000000000002,
+   "cpu": 22612.000000000004,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1536,
+   "doc_count": 2466622673,
+   "data_type": "half_float",
+   "m": 512,
+   "gpu": 9724413226035.201,
+   "cpu": 27026291303526.402,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 3,
+   "doc_count": 1000000,
+   "data_type": "half_float",
+   "m": -204470612,
+   "gpu": -899670689500000.1,
+   "cpu": -1799341373000000.2,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4294967296,
+   "doc_count": 4294967296,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 4.058283726452671e+19,
+   "cpu": 1.549526508238916e+20,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4294967296,
+   "doc_count": 4294967296,
+   "data_type": "float",
+   "m": 9223372036854775807,
+   "gpu": 1.743019575719644e+29,
+   "cpu": 3.486039152177158e+29,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4294967296,
+   "doc_count": 4294967296,
+   "data_type": "float",
+   "m": -9223372036854775808,
+   "gpu": -1.743019574907987e+29,
+   "cpu": -3.4860391490781044e+29,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 9223372036854775808,
+   "doc_count": 9223372036854775808,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 1.8715530180651617e+38,
+   "cpu": 7.145929705339708e+38,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 9223372036854775808,
+   "doc_count": 9223372036854775808,
+   "data_type": "float",
+   "m": 9223372036854775807,
+   "gpu": 5.614659054195485e+38,
+   "cpu": 1.4632141777600356e+39,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 9223372036854775808,
+   "doc_count": 9223372036854775808,
+   "data_type": "float",
+   "m": -9223372036854775808,
+   "gpu": -1.8715530180651617e+38,
+   "cpu": -3.4028236692093877e+37,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 18446744073709551615,
+   "doc_count": 18446744073709551615,
+   "data_type": "float",
+   "m": 16,
+   "gpu": 7.486212072260647e+38,
+   "cpu": 2.858371882135883e+39,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 18446744073709551615,
+   "doc_count": 18446744073709551615,
+   "data_type": "float",
+   "m": 9223372036854775807,
+   "gpu": 1.4972424144521294e+39,
+   "cpu": 4.3556142965880126e+39,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 18446744073709551615,
+   "doc_count": 18446744073709551615,
+   "data_type": "float",
+   "m": -9223372036854775808,
+   "gpu": -4.058283696216102e+19,
+   "cpu": 1.361129467683754e+39,
+   "fits": [
+    false,
+    false
+   ]
+  }
+ ],
+ "at_limits": [
+  {
+   "dimension": 768,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "limits": {
+    "gpu": 1760000000.0000002,
+    "cpu": 6592000000.0
+   },
+   "fits": true
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "limits": {
+    "gpu": 1760000000.0,
+    "cpu": 6592000000.0
+   },
+   "fits": false
+  },
+  {
+   "dimension": 768,
+   "doc_count": 1000000,
+   "data_type": "float",
+   "m": 16,
+   "limits": {
+    "gpu": 1760000000.0000002,
+    "cpu": 6591999999.999999
+   },
+   "fits": false
+  },
+  {
+   "dimension": 100,
+   "doc_count": 12345,
+   "data_type": "half_float",
+   "m": 7,
+   "limits": {
+    "gpu": 1738176.0000000002,
+    "cpu": 5945352.0
+   },
+   "fits": true
+  },
+  {
+   "dimension": 100,
+   "doc_count": 12345,
+   "data_type": "half_float",
+   "m": 7,
+   "limits": {
+    "gpu": 1738176.0,
+    "cpu": 5945352.0
+   },
+   "fits": false
+  },
+  {
+   "dimension": 100,
+   "doc_count": 12345,
+   "data_type": "half_float",
+   "m": 7,
+   "limits": {
+    "gpu": 1738176.0000000002,
+    "cpu": 5945351.999999999
+   },
+   "fits": false
+  },
+  {
+   "dimension": 3,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1,
+   "limits": {
+    "gpu": 11.0,
+    "cpu": 82.0
+   },
+   "fits": true
+  },
+  {
+   "dimension": 3,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1,
+   "limits": {
+    "gpu": 10.999999999999998,
+    "cpu": 82.0
+   },
+   "fits": false
+  },
+  {
+   "dimension": 3,
+   "doc_count": 5,
+   "data_type": "float",
+   "m": -1,
+   "limits": {
+    "gpu": 11.0,
+    "cpu": 81.99999999999999
+   },
+   "fits": false
+  }
+ ],
+ "refusals": {
+  "full": {
+   "vector_path": "a/_0_full.knnvec",
+   "message": "Could not add job 78f5dd1b091d0443faf9f1aa3495a37bafc2224f4c8c8c62580f220182c5fb52 with vector path a/_0_full.knnvec to request store, because request store is at capacity"
+  },
+  "too_large": {
+   "vector_path": "a/_0_large.knnvec",
+   "message": "Insufficient available resources to process job 841ee66bfb204848aae75a512c479f080afcfb95e496bbee8eae254f150776c4 with vector path a/_0_large.knnvec"
+  }
+ }
+}
