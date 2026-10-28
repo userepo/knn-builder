@@ -68,6 +68,12 @@ $RUN $BASE tools/oracle/level_tables.py crates/knn-write/tests/data/level_tables
 $RUN $API tools/oracle/build_tables.py crates/knn-gpu/tests/data
 ```
 
+`oracle/requests.py` records how the service answers `POST /_build` bodies, for `knn-builder`'s request parser: for a body its model accepts, the parameters with defaults filled in and the job id; for any other, the status (422, or 400 for a body that is not UTF-8) and the body its own app returns. Accepted bodies are never posted, so no job starts. A body that is not UTF-8 is recorded in hex (`body_hex`). Run it in the api image:
+
+```sh
+$RUN $API tools/oracle/requests.py crates/knn-builder/tests/data/requests.json
+```
+
 ## Parity
 
 `knn-gpu`'s `build_inputs` example builds inputs as the service does, with `knn-gpu` and `knn-write`, and writes a `runs.json` that `baseline/score.py` scores like the service's (it carries its own timings and has no log). In WSL, in the conda environment:

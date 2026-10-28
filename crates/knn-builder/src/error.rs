@@ -31,6 +31,19 @@ pub enum JobError {
         /// Values of the buffer that could not be allocated.
         values: u64,
     },
+    /// A request parameter the service accepts but no build can take:
+    /// a count past 32 bits, say. The service fails such a job too.
+    #[error("{name} {value} is outside {min} to {max}")]
+    OutOfRange {
+        /// The request's name for the parameter.
+        name: &'static str,
+        /// The request's value.
+        value: i128,
+        /// The least value a build takes.
+        min: i128,
+        /// The greatest value a build takes.
+        max: i128,
+    },
     /// The build parameters could not be derived from the request.
     #[error("deriving the build parameters: {0}")]
     Params(knn_gpu::Error),

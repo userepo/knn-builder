@@ -18,6 +18,12 @@ gpu = ["knn-gpu/gpu"]
 knn-gpu.workspace = true
 knn-store.workspace = true
 knn-write.workspace = true
+# The build request: read as a JSON value, then checked field by field as
+# the service's model checks it; in the body's order, which is the order
+# the service reports unknown fields in, and with every decimal rounded
+# correctly, as Python rounds it.
+serde_json = { workspace = true, features = ["preserve_order", "float_roundtrip"] }
+sha2.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["rt", "rt-multi-thread", "sync", "macros"] }
 
@@ -25,8 +31,6 @@ tokio = { workspace = true, features = ["rt", "rt-multi-thread", "sync", "macros
 tokio = { workspace = true, features = ["time"] }
 # The LocalStack tests set up and inspect their bucket with the SDK.
 aws-sdk-s3.workspace = true
-# The e2e example reads the inputs' input.json and writes runs.json.
-serde_json.workspace = true
 
 [[example]]
 name = "e2e"

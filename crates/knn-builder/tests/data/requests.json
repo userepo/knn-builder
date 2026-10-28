@@ -1,0 +1,1938 @@
+[
+  {
+    "case": "required only",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "every field",
+    "body": "{\"repository_type\": \"s3\", \"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"tenant_id\": \"cluster-a\", \"data_type\": \"float\", \"engine\": \"faiss\", \"index_parameters\": {\"space_type\": \"l2\", \"algorithm\": \"hnsw\", \"algorithm_parameters\": {\"ef_construction\": 100, \"ef_search\": 100, \"m\": 16}}, \"skip_stored_vectors\": false}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "cluster-a",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "b152bc7de68b9e4addd2b2b9fcfb9b1b0d76bf27dfe29e9a8640926098c30a44"
+  },
+  {
+    "case": "half_float, inner product",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"half_float\", \"index_parameters\": {\"space_type\": \"innerproduct\"}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "half_float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "innerproduct",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "skip stored vectors",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": true}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": true
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "extra algorithm parameter",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"m\": 32, \"encoder\": {\"name\": \"sq\", \"bits\": 4}}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 32,
+          "encoder": {
+            "name": "sq",
+            "bits": 4
+          }
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "unknown index parameter",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"space_type\": \"l2\", \"foo\": 1}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension as a numeric string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"768\", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension as an integral float",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768.0, \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "doc_count 5",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 5}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 5,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as a string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": \"true\"}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": true
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as 0",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": 0}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "byte data",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"byte\"}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "byte",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "binary data, hamming",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"binary\", \"index_parameters\": {\"space_type\": \"hamming\"}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "binary",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "hamming",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "m 0",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"m\": 0}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 0
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "negative ef_search",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"ef_search\": -1}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": -1,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension padded string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \" 768 \", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension signed string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"+768\", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "doc_count past 32 bits",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 5000000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 5000000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as Yes",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": \"Yes\"}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": true
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as off",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": \"off\"}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as 1.0",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": 1.0}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": true
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "empty tenant_id",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"tenant_id\": \"\"}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension true",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": true, \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 1,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension decimal string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"768.0\", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension underscored string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"7_68\", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as 2",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": 2}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.skip_stored_vectors",
+          "message": "Input should be a valid boolean, unable to interpret input",
+          "type": "bool_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "bool as null",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": null}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.skip_stored_vectors",
+          "message": "Input should be a valid boolean",
+          "type": "bool_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "tenant_id null",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"tenant_id\": null}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.tenant_id",
+          "message": "Input should be a valid string",
+          "type": "string_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "index_parameters null",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": null}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters",
+          "message": "Input should be a valid dictionary or object to extract fields from",
+          "type": "model_attributes_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "path ending in a newline",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0.knnvec\\n\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.vector_path",
+          "message": "String should match pattern '.+\\.knnvec$'",
+          "type": "string_pattern_mismatch"
+        }
+      ]
+    }
+  },
+  {
+    "case": "path with a newline inside",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments\\n_0.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments\n_0.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "2043a3fe3f4dd63d4c00f47403863d317d69c74b8a42c1daf7f4b57fb270a41c"
+  },
+  {
+    "case": "bool as TRUE",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": \"TRUE\"}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": true
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as a decimal string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": \"1.0\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.skip_stored_vectors",
+          "message": "Input should be a valid boolean, unable to interpret input",
+          "type": "bool_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "bool as 0.5",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": 0.5}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.skip_stored_vectors",
+          "message": "Input should be a valid boolean",
+          "type": "bool_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "bool as -0.0",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": -0.0}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "bool as 2.0",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": 2.0}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.skip_stored_vectors",
+          "message": "Input should be a valid boolean, unable to interpret input",
+          "type": "bool_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension false",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": false, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be greater than 0",
+          "type": "greater_than"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension exponent string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"1e3\", \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension past 64 bits",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 1e+20, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Unable to parse input string as an integer, exceeded maximum size",
+          "type": "int_parsing_size"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension 2**64",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 18446744073709551616, \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 18446744073709551616,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension 2**64 as a string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"18446744073709551616\", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 18446744073709551616,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "m below -2**63",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"m\": -1e+30}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm_parameters.m",
+          "message": "Unable to parse input string as an integer, exceeded maximum size",
+          "type": "int_parsing_size"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension padded decimal underscored",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"  12_3.000 \", \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 123,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "two unknown fields",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"zeta\": 1, \"alpha\": 2}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.zeta",
+          "message": "Extra inputs are not permitted",
+          "type": "extra_forbidden"
+        },
+        {
+          "field": "body.alpha",
+          "message": "Extra inputs are not permitted",
+          "type": "extra_forbidden"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown field before a bad one",
+    "body": "{\"zeta\": 1, \"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 0}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.doc_count",
+          "message": "Input should be greater than 4",
+          "type": "greater_than"
+        },
+        {
+          "field": "body.zeta",
+          "message": "Extra inputs are not permitted",
+          "type": "extra_forbidden"
+        }
+      ]
+    }
+  },
+  {
+    "case": "empty object",
+    "body": "{}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.container_name",
+          "message": "Field required",
+          "type": "missing"
+        },
+        {
+          "field": "body.vector_path",
+          "message": "Field required",
+          "type": "missing"
+        },
+        {
+          "field": "body.doc_id_path",
+          "message": "Field required",
+          "type": "missing"
+        },
+        {
+          "field": "body.dimension",
+          "message": "Field required",
+          "type": "missing"
+        },
+        {
+          "field": "body.doc_count",
+          "message": "Field required",
+          "type": "missing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown field",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"color\": \"red\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.color",
+          "message": "Extra inputs are not permitted",
+          "type": "extra_forbidden"
+        }
+      ]
+    }
+  },
+  {
+    "case": "path without .knnvec",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0.vec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.vector_path",
+          "message": "String should match pattern '.+\\.knnvec$'",
+          "type": "string_pattern_mismatch"
+        }
+      ]
+    }
+  },
+  {
+    "case": "path .knnvec alone",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \".knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.vector_path",
+          "message": "String should match pattern '.+\\.knnvec$'",
+          "type": "string_pattern_mismatch"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension 0",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 0, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be greater than 0",
+          "type": "greater_than"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension negative",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": -3, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be greater than 0",
+          "type": "greater_than"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension text",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": \"abc\", \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension fractional",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 1.5, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a valid integer, got a number with a fractional part",
+          "type": "int_from_float"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension null",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": null, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a valid integer",
+          "type": "int_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "dimension list",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": [768], \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a valid integer",
+          "type": "int_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "doc_count 4",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 4}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.doc_count",
+          "message": "Input should be greater than 4",
+          "type": "greater_than"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown data_type",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"int8\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.data_type",
+          "message": "Input should be 'float', 'half_float', 'byte' or 'binary'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown space_type",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"space_type\": \"cosinesimil\"}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.space_type",
+          "message": "Input should be 'l2', 'innerproduct' or 'hamming'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown algorithm",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm\": \"ivf\"}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm",
+          "message": "Input should be 'hnsw'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown engine",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"engine\": \"lucene\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.engine",
+          "message": "Input should be 'faiss'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "unknown repository_type",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"repository_type\": \"gcs\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.repository_type",
+          "message": "Input should be 's3'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "container_name a number",
+    "body": "{\"container_name\": 123, \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.container_name",
+          "message": "Input should be a valid string",
+          "type": "string_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "index_parameters a string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": \"hnsw\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters",
+          "message": "Input should be a valid dictionary or object to extract fields from",
+          "type": "model_attributes_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "algorithm_parameters a list",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": [16]}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm_parameters",
+          "message": "Input should be a valid dictionary or object to extract fields from",
+          "type": "model_attributes_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "m text",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"m\": \"sixteen\"}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm_parameters.m",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "bool text",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"skip_stored_vectors\": \"maybe\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.skip_stored_vectors",
+          "message": "Input should be a valid boolean, unable to interpret input",
+          "type": "bool_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "several errors",
+    "body": "{\"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1, \"data_type\": \"int8\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.container_name",
+          "message": "Field required",
+          "type": "missing"
+        },
+        {
+          "field": "body.doc_count",
+          "message": "Input should be greater than 4",
+          "type": "greater_than"
+        },
+        {
+          "field": "body.data_type",
+          "message": "Input should be 'float', 'half_float', 'byte' or 'binary'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "every index parameter wrong",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"m\": \"x\", \"ef_search\": \"y\", \"ef_construction\": \"z\"}, \"space_type\": \"q\", \"algorithm\": \"w\"}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm",
+          "message": "Input should be 'hnsw'",
+          "type": "enum"
+        },
+        {
+          "field": "body.index_parameters.space_type",
+          "message": "Input should be 'l2', 'innerproduct' or 'hamming'",
+          "type": "enum"
+        },
+        {
+          "field": "body.index_parameters.algorithm_parameters.ef_construction",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        },
+        {
+          "field": "body.index_parameters.algorithm_parameters.ef_search",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        },
+        {
+          "field": "body.index_parameters.algorithm_parameters.m",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "not JSON",
+    "body": "{",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body[1]",
+          "message": "JSON decode error",
+          "type": "json_invalid"
+        }
+      ]
+    }
+  },
+  {
+    "case": "a JSON list",
+    "body": "[]",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body",
+          "message": "Input should be a valid dictionary or object to extract fields from",
+          "type": "model_attributes_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "JSON null",
+    "body": "null",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body",
+          "message": "Field required",
+          "type": "missing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "trailing comma",
+    "body": "{\"container_name\": \"bucket\",}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body[28]",
+          "message": "JSON decode error",
+          "type": "json_invalid"
+        }
+      ]
+    }
+  },
+  {
+    "case": "not JSON after non-ASCII",
+    "body": "{\"container_name\": \"b\u00e9cket\" \"x\"}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body[28]",
+          "message": "JSON decode error",
+          "type": "json_invalid"
+        }
+      ]
+    }
+  },
+  {
+    "case": "duplicate key",
+    "body": "{\"container_name\": \"a\", \"container_name\": \"b\", \"vector_path\": \"p.knnvec\", \"doc_id_path\": \"p.knndid\", \"dimension\": 8, \"doc_count\": 10}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "b",
+      "vector_path": "p.knnvec",
+      "doc_id_path": "p.knndid",
+      "tenant_id": "",
+      "dimension": 8,
+      "doc_count": 10,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "27d887d82b86a71bb964217af02c1e8e755a4499386202defc5f8409c900862e"
+  },
+  {
+    "case": "empty body",
+    "body": "",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body",
+          "message": "Field required",
+          "type": "missing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "whitespace body",
+    "body": "   ",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body[3]",
+          "message": "JSON decode error",
+          "type": "json_invalid"
+        }
+      ]
+    }
+  },
+  {
+    "case": "BOM",
+    "body": "\ufeff{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "BOM alone",
+    "body": "\ufeff",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body[0]",
+          "message": "JSON decode error",
+          "type": "json_invalid"
+        }
+      ]
+    }
+  },
+  {
+    "case": "invalid UTF-8",
+    "body_hex": "7b22636f6e7461696e65725f6e616d65223a202262ff636b6574222c2022766563746f725f70617468223a20227365676d656e74732f5f305f7461726765745f6669656c642e6b6e6e766563222c2022646f635f69645f70617468223a20227365676d656e74732f5f305f7461726765745f6669656c642e6b6e6e646964222c202264696d656e73696f6e223a203736382c2022646f635f636f756e74223a20313030303030307d",
+    "status": 400,
+    "response": {
+      "detail": "There was an error parsing the body"
+    }
+  },
+  {
+    "case": "invalid UTF-8 after a JSON error",
+    "body_hex": "7b22636f6e7461696e65725f6e616d65223a202c202278223a2022ff227d",
+    "status": 400,
+    "response": {
+      "detail": "There was an error parsing the body"
+    }
+  },
+  {
+    "case": "UTF-16",
+    "body_hex": "fffe7b00220063006f006e007400610069006e00650072005f006e0061006d00650022003a00200022006200750063006b006500740022002c002000220076006500630074006f0072005f00700061007400680022003a00200022007300650067006d0065006e00740073002f005f0030005f007400610072006700650074005f006600690065006c0064002e006b006e006e0076006500630022002c002000220064006f0063005f00690064005f00700061007400680022003a00200022007300650067006d0065006e00740073002f005f0030005f007400610072006700650074005f006600690065006c0064002e006b006e006e0064006900640022002c0020002200640069006d0065006e00730069006f006e0022003a0020003700360038002c002000220064006f0063005f0063006f0075006e00740022003a00200031003000300030003000300030007d00",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "UTF-8 of a surrogate",
+    "body_hex": "7b22636f6e7461696e65725f6e616d65223a20226275636b6574222c2022766563746f725f70617468223a20227365676d656e74732f5f305f7461726765745f6669656c642e6b6e6e766563222c2022646f635f69645f70617468223a20227365676d656e74732f5f305f7461726765745f6669656c642e6b6e6e646964222c202264696d656e73696f6e223a203736382c2022646f635f636f756e74223a20313030303030302c2022696e6465785f706172616d6574657273223a207b2269676e6f726564223a2022eda080227d7d",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "escaped lone surrogate",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"ignored\": \"\\ud800\"}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "NaN",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"ignored\": NaN}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "Infinity",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"ignored\": -Infinity}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "NaN dimension",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": NaN, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a finite number",
+          "type": "finite_number"
+        }
+      ]
+    }
+  },
+  {
+    "case": "nesting past 128 levels",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"ignored\": [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "number past f64",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"ignored\": 1e400}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "dimension past f64",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 1e400, \"doc_count\": 1000000}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.dimension",
+          "message": "Input should be a finite number",
+          "type": "finite_number"
+        }
+      ]
+    }
+  },
+  {
+    "case": "trailing data",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000} x",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body[169]",
+          "message": "JSON decode error",
+          "type": "json_invalid"
+        }
+      ]
+    }
+  },
+  {
+    "case": "decimal rounded to even",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"x\": 9007199254740993.0}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "x": 9007199254740992.0
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "decimal near the least normal",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"x\": 2.2250738585072011e-308}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "x": 2.225073858507201e-308
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  }
+]

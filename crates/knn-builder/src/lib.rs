@@ -9,6 +9,7 @@ mod error;
 mod job;
 mod load;
 mod pipeline;
+pub mod request;
 mod write;
 
 pub use builder::{BuildError, Builder, FakeBuilder, Vectors};

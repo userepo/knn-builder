@@ -42,7 +42,7 @@ impl SpaceType {
 }
 
 /// One index to build: where its inputs are and what to build from them.
-/// The service's request, validated (M5 maps one to the other).
+/// The service's request, validated: [`BuildRequest::job`](crate::request::BuildRequest::job).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Job {
     /// `container_name`: the bucket the blobs are in, and the index goes.

@@ -35,6 +35,9 @@ knn-format = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb
 knn-check = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
 proptest = "1.12.0"
 serde_json = "1.0.154"
+# knn-builder: the job id, a SHA-256 of the request's paths, as the
+# service derives it.
+sha2 = "0.11.1"
 
 # knn-gpu's build script: builds its C++ shim over cuVS with CMake.
 cmake = "0.1.58"
