@@ -57,7 +57,11 @@ typedef struct knn_cagra_params {
  * bytes, may be 0).
  */
 
-/* Creates the resources; raft takes the device current at the first build. */
+/*
+ * Creates the resources; raft takes the device current at the first build.
+ * Their workspace, what cuVS plans its batches by, is a quarter of the memory
+ * of the device current now, at most 2 GiB.
+ */
 int knn_cagra_gpu_create(knn_cagra_gpu** gpu, char* message, size_t message_len);
 
 /* Destroys resources from knn_cagra_gpu_create; null is ignored. */

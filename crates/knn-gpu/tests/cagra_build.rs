@@ -13,7 +13,22 @@
     reason = "test crate"
 )]
 
-use knn_gpu::{BuildParams, Error, Gpu, HostVectors, Metric, fp16};
+use std::sync::Mutex;
+
+use knn_gpu::{BuildParams, Error, Gpu, Graph, HostVectors, Metric, fp16};
+
+/// Held through each test's build: cargo runs the tests on parallel
+/// threads, and two builds at once can crash the process (see `Gpu`).
+static GPU: Mutex<()> = Mutex::new(());
+
+/// Builds on a `Gpu` of its own, one test at a time.
+fn build(vectors: HostVectors<'_>, dimension: usize, params: &BuildParams) -> Result<Graph, Error> {
+    // The callers check the result after the lock is released, so nothing
+    // panics while it is held.
+    let _gpu = GPU.lock().expect("a build panicked holding the GPU lock");
+    let mut gpu = Gpu::new()?;
+    gpu.build(vectors, dimension, params)
+}
 
 /// Values in [-0.5, 0.5) from a fixed-seed xorshift generator.
 fn random_vectors(count: usize, seed: u64) -> Vec<f32> {
@@ -51,8 +66,7 @@ fn check(metric: Metric, half: bool) {
         HostVectors::F32(&values)
     };
     let params = BuildParams::new(5_000, 32, 16, metric).unwrap();
-    let mut gpu = Gpu::new().unwrap();
-    let graph = gpu.build(vectors, DIM, &params).unwrap();
+    let graph = build(vectors, DIM, &params).unwrap();
 
     let degree = params.graph_degree as usize;
     assert_eq!(graph.degree(), degree);
@@ -107,9 +121,8 @@ fn builds_l2_float16() {
 fn refuses_partial_rows() {
     let values = random_vectors(100, 1);
     let params = BuildParams::new(10, 10, 16, Metric::L2).unwrap();
-    let mut gpu = Gpu::new().unwrap();
     assert_eq!(
-        gpu.build(HostVectors::F32(&values[..99]), 10, &params),
+        build(HostVectors::F32(&values[..99]), 10, &params),
         Err(Error::Vectors {
             values: 99,
             dimension: 10

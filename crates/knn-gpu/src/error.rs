@@ -28,8 +28,8 @@ pub enum Error {
         /// The step: `raft::resources`, `make_device_padded_dataset`,
         /// `cagra::build` or `raft::copy`; `knn_cagra_build` for arguments
         /// the shim refused, `the cuVS shim` for a status it did not
-        /// document; `cudaMemGetInfo` or `cudaMalloc` for the CUDA
-        /// runtime's calls.
+        /// document; `cudaMemGetInfo`, `cudaMalloc`, `cudaGetDevice` or
+        /// `cudaDeviceGetAttribute` for the CUDA runtime's calls.
         call: &'static str,
         /// Its message.
         message: String,

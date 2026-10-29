@@ -10,7 +10,9 @@
 pub mod api;
 mod builder;
 pub mod config;
+pub mod cost;
 mod error;
+pub mod forecast;
 mod job;
 mod load;
 mod pipeline;
@@ -21,4 +23,4 @@ mod write;
 pub use builder::{BuildError, Builder, FakeBuilder, Vectors};
 pub use error::JobError;
 pub use job::{DataType, Job, SpaceType};
-pub use pipeline::{Built, Canceler, JobHandle, Pipeline, Span, Timings};
+pub use pipeline::{Built, Canceler, InFlight, JobHandle, Pipeline, Span, Stage, Timings};

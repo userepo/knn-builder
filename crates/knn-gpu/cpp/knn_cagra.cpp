@@ -15,11 +15,15 @@
 #include <cuvs/version_config.h>
 #include <raft/core/host_mdspan.hpp>
 #include <raft/core/resource/cuda_stream.hpp>
+#include <raft/core/resource/device_memory_resource.hpp>
 #include <raft/core/resources.hpp>
 #include <raft/util/cudart_utils.hpp>
+#include <rmm/mr/per_device_resource.hpp>
 
 #include <cuda_fp16.h>
+#include <cuda_runtime_api.h>
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -50,6 +54,13 @@ static_assert(sizeof(knn_cagra_params) == 48);
 struct knn_cagra_gpu {
   raft::resources res;
 };
+
+// The most workspace a build plans its batches by. RAFT's default is a
+// quarter of the device's memory, and cuVS sizes batches from it (the IVF-PQ
+// search's among them), so a larger GPU would batch, and take device memory,
+// otherwise than the 8 GB GPU the service's memory model was measured on,
+// whose quarter is about this.
+constexpr std::size_t kWorkspaceLimit = std::size_t{2} << 30;
 
 namespace {
 
@@ -178,7 +189,18 @@ extern "C" int knn_cagra_gpu_create(knn_cagra_gpu** gpu, char* message, std::siz
     return KNN_CAGRA_ARGUMENTS;
   }
   *gpu = nullptr;
-  return run(KNN_CAGRA_RESOURCES, message, message_len, [&] { *gpu = new knn_cagra_gpu{}; });
+  return run(KNN_CAGRA_RESOURCES, message, message_len, [&] {
+    auto created = std::make_unique<knn_cagra_gpu>();
+    std::size_t free  = 0;
+    std::size_t total = 0;
+    RAFT_CUDA_TRY(cudaMemGetInfo(&free, &total));
+    // RAFT's default resource, as its own factory takes it, with a limit.
+    raft::resource::set_workspace_resource(
+      created->res,
+      raft::mr::device_resource{rmm::mr::get_current_device_resource_ref()},
+      std::min(total / 4, kWorkspaceLimit));
+    *gpu = created.release();
+  });
 }
 
 extern "C" void knn_cagra_gpu_destroy(knn_cagra_gpu* gpu) { delete gpu; }

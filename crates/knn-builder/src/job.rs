@@ -1,7 +1,7 @@
 //! A build job, as the service's request describes it.
 
 /// How k-NN encoded the vectors: the request's `data_type`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DataType {
     /// `float`: fp32 values.
     Float,
@@ -13,7 +13,7 @@ pub enum DataType {
 }
 
 /// The request's `space_type`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SpaceType {
     /// `l2`.
     L2,

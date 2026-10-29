@@ -12,10 +12,13 @@
 //! buffers) before it downloads and gives it back when it ends, so
 //! a large job waits until the ones ahead of it have made room. A job
 //! larger than the whole budget takes all of it, and runs alone.
+//!
+//! [`Pipeline::in_flight`] tells where each job is and since when, for a
+//! forecast of when each will end.
 
 use std::panic::{self, AssertUnwindSafe};
-use std::sync::Arc;
 use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -33,6 +36,7 @@ use crate::{Builder, Job, JobError};
 #[derive(Debug)]
 pub struct Pipeline {
     queue: mpsc::UnboundedSender<Queued>,
+    board: Arc<Board>,
     downloads: JoinHandle<()>,
     builds: thread::JoinHandle<()>,
     uploads: JoinHandle<()>,
@@ -66,6 +70,7 @@ impl Pipeline {
         let uploads = runtime.spawn(uploads(store, graphed));
         Self {
             queue,
+            board: Arc::default(),
             downloads,
             builds,
             uploads,
@@ -73,11 +78,20 @@ impl Pipeline {
     }
 
     /// Queues `job`, after the jobs already queued.
+    ///
+    /// # Panics
+    ///
+    /// After a thread panicked while it held the list of jobs in flight,
+    /// a bug.
     #[must_use]
     pub fn submit(&self, job: Job) -> JobHandle {
         let cancel = Cancel::new();
         let claim = Arc::new(Claim::default());
         let (report, outcome) = oneshot::channel();
+        // On the board and in the queue under one lock, so both hold the
+        // jobs in one order.
+        let mut board = self.board.0.lock().expect(BOARD_POISONED);
+        let track = Board::track(&mut board, &job, &cancel);
         // Stages that stopped drop the job, whose outcome is then
         // `Stopped`.
         _ = self.queue.send(Queued {
@@ -85,7 +99,9 @@ impl Pipeline {
             cancel: cancel.clone(),
             claim: Arc::clone(&claim),
             report,
+            track,
         });
+        drop(board);
         JobHandle {
             cancel,
             claim,
@@ -93,10 +109,22 @@ impl Pipeline {
         }
     }
 
+    /// Every job that has not ended, in the order they were submitted,
+    /// which is the order each stage takes them in.
+    ///
+    /// # Panics
+    ///
+    /// After a thread panicked while it held the list, a bug.
+    #[must_use]
+    pub fn in_flight(&self) -> Vec<InFlight> {
+        self.board.in_flight()
+    }
+
     /// Takes no more jobs, and waits until every job taken has ended.
     pub async fn close(self) {
         let Self {
             queue,
+            board: _,
             downloads,
             builds,
             uploads,
@@ -267,12 +295,116 @@ impl Span {
     }
 }
 
+/// Where a job is in the pipeline.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Stage {
+    /// Waiting to download: in the queue, for the build slot, or for room
+    /// in the budget.
+    Queued,
+    /// Downloading.
+    Downloading,
+    /// Downloaded, in the build slot until the builder takes it.
+    Loaded,
+    /// Building.
+    Building,
+    /// Built, in the upload slot until the upload stage takes it.
+    Graphed,
+    /// Writing and uploading its index.
+    Uploading,
+}
+
+/// A job that has not ended, as [`Pipeline::in_flight`] reports it.
+#[derive(Debug, Clone)]
+pub struct InFlight {
+    /// The job.
+    pub job: Job,
+    /// Its stage.
+    pub stage: Stage,
+    /// When it entered that stage.
+    pub since: Instant,
+    /// Canceled: a queued job will not start, a download or upload stops,
+    /// a build runs to its end and the job ends there.
+    pub canceled: bool,
+}
+
+/// The jobs submitted and not ended, in order.
+#[derive(Debug, Default)]
+struct Board(Mutex<Vec<Arc<Progress>>>);
+
+/// One job's place, from its submission until it ends.
+#[derive(Debug)]
+struct Progress {
+    job: Job,
+    cancel: Cancel,
+    /// Its stage and since when; `None` once it has ended.
+    stage: Mutex<Option<(Stage, Instant)>>,
+}
+
+const BOARD_POISONED: &str = "a thread panicked holding the pipeline's job list";
+
+impl Board {
+    /// Puts `job` on the `board`, locked, after dropping the jobs that
+    /// have ended: it holds no more than the jobs in flight and those that
+    /// ended since the last job came.
+    fn track(board: &mut Vec<Arc<Progress>>, job: &Job, cancel: &Cancel) -> Track {
+        Self::prune(board);
+        let progress = Arc::new(Progress {
+            job: job.clone(),
+            cancel: cancel.clone(),
+            stage: Mutex::new(Some((Stage::Queued, Instant::now()))),
+        });
+        board.push(Arc::clone(&progress));
+        Track(progress)
+    }
+
+    fn prune(board: &mut Vec<Arc<Progress>>) {
+        board.retain(|progress| progress.stage.lock().expect(BOARD_POISONED).is_some());
+    }
+
+    fn in_flight(&self) -> Vec<InFlight> {
+        let mut jobs = self.0.lock().expect(BOARD_POISONED);
+        Self::prune(&mut jobs);
+        jobs.iter()
+            .filter_map(|progress| {
+                let (stage, since) = (*progress.stage.lock().expect(BOARD_POISONED))?;
+                Some(InFlight {
+                    job: progress.job.clone(),
+                    stage,
+                    since,
+                    canceled: progress.cancel.is_canceled(),
+                })
+            })
+            .collect()
+    }
+}
+
+/// A job's entry on the board, carried with it through the stages: it
+/// ends however the job does, its stage dropping it.
+#[derive(Debug)]
+struct Track(Arc<Progress>);
+
+impl Track {
+    fn enter(&self, stage: Stage) {
+        *self.0.stage.lock().expect(BOARD_POISONED) = Some((stage, Instant::now()));
+    }
+}
+
+impl Drop for Track {
+    fn drop(&mut self) {
+        // A poisoned lock is left as it is: the board's next look panics.
+        if let Ok(mut stage) = self.0.stage.lock() {
+            *stage = None;
+        }
+    }
+}
+
 /// A job waiting to download.
 struct Queued {
     job: Job,
     cancel: Cancel,
     claim: Arc<Claim>,
     report: oneshot::Sender<Result<Built, JobError>>,
+    track: Track,
 }
 
 impl Queued {
@@ -283,7 +415,7 @@ impl Queued {
 }
 
 /// The host memory the jobs' buffers may take at once, in MiB.
-struct Budget {
+pub(crate) struct Budget {
     mib: Arc<Semaphore>,
     total: u32,
 }
@@ -292,24 +424,33 @@ impl Budget {
     const MIB: u64 = 1 << 20;
 
     fn new(bytes: u64) -> Self {
-        // Whole MiB, at least one, and a count one permit can take.
-        let max = u32::try_from(Semaphore::MAX_PERMITS).unwrap_or(u32::MAX);
-        let total = u32::try_from(bytes / Self::MIB)
-            .unwrap_or(u32::MAX)
-            .clamp(1, max);
+        let total = Self::total(bytes);
         Self {
             mib: Arc::new(Semaphore::new(total as usize)),
             total,
         }
     }
 
-    /// Waits for `job`'s share: its buffers rounded up to whole MiB, or
-    /// the whole budget when they are larger.
-    async fn take(&self, job: &Job) -> OwnedSemaphorePermit {
+    /// The MiB a budget of `bytes` holds: whole MiB, at least one, and a
+    /// count one permit can take.
+    pub(crate) fn total(bytes: u64) -> u32 {
+        let max = u32::try_from(Semaphore::MAX_PERMITS).unwrap_or(u32::MAX);
+        u32::try_from(bytes / Self::MIB)
+            .unwrap_or(u32::MAX)
+            .clamp(1, max)
+    }
+
+    /// `job`'s share of a budget of `total` MiB: its buffers rounded up to
+    /// whole MiB, or the whole budget when they are larger.
+    pub(crate) fn share(job: &Job, total: u32) -> u32 {
         let mib = job.host_bytes().div_ceil(Self::MIB);
-        let share = u32::try_from(mib).map_or(self.total, |mib| mib.clamp(1, self.total));
+        u32::try_from(mib).map_or(total, |mib| mib.clamp(1, total))
+    }
+
+    /// Waits for `job`'s share.
+    async fn take(&self, job: &Job) -> OwnedSemaphorePermit {
         Arc::clone(&self.mib)
-            .acquire_many_owned(share)
+            .acquire_many_owned(Self::share(job, self.total))
             .await
             .expect("the budget is never closed")
     }
@@ -365,14 +506,19 @@ async fn downloads(
             job.fail(JobError::Canceled);
             continue;
         }
+        job.track.enter(Stage::Downloading);
         let start = Instant::now();
         match load(&store, &job.job, &job.cancel).await {
-            Ok(dataset) => slot.send(Loaded {
-                queued: job,
-                dataset,
-                download: Span::since(start),
-                memory,
-            }),
+            Ok(dataset) => {
+                let download = Span::since(start);
+                job.track.enter(Stage::Loaded);
+                slot.send(Loaded {
+                    queued: job,
+                    dataset,
+                    download,
+                    memory,
+                });
+            }
             Err(error) => job.fail(error),
         }
     }
@@ -406,6 +552,7 @@ fn builds<B: Builder>(
             job.queued.fail(JobError::Canceled);
             continue;
         }
+        job.queued.track.enter(Stage::Building);
         let start = Instant::now();
         // Defense in depth at the job boundary: a panicking build fails
         // its job, not the stage.
@@ -417,8 +564,10 @@ fn builds<B: Builder>(
                 if job.queued.job.skip_stored_vectors {
                     job.dataset.vectors.release_values();
                 }
+                let span = Span::since(start);
+                job.queued.track.enter(Stage::Graphed);
                 slot.send(Graphed {
-                    build: Span::since(start),
+                    build: span,
                     loaded: job,
                     graph,
                     degree,
@@ -460,6 +609,7 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
             degree,
             build,
         } = job;
+        queued.track.enter(Stage::Uploading);
         let start = Instant::now();
         let (store, request, cancel) = (store.clone(), queued.job.clone(), queued.cancel.clone());
         // The inputs and the graph are freed as the write ends.

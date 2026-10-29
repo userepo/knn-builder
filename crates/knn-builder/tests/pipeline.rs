@@ -16,10 +16,14 @@
 
 mod common;
 
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use common::{S3, ids, le_ids};
-use knn_builder::{Builder, Built, DataType, FakeBuilder, Job, JobError, Pipeline, SpaceType};
+use knn_builder::cost::Stages;
+use knn_builder::forecast::Forecaster;
+use knn_builder::{
+    Builder, Built, DataType, FakeBuilder, Job, JobError, Pipeline, SpaceType, Span, Stage,
+};
 use knn_gpu::{BuildParams, fp16};
 use knn_write::{IndexFile, IndexSpec, Vectors};
 
@@ -234,6 +238,78 @@ async fn keeps_the_jobs_in_memory_within_the_budget() {
     // until it has: neither downloads while the builder works.
     assert!(large.download.start >= small2.upload.end);
     assert!(small3.download.start >= large.upload.end);
+    s3.remove().await;
+}
+
+/// How far a forecast may miss when it knows each stage's time, in
+/// seconds: what the stages' hand-offs take.
+const FORECAST_SLACK: f64 = 0.05;
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn ends_the_jobs_when_the_forecast_says() {
+    let s3 = S3::new("forecast").await;
+    // The budget test's jobs: the large one waits for both small ones
+    // before it, and the last small one for the large one.
+    let jobs = [
+        job(&s3.bucket, "small1", 600, 16),
+        job(&s3.bucket, "small2", 600, 16),
+        job(&s3.bucket, "large", 20_000, 32),
+        job(&s3.bucket, "small3", 600, 16),
+    ];
+    for job in &jobs {
+        s3.put_inputs(job, &values(job), Blob::F32, None).await;
+    }
+    let builder = FakeBuilder::new(Duration::from_millis(400));
+    let pipeline = Pipeline::start(s3.store.clone(), builder, BUDGET);
+    let handles: Vec<_> = jobs
+        .iter()
+        .map(|job| pipeline.submit(job.clone()))
+        .collect();
+    let submitted = (Instant::now(), pipeline.in_flight());
+    let order: Vec<_> = submitted.1.iter().map(|f| f.job.clone()).collect();
+    assert_eq!(order, jobs, "in the order submitted");
+    // Partway: the first jobs are on, or past, the builder.
+    tokio::time::sleep(Duration::from_millis(700)).await;
+    let partway = (Instant::now(), pipeline.in_flight());
+    assert!(partway.1.len() < jobs.len(), "{:?}", partway.1);
+    assert!(
+        partway.1.iter().any(|f| f.stage != Stage::Queued),
+        "{:?}",
+        partway.1
+    );
+    let mut timings = Vec::new();
+    for handle in handles {
+        timings.push(handle.outcome().await.unwrap().timings);
+    }
+    assert!(pipeline.in_flight().is_empty(), "every job has ended");
+    pipeline.close().await;
+
+    // Told what each stage of each job took, the forecast plays the
+    // pipeline's rules: each job ends when it did.
+    let took = |job: &Job| {
+        let t = timings[jobs.iter().position(|j| j == job).unwrap()];
+        let seconds = |span: Span| span.duration().as_secs_f64();
+        Stages {
+            download: seconds(t.download),
+            build: seconds(t.build),
+            upload: seconds(t.upload),
+        }
+    };
+    let forecaster = Forecaster::new(took, BUDGET);
+    for (label, (now, in_flight)) in [("at submission", &submitted), ("partway", &partway)] {
+        let forecast = forecaster.forecast(*now, in_flight, None);
+        for (flight, forecast) in in_flight.iter().zip(&forecast.ends) {
+            let i = jobs.iter().position(|j| *j == flight.job).unwrap();
+            let ended = timings[i].upload.end.saturating_duration_since(*now);
+            let (forecast, ended) = (forecast.as_secs_f64(), ended.as_secs_f64());
+            println!("job {i} {label}: forecast {forecast:.3} s, ended after {ended:.3} s");
+            assert!(
+                (forecast - ended).abs() <= FORECAST_SLACK,
+                "job {i} {label}: forecast {forecast:.3} s, ended after {ended:.3} s"
+            );
+        }
+    }
     s3.remove().await;
 }
 

@@ -103,8 +103,19 @@ mod ffi {
 
         pub(super) fn cudaFree(pointer: *mut c_void) -> c_int;
 
+        pub(super) fn cudaGetDevice(device: *mut c_int) -> c_int;
+
+        pub(super) fn cudaDeviceGetAttribute(
+            value: *mut c_int,
+            attr: c_int,
+            device: c_int,
+        ) -> c_int;
+
         pub(super) fn cudaGetErrorString(error: c_int) -> *const c_char;
     }
+
+    /// `cudaDevAttrMaxSharedMemoryPerBlockOptin`.
+    pub(super) const MAX_SHARED_MEMORY_PER_BLOCK_OPTIN: c_int = 97;
 }
 
 /// [`Error::Cuvs`] for a CUDA runtime call that returned `status`, with
@@ -144,6 +155,40 @@ pub fn device_memory() -> Result<DeviceMemory, Error> {
         return Ok(DeviceMemory { free, total });
     }
     Err(runtime_error("cudaMemGetInfo", status))
+}
+
+/// The shared memory a block may take on the device current on the calling
+/// thread, opting in past the default (`sharedMemPerBlockOptin`), in bytes:
+/// what decides which IVF-PQ search kernel cuVS can run.
+///
+/// # Errors
+///
+/// Returns [`Error::Cuvs`] naming `cudaGetDevice` or
+/// `cudaDeviceGetAttribute` when the runtime fails.
+pub fn shared_memory_per_block() -> Result<usize, Error> {
+    let mut device = 0;
+    // SAFETY: a valid out-pointer, written and not kept.
+    let status = unsafe { ffi::cudaGetDevice(&raw mut device) };
+    if status != 0 {
+        return Err(runtime_error("cudaGetDevice", status));
+    }
+    let mut bytes = 0;
+    // SAFETY: a valid out-pointer, written and not kept; the attribute and
+    // the device are the runtime's own values.
+    let status = unsafe {
+        ffi::cudaDeviceGetAttribute(
+            &raw mut bytes,
+            ffi::MAX_SHARED_MEMORY_PER_BLOCK_OPTIN,
+            device,
+        )
+    };
+    if status != 0 {
+        return Err(runtime_error("cudaDeviceGetAttribute", status));
+    }
+    usize::try_from(bytes).map_err(|_| Error::Cuvs {
+        call: "cudaDeviceGetAttribute",
+        message: format!("{bytes} bytes of shared memory a block"),
+    })
 }
 
 /// Device memory held and left unused until dropped, so that less is free
@@ -308,13 +353,27 @@ impl fmt::Debug for Graph {
 /// The resources use the device current when the first build runs; a
 /// `Gpu` moved to another thread must find that device current there too,
 /// which holds on a single-GPU host, the only kind supported so far.
+///
+/// Builds on several threads at once, through separate `Gpu`s, are not
+/// supported; run one build at a time in a process. The k-means that
+/// trains the IVF-PQ lists (cuVS's `kmeans_balanced`) keeps cluster labels
+/// and sizes in CUDA managed memory and reads them on the host. Where the
+/// device does not offer concurrent managed access
+/// (`cudaDevAttrConcurrentManagedAccess` is 0, as under WSL2), the driver
+/// faults a host access to that memory while any kernel of the process
+/// runs, so one build's read during another build's kernels ends the
+/// process with SIGSEGV. Where the device does offer it, builds still race
+/// on a static counter that the k-means updates without synchronization.
 #[derive(Debug)]
 pub struct Gpu {
     resources: Resources,
 }
 
 impl Gpu {
-    /// Creates the resources.
+    /// Creates the resources, with a workspace (what cuVS plans its batches
+    /// by) of a quarter of the device's memory, at most 2 GiB: so every GPU
+    /// of 8 GB or more batches a build alike, and takes the device memory
+    /// it takes on one.
     ///
     /// # Errors
     ///

@@ -1,7 +1,8 @@
 //! Device memory after many builds, some failing inside cuVS: every build,
-//! finished or not, must give back what it took; and a reservation holds
-//! what it took until dropped. Needs the `gpu` feature, a CUDA GPU and the
-//! conda environment in `environment.yml`.
+//! finished or not, must give back what it took; a reservation holds what
+//! it took until dropped; and the device's shared memory a block reads as a
+//! GPU's can. Needs the `gpu` feature, a CUDA GPU and the conda environment
+//! in `environment.yml`.
 
 // The clippy.toml test allowances cover `#[test]` functions, not the
 // helpers beside them; in a test crate panicking is the failure mechanism
@@ -13,7 +14,18 @@
     reason = "test crate"
 )]
 
-use knn_gpu::{BuildParams, Error, Gpu, HostVectors, Metric, Reservation, device_memory};
+use std::sync::Mutex;
+
+use knn_gpu::{
+    BuildParams, Error, Gpu, HostVectors, Metric, Reservation, device_memory,
+    shared_memory_per_block,
+};
+
+/// Held by each test that builds or measures free device memory: cargo
+/// runs the tests on parallel threads, two builds at once can crash the
+/// process (see `Gpu`), and one test's allocations would skew another's
+/// measurements.
+static GPU: Mutex<()> = Mutex::new(());
 
 fn free_device_memory() -> usize {
     device_memory().unwrap().free
@@ -49,6 +61,7 @@ fn failing(params: &BuildParams) -> BuildParams {
 
 #[test]
 fn builds_return_their_device_memory() {
+    let _gpu = GPU.lock().expect("a GPU test failed holding the lock");
     let values = random_vectors(ROWS * DIM, 7);
     let params = BuildParams::new(20_000, 64, 16, Metric::L2).unwrap();
     let mut gpu = Gpu::new().unwrap();
@@ -107,6 +120,7 @@ fn builds_return_their_device_memory() {
 
 #[test]
 fn a_reservation_holds_its_memory_until_dropped() {
+    let _gpu = GPU.lock().expect("a GPU test failed holding the lock");
     let before = free_device_memory();
     let reservation = Reservation::new(256 * MIB).unwrap();
     assert_eq!(reservation.bytes(), 256 * MIB);
@@ -143,4 +157,14 @@ fn a_reservation_holds_its_memory_until_dropped() {
         "{too_much:?}"
     );
     assert_eq!(Reservation::new(0).unwrap().bytes(), 0);
+}
+
+#[test]
+fn reads_the_shared_memory_a_block_may_take() {
+    // Every GPU cuVS 26.08 runs on (compute capability 7.0 and later)
+    // lets a block opt in to more than the default 48 KiB, and none yet
+    // to 256 KiB.
+    let bytes = shared_memory_per_block().unwrap();
+    println!("{bytes} bytes of shared memory a block");
+    assert!((48 << 10..256 << 10).contains(&bytes), "{bytes}");
 }
