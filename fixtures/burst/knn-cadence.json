@@ -1,0 +1,89 @@
+{
+ "mode": "cadence",
+ "flush_status": {
+  "check-cadence-5": 200,
+  "check-cadence-3": 200,
+  "check-cadence-2": 200,
+  "check-cadence-1": 200,
+  "check-cadence-4": 200,
+  "check-cadence-0": 200
+ },
+ "build_requests": {
+  "200": 6
+ },
+ "status_requests": 37,
+ "knn_client_stats_delta": {
+  "status_request_failure_count": 0,
+  "index_build_terminal_exception": 0,
+  "status_request_success_count": 37,
+  "index_build_success_count": 6,
+  "index_build_failure_count": 0,
+  "build_request_failure_count": 0,
+  "index_build_merge_abort_exception": 0,
+  "build_request_success_count": 6,
+  "waiting_time_in_ms": 9855
+ },
+ "jobs": {
+  "d03fcba69c04883d199218df092a3c5e205f06fcecfb85492f12e1db1554207c": {
+   "first_poll_s": 0.68,
+   "gaps_s": [
+    0.18
+   ]
+  },
+  "e9c5bb361508c8af1cba0195e92399b1cff91108f392bd5ff49d8de583976835": {
+   "first_poll_s": 0.65,
+   "gaps_s": [
+    0.16,
+    0.2,
+    0.22,
+    0.22
+   ]
+  },
+  "316d281210fa0c31789235964d44a515938da6fdacef1e35f4e9e6974e8a3091": {
+   "first_poll_s": 0.51,
+   "gaps_s": [
+    0.18,
+    0.17,
+    0.2,
+    0.18,
+    0.2,
+    0.18,
+    0.24
+   ]
+  },
+  "8b45bfa8c08b058fc4d7bdd8a094aa01d68dc3906596970a84b4aa93307c87cc": {
+   "first_poll_s": 0.49,
+   "gaps_s": [
+    0.23,
+    0.21,
+    0.22,
+    0.17,
+    0.22,
+    0.17,
+    0.2
+   ]
+  },
+  "e1eac6566f773b6e8eda220f5813167d004578d7dc1bffac0abf64c917c6e0a3": {
+   "first_poll_s": 0.71,
+   "gaps_s": [
+    0.19,
+    0.21,
+    0.21,
+    0.23,
+    0.17,
+    0.24,
+    0.18
+   ]
+  },
+  "b2bb33664494752961e3f55d6603fc3aeb51be527feaec9ad050aacfdfcf6517": {
+   "first_poll_s": 0.58,
+   "gaps_s": [
+    0.2,
+    0.22,
+    0.17,
+    0.24,
+    0.23
+   ]
+  }
+ }
+}

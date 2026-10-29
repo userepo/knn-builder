@@ -232,3 +232,55 @@ async fn drops_the_jobs_the_data_node_stopped_waiting_for() {
     service.close().await;
     s3.remove().await;
 }
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn drops_the_jobs_forecast_again_to_miss_once_one_ends() {
+    let s3 = S3::new("service-recheck").await;
+    let requests: Vec<_> = (0..4)
+        .map(|i| request(&s3, &format!("job{i}"), &json!({})))
+        .collect();
+    for request in &requests {
+        put_inputs(&s3, request).await;
+    }
+    // Builds the model has at half a second take 3 s: all four are
+    // forecast to end within the 4 s timeout, and taken.
+    let settings = Settings {
+        client_timeout: Duration::from_secs(4),
+        poll_interval: Duration::ZERO,
+        ..Settings::default()
+    };
+    let builder = FakeBuilder::new(Duration::from_secs(3));
+    let service = Service::start(s3.store.clone(), builder.clone(), settings);
+    let submitted = Instant::now();
+    let ids: Vec<_> = requests
+        .iter()
+        .map(|request| service.submit(request.clone()).unwrap())
+        .collect();
+    // Once the first has ended, at 3 s, the jobs still waiting for the
+    // builder are forecast again to end past 4 s, and dropped at once,
+    // before their deadline: their data nodes need not wait it out.
+    let forecast_late = Status::Failed {
+        error_message: "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 4 s".to_owned(),
+    };
+    for job_id in &ids[2..] {
+        assert_eq!(ended(&service, job_id).await, forecast_late);
+        assert!(submitted.elapsed() < Duration::from_secs(4));
+    }
+    assert!(matches!(
+        ended(&service, &ids[0]).await,
+        Status::Completed { .. }
+    ));
+    // The second was building already: it runs on past its deadline,
+    // and is dropped there.
+    assert_eq!(
+        ended(&service, &ids[1]).await,
+        Status::Failed {
+            error_message: "the data node's timeout of 4 s passed, so the job was dropped"
+                .to_owned(),
+        }
+    );
+    assert_eq!(builder.builds(), 2);
+    service.close().await;
+    s3.remove().await;
+}

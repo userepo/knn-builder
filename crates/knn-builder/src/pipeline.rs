@@ -17,7 +17,7 @@
 //! forecast of when each will end.
 
 use std::panic::{self, AssertUnwindSafe};
-use std::sync::atomic::{AtomicU8, Ordering};
+use std::sync::atomic::{AtomicU8, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -38,6 +38,8 @@ use crate::{Builder, Job, JobError};
 pub struct Pipeline {
     queue: mpsc::UnboundedSender<Queued>,
     board: Arc<Board>,
+    /// The number the next job submitted gets.
+    next: AtomicU64,
     downloads: JoinHandle<()>,
     builds: thread::JoinHandle<()>,
     uploads: JoinHandle<()>,
@@ -72,6 +74,7 @@ impl Pipeline {
         Self {
             queue,
             board: Arc::default(),
+            next: AtomicU64::new(0),
             downloads,
             builds,
             uploads,
@@ -92,7 +95,8 @@ impl Pipeline {
         // On the board and in the queue under one lock, so both hold the
         // jobs in one order.
         let mut board = self.board.0.lock().expect(BOARD_POISONED);
-        let track = Board::track(&mut board, &job, &cancel);
+        let id = self.next.fetch_add(1, Ordering::Relaxed);
+        let track = Board::track(&mut board, id, &job, &cancel);
         // Stages that stopped drop the job, whose outcome is then
         // `Stopped`.
         _ = self.queue.send(Queued {
@@ -104,6 +108,7 @@ impl Pipeline {
         });
         drop(board);
         JobHandle {
+            id,
             cancel,
             claim,
             outcome,
@@ -121,11 +126,19 @@ impl Pipeline {
         self.board.in_flight()
     }
 
+    /// What tells the jobs in flight from elsewhere, such as from a task
+    /// that does not hold the pipeline.
+    #[must_use]
+    pub fn flights(&self) -> Flights {
+        Flights(Arc::clone(&self.board))
+    }
+
     /// Takes no more jobs, and waits until every job taken has ended.
     pub async fn close(self) {
         let Self {
             queue,
             board: _,
+            next: _,
             downloads,
             builds,
             uploads,
@@ -142,12 +155,20 @@ impl Pipeline {
 /// A job in the pipeline.
 #[derive(Debug)]
 pub struct JobHandle {
+    id: u64,
     cancel: Cancel,
     claim: Arc<Claim>,
     outcome: oneshot::Receiver<Result<Built, JobError>>,
 }
 
 impl JobHandle {
+    /// The job's number: the order it was submitted in, as
+    /// [`InFlight::id`] reports it.
+    #[must_use]
+    pub fn id(&self) -> u64 {
+        self.id
+    }
+
     /// Cancels the job, as [`Canceler::cancel`] does.
     pub fn cancel(&self) {
         self.canceler().cancel();
@@ -170,6 +191,7 @@ impl JobHandle {
     /// The job's failure.
     pub async fn outcome(self) -> Result<Built, JobError> {
         let Self {
+            id: _,
             cancel,
             claim,
             outcome,
@@ -317,6 +339,8 @@ pub enum Stage {
 /// A job that has not ended, as [`Pipeline::in_flight`] reports it.
 #[derive(Debug, Clone)]
 pub struct InFlight {
+    /// Its number, as [`JobHandle::id`] gives it.
+    pub id: u64,
     /// The job.
     pub job: Job,
     /// Its stage.
@@ -328,6 +352,23 @@ pub struct InFlight {
     pub canceled: bool,
 }
 
+/// The jobs in flight of a pipeline, as [`Pipeline::flights`] gives
+/// them; clones tell the same.
+#[derive(Debug, Clone)]
+pub struct Flights(Arc<Board>);
+
+impl Flights {
+    /// As [`Pipeline::in_flight`].
+    ///
+    /// # Panics
+    ///
+    /// After a thread panicked while it held the list, a bug.
+    #[must_use]
+    pub fn in_flight(&self) -> Vec<InFlight> {
+        self.0.in_flight()
+    }
+}
+
 /// The jobs submitted and not ended, in order.
 #[derive(Debug, Default)]
 struct Board(Mutex<Vec<Arc<Progress>>>);
@@ -335,6 +376,7 @@ struct Board(Mutex<Vec<Arc<Progress>>>);
 /// One job's place, from its submission until it ends.
 #[derive(Debug)]
 struct Progress {
+    id: u64,
     job: Job,
     cancel: Cancel,
     /// Its stage and since when; `None` once it has ended.
@@ -347,9 +389,10 @@ impl Board {
     /// Puts `job` on the `board`, locked, after dropping the jobs that
     /// have ended: it holds no more than the jobs in flight and those that
     /// ended since the last job came.
-    fn track(board: &mut Vec<Arc<Progress>>, job: &Job, cancel: &Cancel) -> Track {
+    fn track(board: &mut Vec<Arc<Progress>>, id: u64, job: &Job, cancel: &Cancel) -> Track {
         Self::prune(board);
         let progress = Arc::new(Progress {
+            id,
             job: job.clone(),
             cancel: cancel.clone(),
             stage: Mutex::new(Some((Stage::Queued, Instant::now()))),
@@ -369,6 +412,7 @@ impl Board {
             .filter_map(|progress| {
                 let (stage, since) = (*progress.stage.lock().expect(BOARD_POISONED))?;
                 Some(InFlight {
+                    id: progress.id,
                     job: progress.job.clone(),
                     stage,
                     since,
@@ -410,8 +454,12 @@ struct Queued {
 
 impl Queued {
     fn fail(self, error: JobError) {
+        // Off the board before its end is told, so whoever hears of it
+        // sees it gone.
+        let Self { report, track, .. } = self;
+        drop(track);
         // The handle may be gone; the job ends all the same.
-        _ = self.report.send(Err(error));
+        _ = report.send(Err(error));
     }
 }
 
@@ -646,7 +694,10 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
         // The buffers are freed; the share goes back before the job ends,
         // so the next one may start downloading at once.
         drop(memory);
-        _ = queued.report.send(outcome);
+        // Off the board before its end is told, as in `Queued::fail`.
+        let Queued { report, track, .. } = queued;
+        drop(track);
+        _ = report.send(outcome);
     }
 }
 

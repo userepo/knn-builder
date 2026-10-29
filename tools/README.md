@@ -129,6 +129,33 @@ docker compose -f tools/cluster/docker-compose.yml down -v
 
 Where the fixtures hold the same segment built by the upstream service (float `l2` and `cosinesimil`, half_float `l2`, on-disk `l2`), knn-builder's file has its layout and its size. On a run of 2026-10-29 it also had its recall@10 on 200 of its own vectors (1.0, 0.9995, 1.0 and 0.984); the GPU build is not deterministic, so another run's recall can differ in its last digits. cuVS refuses a CAGRA build of a small inner-product or cosine set, 500 random vectors here, as it did for the upstream service when those fixtures were built, and the node then builds the segment itself; 2,000 build. knn-builder does not build `byte` or `binary` vectors yet: their build requests get a 422, and the node builds those segments itself too.
 
+## Burst
+
+`burst/burst.py` sends a burst of build requests to one service as k-NN 3.9.0.0's data nodes would, all at once, and records how each ends for its data node: built in time, refused, failed, or timed out, and how long it waited before building the segment on its own CPU. Each request follows k-NN's client: one retry, a second later, of a 408, 409, 429, 500, 502, 503 or 509; a wait that starts as the request returns, a first status request after three poll intervals and one an interval after, each stretched by 0.8 to 1.2; and the CPU build on a 507, a failed job, a status request that fails, or the timeout. The jobs share one blob per input, differing by tenant id, so 48 jobs need only the four inputs' 2.3 GB in LocalStack. `burst/docker-compose.yml` runs it, in the upstream image for boto3, against knn-builder's image or the upstream one, which knows nothing of the data node's timeout; under WSL2 the upstream service needs `MAX_WORKERS=1`, as two builds at once crash it (as they would knn-gpu's, see `Gpu`):
+
+```sh
+docker build -t knn-builder:dev .
+$RUN $API tools/make_inputs.py grid target/burst/inputs l2-1000000x128 l2-500000x384 l2-250000x768 l2-100000x768
+SERVICE_IMAGE=knn-builder:dev LABEL=knn-builder docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
+docker compose -f tools/burst/docker-compose.yml down
+SERVICE_IMAGE=$API MAX_WORKERS=1 LABEL=upstream-1-worker docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
+docker compose -f tools/burst/docker-compose.yml down
+```
+
+`JOBS` (48), `TIMEOUT_SECONDS` (90), `POLL_SECONDS` (5), `SEED` (1) and `NAMES` set the burst; each run writes `target/burst/<LABEL>.json`.
+
+`burst/knn_check.py` checks the driver's model against k-NN itself, on the cluster above: it sets the node's poll interval and timeout, flushes six small indices at once, and reads the builder's request log. `cadence` (with 200 ms polls, so the builds outlast several) times k-NN's first status request after each build request and the gaps after it; `refused`, with the builder started at `CLIENT_TIMEOUT_SECONDS=10`, below k-NN's first poll, checks that k-NN sends each refused request once, never polls it, and builds the segment itself:
+
+```sh
+CLIENT_POLL_INTERVAL_SECONDS=1 docker compose -f tools/cluster/docker-compose.yml up -d
+python tools/burst/knn_check.py cadence
+CLIENT_TIMEOUT_SECONDS=10 docker compose -f tools/cluster/docker-compose.yml up -d builder
+python tools/burst/knn_check.py refused
+docker compose -f tools/cluster/docker-compose.yml down -v
+```
+
+`fixtures/burst/` holds the results.
+
 ## Peak memory
 
 `knn-builder`'s `e2e` example runs whole jobs through its pipeline on the GPU against LocalStack: `put` uploads inputs, `build` runs them and appends each job's stage times and peak resident memory (`VmHWM`, reset before each job: what is resident when the job starts, the CUDA runtime and whatever the allocator kept from earlier jobs, plus the job's own peak; one job per invocation gives a job's figure alone) to `runs.json`, `get` streams the index files to disk for `score.py`. Each runs as a process of its own, so `put` and `get` stay out of the measured peak. In WSL, in the conda environment, with LocalStack on port 4566 and the S3 settings the service reads:

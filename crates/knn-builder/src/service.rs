@@ -25,7 +25,10 @@
 //! - A job the data node has stopped waiting for, its timeout counted
 //!   from the request, is canceled: one queued never starts, a transfer
 //!   stops, and a build runs to its end but stores nothing. The service
-//!   builds such a job anyway.
+//!   builds such a job anyway. And whenever a job ends, the jobs not yet
+//!   building are forecast again, with what the ended ones taught, and
+//!   those that would now miss are canceled at once, so their data nodes
+//!   build the segments themselves at their next poll.
 //! - A new job also gets 507 at once when the GPU's memory cannot hold its
 //!   build, with the service's message, or when the data node, as it
 //!   polls, would see it ended only past its timeout, or, when asked, when
@@ -34,7 +37,7 @@
 //!   timeout or its failure.
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 use knn_store::Store;
@@ -44,7 +47,7 @@ use tokio::task::JoinSet;
 use crate::cost::CpuThreads;
 use crate::gate::Gate;
 use crate::request::{BuildRequest, JobId};
-use crate::{Builder, Built, Canceler, DataType, JobError, Pipeline};
+use crate::{Builder, Built, Canceler, DataType, Flights, JobError, Pipeline};
 
 const POISONED: &str = "a thread panicked holding the job store";
 
@@ -232,6 +235,10 @@ struct Inner {
     jobs: Jobs,
     /// What lets a new job in, and learns from those that end.
     gate: Gate,
+    /// The pipeline's jobs in flight, for the forecast.
+    flights: Flights,
+    /// The jobs let in and not ended, by their number in the pipeline.
+    watches: HashMap<u64, Watch>,
     /// A task per running job, recording its outcome.
     recorders: JoinSet<()>,
 }
@@ -250,13 +257,16 @@ impl Service {
             reason = "bytes, saturating; a limit below 0 leaves the pipeline its least budget"
         )]
         let host_memory = settings.cpu_memory_limit as u64;
+        let pipeline = Pipeline::start(store, builder, host_memory);
         Self {
             inner: Arc::new(Mutex::new(Inner {
                 jobs: Jobs::new(settings),
                 gate: Gate::new(&settings),
+                flights: pipeline.flights(),
+                watches: HashMap::new(),
                 recorders: JoinSet::new(),
             })),
-            pipeline: Pipeline::start(store, builder, host_memory),
+            pipeline,
         }
     }
 
@@ -295,7 +305,7 @@ impl Service {
                 };
                 // Under the store's lock, so the next request's forecast
                 // counts this job.
-                let in_flight = self.pipeline.in_flight();
+                let in_flight = inner.flights.in_flight();
                 let admitted = inner
                     .gate
                     .admit(job_id, &vector_path, &job, &in_flight, now)?;
@@ -307,7 +317,19 @@ impl Service {
                 );
                 let learned = job.clone();
                 let handle = self.pipeline.submit(job);
+                let id = handle.id();
                 let canceler = handle.canceler();
+                let reason = Arc::new(OnceLock::new());
+                inner.watches.insert(
+                    id,
+                    Watch {
+                        job_id: job_id.clone(),
+                        vector_path: vector_path.clone(),
+                        admitted: now,
+                        canceler: canceler.clone(),
+                        reason: Arc::clone(&reason),
+                    },
+                );
                 let stop = canceler.clone();
                 let shared = Arc::clone(&self.inner);
                 let (job_id, vector_path) = (job_id.clone(), vector_path.clone());
@@ -320,18 +342,23 @@ impl Service {
                     let outcome = tokio::select! {
                         outcome = &mut outcome => outcome,
                         () = past(deadline) => {
-                            tracing::info!(%job_id, vector_path, "past the data node's timeout: canceling the job");
-                            stop.cancel();
+                            let past = JobError::PastDeadline {
+                                seconds: timeout.as_secs(),
+                            };
+                            if reason.set(past).is_ok() {
+                                tracing::info!(%job_id, vector_path, "past the data node's timeout: canceling the job");
+                                stop.cancel();
+                            }
                             // An upload that sent its last request first
                             // has stored the index.
-                            outcome.await.map_err(|error| match error {
-                                JobError::Canceled => JobError::PastDeadline {
-                                    seconds: timeout.as_secs(),
-                                },
-                                error => error,
-                            })
+                            outcome.await
                         }
                     };
+                    // A cancel says why, when the service made it.
+                    let outcome = outcome.map_err(|error| match (error, reason.get()) {
+                        (JobError::Canceled, Some(why)) => why.clone(),
+                        (error, _) => error,
+                    });
                     let ended = Instant::now();
                     log_end(&job_id, &vector_path, &outcome);
                     let mut inner = shared.lock().expect(POISONED);
@@ -339,6 +366,10 @@ impl Service {
                         inner.gate.learn(&learned, &built.timings);
                     }
                     inner.jobs.end(&job_id, outcome, ended);
+                    inner.watches.remove(&id);
+                    // What this one taught, and the room it left, may move
+                    // the others' forecasts.
+                    inner.recheck(ended);
                 });
                 Ok(State::Running(canceler))
             });
@@ -405,6 +436,50 @@ async fn past(deadline: Option<Instant>) {
     match deadline {
         Some(deadline) => tokio::time::sleep_until(deadline.into()).await,
         None => std::future::pending().await,
+    }
+}
+
+/// A job let in, as the service watches it until it ends.
+#[derive(Debug)]
+struct Watch {
+    job_id: JobId,
+    vector_path: String,
+    /// When it was let in: the data node's wait starts about then.
+    admitted: Instant,
+    canceler: Canceler,
+    /// Why it was canceled, set by whoever cancels it first.
+    reason: Arc<OnceLock<JobError>>,
+}
+
+impl Inner {
+    /// Forecasts the jobs not yet building again, and cancels those that
+    /// would now miss the data node's timeout. Each fails at once: one
+    /// waiting in the build slot would otherwise end only when the builder
+    /// takes it, and none of them can store an index any more, the builder
+    /// and the upload each checking for the cancel before they start.
+    fn recheck(&mut self, now: Instant) {
+        let overdue = self.gate.overdue(now, &self.flights.in_flight(), |id| {
+            self.watches.get(&id).map(|watch| watch.admitted)
+        });
+        for id in overdue {
+            let Some(watch) = self.watches.get(&id) else {
+                continue;
+            };
+            let reason = JobError::WouldMissDeadline {
+                seconds: self.gate.timeout_seconds(),
+            };
+            if watch.reason.set(reason.clone()).is_ok() {
+                tracing::info!(
+                    job_id = %watch.job_id,
+                    vector_path = watch.vector_path,
+                    "forecast to miss the data node's timeout: canceling the job"
+                );
+                watch.canceler.cancel();
+                // The pipeline's report, when it comes, finds it ended.
+                let job_id = watch.job_id.clone();
+                self.jobs.end(&job_id, Err(reason), now);
+            }
+        }
     }
 }
 

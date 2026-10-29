@@ -1,0 +1,359 @@
+{
+ "label": "upstream-1-worker",
+ "service": "http://service:1025",
+ "jobs": 48,
+ "inputs": [
+  "l2-1000000x128",
+  "l2-500000x384",
+  "l2-250000x768",
+  "l2-100000x768"
+ ],
+ "timeout_seconds": 90.0,
+ "poll_seconds": 5.0,
+ "seed": 1,
+ "outcomes": {
+  "timed_out": 40,
+  "built": 8
+ },
+ "to_cpu": 40,
+ "cpu_wait_seconds": 3707.8,
+ "built_seen_after_max": 84.9,
+ "records": [
+  {
+   "index": 0,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.07688908398267813,
+   "outcome": "timed_out",
+   "cpu_after": 90.92605203200947
+  },
+  {
+   "index": 1,
+   "input": "l2-500000x384",
+   "post_seconds": 0.06416639502276666,
+   "outcome": "timed_out",
+   "cpu_after": 94.70035752299009
+  },
+  {
+   "index": 2,
+   "input": "l2-250000x768",
+   "post_seconds": 0.0850403470103629,
+   "outcome": "timed_out",
+   "cpu_after": 92.88381896499777
+  },
+  {
+   "index": 3,
+   "input": "l2-100000x768",
+   "post_seconds": 0.0800345349998679,
+   "outcome": "timed_out",
+   "cpu_after": 93.3276028370019
+  },
+  {
+   "index": 4,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.0770143439876847,
+   "outcome": "timed_out",
+   "cpu_after": 94.24912785401102
+  },
+  {
+   "index": 5,
+   "input": "l2-500000x384",
+   "post_seconds": 0.06667433399707079,
+   "outcome": "timed_out",
+   "cpu_after": 91.67198951399769
+  },
+  {
+   "index": 6,
+   "input": "l2-250000x768",
+   "post_seconds": 0.08513411099556834,
+   "outcome": "timed_out",
+   "cpu_after": 94.5750342149986
+  },
+  {
+   "index": 7,
+   "input": "l2-100000x768",
+   "post_seconds": 0.07518532298854552,
+   "outcome": "timed_out",
+   "cpu_after": 92.26549040700775
+  },
+  {
+   "index": 8,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.08837375600705855,
+   "outcome": "timed_out",
+   "cpu_after": 94.19570872699842
+  },
+  {
+   "index": 9,
+   "input": "l2-500000x384",
+   "post_seconds": 0.06643756298581138,
+   "outcome": "timed_out",
+   "cpu_after": 91.72692635000567
+  },
+  {
+   "index": 10,
+   "input": "l2-250000x768",
+   "post_seconds": 0.08056201098952442,
+   "outcome": "timed_out",
+   "cpu_after": 94.10859999898821
+  },
+  {
+   "index": 11,
+   "input": "l2-100000x768",
+   "post_seconds": 0.07397534098709002,
+   "outcome": "timed_out",
+   "cpu_after": 91.5282254430058
+  },
+  {
+   "index": 12,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.057829659985145554,
+   "outcome": "built",
+   "seen_after": 74.58912053701351
+  },
+  {
+   "index": 13,
+   "input": "l2-500000x384",
+   "post_seconds": 0.03474056799313985,
+   "outcome": "built",
+   "seen_after": 17.207009039004333
+  },
+  {
+   "index": 14,
+   "input": "l2-250000x768",
+   "post_seconds": 0.08793447498464957,
+   "outcome": "timed_out",
+   "cpu_after": 93.74552058801055
+  },
+  {
+   "index": 15,
+   "input": "l2-100000x768",
+   "post_seconds": 0.06497133799712174,
+   "outcome": "timed_out",
+   "cpu_after": 92.95495858500362
+  },
+  {
+   "index": 16,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.08236661498085596,
+   "outcome": "timed_out",
+   "cpu_after": 91.52276209500269
+  },
+  {
+   "index": 17,
+   "input": "l2-500000x384",
+   "post_seconds": 0.0829399760114029,
+   "outcome": "timed_out",
+   "cpu_after": 92.26436861700495
+  },
+  {
+   "index": 18,
+   "input": "l2-250000x768",
+   "post_seconds": 0.05785003799246624,
+   "outcome": "built",
+   "seen_after": 84.8718408549903
+  },
+  {
+   "index": 19,
+   "input": "l2-100000x768",
+   "post_seconds": 0.06313044900889508,
+   "outcome": "timed_out",
+   "cpu_after": 91.94904723600484
+  },
+  {
+   "index": 20,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.07092277400079183,
+   "outcome": "timed_out",
+   "cpu_after": 94.980315185996
+  },
+  {
+   "index": 21,
+   "input": "l2-500000x384",
+   "post_seconds": 0.06792939800652675,
+   "outcome": "timed_out",
+   "cpu_after": 90.44294816700858
+  },
+  {
+   "index": 22,
+   "input": "l2-250000x768",
+   "post_seconds": 0.081266825000057,
+   "outcome": "timed_out",
+   "cpu_after": 90.3096026770072
+  },
+  {
+   "index": 23,
+   "input": "l2-100000x768",
+   "post_seconds": 0.0863742369983811,
+   "outcome": "timed_out",
+   "cpu_after": 94.8695234110055
+  },
+  {
+   "index": 24,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.08049908198881894,
+   "outcome": "timed_out",
+   "cpu_after": 90.35522248898633
+  },
+  {
+   "index": 25,
+   "input": "l2-500000x384",
+   "post_seconds": 0.06876572399050929,
+   "outcome": "timed_out",
+   "cpu_after": 90.31300386600196
+  },
+  {
+   "index": 26,
+   "input": "l2-250000x768",
+   "post_seconds": 0.08644739401643164,
+   "outcome": "timed_out",
+   "cpu_after": 92.20040238299407
+  },
+  {
+   "index": 27,
+   "input": "l2-100000x768",
+   "post_seconds": 0.03850509601761587,
+   "outcome": "built",
+   "seen_after": 12.889783849997912
+  },
+  {
+   "index": 28,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.060945358010940254,
+   "outcome": "timed_out",
+   "cpu_after": 93.25756240601186
+  },
+  {
+   "index": 29,
+   "input": "l2-500000x384",
+   "post_seconds": 0.08522946899756789,
+   "outcome": "timed_out",
+   "cpu_after": 91.56579337001313
+  },
+  {
+   "index": 30,
+   "input": "l2-250000x768",
+   "post_seconds": 0.05974334999336861,
+   "outcome": "timed_out",
+   "cpu_after": 91.67765361999045
+  },
+  {
+   "index": 31,
+   "input": "l2-100000x768",
+   "post_seconds": 0.08499163700616919,
+   "outcome": "timed_out",
+   "cpu_after": 93.75429594700108
+  },
+  {
+   "index": 32,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.06766479599173181,
+   "outcome": "timed_out",
+   "cpu_after": 91.3079259340011
+  },
+  {
+   "index": 33,
+   "input": "l2-500000x384",
+   "post_seconds": 0.058072682993952185,
+   "outcome": "timed_out",
+   "cpu_after": 94.1974667070026
+  },
+  {
+   "index": 34,
+   "input": "l2-250000x768",
+   "post_seconds": 0.080618587002391,
+   "outcome": "timed_out",
+   "cpu_after": 92.20597123200423
+  },
+  {
+   "index": 35,
+   "input": "l2-100000x768",
+   "post_seconds": 0.04036025999812409,
+   "outcome": "built",
+   "seen_after": 37.46958675701171
+  },
+  {
+   "index": 36,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.07663699999102391,
+   "outcome": "timed_out",
+   "cpu_after": 92.11733804500545
+  },
+  {
+   "index": 37,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04036812900449149,
+   "outcome": "built",
+   "seen_after": 30.966490739985602
+  },
+  {
+   "index": 38,
+   "input": "l2-250000x768",
+   "post_seconds": 0.0862918889906723,
+   "outcome": "timed_out",
+   "cpu_after": 93.50424548599403
+  },
+  {
+   "index": 39,
+   "input": "l2-100000x768",
+   "post_seconds": 0.07728310499805957,
+   "outcome": "timed_out",
+   "cpu_after": 91.72648584400304
+  },
+  {
+   "index": 40,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.0827219809871167,
+   "outcome": "timed_out",
+   "cpu_after": 92.42605289100902
+  },
+  {
+   "index": 41,
+   "input": "l2-500000x384",
+   "post_seconds": 0.08114753098925576,
+   "outcome": "timed_out",
+   "cpu_after": 95.0541506090085
+  },
+  {
+   "index": 42,
+   "input": "l2-250000x768",
+   "post_seconds": 0.06563700299011543,
+   "outcome": "timed_out",
+   "cpu_after": 94.20608850001008
+  },
+  {
+   "index": 43,
+   "input": "l2-100000x768",
+   "post_seconds": 0.039713079982902855,
+   "outcome": "built",
+   "seen_after": 41.309740180993685
+  },
+  {
+   "index": 44,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.05196956399595365,
+   "outcome": "built",
+   "seen_after": 56.71585268501076
+  },
+  {
+   "index": 45,
+   "input": "l2-500000x384",
+   "post_seconds": 0.08668115598266013,
+   "outcome": "timed_out",
+   "cpu_after": 92.77168125798926
+  },
+  {
+   "index": 46,
+   "input": "l2-250000x768",
+   "post_seconds": 0.07287274900591001,
+   "outcome": "timed_out",
+   "cpu_after": 94.37632411299273
+  },
+  {
+   "index": 47,
+   "input": "l2-100000x768",
+   "post_seconds": 0.07780364400241524,
+   "outcome": "timed_out",
+   "cpu_after": 91.57801517599728
+  }
+ ]
+}

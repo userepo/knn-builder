@@ -3,7 +3,9 @@
 //! before the data node stops waiting for it, and, when asked, whether the
 //! data node would build it sooner itself. A job refused here gets 507 at
 //! once, which k-NN does not retry: the data node builds the segment on its
-//! CPU now, rather than after a timeout.
+//! CPU now, rather than after a timeout. As jobs end, and the forecast
+//! learns from them, the jobs let in and not yet building are forecast
+//! again, and those that would now miss are named, to be dropped.
 //!
 //! The data node's wait starts when its request returns. It asks for the
 //! job's status first after three poll intervals and then once an interval,
@@ -18,7 +20,7 @@ use crate::cost::{CpuThreads, Fitted};
 use crate::forecast::Forecaster;
 use crate::request::JobId;
 use crate::service::{Refusal, Settings};
-use crate::{InFlight, Job, Timings};
+use crate::{InFlight, Job, Stage, Timings};
 
 /// The most a poll interval stretches with k-NN's jitter.
 const JITTER: f64 = 1.2;
@@ -138,6 +140,39 @@ impl Gate {
         }
     }
 
+    /// The jobs `in_flight` not yet building that the forecast now has
+    /// seen ended only past the data node's timeout: their ids.
+    /// `admitted` gives when a job was let in, for the jobs it knows.
+    pub(crate) fn overdue(
+        &self,
+        now: Instant,
+        in_flight: &[InFlight],
+        admitted: impl Fn(u64) -> Option<Instant>,
+    ) -> Vec<u64> {
+        let forecast = self.forecaster.forecast(now, in_flight, None);
+        in_flight
+            .iter()
+            .zip(&forecast.ends)
+            .filter(|(flight, _)| {
+                !flight.canceled
+                    && matches!(
+                        flight.stage,
+                        Stage::Queued | Stage::Downloading | Stage::Loaded
+                    )
+            })
+            .filter_map(|(flight, ends)| {
+                let since = now.saturating_duration_since(admitted(flight.id)?);
+                let ends = since.saturating_add(*ends).as_secs_f64();
+                (self.latest_seen(ends) >= self.timeout).then_some(flight.id)
+            })
+            .collect()
+    }
+
+    /// The data node's timeout, in whole seconds.
+    pub(crate) fn timeout_seconds(&self) -> u64 {
+        whole_seconds(self.timeout)
+    }
+
     /// When the data node, polling without jitter, sees a job that ends
     /// at `ends` seconds.
     fn seen(&self, ends: f64) -> f64 {
@@ -227,7 +262,8 @@ mod tests {
         // Behind jobs that take longer than that, it is late too.
         let now = Instant::now();
         let ahead: Vec<_> = (0..4)
-            .map(|_| InFlight {
+            .map(|id| InFlight {
+                id,
                 job: job("bucket", 500_000, 384),
                 stage: Stage::Queued,
                 since: now,

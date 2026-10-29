@@ -42,4 +42,20 @@ All 58 builds completed. The device peak model, the dataset plus the larger of a
 
 The build time is off by 6% at the median and 33% at worst on the builds left out; d 768 at m 32 builds two to five times slower than at m 16 (79.6 s against 14.4 s at 1M vectors), as the IVF-PQ search's lookup table and top-k no longer fit a block's shared memory. Download and upload times carry LocalStack's own spread (one 1M x 384 upload took 9.9 s, its m 32 twin 3.2 s). The index file's size is exact. The CPU model is within 13% on the sizes it was fitted to and under by 14 to 23% at 500k vectors, where HNSW slows faster than n log n. On 4 threads a 500k x 768 build took 62 s. The service's part of the same remote build took 17 s, but the data node's wait is longer: at these transfer rates it uploads the vectors in about 4 s, sees the job complete at its second poll, about 20 s in (the first comes about 15 s after the request, then one every 5 s), and downloads the file in about 5 s, about 29 s in all.
 
+`burst/` holds bursts of 48 build requests, sent at once as k-NN's data nodes would (`tools/burst/`), with a 90 s client timeout and 5 s polls, against each service on the RTX 4070 in WSL2 with LocalStack: twelve each of 1M x 128, 500k x 384, 250k x 768 and 100k x 768 fp32 vectors. Each file lists every job's outcome and when its data node had the index or built the segment itself.
+
+| Run | Built in time | Refused | Failed | Timed out | To the CPU | Data nodes' wait before the CPU |
+| --- | --- | --- | --- | --- | --- | --- |
+| `knn-builder.json` | 13 | 22 | 13 | 0 | 35 | 361 s |
+| `knn-builder-seed2.json` | 7 | 24 | 17 | 0 | 41 | 492 s |
+| `upstream-1-worker.json` | 8 | 0 | 0 | 40 | 40 | 3,708 s |
+| `upstream-1-worker-seed2.json` | 6 | 0 | 0 | 42 | 42 | 3,881 s |
+| `upstream.json`, 2 workers | 0 | 0 | 48 | 0 | 48 | 4,036 s |
+
+knn-builder's failures are the jobs it dropped early; the two-worker upstream run's, status requests that failed once the service had crashed.
+
+The upstream service's default of two workers crashes it under WSL2, at its first two builds at once (exit 139), and every job fails; with one it builds jobs in order, and those that cannot end in time make their data nodes wait out the timeout. knn-builder refuses at once the jobs forecast to miss, and drops early, before their builds, those that the jobs ending meanwhile show will miss after all: its forecast starts from the grid's model, and uploads to LocalStack on this compose network take three to six times as long as the grid's, which it learns only from the first jobs to end. Here the uploads bound both services, which is why they build about as many in time.
+
+`burst/knn-cadence.json` and `burst/knn-refused.json` check the driver against k-NN 3.9.0 on the cluster: with 200 ms polls, k-NN's 37 status requests came 0.49 to 0.71 s after each build request and then 0.16 to 0.24 s apart, as the driver's 0.48 to 0.72 s and 0.16 to 0.24 s; with every build refused, k-NN sent each request once, polled none, counted six build requests failed and no time waited, and built the segments itself.
+
 Builds are not reproducible: the five files of one input share their headers and level tables but differ in their graphs, so `knn-gpu` is held to the recall spread, and `knn-write` to the oracle, which rebuilds each of these files exactly from its own graph.

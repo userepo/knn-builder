@@ -1,0 +1,449 @@
+{
+ "label": "knn-builder-seed2",
+ "service": "http://service:1025",
+ "jobs": 48,
+ "inputs": [
+  "l2-1000000x128",
+  "l2-500000x384",
+  "l2-250000x768",
+  "l2-100000x768"
+ ],
+ "timeout_seconds": 90.0,
+ "poll_seconds": 5.0,
+ "seed": 2,
+ "outcomes": {
+  "built": 7,
+  "failed": 17,
+  "refused": 24
+ },
+ "to_cpu": 41,
+ "cpu_wait_seconds": 492.3,
+ "built_seen_after_max": 77.7,
+ "records": [
+  {
+   "index": 0,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.037937719986075535,
+   "outcome": "built",
+   "seen_after": 30.94330616199295
+  },
+  {
+   "index": 1,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04707637199317105,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 30.9759223840083
+  },
+  {
+   "index": 2,
+   "input": "l2-250000x768",
+   "post_seconds": 0.04245331202400848,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 56.69772862800164
+  },
+  {
+   "index": 3,
+   "input": "l2-100000x768",
+   "post_seconds": 0.043401242000982165,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 19.083139711990952
+  },
+  {
+   "index": 4,
+   "input": "l2-1000000x128",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 023256bfb927072fc02a00eded57689d0b98d8c89b7eb44f9d90a3f587d2dc44 with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04931996000232175
+  },
+  {
+   "index": 5,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04158698898390867,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 45.08692673398764
+  },
+  {
+   "index": 6,
+   "input": "l2-250000x768",
+   "post_seconds": 0.03854984001372941,
+   "outcome": "built",
+   "seen_after": 64.76719942199998
+  },
+  {
+   "index": 7,
+   "input": "l2-100000x768",
+   "post_seconds": 0.04258643600041978,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 21.395732395001687
+  },
+  {
+   "index": 8,
+   "input": "l2-1000000x128",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 92b78376f83e9395f6f42fbc435af929d8f72ee00b368ebeff810b091ebc6a0d with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050628651981242
+  },
+  {
+   "index": 9,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04023090400733054,
+   "outcome": "built",
+   "seen_after": 71.51577663398348
+  },
+  {
+   "index": 10,
+   "input": "l2-250000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 3c1b769bec8ca60a5d295c1a82846eb4e0aa3caced34b98684d7c203732e8757 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.05002606299240142
+  },
+  {
+   "index": 11,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 7667e43b70037aa0b94574cb5ff75f2c327063008b0f3ec58e09df3a8fdd99ce with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.046713727992028
+  },
+  {
+   "index": 12,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.047665477002738044,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 22.283660265005892
+  },
+  {
+   "index": 13,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 6307ffc4642cd0dd731c91768c0b35c44445580283b8b37e1f10a2dad08be38a with vector path l2-500000x384/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04829812399111688
+  },
+  {
+   "index": 14,
+   "input": "l2-250000x768",
+   "post_seconds": 0.04474293498788029,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 23.368939667008817
+  },
+  {
+   "index": 15,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job bbe0aded51b932ff8d859e6cd6f9205c553731eee5ac18ad3f1d62f8d4ee41fc with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.049502996989758685
+  },
+  {
+   "index": 16,
+   "input": "l2-1000000x128",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job bfbeeb61af698709872c9fb764a8e83e9ec9ac7df826a6bbd8febb70c93827e6 with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04955844100913964
+  },
+  {
+   "index": 17,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 264dd4dce44e01e4f04df718dff56adad93b6e650454cf00198248e7e00176f9 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04898627000511624
+  },
+  {
+   "index": 18,
+   "input": "l2-250000x768",
+   "post_seconds": 0.036142357013886794,
+   "outcome": "built",
+   "seen_after": 22.001886265992653
+  },
+  {
+   "index": 19,
+   "input": "l2-100000x768",
+   "post_seconds": 0.04633258399553597,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 18.151587831991492
+  },
+  {
+   "index": 20,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.04568372599896975,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 45.540634628006956
+  },
+  {
+   "index": 21,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 57245a06b32ce7df52982ed9178e9d3cb0529f819376b38ce5ea7373c02db0a2 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04453090799506754
+  },
+  {
+   "index": 22,
+   "input": "l2-250000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 1d3c8eb43f053dac4d64d5ed0a45566e8f25d0af7335752ec26a9298fc4ae4c7 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.047684677003417164
+  },
+  {
+   "index": 23,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 8fc8d21cf5121a4dad006f0f4008afc6b3ec1b0c32908065189e457b9b720d6f with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050078709988156334
+  },
+  {
+   "index": 24,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.0452946069999598,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 19.29855226998916
+  },
+  {
+   "index": 25,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 4234e8a9cea422df922049de3af5532253daccb723192d23d798a81440e26f45 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050685049005551264
+  },
+  {
+   "index": 26,
+   "input": "l2-250000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job a677ef2b6344c8b5a1eeccdb514da23a26eb976830133c0bf296d194bedb6bdf with vector path l2-250000x768/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04820825799833983
+  },
+  {
+   "index": 27,
+   "input": "l2-100000x768",
+   "post_seconds": 0.04635488899657503,
+   "outcome": "built",
+   "seen_after": 77.69656725300592
+  },
+  {
+   "index": 28,
+   "input": "l2-1000000x128",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 2449b7c820472b22510ca3aa295f28139d33d33deae3661f5453b5588918afce with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050735372002236545
+  },
+  {
+   "index": 29,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04285807700944133,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 34.24589178999304
+  },
+  {
+   "index": 30,
+   "input": "l2-250000x768",
+   "post_seconds": 0.045938513008877635,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 30.710304495005403
+  },
+  {
+   "index": 31,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 403356d0d9c112857551a629c4f422de9f7fe2a2f1e4f940101602748804f6f3 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.047927743988111615
+  },
+  {
+   "index": 32,
+   "input": "l2-1000000x128",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job a7410ef9098bee0597c55e32a5bf73fe845f9d3181a7147feb7a1443db1f511b with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.05035587100428529
+  },
+  {
+   "index": 33,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04378723198897205,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 31.93981546899886
+  },
+  {
+   "index": 34,
+   "input": "l2-250000x768",
+   "post_seconds": 0.0356244959984906,
+   "outcome": "built",
+   "seen_after": 45.55859859200427
+  },
+  {
+   "index": 35,
+   "input": "l2-100000x768",
+   "post_seconds": 0.045508256007451564,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 23.567804558988428
+  },
+  {
+   "index": 36,
+   "input": "l2-1000000x128",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 5db1abed7774d7936d13209db54917d10cd7c8794ecd175e12174bbfd18238e4 with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.049095461989054456
+  },
+  {
+   "index": 37,
+   "input": "l2-500000x384",
+   "post_seconds": 0.04087067602085881,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 23.34211144899018
+  },
+  {
+   "index": 38,
+   "input": "l2-250000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job b2ec72860e618ee125a5c69734662828e091bebe21418f65b0f898cd83365987 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04754262798815034
+  },
+  {
+   "index": 39,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 8d94fb155e1eb2fd929ca8056c9f6155ddb4bbd12bd023abfab4afd6761632e6 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.07402944899513386
+  },
+  {
+   "index": 40,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.039413238002453,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 22.31439492799109
+  },
+  {
+   "index": 41,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 68662bdf4130e487850ae149d8a2422624f3fc226ad0b0afdc353fd85973936d with vector path l2-500000x384/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04835316998651251
+  },
+  {
+   "index": 42,
+   "input": "l2-250000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job c7923d9071e42e45e3f1eb2eaa4ba56b7786735d2691890999b80383c1ac8c08 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050430728995706886
+  },
+  {
+   "index": 43,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 4f8ddfeea7bc4c6188c79b1a5352d5d3b5b411a3cd675b2fa22c9b1c97a82910 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.07411036099074408
+  },
+  {
+   "index": 44,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.0445732020016294,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 23.091364469000837
+  },
+  {
+   "index": 45,
+   "input": "l2-500000x384",
+   "post_seconds": 0.03498932800721377,
+   "outcome": "built",
+   "seen_after": 58.086862341006054
+  },
+  {
+   "index": 46,
+   "input": "l2-250000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job e75a16c3cba1b230311dd6bfb54b287043052e4a14a6fa4c6f46677e3d8409b7 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.047742494993144646
+  },
+  {
+   "index": 47,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job b18f1cf5ec476c007f6fca465904a6cb2f2da61ce26c98311adf15113fee7f7b with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04841223900439218
+  }
+ ]
+}

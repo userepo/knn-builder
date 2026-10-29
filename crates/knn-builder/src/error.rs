@@ -70,6 +70,18 @@ pub enum JobError {
     /// The job was canceled. Nothing was stored.
     #[error("the job was canceled")]
     Canceled,
+    /// The forecast, corrected by the jobs that ended since this one was
+    /// taken, has it seen ended only past the data node's timeout, so it
+    /// was canceled before its build: the data node builds the segment
+    /// itself at its next poll rather than after its timeout. Nothing was
+    /// stored.
+    #[error(
+        "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of {seconds} s"
+    )]
+    WouldMissDeadline {
+        /// The data node's timeout, in seconds.
+        seconds: u64,
+    },
     /// The data node stopped waiting for the job, and it was canceled.
     /// Nothing was stored.
     #[error("the data node's timeout of {seconds} s passed, so the job was dropped")]

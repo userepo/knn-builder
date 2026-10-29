@@ -31,6 +31,9 @@ services:
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
       - LOG_LEVEL=DEBUG
+      # The node's knn.remote_index_build.client.timeout and poll.interval.
+      - CLIENT_TIMEOUT_SECONDS=${CLIENT_TIMEOUT_SECONDS:-3600}
+      - CLIENT_POLL_INTERVAL_SECONDS=${CLIENT_POLL_INTERVAL_SECONDS:-5}
     ports:
       - "1025:1025"
     deploy:

@@ -342,6 +342,7 @@ mod tests {
 
     fn at(now: Instant, job: Job, stage: Stage, elapsed: f64, canceled: bool) -> InFlight {
         InFlight {
+            id: 0,
             job,
             stage,
             since: now.checked_sub(Duration::from_secs_f64(elapsed)).unwrap(),

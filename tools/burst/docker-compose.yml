@@ -1,0 +1,70 @@
+# A burst of build requests, as k-NN's data nodes send them, against one
+# remote index build service on the GPU: knn-builder's image, or the
+# upstream service at the pinned commit (3a02e64, as the api-snapshot image
+# of that digest). burst.py drives it from the upstream image, for boto3,
+# with LocalStack for S3; knn-builder takes the data node's timeout and poll
+# interval as its own settings, which the upstream service has none of.
+#
+# From the repository root, with the inputs written (tools/README.md):
+#   SERVICE_IMAGE=knn-builder:dev LABEL=knn-builder \
+#     docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
+#   docker compose -f tools/burst/docker-compose.yml down
+#   SERVICE_IMAGE=opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da LABEL=upstream \
+#     docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
+#   docker compose -f tools/burst/docker-compose.yml down
+name: knn-builder-burst
+
+x-aws: &aws
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_DEFAULT_REGION: us-east-1
+
+services:
+  localstack:
+    # 4.14, the version upstream's e2e test uses.
+    image: localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a
+    environment:
+      SERVICES: s3
+      <<: *aws
+
+  service:
+    image: ${SERVICE_IMAGE:?set SERVICE_IMAGE}
+    environment:
+      S3_ENDPOINT_URL: http://localstack:4566
+      CLIENT_TIMEOUT_SECONDS: ${TIMEOUT_SECONDS:-90}
+      CLIENT_POLL_INTERVAL_SECONDS: ${POLL_SECONDS:-5}
+      # The upstream service's builds at once; knn-builder reads and
+      # ignores it. Under WSL2 two builds at once crash the process.
+      MAX_WORKERS: ${MAX_WORKERS:-2}
+      # Each job's stage times, in the logs of both services.
+      LOG_LEVEL: DEBUG
+      <<: *aws
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      - localstack
+
+  driver:
+    image: opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
+    entrypoint: ["python", "/work/tools/burst/burst.py"]
+    environment:
+      SERVICE_URL: http://service:1025
+      S3_ENDPOINT_URL: http://localstack:4566
+      INPUTS: /work/${INPUTS:-target/burst/inputs}
+      NAMES: ${NAMES:-l2-1000000x128,l2-500000x384,l2-250000x768,l2-100000x768}
+      JOBS: ${JOBS:-48}
+      TIMEOUT_SECONDS: ${TIMEOUT_SECONDS:-90}
+      POLL_SECONDS: ${POLL_SECONDS:-5}
+      SEED: ${SEED:-1}
+      OUT: /work/${OUT:-target/burst}
+      LABEL: ${LABEL:?set LABEL}
+      <<: *aws
+    volumes:
+      - ../..:/work
+    depends_on:
+      - service

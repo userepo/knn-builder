@@ -1,0 +1,454 @@
+{
+ "label": "upstream",
+ "service": "http://service:1025",
+ "jobs": 48,
+ "inputs": [
+  "l2-1000000x128",
+  "l2-500000x384",
+  "l2-250000x768",
+  "l2-100000x768"
+ ],
+ "timeout_seconds": 90.0,
+ "poll_seconds": 5.0,
+ "seed": 1,
+ "outcomes": {
+  "status_failed": 48
+ },
+ "to_cpu": 48,
+ "cpu_wait_seconds": 4035.8,
+ "built_seen_after_max": 0.0,
+ "records": [
+  {
+   "index": 0,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.12063924601534382,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07845082998392
+  },
+  {
+   "index": 1,
+   "input": "l2-500000x384",
+   "post_seconds": 0.1271736289781984,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07901811299962
+  },
+  {
+   "index": 2,
+   "input": "l2-250000x768",
+   "post_seconds": 0.1056352450104896,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07816610799637
+  },
+  {
+   "index": 3,
+   "input": "l2-100000x768",
+   "post_seconds": 0.12465259301825427,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07947815800435
+  },
+  {
+   "index": 4,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.11477948998799548,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0791113129817
+  },
+  {
+   "index": 5,
+   "input": "l2-500000x384",
+   "post_seconds": 0.10874208100722171,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07944457198028
+  },
+  {
+   "index": 6,
+   "input": "l2-250000x768",
+   "post_seconds": 0.11848668800666928,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07746518097701
+  },
+  {
+   "index": 7,
+   "input": "l2-100000x768",
+   "post_seconds": 0.09116604100563563,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07839295099257
+  },
+  {
+   "index": 8,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.11619002500083297,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07699996299925
+  },
+  {
+   "index": 9,
+   "input": "l2-500000x384",
+   "post_seconds": 0.11276623400044627,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0776521069929
+  },
+  {
+   "index": 10,
+   "input": "l2-250000x768",
+   "post_seconds": 0.1262692820164375,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07787924999138
+  },
+  {
+   "index": 11,
+   "input": "l2-100000x768",
+   "post_seconds": 0.09802037698682398,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07643015999929
+  },
+  {
+   "index": 12,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.03614207298960537,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.077172099991
+  },
+  {
+   "index": 13,
+   "input": "l2-500000x384",
+   "post_seconds": 0.11553058301797137,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07961693400284
+  },
+  {
+   "index": 14,
+   "input": "l2-250000x768",
+   "post_seconds": 0.1217799180012662,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07684843198513
+  },
+  {
+   "index": 15,
+   "input": "l2-100000x768",
+   "post_seconds": 0.10387137302313931,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07776218798244
+  },
+  {
+   "index": 16,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.1257803540211171,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07974294899032
+  },
+  {
+   "index": 17,
+   "input": "l2-500000x384",
+   "post_seconds": 0.12519682600395754,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07620128500275
+  },
+  {
+   "index": 18,
+   "input": "l2-250000x768",
+   "post_seconds": 0.10343605899834074,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07828789300402
+  },
+  {
+   "index": 19,
+   "input": "l2-100000x768",
+   "post_seconds": 0.03616755802067928,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0789400950016
+  },
+  {
+   "index": 20,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.09242082099081017,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0778223349771
+  },
+  {
+   "index": 21,
+   "input": "l2-500000x384",
+   "post_seconds": 0.11109333400963806,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07856275499216
+  },
+  {
+   "index": 22,
+   "input": "l2-250000x768",
+   "post_seconds": 0.11241323000285774,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07850989099825
+  },
+  {
+   "index": 23,
+   "input": "l2-100000x768",
+   "post_seconds": 0.12395337800262496,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07803635598975
+  },
+  {
+   "index": 24,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.1140731289924588,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07861309999134
+  },
+  {
+   "index": 25,
+   "input": "l2-500000x384",
+   "post_seconds": 0.1219773199991323,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07797382998979
+  },
+  {
+   "index": 26,
+   "input": "l2-250000x768",
+   "post_seconds": 0.11235468598897569,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0791628829902
+  },
+  {
+   "index": 27,
+   "input": "l2-100000x768",
+   "post_seconds": 0.09774926901445724,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07808919699164
+  },
+  {
+   "index": 28,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.10529001301620156,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07888226999785
+  },
+  {
+   "index": 29,
+   "input": "l2-500000x384",
+   "post_seconds": 0.11356950999470428,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07691582798725
+  },
+  {
+   "index": 30,
+   "input": "l2-250000x768",
+   "post_seconds": 0.10616041399771348,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07724360298016
+  },
+  {
+   "index": 31,
+   "input": "l2-100000x768",
+   "post_seconds": 0.10127646601176821,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07753088299069
+  },
+  {
+   "index": 32,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.122361532994546,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07822821498848
+  },
+  {
+   "index": 33,
+   "input": "l2-500000x384",
+   "post_seconds": 0.10299247200600803,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07882236299338
+  },
+  {
+   "index": 34,
+   "input": "l2-250000x768",
+   "post_seconds": 0.09940598497632891,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07734617497772
+  },
+  {
+   "index": 35,
+   "input": "l2-100000x768",
+   "post_seconds": 0.10562700900482014,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07740982298856
+  },
+  {
+   "index": 36,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.1194374879996758,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0796707069967
+  },
+  {
+   "index": 37,
+   "input": "l2-500000x384",
+   "post_seconds": 0.11824776398134418,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07875574298669
+  },
+  {
+   "index": 38,
+   "input": "l2-250000x768",
+   "post_seconds": 0.09237604300142266,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07730893598637
+  },
+  {
+   "index": 39,
+   "input": "l2-100000x768",
+   "post_seconds": 0.11431511800037697,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07833835299243
+  },
+  {
+   "index": 40,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.11567265901248902,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07872254398535
+  },
+  {
+   "index": 41,
+   "input": "l2-500000x384",
+   "post_seconds": 0.09769612798118033,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07770301800338
+  },
+  {
+   "index": 42,
+   "input": "l2-250000x768",
+   "post_seconds": 0.03184724098537117,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07926065099309
+  },
+  {
+   "index": 43,
+   "input": "l2-100000x768",
+   "post_seconds": 0.09691845200723037,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.0795374509762
+  },
+  {
+   "index": 44,
+   "input": "l2-1000000x128",
+   "post_seconds": 0.10322439300944097,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07793650799431
+  },
+  {
+   "index": 45,
+   "input": "l2-500000x384",
+   "post_seconds": 0.10428015197976492,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07867027499015
+  },
+  {
+   "index": 46,
+   "input": "l2-250000x768",
+   "post_seconds": 0.038358482997864485,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07907636498567
+  },
+  {
+   "index": 47,
+   "input": "l2-100000x768",
+   "post_seconds": 0.12264163099462166,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 84.07759171698126
+  }
+ ]
+}
