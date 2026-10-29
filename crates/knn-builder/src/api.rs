@@ -1,7 +1,8 @@
 //! The HTTP API k-NN calls, answered as the upstream service answers it:
 //! `POST /_build`, `GET /_status/{job_id}` and `GET /_heart_beat`, with its
-//! status codes and bodies. As FastAPI does, a route answers another
-//! method, HEAD included, with 405, its `Allow` and
+//! status codes and bodies; and the service's debug list of every job,
+//! `GET /_jobs`, which its end-to-end client reads. As FastAPI does, a
+//! route answers another method, HEAD included, with 405, its `Allow` and
 //! `{"detail":"Method Not Allowed"}`; a path no route takes with 404 and
 //! `{"detail":"Not Found"}`, or with a 307 to the route's path when only
 //! trailing slashes are in the way. Like Starlette, it routes on the
@@ -10,14 +11,15 @@
 //! `tools/oracle/routes.py`.
 //!
 //! The service also serves FastAPI's documentation (`/docs`, `/redoc`,
-//! `/openapi.json`) and a debug list of every job (`/_jobs`); here they are
-//! paths like any other, 404. A build request's body may be 2 MB at most,
+//! `/openapi.json`); here those are paths like any other, 404. A build
+//! request's body may be 2 MB at most,
 //! axum's default; a larger one gets 413, where the service reads any
 //! size. k-NN's are a few hundred bytes.
 //!
-//! With [`Credentials`] set, every route asks for them by Basic Auth, and
-//! answers 401 without them; unset, the `Authorization` header is
-//! ignored, as the service ignores it.
+//! With [`Credentials`] set, every route but `/_heart_beat` asks for them
+//! by Basic Auth, and answers 401 without them; the heart beat stays open
+//! for health checks, as it tells nothing. Unset, the `Authorization`
+//! header is ignored, as the service ignores it.
 
 use std::fmt::Write as _;
 use std::sync::Arc;
@@ -38,7 +40,7 @@ use tower::util::MapRequest;
 
 use crate::config::Credentials;
 use crate::request::{self, JobId};
-use crate::service::{Service, Status};
+use crate::service::{Listed, Service, Status};
 
 /// What `GET /_heart_beat` answers: the service's name.
 pub const SERVICE_NAME: &str = "remote-vector-index-builder-api";
@@ -142,12 +144,19 @@ fn router(service: Arc<Service>, auth: Option<Credentials>) -> Router {
                 .fallback(not_allowed("GET")),
         )
         .route(
+            "/_jobs",
+            get(jobs)
+                .head(not_allowed("GET"))
+                .fallback(not_allowed("GET")),
+        )
+        .route_layer(middleware::from_fn_with_state(api.clone(), authenticate))
+        // Added after the auth layer, so outside it.
+        .route(
             "/_heart_beat",
             get(heart_beat)
                 .head(not_allowed("GET"))
                 .fallback(not_allowed("GET")),
         )
-        .route_layer(middleware::from_fn_with_state(api.clone(), authenticate))
         .fallback(not_found)
         .layer(middleware::from_fn(log))
         .with_state(api)
@@ -179,13 +188,76 @@ async fn heart_beat() -> Json<&'static str> {
     Json(SERVICE_NAME)
 }
 
-/// The status response: every field, null where it does not apply.
-fn status_body(status: &Status) -> Value {
-    let (file_name, error_message) = match status {
+async fn jobs(State(api): State<Api>) -> Json<String> {
+    Json(jobs_text(&api.service.jobs()))
+}
+
+/// The service's debug list, as its route builds it: every job's fields,
+/// by id, dumped by Python's `json.dumps` with an indent of 4, so with
+/// every character past ASCII escaped; then answered as a JSON string.
+fn jobs_text(jobs: &[Listed]) -> String {
+    let mut by_id = serde_json::Map::new();
+    for job in jobs {
+        let (file_name, error_message) = fields(&job.status);
+        by_id.insert(
+            job.job_id.as_str().to_owned(),
+            json!({
+                "id": job.job_id.as_str(),
+                "status": job.status.task_status(),
+                "request_parameters": {
+                    "vector_path": job.vector_path,
+                    "tenant_id": job.tenant_id,
+                },
+                "file_name": file_name,
+                "error_message": error_message,
+            }),
+        );
+    }
+    // serde_json's pretty form indents by 2; a JSON string holds no raw
+    // line break, so every line's leading spaces are its indent.
+    let pretty = format!("{:#}", Value::Object(by_id));
+    let text: Vec<String> = pretty
+        .lines()
+        .map(|line| {
+            let indent = line.len() - line.trim_start_matches(' ').len();
+            format!("{}{}", " ".repeat(indent * 2), line.trim_start_matches(' '))
+        })
+        .collect();
+    ascii(&text.join("\n"))
+}
+
+/// `text` with DEL and every character past ASCII escaped as `\uXXXX`,
+/// UTF-16 surrogates past the Basic Multilingual Plane, as `json.dumps`
+/// escapes them.
+fn ascii(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for c in text.chars() {
+        // serde_json has escaped the controls within strings already; the
+        // line breaks left are the layout's own.
+        if c.is_ascii() && c != '\u{7f}' {
+            out.push(c);
+        } else {
+            for unit in c.encode_utf16(&mut [0; 2]) {
+                let _ = write!(out, "\\u{unit:04x}");
+            }
+        }
+    }
+    out
+}
+
+/// A status's `file_name` and `error_message`, null where they do not
+/// apply.
+fn fields(status: &Status) -> (Option<&String>, Option<&String>) {
+    match status {
         Status::Running => (None, None),
         Status::Completed { file_name } => (Some(file_name), None),
         Status::Failed { error_message } => (None, Some(error_message)),
-    };
+    }
+}
+
+/// The status response: every field, null where it does not apply.
+fn status_body(status: &Status) -> Value {
+    let (file_name, error_message) = fields(status);
     json!({
         "task_status": status.task_status(),
         "file_name": file_name,
@@ -234,7 +306,7 @@ async fn not_found(headers: HeaderMap, uri: Uri) -> Response {
 
 /// Whether a route takes `path`.
 fn is_route(path: &str) -> bool {
-    matches!(path, "/_build" | "/_heart_beat")
+    matches!(path, "/_build" | "/_heart_beat" | "/_jobs")
         || path
             .strip_prefix("/_status/")
             .is_some_and(|id| !id.is_empty() && !id.contains('/'))
@@ -338,8 +410,9 @@ async fn log(request: Request, next: Next) -> Response {
 mod tests {
     use serde_json::Value;
 
-    use super::{decoded, encoded, is_route, same, status_body};
-    use crate::service::Status;
+    use super::{decoded, encoded, is_route, jobs_text, same, status_body};
+    use crate::request;
+    use crate::service::{Listed, Status};
 
     /// `tools/oracle/routes.py`'s record of the service's answers.
     const ROUTES: &str = include_str!("../tests/data/routes.json");
@@ -369,8 +442,44 @@ mod tests {
     }
 
     #[test]
+    fn lists_jobs_as_the_service_does() {
+        let table: Value = serde_json::from_str(ROUTES).unwrap();
+        let listing = &table["listing"];
+        // The oracle's three jobs, in its states.
+        let statuses = [
+            Status::Running,
+            Status::Completed {
+                file_name: "_0_\u{e9}t\u{e9}.faiss".into(),
+            },
+            Status::Failed {
+                error_message: "it failed".into(),
+            },
+        ];
+        let jobs: Vec<Listed> = listing["bodies"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .zip(statuses)
+            .map(|(body, status)| {
+                let request = request::parse(body.as_str().unwrap().as_bytes()).unwrap();
+                Listed {
+                    job_id: request.job_id(),
+                    status,
+                    vector_path: request.vector_path,
+                    tenant_id: request.tenant_id,
+                }
+            })
+            .collect();
+        assert_eq!(jobs.len(), 3);
+        let body = serde_json::to_string(&Value::String(jobs_text(&jobs))).unwrap();
+        assert_eq!(body, listing["response_body"]);
+        // None held: an empty object, as `json.dumps` writes one.
+        assert_eq!(jobs_text(&[]), "{}");
+    }
+
+    #[test]
     fn knows_its_routes() {
-        for route in ["/_build", "/_heart_beat", "/_status/abc"] {
+        for route in ["/_build", "/_heart_beat", "/_jobs", "/_status/abc"] {
             assert!(is_route(route), "{route}");
         }
         for path in [
@@ -378,7 +487,7 @@ mod tests {
             "/_status",
             "/_status/",
             "/_status/a/b",
-            "/_jobs",
+            "/_jobs/x",
             "/_build/x",
         ] {
             assert!(!is_route(path), "{path}");

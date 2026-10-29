@@ -80,7 +80,7 @@ $RUN $API tools/oracle/requests.py crates/knn-builder/tests/data/requests.json
 $RUN $API tools/oracle/capacity.py crates/knn-builder/tests/data/capacity.json
 ```
 
-`oracle/routes.py` records how the service answers HTTP requests, for `knn-builder`'s routes: the status, the headers that matter and the body, for each route and method, the content types a build request may come with, paths no route takes, and the status of a job running, completed and failed. Its jobs never start, so it needs no S3. Run it in the api image:
+`oracle/routes.py` records how the service answers HTTP requests, for `knn-builder`'s routes: the status, the headers that matter and the body, for each route and method, the content types a build request may come with, paths no route takes, the status of a job running, completed and failed, and the debug list of jobs (`/_jobs`). Its jobs never start, so it needs no S3. Run it in the api image:
 
 ```sh
 $RUN $API tools/oracle/routes.py crates/knn-builder/tests/data/routes.json
@@ -95,6 +95,18 @@ cargo run --release -p knn-gpu --features gpu --example build_inputs -- target/i
 ```
 
 Then, from Windows or Linux, `python tools/baseline/score.py target/rust-baseline/large20 target/inputs-large ../knn-inspect/target/release/knn-inspect`, and the service's own 20 builds with `RUNS=20` as above.
+
+## End to end
+
+`e2e/docker-compose.yml` runs the upstream service's end-to-end test against knn-builder's image: its client, unchanged, from upstream's own e2e image at 3a02e64, in knn-builder's container's network, where the address the client calls (`localhost:1025`) is knn-builder's, with LocalStack for S3. It builds an index of each of upstream's six test datasets (1M x 128, 384 and 768 float, two 100k half_float and a small one), checks each job through `/_status` and `/_jobs`, and exits 0 when all pass. Build the two images first, the upstream one from a checkout of upstream at 3a02e64 under `target/`, which git and the image's build leave out, on the `faiss-base` image pinned above:
+
+```sh
+docker build -t knn-builder:dev .
+git clone https://github.com/opensearch-project/remote-vector-index-builder target/upstream && git -C target/upstream checkout 3a02e64
+docker tag opensearchstaging/remote-vector-index-builder@sha256:b3420e65b89c0d25a58ccc31dd1edfe1019383605ff356df563416b2d35bca9c opensearchstaging/remote-vector-index-builder:faiss-base-3a02e64
+docker build --build-arg BASE_IMAGE_TAG=faiss-base-3a02e64 -f target/upstream/e2e/api/Dockerfile -t remote-vector-index-builder:e2e-3a02e64 target/upstream
+docker compose -f tools/e2e/docker-compose.yml up --exit-code-from e2e
+```
 
 ## Peak memory
 

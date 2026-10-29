@@ -1,0 +1,46 @@
+# The upstream service's end-to-end test against knn-builder's image: its
+# client, unchanged, from its own e2e image at 3a02e64, run in knn-builder's
+# network, where the address it calls, localhost:1025, is knn-builder's.
+# See tools/README.md for the images and the run.
+#
+#   docker compose -f tools/e2e/docker-compose.yml up --exit-code-from e2e
+
+services:
+  localstack:
+    # localstack/localstack:4.14, the version upstream's e2e test uses.
+    image: localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a
+    environment:
+      - SERVICES=s3
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+
+  knn-builder:
+    image: ${KNN_BUILDER_IMAGE:-knn-builder:dev}
+    environment:
+      - S3_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - LOG_LEVEL=DEBUG
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      - localstack
+
+  e2e:
+    image: ${E2E_IMAGE:-remote-vector-index-builder:e2e-3a02e64}
+    command: python e2e/api/run_e2e.py
+    network_mode: service:knn-builder
+    environment:
+      - S3_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    depends_on:
+      - knn-builder

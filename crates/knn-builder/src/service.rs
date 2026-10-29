@@ -250,6 +250,17 @@ impl Service {
             .status(job_id, Instant::now())
     }
 
+    /// Every job held, in the order they were taken: the debug list of
+    /// `GET /_jobs`.
+    ///
+    /// # Panics
+    ///
+    /// After a thread panicked holding the job store, a bug.
+    #[must_use]
+    pub fn jobs(&self) -> Vec<Listed> {
+        self.inner.lock().expect(POISONED).jobs.list(Instant::now())
+    }
+
     /// Cancels every running job, then waits for the pipeline to stop.
     /// Queued jobs end at once, and downloads and uploads stop, the uploads
     /// aborted so they store nothing; but a build under way cannot be
@@ -307,17 +318,33 @@ enum Admission {
     New(JobId),
 }
 
+/// A job held, as `GET /_jobs` lists it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Listed {
+    /// Its id.
+    pub job_id: JobId,
+    /// Its state.
+    pub status: Status,
+    /// The request's vector path.
+    pub vector_path: String,
+    /// The request's tenant id.
+    pub tenant_id: String,
+}
+
 /// The jobs held, by id.
 #[derive(Debug)]
 struct Jobs {
     settings: Settings,
     held: HashMap<JobId, Held>,
+    /// The number the next job taken gets: jobs are listed in that order.
+    next: u64,
 }
 
 #[derive(Debug)]
 struct Held {
     request: BuildRequest,
     state: State,
+    number: u64,
 }
 
 #[derive(Debug)]
@@ -345,6 +372,7 @@ impl Jobs {
         Self {
             settings,
             held: HashMap::new(),
+            next: 0,
         }
     }
 
@@ -397,7 +425,16 @@ impl Jobs {
             Admission::New(job_id) => job_id,
         };
         let state = start(&job_id, &request, now);
-        self.held.insert(job_id.clone(), Held { request, state });
+        let number = self.next;
+        self.next += 1;
+        self.held.insert(
+            job_id.clone(),
+            Held {
+                request,
+                state,
+                number,
+            },
+        );
         Ok(job_id)
     }
 
@@ -413,10 +450,23 @@ impl Jobs {
 
     fn status(&mut self, job_id: &JobId, now: Instant) -> Option<Status> {
         self.expire(job_id, now);
-        self.held.get(job_id).map(|held| match &held.state {
-            State::Running(_) => Status::Running,
-            State::Ended { status, .. } => status.clone(),
-        })
+        self.held.get(job_id).map(Held::status)
+    }
+
+    /// The jobs not expired, in the order they were taken.
+    fn list(&mut self, now: Instant) -> Vec<Listed> {
+        self.held
+            .retain(|_, held| !held.expired(self.settings.ttl, now));
+        let mut held: Vec<(&JobId, &Held)> = self.held.iter().collect();
+        held.sort_by_key(|(_, held)| held.number);
+        held.into_iter()
+            .map(|(job_id, held)| Listed {
+                job_id: job_id.clone(),
+                status: held.status(),
+                vector_path: held.request.vector_path.clone(),
+                tenant_id: held.request.tenant_id.clone(),
+            })
+            .collect()
     }
 
     fn running(&self) -> impl Iterator<Item = &Canceler> {
@@ -439,6 +489,13 @@ impl Jobs {
 }
 
 impl Held {
+    fn status(&self) -> Status {
+        match &self.state {
+            State::Running(_) => Status::Running,
+            State::Ended { status, .. } => status.clone(),
+        }
+    }
+
     /// Ended `ttl` ago or longer.
     fn expired(&self, ttl: Duration, now: Instant) -> bool {
         match self.state {
@@ -795,6 +852,28 @@ mod tests {
         assert_eq!(jobs.status(&job_id, now), completed);
         assert_eq!(jobs.running().count(), 0);
         assert_eq!(jobs.status(&JobId::from("no-such-job"), now), None);
+    }
+
+    #[test]
+    fn lists_jobs_in_the_order_taken() {
+        let now = Instant::now();
+        let mut jobs = jobs(10);
+        let paths = ["a/_0_c.knnvec", "a/_0_a.knnvec", "a/_0_b.knnvec"];
+        let ids: Vec<JobId> = paths
+            .iter()
+            .map(|path| start(&mut jobs, &request(path, 8), now))
+            .collect();
+        jobs.end(&ids[1], Err(JobError::Canceled), now);
+        let listed = jobs.list(now);
+        let order: Vec<&str> = listed.iter().map(|job| job.vector_path.as_str()).collect();
+        assert_eq!(order, paths);
+        assert_eq!(listed[0].job_id, ids[0]);
+        assert_eq!(listed[0].status, Status::Running);
+        assert!(matches!(listed[1].status, Status::Failed { .. }));
+        // An expired job is not listed; a running one stays.
+        let listed = jobs.list(now + TTL);
+        let order: Vec<&str> = listed.iter().map(|job| job.vector_path.as_str()).collect();
+        assert_eq!(order, [paths[0], paths[2]]);
     }
 
     #[test]

@@ -1,0 +1,6 @@
+# The image builds from the sources and lock file alone.
+target/
+.git/
+.vscode/
+fixtures/
+tools/

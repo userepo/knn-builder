@@ -591,5 +591,17 @@
    },
    "response_body": "{\"task_status\":\"FAILED_INDEX_BUILD\",\"file_name\":null,\"error_message\":\"it failed\"}"
   }
+ },
+ "listing": {
+  "bodies": [
+   "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_listed.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_\\u00e9t\\u00e9.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_tenant.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"tenant_id\": \"t\\u007f\"}"
+  ],
+  "status": 200,
+  "response_headers": {
+   "content-type": "application/json"
+  },
+  "response_body": "\"{\\n    \\\"1862df5ef1d173a388991f0e6b5d32ac4f6ced52f84ceab1d72195068fcb16b1\\\": {\\n        \\\"id\\\": \\\"1862df5ef1d173a388991f0e6b5d32ac4f6ced52f84ceab1d72195068fcb16b1\\\",\\n        \\\"status\\\": \\\"RUNNING_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_listed.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": null\\n    },\\n    \\\"4855e24341782db561b826bd4fdf5f886bdc15c509c142cf4536c15b09386916\\\": {\\n        \\\"id\\\": \\\"4855e24341782db561b826bd4fdf5f886bdc15c509c142cf4536c15b09386916\\\",\\n        \\\"status\\\": \\\"COMPLETED_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_\\\\u00e9t\\\\u00e9.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": \\\"_0_\\\\u00e9t\\\\u00e9.faiss\\\",\\n        \\\"error_message\\\": null\\n    },\\n    \\\"ccae4291ddb75577e6649cbc504f699b8c93ba47b77bf2fb91baa0ea23df9510\\\": {\\n        \\\"id\\\": \\\"ccae4291ddb75577e6649cbc504f699b8c93ba47b77bf2fb91baa0ea23df9510\\\",\\n        \\\"status\\\": \\\"FAILED_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_tenant.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"t\\\\u007f\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": \\\"it failed\\\"\\n    }\\n}\""
  }
 }

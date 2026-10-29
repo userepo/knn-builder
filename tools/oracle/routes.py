@@ -1,8 +1,8 @@
 """Records how the service answers HTTP requests, for knn-builder's routes
 (crates/knn-builder/tests/data/routes.json): the status, the headers that
 matter and the body, for each route and method, the content types a build
-request may come with, paths no route takes, and the status of a job
-running, completed and failed.
+request may come with, paths no route takes, the status of a job
+running, completed and failed, and the debug list of jobs.
 
 The service runs as its own app does, in a test client, but with jobs
 that never start: the workflow executor takes them and does nothing, so
@@ -133,6 +133,32 @@ def statuses(client):
     return out
 
 
+def listing(client):
+    """`/_jobs` over three jobs, in order: running, completed and failed,
+    one with a path not ASCII and one with a tenant id holding DEL, the
+    store emptied first."""
+    service = app.state.job_service
+    service.request_store._store.clear()
+    bodies = [
+        other("a/_0_listed.knnvec"),
+        other("a/_0_été.knnvec"),
+        # A tenant id with DEL, which json.dumps escapes as it does past ASCII.
+        other("a/_0_tenant.knnvec", tenant_id="t\x7f"),
+    ]
+    ids = [client.post("/_build", content=b, headers=JSON).json()["job_id"] for b in bodies]
+    service.request_store.update(
+        ids[1], {"status": JobStatus.COMPLETED, "file_name": "_0_été.faiss"}
+    )
+    service.request_store.update(ids[2], {"status": JobStatus.FAILED, "error_message": "it failed"})
+    response = client.get("/_jobs")
+    return {
+        "bodies": bodies,
+        "status": response.status_code,
+        "response_headers": {h: response.headers[h] for h in HEADERS if h in response.headers},
+        "response_body": response.text,
+    }
+
+
 def main():
     # Jobs taken, never run.
     app.state.job_service.workflow_executor.submit_workflow = lambda workflow: None
@@ -140,6 +166,7 @@ def main():
     table = {
         "cases": [{**c, **answer(client, c)} for c in CASES],
         "statuses": statuses(client),
+        "listing": listing(client),
     }
     with open(sys.argv[1], "wb") as out:
         out.write((json.dumps(table, indent=1) + "\n").encode())
