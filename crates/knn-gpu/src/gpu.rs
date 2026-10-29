@@ -94,7 +94,120 @@ mod ffi {
             message_len: usize,
         ) -> c_int;
     }
+
+    // The CUDA runtime, which the build script links for cuVS.
+    unsafe extern "C" {
+        pub(super) fn cudaMemGetInfo(free: *mut usize, total: *mut usize) -> c_int;
+
+        pub(super) fn cudaMalloc(pointer: *mut *mut c_void, size: usize) -> c_int;
+
+        pub(super) fn cudaFree(pointer: *mut c_void) -> c_int;
+
+        pub(super) fn cudaGetErrorString(error: c_int) -> *const c_char;
+    }
 }
+
+/// [`Error::Cuvs`] for a CUDA runtime call that returned `status`, with
+/// the runtime's text for it.
+fn runtime_error(call: &'static str, status: c_int) -> Error {
+    // SAFETY: the runtime returns a static NUL-terminated string for any
+    // code, an unknown one included.
+    let text = unsafe { CStr::from_ptr(ffi::cudaGetErrorString(status)) };
+    Error::Cuvs {
+        call,
+        message: format!("{} (error {status})", text.to_string_lossy()),
+    }
+}
+
+/// A device's memory, as the CUDA runtime counts it, in bytes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeviceMemory {
+    /// Free: not allocated by any process on the device, this one's
+    /// builds included.
+    pub free: usize,
+    /// In all.
+    pub total: usize,
+}
+
+/// The memory of the device current on the calling thread: the only one,
+/// on a single-GPU host. The first call on a thread creates or binds the
+/// device's primary context, as a build does.
+///
+/// # Errors
+///
+/// Returns [`Error::Cuvs`] naming `cudaMemGetInfo` when the runtime fails.
+pub fn device_memory() -> Result<DeviceMemory, Error> {
+    let (mut free, mut total) = (0, 0);
+    // SAFETY: two valid out-pointers, written and not kept.
+    let status = unsafe { ffi::cudaMemGetInfo(&raw mut free, &raw mut total) };
+    if status == 0 {
+        return Ok(DeviceMemory { free, total });
+    }
+    Err(runtime_error("cudaMemGetInfo", status))
+}
+
+/// Device memory held and left unused until dropped, so that less is free
+/// for builds: what another process on the GPU would take. Under WSL2 the
+/// driver pages device memory out to the host when a build needs more than
+/// is free, so there a reservation lowers what [`device_memory`] reports
+/// without keeping a build from the memory; a native Linux driver refuses
+/// the build's allocation instead.
+#[derive(Debug)]
+pub struct Reservation {
+    pointer: NonNull<c_void>,
+    bytes: usize,
+}
+
+impl Reservation {
+    /// Allocates `bytes` on the device current on the calling thread; 0
+    /// holds nothing.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Cuvs`] naming `cudaMalloc` when the device cannot
+    /// give that much.
+    pub fn new(bytes: usize) -> Result<Self, Error> {
+        if bytes == 0 {
+            return Ok(Self {
+                pointer: NonNull::dangling(),
+                bytes,
+            });
+        }
+        let mut pointer = ptr::null_mut();
+        // SAFETY: a valid out-pointer, written and not kept.
+        let status = unsafe { ffi::cudaMalloc(&raw mut pointer, bytes) };
+        if status != 0 {
+            return Err(runtime_error("cudaMalloc", status));
+        }
+        NonNull::new(pointer)
+            .map(|pointer| Self { pointer, bytes })
+            .ok_or_else(|| Error::Cuvs {
+                call: "cudaMalloc",
+                message: "a null pointer".to_owned(),
+            })
+    }
+
+    /// The bytes held.
+    #[must_use]
+    pub fn bytes(&self) -> usize {
+        self.bytes
+    }
+}
+
+impl Drop for Reservation {
+    fn drop(&mut self) {
+        if self.bytes > 0 {
+            // SAFETY: the pointer came from cudaMalloc and is freed only
+            // here. A failure leaves the memory held until the process
+            // ends, which a drop cannot report.
+            unsafe { ffi::cudaFree(self.pointer.as_ptr()) };
+        }
+    }
+}
+
+// SAFETY: device memory belongs to the context, not to the thread that
+// allocated it; the pointer is only ever passed back to cudaFree.
+unsafe impl Send for Reservation {}
 
 /// The vectors in host memory, row-major.
 #[derive(Clone, Copy)]

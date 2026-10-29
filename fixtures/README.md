@@ -29,4 +29,17 @@ Synthetic inputs and the files the upstream service built from them, at commit 3
 
 `peak/l2-1000000x768.json` holds one build of the 1M x 768 fp32 input (`make_inputs.py peak`) by each service, on LocalStack: the whole job through `knn-builder`'s pipeline on the GPU (its `e2e` example) and through the service, with stage times, knn-inspect `verify` and `recall`, and the building process's peak resident memory (`VmHWM`). `knn-builder` peaked at 4.24 GB, the service at 8.28 GB; both index files are 3,352,129,561 bytes and verify clean.
 
+`grid/` holds the measurements a forecast of a job starts from, on the RTX 4070 Laptop GPU (8 GB) and its 32-thread CPU, in WSL2 against LocalStack (`tools/grid/`):
+
+| File | What |
+| --- | --- |
+| `grid/runs.json` | 58 builds by `knn-builder`'s `e2e` example, each of the 29 `grid` inputs with m 16 and 32, and the warm-up builds before them: stage seconds, index file size, peak resident memory and peak device memory |
+| `grid/cpu.json` | Faiss HNSW builds (M 16, ef_construction 100) of the fp32 inputs to 500k vectors, on 4 threads and, to 250k and one of 500k, on 1 |
+| `grid/check.json` | five of those builds again: reading the free memory as often as it can, and with device memory held to leave the sampled peak plus a margin, then 90% of it, free |
+| `grid/fits.json` | each model's terms and its relative error on the builds it was fitted to and on those it left out (the 250k- and 750k-vector builds; the CPU's 500k-vector ones) |
+
+All 58 builds completed. The device peak model, the dataset plus the larger of an IVF-PQ phase (the PQ codes and a fixed batch of rows) and a graph phase (the finished graph and a buffer over at most 500,000 rows), is within 1.6% on the builds left out, and its worst under-estimate on any build is 2.7%; the codes and the graph are floors it only adds to, so it never forecasts less than they take, past the grid included. Reading the free memory in a tight loop found the same peaks as reading it every 5 ms. The held-memory builds prove nothing on this host: WSL2's driver pages device memory out to the host instead of refusing it, so the builds leaving 90% of the peak free completed as well.
+
+The build time is off by 6% at the median and 33% at worst on the builds left out; d 768 at m 32 builds two to five times slower than at m 16 (79.6 s against 14.4 s at 1M vectors), as the IVF-PQ search's lookup table and top-k no longer fit a block's shared memory. Download and upload times carry LocalStack's own spread (one 1M x 384 upload took 9.9 s, its m 32 twin 3.2 s). The index file's size is exact. The CPU model is within 13% on the sizes it was fitted to and under by 14 to 23% at 500k vectors, where HNSW slows faster than n log n. On 4 threads a 500k x 768 build took 62 s. The service's part of the same remote build took 17 s, but the data node's wait is longer: at these transfer rates it uploads the vectors in about 4 s, sees the job complete at its second poll, about 20 s in (the first comes about 15 s after the request, then one every 5 s), and downloads the file in about 5 s, about 29 s in all.
+
 Builds are not reproducible: the five files of one input share their headers and level tables but differ in their graphs, so `knn-gpu` is held to the recall spread, and `knn-write` to the oracle, which rebuilds each of these files exactly from its own graph.

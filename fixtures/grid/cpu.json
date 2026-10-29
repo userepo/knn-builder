@@ -1,0 +1,210 @@
+[
+ {
+  "input": "l2-100000x128",
+  "threads": 4,
+  "seconds": 2.325,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 128,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x384",
+  "threads": 4,
+  "seconds": 4.468,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 384,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x768",
+  "threads": 4,
+  "seconds": 7.855,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 768,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x128",
+  "threads": 4,
+  "seconds": 7.485,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 128,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x384",
+  "threads": 4,
+  "seconds": 14.007,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 384,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x768",
+  "threads": 4,
+  "seconds": 26.111,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 768,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x128",
+  "threads": 4,
+  "seconds": 17.876,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 128,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x384",
+  "threads": 4,
+  "seconds": 33.266,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 384,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x768",
+  "threads": 4,
+  "seconds": 62.18,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 768,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x128",
+  "threads": 1,
+  "seconds": 9.159,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 128,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x384",
+  "threads": 1,
+  "seconds": 17.674,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 384,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x768",
+  "threads": 1,
+  "seconds": 28.729,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 768,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x128",
+  "threads": 1,
+  "seconds": 27.317,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 128,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x384",
+  "threads": 1,
+  "seconds": 53.404,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 384,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x768",
+  "threads": 1,
+  "seconds": 89.471,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 768,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x128",
+  "threads": 1,
+  "seconds": 64.174,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 128,
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ }
+]

@@ -1,0 +1,1682 @@
+[
+  {
+    "input": "l2-100000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 79220889,
+    "wall_seconds": 0.871,
+    "seconds": {
+      "download": 0.131,
+      "build": 0.572,
+      "upload": 0.168
+    },
+    "peak_rss_bytes": 811692032,
+    "peak_rss_after_gpu_init_bytes": 252506112,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7228882944,
+      "peak_bytes": 123731968
+    }
+  },
+  {
+    "input": "l2-100000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 104808589,
+    "wall_seconds": 0.977,
+    "seconds": {
+      "download": 0.136,
+      "build": 0.647,
+      "upload": 0.194
+    },
+    "peak_rss_bytes": 881577984,
+    "peak_rss_after_gpu_init_bytes": 252784640,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7195328512,
+      "peak_bytes": 157286400
+    }
+  },
+  {
+    "input": "l2-100000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 53620925,
+    "wall_seconds": 0.678,
+    "seconds": {
+      "download": 0.066,
+      "build": 0.508,
+      "upload": 0.103
+    },
+    "peak_rss_bytes": 818401280,
+    "peak_rss_after_gpu_init_bytes": 252874752,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7270825984,
+      "peak_bytes": 81788928
+    }
+  },
+  {
+    "input": "l2-100000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 79208625,
+    "wall_seconds": 1.147,
+    "seconds": {
+      "download": 0.071,
+      "build": 0.916,
+      "upload": 0.16
+    },
+    "peak_rss_bytes": 835641344,
+    "peak_rss_after_gpu_init_bytes": 252899328,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7220494336,
+      "peak_bytes": 132120576
+    }
+  },
+  {
+    "input": "l2-100000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 181620889,
+    "wall_seconds": 1.869,
+    "seconds": {
+      "download": 0.365,
+      "build": 1.152,
+      "upload": 0.352
+    },
+    "peak_rss_bytes": 1000697856,
+    "peak_rss_after_gpu_init_bytes": 252866560,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6983516160,
+      "peak_bytes": 369098752
+    }
+  },
+  {
+    "input": "l2-100000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 207208589,
+    "wall_seconds": 1.975,
+    "seconds": {
+      "download": 0.358,
+      "build": 1.207,
+      "upload": 0.41
+    },
+    "peak_rss_bytes": 1045884928,
+    "peak_rss_after_gpu_init_bytes": 252825600,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6983516160,
+      "peak_bytes": 369098752
+    }
+  },
+  {
+    "input": "l2-100000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 104820925,
+    "wall_seconds": 1.616,
+    "seconds": {
+      "download": 0.186,
+      "build": 1.181,
+      "upload": 0.25
+    },
+    "peak_rss_bytes": 886751232,
+    "peak_rss_after_gpu_init_bytes": 253104128,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7061110784,
+      "peak_bytes": 291504128
+    }
+  },
+  {
+    "input": "l2-100000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 130408625,
+    "wall_seconds": 1.507,
+    "seconds": {
+      "download": 0.185,
+      "build": 1.074,
+      "upload": 0.247
+    },
+    "peak_rss_bytes": 932286464,
+    "peak_rss_after_gpu_init_bytes": 252841984,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7061110784,
+      "peak_bytes": 291504128
+    }
+  },
+  {
+    "input": "l2-100000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 335220889,
+    "wall_seconds": 3.404,
+    "seconds": {
+      "download": 0.73,
+      "build": 1.948,
+      "upload": 0.726
+    },
+    "peak_rss_bytes": 1167474688,
+    "peak_rss_after_gpu_init_bytes": 252850176,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6614417408,
+      "peak_bytes": 738197504
+    }
+  },
+  {
+    "input": "l2-100000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 360808589,
+    "wall_seconds": 5.47,
+    "seconds": {
+      "download": 0.728,
+      "build": 4.052,
+      "upload": 0.69
+    },
+    "peak_rss_bytes": 1201180672,
+    "peak_rss_after_gpu_init_bytes": 253042688,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6614417408,
+      "peak_bytes": 738197504
+    }
+  },
+  {
+    "input": "l2-100000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 181620925,
+    "wall_seconds": 2.855,
+    "seconds": {
+      "download": 0.456,
+      "build": 1.998,
+      "upload": 0.402
+    },
+    "peak_rss_bytes": 1011511296,
+    "peak_rss_after_gpu_init_bytes": 252678144,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6767509504,
+      "peak_bytes": 585105408
+    }
+  },
+  {
+    "input": "l2-100000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 207208625,
+    "wall_seconds": 4.801,
+    "seconds": {
+      "download": 0.362,
+      "build": 4.009,
+      "upload": 0.429
+    },
+    "peak_rss_bytes": 1058525184,
+    "peak_rss_after_gpu_init_bytes": 252854272,
+    "shape": {
+      "doc_count": 100000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6767509504,
+      "peak_bytes": 585105408
+    }
+  },
+  {
+    "input": "l2-250000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 198042201,
+    "wall_seconds": 1.824,
+    "seconds": {
+      "download": 0.316,
+      "build": 1.112,
+      "upload": 0.396
+    },
+    "peak_rss_bytes": 1014177792,
+    "peak_rss_after_gpu_init_bytes": 253120512,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7090470912,
+      "peak_bytes": 262144000
+    }
+  },
+  {
+    "input": "l2-250000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 262008397,
+    "wall_seconds": 2.139,
+    "seconds": {
+      "download": 0.301,
+      "build": 1.326,
+      "upload": 0.512
+    },
+    "peak_rss_bytes": 1096073216,
+    "peak_rss_after_gpu_init_bytes": 252788736,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6958350336,
+      "peak_bytes": 394264576
+    }
+  },
+  {
+    "input": "l2-250000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 134042237,
+    "wall_seconds": 1.718,
+    "seconds": {
+      "download": 0.161,
+      "build": 1.3,
+      "upload": 0.256
+    },
+    "peak_rss_bytes": 925876224,
+    "peak_rss_after_gpu_init_bytes": 252682240,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7155482624,
+      "peak_bytes": 197132288
+    }
+  },
+  {
+    "input": "l2-250000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 198008433,
+    "wall_seconds": 1.95,
+    "seconds": {
+      "download": 0.164,
+      "build": 1.388,
+      "upload": 0.398
+    },
+    "peak_rss_bytes": 1049743360,
+    "peak_rss_after_gpu_init_bytes": 252715008,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 7023362048,
+      "peak_bytes": 329252864
+    }
+  },
+  {
+    "input": "l2-250000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 454042201,
+    "wall_seconds": 4.256,
+    "seconds": {
+      "download": 0.921,
+      "build": 2.292,
+      "upload": 1.043
+    },
+    "peak_rss_bytes": 1283239936,
+    "peak_rss_after_gpu_init_bytes": 253009920,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6736052224,
+      "peak_bytes": 616562688
+    }
+  },
+  {
+    "input": "l2-250000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 518008397,
+    "wall_seconds": 4.668,
+    "seconds": {
+      "download": 1.116,
+      "build": 2.421,
+      "upload": 1.132
+    },
+    "peak_rss_bytes": 1353601024,
+    "peak_rss_after_gpu_init_bytes": 253116416,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6702497792,
+      "peak_bytes": 650117120
+    }
+  },
+  {
+    "input": "l2-250000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 262042237,
+    "wall_seconds": 3.378,
+    "seconds": {
+      "download": 0.483,
+      "build": 2.306,
+      "upload": 0.589
+    },
+    "peak_rss_bytes": 1112875008,
+    "peak_rss_after_gpu_init_bytes": 253091840,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6928990208,
+      "peak_bytes": 423624704
+    }
+  },
+  {
+    "input": "l2-250000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 326008433,
+    "wall_seconds": 3.394,
+    "seconds": {
+      "download": 0.48,
+      "build": 2.273,
+      "upload": 0.641
+    },
+    "peak_rss_bytes": 1184821248,
+    "peak_rss_after_gpu_init_bytes": 252788736,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6895435776,
+      "peak_bytes": 457179136
+    }
+  },
+  {
+    "input": "l2-250000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 838042201,
+    "wall_seconds": 7.137,
+    "seconds": {
+      "download": 1.805,
+      "build": 3.571,
+      "upload": 1.761
+    },
+    "peak_rss_bytes": 1665925120,
+    "peak_rss_after_gpu_init_bytes": 252874752,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6119489536,
+      "peak_bytes": 1233125376
+    }
+  },
+  {
+    "input": "l2-250000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 902008397,
+    "wall_seconds": 15.734,
+    "seconds": {
+      "download": 2.048,
+      "build": 11.778,
+      "upload": 1.908
+    },
+    "peak_rss_bytes": 1740779520,
+    "peak_rss_after_gpu_init_bytes": 252833792,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6119489536,
+      "peak_bytes": 1233125376
+    }
+  },
+  {
+    "input": "l2-250000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 454042237,
+    "wall_seconds": 5.734,
+    "seconds": {
+      "download": 0.906,
+      "build": 3.644,
+      "upload": 1.184
+    },
+    "peak_rss_bytes": 1306812416,
+    "peak_rss_after_gpu_init_bytes": 252538880,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6503268352,
+      "peak_bytes": 849346560
+    }
+  },
+  {
+    "input": "l2-250000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 518008433,
+    "wall_seconds": 13.663,
+    "seconds": {
+      "download": 0.9,
+      "build": 11.85,
+      "upload": 0.913
+    },
+    "peak_rss_bytes": 1378562048,
+    "peak_rss_after_gpu_init_bytes": 252727296,
+    "shape": {
+      "doc_count": 250000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6503268352,
+      "peak_bytes": 849346560
+    }
+  },
+  {
+    "input": "l2-500000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 396066073,
+    "wall_seconds": 3.604,
+    "seconds": {
+      "download": 0.582,
+      "build": 2.328,
+      "upload": 0.693
+    },
+    "peak_rss_bytes": 1217536000,
+    "peak_rss_after_gpu_init_bytes": 252891136,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6828326912,
+      "peak_bytes": 524288000
+    }
+  },
+  {
+    "input": "l2-500000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 524030861,
+    "wall_seconds": 4.6,
+    "seconds": {
+      "download": 0.584,
+      "build": 2.981,
+      "upload": 1.035
+    },
+    "peak_rss_bytes": 1452572672,
+    "peak_rss_after_gpu_init_bytes": 252792832,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6566182912,
+      "peak_bytes": 786432000
+    }
+  },
+  {
+    "input": "l2-500000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 268066109,
+    "wall_seconds": 3.274,
+    "seconds": {
+      "download": 0.307,
+      "build": 2.436,
+      "upload": 0.53
+    },
+    "peak_rss_bytes": 1111441408,
+    "peak_rss_after_gpu_init_bytes": 252739584,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6956253184,
+      "peak_bytes": 396361728
+    }
+  },
+  {
+    "input": "l2-500000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 396030897,
+    "wall_seconds": 4.418,
+    "seconds": {
+      "download": 0.298,
+      "build": 3.38,
+      "upload": 0.74
+    },
+    "peak_rss_bytes": 1343856640,
+    "peak_rss_after_gpu_init_bytes": 252731392,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6694109184,
+      "peak_bytes": 658505728
+    }
+  },
+  {
+    "input": "l2-500000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 908066073,
+    "wall_seconds": 8.688,
+    "seconds": {
+      "download": 2.875,
+      "build": 4.119,
+      "upload": 1.693
+    },
+    "peak_rss_bytes": 1732911104,
+    "peak_rss_after_gpu_init_bytes": 253014016,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6316621824,
+      "peak_bytes": 1035993088
+    }
+  },
+  {
+    "input": "l2-500000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1036030861,
+    "wall_seconds": 7.966,
+    "seconds": {
+      "download": 1.796,
+      "build": 4.304,
+      "upload": 1.867
+    },
+    "peak_rss_bytes": 1969704960,
+    "peak_rss_after_gpu_init_bytes": 252674048,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6054477824,
+      "peak_bytes": 1298137088
+    }
+  },
+  {
+    "input": "l2-500000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 524066109,
+    "wall_seconds": 5.985,
+    "seconds": {
+      "download": 0.89,
+      "build": 4.11,
+      "upload": 0.985
+    },
+    "peak_rss_bytes": 1374093312,
+    "peak_rss_after_gpu_init_bytes": 252727296,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6700400640,
+      "peak_bytes": 652214272
+    }
+  },
+  {
+    "input": "l2-500000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 652030897,
+    "wall_seconds": 6.544,
+    "seconds": {
+      "download": 0.918,
+      "build": 4.207,
+      "upload": 1.419
+    },
+    "peak_rss_bytes": 1602916352,
+    "peak_rss_after_gpu_init_bytes": 252530688,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6438256640,
+      "peak_bytes": 914358272
+    }
+  },
+  {
+    "input": "l2-500000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1676066073,
+    "wall_seconds": 17.247,
+    "seconds": {
+      "download": 4.032,
+      "build": 8.603,
+      "upload": 4.613
+    },
+    "peak_rss_bytes": 2499956736,
+    "peak_rss_after_gpu_init_bytes": 253075456,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5295308800,
+      "peak_bytes": 2057306112
+    }
+  },
+  {
+    "input": "l2-500000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1804030861,
+    "wall_seconds": 39.08,
+    "seconds": {
+      "download": 3.899,
+      "build": 31.342,
+      "upload": 3.84
+    },
+    "peak_rss_bytes": 2733617152,
+    "peak_rss_after_gpu_init_bytes": 252715008,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5286920192,
+      "peak_bytes": 2065694720
+    }
+  },
+  {
+    "input": "l2-500000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 908066109,
+    "wall_seconds": 13.528,
+    "seconds": {
+      "download": 1.837,
+      "build": 8.784,
+      "upload": 2.906
+    },
+    "peak_rss_bytes": 1757364224,
+    "peak_rss_after_gpu_init_bytes": 252801024,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6062866432,
+      "peak_bytes": 1289748480
+    }
+  },
+  {
+    "input": "l2-500000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1036030897,
+    "wall_seconds": 34.996,
+    "seconds": {
+      "download": 2.068,
+      "build": 31.042,
+      "upload": 1.886
+    },
+    "peak_rss_bytes": 1987661824,
+    "peak_rss_after_gpu_init_bytes": 252715008,
+    "shape": {
+      "doc_count": 500000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6054477824,
+      "peak_bytes": 1298137088
+    }
+  },
+  {
+    "input": "l2-1000000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 792129561,
+    "wall_seconds": 7.408,
+    "seconds": {
+      "download": 1.187,
+      "build": 3.865,
+      "upload": 2.355
+    },
+    "peak_rss_bytes": 1700290560,
+    "peak_rss_after_gpu_init_bytes": 252833792,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6442450944,
+      "peak_bytes": 910163968
+    }
+  },
+  {
+    "input": "l2-1000000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1048062477,
+    "wall_seconds": 8.8,
+    "seconds": {
+      "download": 1.334,
+      "build": 5.24,
+      "upload": 2.226
+    },
+    "peak_rss_bytes": 2223525888,
+    "peak_rss_after_gpu_init_bytes": 252686336,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6052380672,
+      "peak_bytes": 1300234240
+    }
+  },
+  {
+    "input": "l2-1000000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 536129597,
+    "wall_seconds": 5.678,
+    "seconds": {
+      "download": 0.602,
+      "build": 3.799,
+      "upload": 1.276
+    },
+    "peak_rss_bytes": 1467060224,
+    "peak_rss_after_gpu_init_bytes": 252530688,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6698303488,
+      "peak_bytes": 654311424
+    }
+  },
+  {
+    "input": "l2-1000000x128-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 792062513,
+    "wall_seconds": 8.022,
+    "seconds": {
+      "download": 0.685,
+      "build": 5.182,
+      "upload": 2.154
+    },
+    "peak_rss_bytes": 1987309568,
+    "peak_rss_after_gpu_init_bytes": 253042688,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 128,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6308233216,
+      "peak_bytes": 1044381696
+    }
+  },
+  {
+    "input": "l2-1000000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1816129561,
+    "wall_seconds": 20.891,
+    "seconds": {
+      "download": 3.561,
+      "build": 7.445,
+      "upload": 9.885
+    },
+    "peak_rss_bytes": 2725625856,
+    "peak_rss_after_gpu_init_bytes": 252825600,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5419040768,
+      "peak_bytes": 1933574144
+    }
+  },
+  {
+    "input": "l2-1000000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 2072062477,
+    "wall_seconds": 22.531,
+    "seconds": {
+      "download": 3.739,
+      "build": 8.255,
+      "upload": 10.537
+    },
+    "peak_rss_bytes": 3249209344,
+    "peak_rss_after_gpu_init_bytes": 252706816,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5028970496,
+      "peak_bytes": 2323644416
+    }
+  },
+  {
+    "input": "l2-1000000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1048129597,
+    "wall_seconds": 19.833,
+    "seconds": {
+      "download": 3.318,
+      "build": 7.62,
+      "upload": 8.895
+    },
+    "peak_rss_bytes": 1980399616,
+    "peak_rss_after_gpu_init_bytes": 252850176,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6184501248,
+      "peak_bytes": 1168113664
+    }
+  },
+  {
+    "input": "l2-1000000x384-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1304062513,
+    "wall_seconds": 13.252,
+    "seconds": {
+      "download": 1.867,
+      "build": 8.171,
+      "upload": 3.214
+    },
+    "peak_rss_bytes": 2501353472,
+    "peak_rss_after_gpu_init_bytes": 252833792,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 384,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5796528128,
+      "peak_bytes": 1556086784
+    }
+  },
+  {
+    "input": "l2-1000000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 3352129561,
+    "wall_seconds": 32.552,
+    "seconds": {
+      "download": 7.386,
+      "build": 14.445,
+      "upload": 10.721
+    },
+    "peak_rss_bytes": 4263383040,
+    "peak_rss_after_gpu_init_bytes": 252715008,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 3657433088,
+      "peak_bytes": 3695181824
+    }
+  },
+  {
+    "input": "l2-1000000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 3608062477,
+    "wall_seconds": 100.36,
+    "seconds": {
+      "download": 8.718,
+      "build": 79.602,
+      "upload": 12.04
+    },
+    "peak_rss_bytes": 4785979392,
+    "peak_rss_after_gpu_init_bytes": 252829696,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 3493855232,
+      "peak_bytes": 3858759680
+    }
+  },
+  {
+    "input": "l2-1000000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1816129597,
+    "wall_seconds": 23.595,
+    "seconds": {
+      "download": 3.398,
+      "build": 13.822,
+      "upload": 6.375
+    },
+    "peak_rss_bytes": 2752081920,
+    "peak_rss_after_gpu_init_bytes": 252669952,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5192548352,
+      "peak_bytes": 2160066560
+    }
+  },
+  {
+    "input": "l2-1000000x768-fp16",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 2072062513,
+    "wall_seconds": 85.909,
+    "seconds": {
+      "download": 3.499,
+      "build": 78.514,
+      "upload": 3.896
+    },
+    "peak_rss_bytes": 3273146368,
+    "peak_rss_after_gpu_init_bytes": 252833792,
+    "shape": {
+      "doc_count": 1000000,
+      "dimension": 768,
+      "data_type": "half_float",
+      "blob_dtype": "<f2",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5028970496,
+      "peak_bytes": 2323644416
+    }
+  },
+  {
+    "input": "l2-750000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 594101721,
+    "wall_seconds": 5.312,
+    "seconds": {
+      "download": 0.885,
+      "build": 3.278,
+      "upload": 1.149
+    },
+    "peak_rss_bytes": 1444323328,
+    "peak_rss_after_gpu_init_bytes": 252989440,
+    "shape": {
+      "doc_count": 750000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6635388928,
+      "peak_bytes": 717225984
+    }
+  },
+  {
+    "input": "l2-750000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 786053325,
+    "wall_seconds": 6.6,
+    "seconds": {
+      "download": 0.886,
+      "build": 4.224,
+      "upload": 1.49
+    },
+    "peak_rss_bytes": 1838747648,
+    "peak_rss_after_gpu_init_bytes": 252837888,
+    "shape": {
+      "doc_count": 750000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 6308233216,
+      "peak_bytes": 1044381696
+    }
+  },
+  {
+    "input": "l2-750000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1362101721,
+    "wall_seconds": 11.302,
+    "seconds": {
+      "download": 2.554,
+      "build": 5.815,
+      "upload": 2.933
+    },
+    "peak_rss_bytes": 2215714816,
+    "peak_rss_after_gpu_init_bytes": 252588032,
+    "shape": {
+      "doc_count": 750000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5867831296,
+      "peak_bytes": 1484783616
+    }
+  },
+  {
+    "input": "l2-750000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1554053325,
+    "wall_seconds": 17.86,
+    "seconds": {
+      "download": 2.733,
+      "build": 6.379,
+      "upload": 8.748
+    },
+    "peak_rss_bytes": 2608271360,
+    "peak_rss_after_gpu_init_bytes": 252899328,
+    "shape": {
+      "doc_count": 750000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5540675584,
+      "peak_bytes": 1811939328
+    }
+  },
+  {
+    "input": "l2-750000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 2514101721,
+    "wall_seconds": 31.848,
+    "seconds": {
+      "download": 5.282,
+      "build": 11.532,
+      "upload": 15.034
+    },
+    "peak_rss_bytes": 3365019648,
+    "peak_rss_after_gpu_init_bytes": 252768256,
+    "shape": {
+      "doc_count": 750000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 4475322368,
+      "peak_bytes": 2877292544
+    }
+  },
+  {
+    "input": "l2-750000x768",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 2706053325,
+    "wall_seconds": 67.31,
+    "seconds": {
+      "download": 6.794,
+      "build": 53.623,
+      "upload": 6.893
+    },
+    "peak_rss_bytes": 3761340416,
+    "peak_rss_after_gpu_init_bytes": 252784640,
+    "shape": {
+      "doc_count": 750000,
+      "dimension": 768,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 4389339136,
+      "peak_bytes": 2963275776
+    }
+  },
+  {
+    "input": "l2-2000000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 1584280345,
+    "wall_seconds": 16.901,
+    "seconds": {
+      "download": 2.34,
+      "build": 7.758,
+      "upload": 6.802
+    },
+    "peak_rss_bytes": 2739183616,
+    "peak_rss_after_gpu_init_bytes": 252833792,
+    "shape": {
+      "doc_count": 2000000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5670699008,
+      "peak_bytes": 1681915904
+    }
+  },
+  {
+    "input": "l2-2000000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 2096140045,
+    "wall_seconds": 21.688,
+    "seconds": {
+      "download": 2.395,
+      "build": 11.454,
+      "upload": 7.839
+    },
+    "peak_rss_bytes": 3770953728,
+    "peak_rss_after_gpu_init_bytes": 252833792,
+    "shape": {
+      "doc_count": 2000000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 5024776192,
+      "peak_bytes": 2327838720
+    }
+  },
+  {
+    "input": "l2-10000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 7917913,
+    "wall_seconds": 0.43,
+    "seconds": {
+      "download": 0.014,
+      "build": 0.38,
+      "upload": 0.036
+    },
+    "peak_rss_bytes": 667934720,
+    "peak_rss_after_gpu_init_bytes": 252837888,
+    "shape": {
+      "doc_count": 10000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7396655104,
+      "least_free_bytes": 7306477568,
+      "peak_bytes": 90177536
+    }
+  },
+  {
+    "input": "l2-2000000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 3632280345,
+    "wall_seconds": 43.075,
+    "seconds": {
+      "download": 6.866,
+      "build": 14.903,
+      "upload": 21.306
+    },
+    "peak_rss_bytes": 4786917376,
+    "peak_rss_after_gpu_init_bytes": 252837888,
+    "shape": {
+      "doc_count": 2000000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 16
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 3623878656,
+      "peak_bytes": 3728736256
+    }
+  },
+  {
+    "input": "l2-10000x128",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 10477901,
+    "wall_seconds": 0.55,
+    "seconds": {
+      "download": 0.018,
+      "build": 0.49,
+      "upload": 0.042
+    },
+    "peak_rss_bytes": 677867520,
+    "peak_rss_after_gpu_init_bytes": 252858368,
+    "shape": {
+      "doc_count": 10000,
+      "dimension": 128,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7396655104,
+      "least_free_bytes": 7287603200,
+      "peak_bytes": 109051904
+    }
+  },
+  {
+    "input": "l2-2000000x384",
+    "run": 1,
+    "task_status": "COMPLETED_INDEX_BUILD",
+    "file_name": "vectors.faiss",
+    "file_size": 4144140045,
+    "wall_seconds": 59.913,
+    "seconds": {
+      "download": 10.432,
+      "build": 16.068,
+      "upload": 33.413
+    },
+    "peak_rss_bytes": 5819944960,
+    "peak_rss_after_gpu_init_bytes": 252858368,
+    "shape": {
+      "doc_count": 2000000,
+      "dimension": 384,
+      "data_type": "float",
+      "blob_dtype": "<f4",
+      "m": 32
+    },
+    "device": {
+      "total_bytes": 8585216000,
+      "free_before_bytes": 7352614912,
+      "least_free_bytes": 2977955840,
+      "peak_bytes": 4374659072
+    }
+  }
+]

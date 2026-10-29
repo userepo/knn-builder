@@ -20,5 +20,5 @@ mod params;
 
 pub use error::Error;
 #[cfg(feature = "gpu")]
-pub use gpu::{Gpu, Graph, HostVectors};
+pub use gpu::{DeviceMemory, Gpu, Graph, HostVectors, Reservation, device_memory};
 pub use params::{BuildParams, Metric};

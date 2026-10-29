@@ -1,16 +1,33 @@
 //! End to end on the GPU against S3 (LocalStack): uploads inputs written
 //! by `tools/make_inputs.py`, builds them through the pipeline with
 //! knn-gpu, and fetches the index files for `tools/baseline/score.py`.
-//! `build` reports each job's stage times and the process's peak resident
-//! memory (`VmHWM`); `put` and `get` run as processes of their own, so
-//! their buffers stay out of that peak. Needs the `gpu` feature, and S3
-//! settings as the service reads them (`S3_ENDPOINT_URL`, credentials).
+//! `build` reports each job's stage times, its index file's size, the
+//! process's peak resident memory (`VmHWM`), and the device memory the job
+//! took at its peak: the free memory before it less the least seen free
+//! while it ran, read every 5 ms by default. `put` and `get` run as
+//! processes of their own, so their buffers stay out of the resident peak.
+//! Needs the `gpu` feature, and S3 settings as the service reads them
+//! (`S3_ENDPOINT_URL`, credentials).
 //!
 //! ```text
-//! e2e put   BUCKET INPUTS NAME...       upload NAME/vectors.knnvec, NAME/doc_ids.knndid
-//! e2e build BUCKET INPUTS OUT NAME...   build each, append to OUT/runs.json
-//! e2e get   BUCKET OUT                  fetch each built file to OUT/NAME/run-1.faiss
+//! e2e put   BUCKET INPUTS NAME...   upload NAME/vectors.knnvec, NAME/doc_ids.knndid
+//! e2e build BUCKET INPUTS OUT [--m M] [--leave BYTES] [--every MICROSECONDS] NAME...
+//!                                   build each and append to OUT/runs.json: with m = M in place
+//!                                   of the input's, with device memory held so that only BYTES
+//!                                   are free when the job starts, and reading the free memory
+//!                                   every MICROSECONDS (0: as often as it can)
+//! e2e get   BUCKET OUT              fetch each built file to OUT/NAME/run-1.faiss
+//! e2e drop  BUCKET NAME...          delete every object under NAME/
 //! ```
+//!
+//! Builds of one input with several m write one file name, each over the
+//! last, so `get` refuses a `runs.json` that holds more than one completed
+//! build of an input: build each m into an OUT of its own to fetch them.
+//!
+//! Under WSL2 the driver pages device memory out to the host when a build
+//! needs more than is free, so memory held with `--leave` lowers what the
+//! device reports free but does not make a build fail; on a native Linux
+//! driver a build that needs more than is left fails out of memory.
 
 #![allow(
     clippy::unwrap_used,
@@ -19,13 +36,17 @@
     reason = "a measuring tool: failing loudly is the point"
 )]
 
+use std::collections::HashSet;
 use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::time::Instant;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
+use std::time::{Duration, Instant};
 
 use knn_builder::{DataType, Job, Pipeline, SpaceType};
-use knn_gpu::Gpu;
+use knn_gpu::{Gpu, Reservation, device_memory};
 use knn_store::{Cancel, Settings, Store, Transfers};
 use serde_json::{Value, json};
 
@@ -46,6 +67,7 @@ async fn main() {
             .await;
         }
         Some("get") => get(&store, &args[1], Path::new(&args[2])).await,
+        Some("drop") => drop_inputs(&store, &args[1], &args[2..]).await,
         _ => panic!("usage: e2e put|build|get ... (see the file's docs)"),
     }
 }
@@ -79,8 +101,9 @@ async fn put(store: &Store, bucket: &str, inputs: &Path, names: &[String]) {
     }
 }
 
-/// The job `tools/baseline/run_baseline.py` would request for `name`.
-fn job(bucket: &str, name: &str, meta: &Value) -> Job {
+/// The job `tools/baseline/run_baseline.py` would request for `name`,
+/// with `m` in place of the input's when given.
+fn job(bucket: &str, name: &str, meta: &Value, m: Option<u32>) -> Job {
     let number = |key: &str| meta[key].as_u64().unwrap();
     Job {
         bucket: bucket.to_owned(),
@@ -98,7 +121,7 @@ fn job(bucket: &str, name: &str, meta: &Value) -> Job {
             "innerproduct" => SpaceType::InnerProduct,
             other => panic!("space_type {other}"),
         },
-        m: u32::try_from(number("m")).unwrap(),
+        m: m.unwrap_or_else(|| u32::try_from(number("m")).unwrap()),
         ef_construction: i32::try_from(number("ef_construction")).unwrap(),
         ef_search: i32::try_from(number("ef_search")).unwrap(),
         skip_stored_vectors: meta["skip_stored_vectors"].as_bool().unwrap(),
@@ -120,9 +143,59 @@ fn reset_peak_rss() {
     fs::write("/proc/self/clear_refs", "5").unwrap();
 }
 
+/// Reads the device's free memory every `every` until `stop` is set, and
+/// returns the least it saw.
+fn least_free(stop: Arc<AtomicBool>, every: Duration) -> thread::JoinHandle<usize> {
+    thread::spawn(move || {
+        let mut least = usize::MAX;
+        loop {
+            least = least.min(device_memory().unwrap().free);
+            if stop.load(Ordering::Relaxed) {
+                return least;
+            }
+            if !every.is_zero() {
+                thread::sleep(every);
+            }
+        }
+    })
+}
+
+/// `build`'s options.
+struct BuildFlags {
+    /// `--m`: m in place of each input's.
+    m: Option<u32>,
+    /// `--leave`: the device memory to leave free for each job.
+    leave: Option<usize>,
+    /// `--every`: how often to read the free memory.
+    every: Duration,
+}
+
+/// `build`'s options, in any order before the names, and the names.
+fn build_flags(mut args: &[String]) -> (BuildFlags, &[String]) {
+    let mut flags = BuildFlags {
+        m: None,
+        leave: None,
+        every: Duration::from_millis(5),
+    };
+    loop {
+        match args {
+            [flag, value, ..] if flag == "--m" => flags.m = Some(value.parse().unwrap()),
+            [flag, value, ..] if flag == "--leave" => flags.leave = Some(value.parse().unwrap()),
+            [flag, value, ..] if flag == "--every" => {
+                flags.every = Duration::from_micros(value.parse().unwrap());
+            }
+            _ => return (flags, args),
+        }
+        args = &args[2..];
+    }
+}
+
 /// Builds each input, one job after another, and appends a record per job
-/// to `out/runs.json` in the shape `score.py` reads.
-async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, names: &[String]) {
+/// to `out/runs.json` in the shape `score.py` reads. A record is kept per
+/// input and m: a later run of both replaces it, as it replaces a record
+/// written before records carried their m.
+async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, args: &[String]) {
+    let (flags, names) = build_flags(args);
     let gpu = Gpu::new().unwrap();
     let after_init = peak_rss();
     // One job at a time, so no budget is needed.
@@ -136,18 +209,57 @@ async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, names: &[
         let meta: Value =
             serde_json::from_slice(&fs::read(inputs.join(name).join("input.json")).unwrap())
                 .unwrap();
+        let job = job(bucket, name, &meta, flags.m);
+        let shape = json!({
+            "doc_count": job.doc_count,
+            "dimension": job.dimension,
+            "data_type": meta["data_type"],
+            "blob_dtype": meta["blob_dtype"],
+            "m": job.m,
+        });
+        // What another process on the GPU would take, for this job.
+        let held = flags.leave.map(|leave| {
+            let free = device_memory().unwrap().free;
+            Reservation::new(free.saturating_sub(leave)).unwrap()
+        });
+        let before = device_memory().unwrap();
+        let stop = Arc::new(AtomicBool::new(false));
+        let sampler = least_free(Arc::clone(&stop), flags.every);
         reset_peak_rss();
         let start = Instant::now();
-        let outcome = pipeline.submit(job(bucket, name, &meta)).outcome().await;
+        let outcome = pipeline.submit(job).outcome().await;
         let wall = start.elapsed().as_secs_f64();
-        let record = match outcome {
+        stop.store(true, Ordering::Relaxed);
+        let least = sampler.join().unwrap();
+        let mut device = json!({
+            "total_bytes": before.total,
+            "free_before_bytes": before.free,
+            "least_free_bytes": least,
+            "peak_bytes": before.free.saturating_sub(least),
+            "read_every_us": flags.every.as_micros(),
+        });
+        if let Some(held) = held {
+            device["held_bytes"] = json!(held.bytes());
+        }
+        let mut record = match outcome {
             Ok(built) => {
                 let t = built.timings;
+                let size = store
+                    .sdk_client()
+                    .head_object()
+                    .bucket(bucket)
+                    .key(format!("{name}/{}", built.file_name))
+                    .send()
+                    .await
+                    .unwrap()
+                    .content_length()
+                    .unwrap();
                 json!({
                     "input": name,
                     "run": 1,
                     "task_status": "COMPLETED_INDEX_BUILD",
                     "file_name": built.file_name,
+                    "file_size": size,
                     "wall_seconds": round(wall),
                     "seconds": {
                         "download": round(t.download.duration().as_secs_f64()),
@@ -166,8 +278,14 @@ async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, names: &[
                 "wall_seconds": round(wall),
             }),
         };
+        record["shape"] = shape;
+        record["device"] = device;
         println!("{record}");
-        runs.retain(|r| r["input"] != record["input"]);
+        // A record without a shape predates m in the record: one per input.
+        runs.retain(|r| {
+            r["input"] != record["input"]
+                || (r.get("shape").is_some() && r["shape"]["m"] != record["shape"]["m"])
+        });
         runs.push(record);
     }
     pipeline.close().await;
@@ -186,6 +304,16 @@ fn round(seconds: f64) -> f64 {
 async fn get(store: &Store, bucket: &str, out: &Path) {
     let runs_path = out.join("runs.json");
     let mut runs: Vec<Value> = serde_json::from_slice(&fs::read(&runs_path).unwrap()).unwrap();
+    let completed = |r: &&Value| r["task_status"] == "COMPLETED_INDEX_BUILD";
+    let mut seen = HashSet::new();
+    for record in runs.iter().filter(completed) {
+        let name = record["input"].as_str().unwrap();
+        assert!(
+            seen.insert(name),
+            "{name} was built more than once (with several m): the builds share one file; \
+             build each m into an OUT of its own to fetch it"
+        );
+    }
     for record in &mut runs {
         if record["task_status"] != "COMPLETED_INDEX_BUILD" {
             continue;
@@ -220,4 +348,30 @@ async fn get(store: &Store, bucket: &str, out: &Path) {
         serde_json::to_string_pretty(&runs).unwrap() + "\n",
     )
     .unwrap();
+}
+
+/// Deletes every object under each `NAME/`: an input's blobs and the
+/// files built from it.
+async fn drop_inputs(store: &Store, bucket: &str, names: &[String]) {
+    let client = store.sdk_client();
+    for name in names {
+        let listed = client
+            .list_objects_v2()
+            .bucket(bucket)
+            .prefix(format!("{name}/"))
+            .send()
+            .await
+            .unwrap();
+        for object in listed.contents() {
+            let key = object.key().unwrap();
+            client
+                .delete_object()
+                .bucket(bucket)
+                .key(key)
+                .send()
+                .await
+                .unwrap();
+            println!("dropped {key}");
+        }
+    }
 }

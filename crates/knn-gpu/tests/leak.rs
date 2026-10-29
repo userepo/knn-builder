@@ -1,6 +1,7 @@
 //! Device memory after many builds, some failing inside cuVS: every build,
-//! finished or not, must give back what it took. Needs the `gpu` feature,
-//! a CUDA GPU and the conda environment in `environment.yml`.
+//! finished or not, must give back what it took; and a reservation holds
+//! what it took until dropped. Needs the `gpu` feature, a CUDA GPU and the
+//! conda environment in `environment.yml`.
 
 // The clippy.toml test allowances cover `#[test]` functions, not the
 // helpers beside them; in a test crate panicking is the failure mechanism
@@ -11,26 +12,11 @@
     clippy::indexing_slicing,
     reason = "test crate"
 )]
-#![expect(
-    unsafe_code,
-    reason = "reads the device's free memory through the CUDA runtime's C API"
-)]
 
-use std::ffi::c_int;
-
-use knn_gpu::{BuildParams, Error, Gpu, HostVectors, Metric};
-
-#[link(name = "cudart")]
-unsafe extern "C" {
-    fn cudaMemGetInfo(free: *mut usize, total: *mut usize) -> c_int;
-}
+use knn_gpu::{BuildParams, Error, Gpu, HostVectors, Metric, Reservation, device_memory};
 
 fn free_device_memory() -> usize {
-    let (mut free, mut total) = (0, 0);
-    // SAFETY: two valid out-pointers.
-    let status = unsafe { cudaMemGetInfo(&raw mut free, &raw mut total) };
-    assert_eq!(status, 0, "cudaMemGetInfo failed");
-    free
+    device_memory().unwrap().free
 }
 
 fn random_vectors(count: usize, seed: u64) -> Vec<f32> {
@@ -117,4 +103,44 @@ fn builds_return_their_device_memory() {
         "{} MiB fewer free after 100 builds",
         (baseline - after) / MIB
     );
+}
+
+#[test]
+fn a_reservation_holds_its_memory_until_dropped() {
+    let before = free_device_memory();
+    let reservation = Reservation::new(256 * MIB).unwrap();
+    assert_eq!(reservation.bytes(), 256 * MIB);
+    let held = free_device_memory();
+    drop(reservation);
+    let after = free_device_memory();
+    println!(
+        "free device memory {} MiB before, {} MiB held, {} MiB after",
+        before / MIB,
+        held / MIB,
+        after / MIB
+    );
+    // The first allocation may also create the context's own state; the
+    // margin covers that and other processes sharing the GPU.
+    assert!(
+        held + 256 * MIB <= before + 16 * MIB,
+        "only {} MiB taken",
+        before.saturating_sub(held) / MIB
+    );
+    assert!(
+        after + 16 * MIB >= before,
+        "{} MiB not returned",
+        before.saturating_sub(after) / MIB
+    );
+    let too_much = Reservation::new(usize::MAX / 2);
+    assert!(
+        matches!(
+            too_much,
+            Err(Error::Cuvs {
+                call: "cudaMalloc",
+                ..
+            })
+        ),
+        "{too_much:?}"
+    );
+    assert_eq!(Reservation::new(0).unwrap().bytes(), 0);
 }

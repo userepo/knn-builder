@@ -144,4 +144,21 @@ python tools/baseline/score.py target/e2e/peak target/inputs-peak ../knn-inspect
 
 For the service, start `localstack` and `service` with `docker compose ... up -d`, run the runner with `docker compose ... run --rm runner` (`INPUTS=target/inputs-peak`, `RUNS=1`), and read the service's peak from `/proc/1/status` in its container (`VmHWM`) before taking it down. `fixtures/peak/` holds the result.
 
+## Stage times and device memory
+
+`grid/run_grid.py` runs `make_inputs.py`'s `grid` set through the same `e2e` example, one input at a time, since the 29 inputs (100k, 250k, 500k and 1M vectors of dimension 128, 384 and 768, fp32 and fp16, with 750k fp32 at each dimension and 2M fp32 at 128 and 384) take 22 GB: it writes an input, uploads it, builds it with m 16 and with m 32, each in a process of its own after a warm-up build of a small input, then deletes it. Each build records its stage times, its index file's size, and the device memory it took at its peak (the free memory before it less the least seen free while it ran, read every 5 ms through `knn_gpu::device_memory`). Samples every 5 ms can miss an allocation shorter than that, so `grid/check_peaks.py` rebuilds five inputs reading the free memory as often as it can (`e2e build --every 0`), whose peaks the 5 ms ones should match, and twice more with device memory held as another process would hold it (`e2e build --leave`, through `knn_gpu::Reservation`): leaving the sampled peak plus 2% and 16 MiB free must complete, and leaving 90% of it must fail out of device memory. Under WSL2 the second completes as well, since the driver pages device memory out to the host rather than refuse it, so there the pair proves nothing and `check.json` says so; on a native Linux driver it checks the peak itself. `grid/cpu_hnsw.py` times the build a data node runs itself, Faiss's HNSW over the same float vectors, on 1 and 4 threads (k-NN's `knn.algo_param.index_thread_qty`: 4 on a node of 32 processors or more), with faiss-cpu 1.15.1. `grid/fit.py` fits a model of each quantity and scores it on the builds it left out. In WSL, in the conda environment, with LocalStack and the S3 settings as above, and faiss-cpu in a venv of its own (`$FAISS_PY`):
+
+```sh
+cargo build --release -p knn-builder --features gpu --example e2e
+python tools/grid/run_grid.py $CARGO_TARGET_DIR/release/examples/e2e ~/knn-grid/inputs target/grid
+python tools/grid/check_peaks.py $CARGO_TARGET_DIR/release/examples/e2e ~/knn-grid/inputs target/grid target/grid/check
+CPU="l2-100000x128 l2-100000x384 l2-100000x768 l2-250000x128 l2-250000x384 l2-250000x768"
+$FAISS_PY tools/make_inputs.py grid ~/knn-grid/cpu $CPU l2-500000x128 l2-500000x384 l2-500000x768
+$FAISS_PY tools/grid/cpu_hnsw.py ~/knn-grid/cpu target/grid 4 $CPU l2-500000x128 l2-500000x384 l2-500000x768
+$FAISS_PY tools/grid/cpu_hnsw.py ~/knn-grid/cpu target/grid 1 $CPU l2-500000x128
+$FAISS_PY tools/grid/fit.py target/grid target/grid
+```
+
+`fixtures/grid/` holds the RTX 4070's results and fits.
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

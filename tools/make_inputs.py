@@ -12,12 +12,18 @@ Each input is a directory holding
 The doc ids are a shuffled, spread-out set rather than 0..n, so a writer
 that confuses positions and ids cannot pass by accident.
 
-Usage: python make_inputs.py {small,large,peak} OUT_DIR
+Usage: python make_inputs.py {small,large,peak,grid} OUT_DIR [NAME...]
   small  the committed fixtures (fixtures/inputs)
   large  the inputs for measuring recall spread (not committed)
   peak   1M x 768 fp32, for measuring peak host memory (not committed;
          3 GB of vectors, drawn in float32 chunks so writing it takes
          little memory)
+  grid   100k, 250k, 500k and 1M vectors of dimension 128, 384 and 768,
+         fp32 and fp16, with 750k fp32 at each dimension and 2M fp32 at
+         128 and 384, for timing the stages and measuring device memory
+         (not committed; 22 GB in all, so tools/grid/run_grid.py writes
+         one at a time), and a small input to warm the GPU up with
+With NAMEs, only those inputs of the set.
 
 Runs in the remote-vector-index-builder image, for its numpy.
 """
@@ -57,6 +63,40 @@ SETS = {
     },
     "peak": {
         "l2-1000000x768": (1006, 1_000_000, 768, "l2", "float", "<f4", False),
+    },
+    "grid": {
+        # Seeds by name, as everywhere here; the 750k and 2M inputs pin the
+        # device peak between and past the others.
+        "l2-10000x128": (2000, 10_000, 128, "l2", "float", "<f4", False),
+        "l2-100000x128": (2001, 100_000, 128, "l2", "float", "<f4", False),
+        "l2-100000x128-fp16": (2002, 100_000, 128, "l2", "half_float", "<f2", False),
+        "l2-100000x384": (2003, 100_000, 384, "l2", "float", "<f4", False),
+        "l2-100000x384-fp16": (2004, 100_000, 384, "l2", "half_float", "<f2", False),
+        "l2-100000x768": (2005, 100_000, 768, "l2", "float", "<f4", False),
+        "l2-100000x768-fp16": (2006, 100_000, 768, "l2", "half_float", "<f2", False),
+        "l2-250000x128": (2007, 250_000, 128, "l2", "float", "<f4", False),
+        "l2-250000x128-fp16": (2008, 250_000, 128, "l2", "half_float", "<f2", False),
+        "l2-250000x384": (2009, 250_000, 384, "l2", "float", "<f4", False),
+        "l2-250000x384-fp16": (2010, 250_000, 384, "l2", "half_float", "<f2", False),
+        "l2-250000x768": (2011, 250_000, 768, "l2", "float", "<f4", False),
+        "l2-250000x768-fp16": (2012, 250_000, 768, "l2", "half_float", "<f2", False),
+        "l2-500000x128": (2013, 500_000, 128, "l2", "float", "<f4", False),
+        "l2-500000x128-fp16": (2014, 500_000, 128, "l2", "half_float", "<f2", False),
+        "l2-500000x384": (2015, 500_000, 384, "l2", "float", "<f4", False),
+        "l2-500000x384-fp16": (2016, 500_000, 384, "l2", "half_float", "<f2", False),
+        "l2-500000x768": (2017, 500_000, 768, "l2", "float", "<f4", False),
+        "l2-500000x768-fp16": (2018, 500_000, 768, "l2", "half_float", "<f2", False),
+        "l2-1000000x128": (2019, 1_000_000, 128, "l2", "float", "<f4", False),
+        "l2-1000000x128-fp16": (2020, 1_000_000, 128, "l2", "half_float", "<f2", False),
+        "l2-1000000x384": (2021, 1_000_000, 384, "l2", "float", "<f4", False),
+        "l2-1000000x384-fp16": (2022, 1_000_000, 384, "l2", "half_float", "<f2", False),
+        "l2-1000000x768": (2023, 1_000_000, 768, "l2", "float", "<f4", False),
+        "l2-1000000x768-fp16": (2024, 1_000_000, 768, "l2", "half_float", "<f2", False),
+        "l2-750000x128": (2025, 750_000, 128, "l2", "float", "<f4", False),
+        "l2-750000x384": (2026, 750_000, 384, "l2", "float", "<f4", False),
+        "l2-750000x768": (2027, 750_000, 768, "l2", "float", "<f4", False),
+        "l2-2000000x128": (2028, 2_000_000, 128, "l2", "float", "<f4", False),
+        "l2-2000000x384": (2029, 2_000_000, 384, "l2", "float", "<f4", False),
     },
 }
 
@@ -119,8 +159,13 @@ def write_input(out, name, spec):
 
 
 def main():
-    which, out = sys.argv[1], pathlib.Path(sys.argv[2])
+    which, out, names = sys.argv[1], pathlib.Path(sys.argv[2]), sys.argv[3:]
+    for name in names:
+        if name not in SETS[which]:
+            sys.exit(f"no input {name} in {which}")
     for name, spec in SETS[which].items():
+        if names and name not in names:
+            continue
         write_input(out, name, spec)
         print(f"wrote {out / name}")
 

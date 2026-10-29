@@ -22,15 +22,16 @@ pub enum Error {
         /// The dimension.
         dimension: usize,
     },
-    /// cuVS reported an error.
+    /// cuVS, or the CUDA runtime, reported an error.
     #[error("{call} failed: {message}")]
     Cuvs {
         /// The step: `raft::resources`, `make_device_padded_dataset`,
         /// `cagra::build` or `raft::copy`; `knn_cagra_build` for arguments
         /// the shim refused, `the cuVS shim` for a status it did not
-        /// document.
+        /// document; `cudaMemGetInfo` or `cudaMalloc` for the CUDA
+        /// runtime's calls.
         call: &'static str,
-        /// cuVS's message.
+        /// Its message.
         message: String,
     },
     /// A graph too large for host memory: rows x degree ids that overflow
