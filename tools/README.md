@@ -108,6 +108,27 @@ docker build --build-arg BASE_IMAGE_TAG=faiss-base-3a02e64 -f target/upstream/e2
 docker compose -f tools/e2e/docker-compose.yml up --exit-code-from e2e
 ```
 
+## Cluster
+
+`cluster/docker-compose.yml` runs a single OpenSearch 3.9.0 node whose k-NN remote index build sends its segments to knn-builder's image, with LocalStack as the S3 repository, as k-NN's own CI runs the upstream service. [knn-inspect](https://github.com/userepo/knn-inspect)'s `tools/extract_opensearch.py --remote`, from a checkout beside this one with its `tools/requirements.txt` installed, registers the repository, turns the feature on sending every segment of 1 KB or more to the builder, indexes seeded vectors, refuses a segment whose native file is not a CAGRA graph (a build that fell back to the data node's), and copies the segment out; knn-inspect's `scan` and `recall`, from the same checkout, then check the files, and `recall` scores the upstream service's segments in knn-inspect's `fixtures/opensearch-3.9.0-remote` alike:
+
+```sh
+docker build -t knn-builder:dev .
+docker compose -f tools/cluster/docker-compose.yml up -d
+EXTRACT="python ../knn-inspect/tools/extract_opensearch.py --remote --dim 64 --container knn-builder-cluster-opensearch --builder-container knn-builder-cluster-builder --localstack http://localhost:4567"
+$EXTRACT --out target/cluster/float --spaces l2
+$EXTRACT --count 2000 --out target/cluster/float --spaces cosinesimil innerproduct
+$EXTRACT --out target/cluster/half-float --encoding half-float --spaces l2
+$EXTRACT --count 2000 --out target/cluster/half-float --encoding half-float --spaces cosinesimil
+$EXTRACT --out target/cluster/on-disk --encoding on-disk --spaces l2
+KNN_INSPECT=../knn-inspect/target/release/knn-inspect
+$KNN_INSPECT scan target/cluster
+for f in target/cluster/*/*/*.faiss ../knn-inspect/fixtures/opensearch-3.9.0-remote/*/*/*.faiss; do echo "$f"; $KNN_INSPECT recall "$f" --sample 200; done
+docker compose -f tools/cluster/docker-compose.yml down -v
+```
+
+Where the fixtures hold the same segment built by the upstream service (float `l2` and `cosinesimil`, half_float `l2`, on-disk `l2`), knn-builder's file has its layout and its size. On a run of 2026-10-29 it also had its recall@10 on 200 of its own vectors (1.0, 0.9995, 1.0 and 0.984); the GPU build is not deterministic, so another run's recall can differ in its last digits. cuVS refuses a CAGRA build of a small inner-product or cosine set, 500 random vectors here, as it did for the upstream service when those fixtures were built, and the node then builds the segment itself; 2,000 build. knn-builder does not build `byte` or `binary` vectors yet: their build requests get a 422, and the node builds those segments itself too.
+
 ## Peak memory
 
 `knn-builder`'s `e2e` example runs whole jobs through its pipeline on the GPU against LocalStack: `put` uploads inputs, `build` runs them and appends each job's stage times and peak resident memory (`VmHWM`, reset before each job: what is resident when the job starts, the CUDA runtime and whatever the allocator kept from earlier jobs, plus the job's own peak; one job per invocation gives a job's figure alone) to `runs.json`, `get` streams the index files to disk for `score.py`. Each runs as a process of its own, so `put` and `get` stay out of the measured peak. In WSL, in the conda environment, with LocalStack on port 4566 and the S3 settings the service reads:
