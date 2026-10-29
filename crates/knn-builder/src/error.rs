@@ -47,6 +47,17 @@ pub enum JobError {
     /// The build parameters could not be derived from the request.
     #[error("deriving the build parameters: {0}")]
     Params(knn_gpu::Error),
+    /// Too little device memory is free for the build, which would fail
+    /// out of it partway: another process holds the rest.
+    #[error(
+        "building the graph: it needs about {needed_mib} MiB of device memory, {free_mib} MiB are free"
+    )]
+    DeviceMemory {
+        /// The build's modeled peak, with a margin, in MiB.
+        needed_mib: u64,
+        /// The device's free memory before the build, in MiB.
+        free_mib: u64,
+    },
     /// The builder failed.
     #[error("building the graph: {0}")]
     Build(String),

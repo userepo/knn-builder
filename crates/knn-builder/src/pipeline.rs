@@ -28,6 +28,7 @@ use tokio::runtime::Handle;
 use tokio::sync::{OwnedSemaphorePermit, Semaphore, mpsc, oneshot};
 use tokio::task::JoinHandle;
 
+use crate::cost::Fitted;
 use crate::load::{Dataset, load};
 use crate::write::write_index;
 use crate::{Builder, Job, JobError};
@@ -581,6 +582,17 @@ fn builds<B: Builder>(
 /// A job's graph and its degree.
 fn build<B: Builder>(builder: &mut B, job: &Loaded) -> Result<(Vec<u32>, usize), JobError> {
     let request = &job.queued.job;
+    // Another process may have taken device memory since the job was
+    // admitted: fail it now rather than out of memory partway.
+    if let Some(free) = builder.free_device_memory() {
+        let needed = Fitted::device_bytes_needed(request);
+        if needed > free {
+            return Err(JobError::DeviceMemory {
+                needed_mib: needed.div_ceil(1 << 20),
+                free_mib: free >> 20,
+            });
+        }
+    }
     let params = BuildParams::new(
         request.doc_count,
         request.dimension,

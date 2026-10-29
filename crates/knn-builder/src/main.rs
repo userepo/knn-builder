@@ -17,7 +17,7 @@ use std::time::Duration;
 
 use knn_builder::api;
 use knn_builder::config::Config;
-use knn_builder::service::Service;
+use knn_builder::service::{Device, Service};
 use knn_store::{Settings, Store, Transfers};
 use tokio::net::TcpListener;
 use tracing_subscriber::filter::Targets;
@@ -36,7 +36,7 @@ const SHUTDOWN_GRACE: Duration = Duration::from_secs(5);
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> ExitCode {
-    let config = match Config::from_env() {
+    let mut config = match Config::from_env() {
         Ok(config) => config,
         Err(error) => {
             eprintln!("knn-builder: {error}");
@@ -58,6 +58,22 @@ async fn main() -> ExitCode {
         Ok(builder) => builder,
         Err(error) => {
             tracing::error!(%error, "no builder");
+            return ExitCode::FAILURE;
+        }
+    };
+    // Read once the build's resources exist, so their memory is not
+    // counted free.
+    config.service.device = match device() {
+        Ok(device) => {
+            tracing::info!(
+                free_mib = device.free_memory >> 20,
+                shared_memory_per_block = device.shared_memory_per_block,
+                "GPU"
+            );
+            Some(device)
+        }
+        Err(error) => {
+            tracing::error!(%error, "cannot read the GPU");
             return ExitCode::FAILURE;
         }
     };
@@ -107,6 +123,25 @@ fn builder() -> Result<knn_gpu::Gpu, String> {
 #[cfg(not(feature = "gpu"))]
 fn builder() -> Result<knn_builder::FakeBuilder, String> {
     Err("built without the gpu feature, so there is no GPU to build on".to_owned())
+}
+
+/// The GPU's free memory and the shared memory a block may take.
+#[cfg(feature = "gpu")]
+fn device() -> Result<Device, String> {
+    let memory = knn_gpu::device_memory().map_err(|error| error.to_string())?;
+    let shared_memory_per_block =
+        knn_gpu::shared_memory_per_block().map_err(|error| error.to_string())?;
+    Ok(Device {
+        free_memory: u64::try_from(memory.free).unwrap_or(u64::MAX),
+        shared_memory_per_block,
+    })
+}
+
+/// No GPU without the `gpu` feature: never called, the builder having
+/// failed first.
+#[cfg(not(feature = "gpu"))]
+fn device() -> Result<Device, String> {
+    Err("built without the gpu feature".to_owned())
 }
 
 /// A SIGTERM, or Ctrl-C. A signal that cannot be listened for never comes.

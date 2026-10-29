@@ -22,7 +22,7 @@ use common::{S3, ids, le_ids};
 use knn_builder::FakeBuilder;
 use knn_builder::api;
 use knn_builder::config::Credentials;
-use knn_builder::service::{Service, Settings};
+use knn_builder::service::{Device, Service, Settings};
 use knn_store::{Store, Transfers};
 use serde_json::{Value, json};
 use tower::ServiceExt as _;
@@ -315,6 +315,71 @@ async fn post(router: &api::App, body: &Value) -> Answer {
         &body.to_string(),
     )
     .await
+}
+
+/// A request for 1M x 768 fp32 vectors: about half a minute to build,
+/// and about 3.5 GiB of device memory at its peak.
+fn large_body() -> Value {
+    json!({
+        "container_name": "bucket",
+        "vector_path": "large/_0_vectors.knnvec",
+        "doc_id_path": "large/_0_vectors.knndid",
+        "dimension": 768,
+        "doc_count": 1_000_000,
+    })
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn refuses_a_job_it_cannot_build_in_time_or_memory() {
+    // The GPU's memory is checked first, and refused with the service's
+    // message.
+    let small_gpu = Settings {
+        client_timeout: Duration::from_secs(10),
+        device: Some(Device {
+            free_memory: 1 << 30,
+            shared_memory_per_block: 101_376,
+        }),
+        ..Settings::default()
+    };
+    let router = api::app(
+        service(nowhere().await, FakeBuilder::new(Duration::ZERO), small_gpu),
+        None,
+    );
+    let answer = post(&router, &large_body()).await;
+    assert_eq!(answer.status, 507, "{}", answer.body);
+    let detail = serde_json::from_str::<Value>(&answer.body).unwrap()["detail"].clone();
+    assert!(
+        detail
+            .as_str()
+            .unwrap()
+            .starts_with("Insufficient available resources to process job "),
+        "{detail}"
+    );
+    // With the memory, the data node's 10 s timeout refuses it.
+    let short = Settings {
+        client_timeout: Duration::from_secs(10),
+        ..Settings::default()
+    };
+    let router = api::app(
+        service(nowhere().await, FakeBuilder::new(Duration::ZERO), short),
+        None,
+    );
+    let answer = post(&router, &large_body()).await;
+    assert_eq!(answer.status, 507, "{}", answer.body);
+    let detail = serde_json::from_str::<Value>(&answer.body).unwrap()["detail"].clone();
+    assert!(
+        detail
+            .as_str()
+            .unwrap()
+            .ends_with("past the data node's timeout of 10 s"),
+        "{detail}"
+    );
+    // Refused, it is not held: no job is listed.
+    let jobs = send(&router, "GET", "/_jobs", &[], "").await;
+    assert_eq!(jobs.status, 200);
+    assert_eq!(jobs.body, r#""{}""#);
+    let status = send(&router, "GET", "/_status/0123abc", &[], "").await;
+    assert_eq!(status.status, 404);
 }
 
 /// The status of `job_id` once it is no longer running.

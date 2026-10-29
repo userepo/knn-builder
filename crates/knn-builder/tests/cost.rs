@@ -13,7 +13,7 @@
 use std::fs;
 use std::path::Path;
 
-use knn_builder::cost::Fitted;
+use knn_builder::cost::{CpuThreads, Fitted};
 use knn_builder::{DataType, Job, SpaceType};
 use serde_json::Value;
 
@@ -190,5 +190,38 @@ fn never_forecasts_less_device_memory_than_the_dataset_codes_and_graph() {
         let (n, d, g) = (f64::from(doc_count), f64::from(dimension), f64::from(4 * m));
         let floor = n * d * 4.0 + (n * d / 4.0).max(4.0 * n * g);
         assert!(Fitted::device_peak_bytes(&job) >= floor);
+    }
+}
+
+#[test]
+fn takes_the_cpu_build_the_fit_says() {
+    let fits = fixture("fits.json");
+    let Value::Array(builds) = fixture("cpu.json") else {
+        panic!("cpu.json is a list")
+    };
+    let template = job(&self::builds()[0]);
+    for record in builds {
+        let shape = &record["shape"];
+        let n = shape["doc_count"].as_f64().unwrap();
+        let d = shape["dimension"].as_f64().unwrap();
+        let job = Job {
+            doc_count: u32::try_from(shape["doc_count"].as_u64().unwrap()).unwrap(),
+            dimension: u32::try_from(shape["dimension"].as_u64().unwrap()).unwrap(),
+            ..template.clone()
+        };
+        let (threads, key) = match record["threads"].as_u64().unwrap() {
+            1 => (CpuThreads::One, "cpu_seconds_1_threads"),
+            4 => (CpuThreads::Four, "cpu_seconds_4_threads"),
+            other => panic!("{other} threads"),
+        };
+        let fit = evaluate(
+            &fits[key]["terms"],
+            &[
+                ("1", 1.0),
+                ("n log2(n)", n * n.log2()),
+                ("n log2(n) d", n * n.log2() * d),
+            ],
+        );
+        close(Fitted::cpu_seconds(&job, threads), fit, key, &record);
     }
 }

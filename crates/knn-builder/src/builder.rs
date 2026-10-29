@@ -81,11 +81,25 @@ pub trait Builder: Send + 'static {
         dimension: usize,
         params: &BuildParams,
     ) -> Result<Vec<u32>, BuildError>;
+
+    /// The device memory free for the next build, in bytes, when the
+    /// builder can tell; the pipeline fails a job whose build needs more
+    /// at once. `None` by default: no check.
+    fn free_device_memory(&self) -> Option<u64> {
+        None
+    }
 }
 
 /// The build itself: cuVS on the GPU, through `knn-gpu`.
 #[cfg(feature = "gpu")]
 impl Builder for knn_gpu::Gpu {
+    fn free_device_memory(&self) -> Option<u64> {
+        // A reading that fails leaves the build to fail on its own.
+        knn_gpu::device_memory()
+            .ok()
+            .and_then(|memory| u64::try_from(memory.free).ok())
+    }
+
     fn build(
         &mut self,
         vectors: &Vectors,
@@ -109,6 +123,7 @@ pub struct FakeBuilder {
     delay: Duration,
     outcome: Fake,
     builds: Arc<AtomicUsize>,
+    free_device_memory: Option<u64>,
 }
 
 #[derive(Debug, Clone)]
@@ -126,6 +141,17 @@ impl FakeBuilder {
             delay,
             outcome: Fake::Graph,
             builds: Arc::default(),
+            free_device_memory: None,
+        }
+    }
+
+    /// The same builder, reporting `bytes` of device memory free before
+    /// each build.
+    #[must_use]
+    pub fn with_free_device_memory(self, bytes: u64) -> Self {
+        Self {
+            free_device_memory: Some(bytes),
+            ..self
         }
     }
 
@@ -136,6 +162,7 @@ impl FakeBuilder {
             delay,
             outcome: Fake::Fails(message.to_owned()),
             builds: Arc::default(),
+            free_device_memory: None,
         }
     }
 
@@ -147,6 +174,7 @@ impl FakeBuilder {
             delay,
             outcome: Fake::NamesMissingVectors,
             builds: Arc::default(),
+            free_device_memory: None,
         }
     }
 
@@ -168,6 +196,10 @@ impl FakeBuilder {
 }
 
 impl Builder for FakeBuilder {
+    fn free_device_memory(&self) -> Option<u64> {
+        self.free_device_memory
+    }
+
     fn build(
         &mut self,
         vectors: &Vectors,

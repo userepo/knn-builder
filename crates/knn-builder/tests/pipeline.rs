@@ -19,7 +19,7 @@ mod common;
 use std::time::{Duration, Instant};
 
 use common::{S3, ids, le_ids};
-use knn_builder::cost::Stages;
+use knn_builder::cost::{Fitted, Stages};
 use knn_builder::forecast::Forecaster;
 use knn_builder::{
     Builder, Built, DataType, FakeBuilder, Job, JobError, Pipeline, SpaceType, Span, Stage,
@@ -238,6 +238,38 @@ async fn keeps_the_jobs_in_memory_within_the_budget() {
     // until it has: neither downloads while the builder works.
     assert!(large.download.start >= small2.upload.end);
     assert!(small3.download.start >= large.upload.end);
+    s3.remove().await;
+}
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn fails_a_build_the_free_device_memory_cannot_hold() {
+    let s3 = S3::new("device-memory").await;
+    let small = job(&s3.bucket, "small", 600, 16);
+    let large = job(&s3.bucket, "large", 20_000, 32);
+    for job in [&small, &large] {
+        s3.put_inputs(job, &values(job), Blob::F32, None).await;
+    }
+    // Free memory for the small build, not the large one, as if another
+    // process had taken the rest.
+    let free = u64::midpoint(
+        Fitted::device_bytes_needed(&small),
+        Fitted::device_bytes_needed(&large),
+    );
+    assert!(Fitted::device_bytes_needed(&small) < free);
+    let builder = FakeBuilder::new(Duration::ZERO).with_free_device_memory(free);
+    let pipeline = s3.pipeline(builder.clone());
+    let large_outcome = pipeline.submit(large.clone()).outcome();
+    let small_outcome = pipeline.submit(small.clone()).outcome();
+    let failed = large_outcome.await;
+    assert!(
+        matches!(failed, Err(JobError::DeviceMemory { .. })),
+        "{failed:?}"
+    );
+    small_outcome.await.unwrap();
+    pipeline.close().await;
+    // The large job never reached the builder.
+    assert_eq!(builder.builds(), 1);
     s3.remove().await;
 }
 

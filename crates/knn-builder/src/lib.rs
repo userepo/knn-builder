@@ -13,6 +13,7 @@ pub mod config;
 pub mod cost;
 mod error;
 pub mod forecast;
+mod gate;
 mod job;
 mod load;
 mod pipeline;

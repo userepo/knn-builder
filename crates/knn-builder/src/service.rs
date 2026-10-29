@@ -22,6 +22,12 @@
 //!   the service fails one whose estimate does not fit beside the jobs
 //!   running. Either way the jobs held in memory stay within the limit;
 //!   here measured by the buffers they take, there by their estimates.
+//! - A new job also gets 507 at once when the GPU's memory cannot hold its
+//!   build, with the service's message, or when the data node, as it
+//!   polls, would see it ended only past its timeout, or, when asked, when
+//!   the data node would build it sooner itself (`crate::gate`). The
+//!   service takes such a job, and the data node waits for it until its
+//!   timeout or its failure.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
@@ -31,13 +37,16 @@ use knn_store::Store;
 use thiserror::Error;
 use tokio::task::JoinSet;
 
+use crate::cost::CpuThreads;
+use crate::gate::Gate;
 use crate::request::{BuildRequest, JobId};
 use crate::{Builder, Built, Canceler, DataType, JobError, Pipeline};
 
 const POISONED: &str = "a thread panicked holding the job store";
 
-/// How many jobs the service holds, for how long, and how large a job it
-/// takes. The defaults are the upstream service's.
+/// How many jobs the service holds, for how long, how large a job it
+/// takes, and what it knows of the data node and the GPU. The upstream
+/// service's settings take its defaults, k-NN's take k-NN's.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Settings {
     /// Jobs held at most (`REQUEST_STORE_MAX_SIZE`); 10,000 by default.
@@ -52,6 +61,21 @@ pub struct Settings {
     /// (`CPU_MEMORY_LIMIT`, in GB); 32e9 by default. Also the host memory
     /// the buffers of the jobs in the pipeline take at most at once.
     pub cpu_memory_limit: f64,
+    /// How long the data node waits for a job before it builds the
+    /// segment itself (`CLIENT_TIMEOUT_SECONDS`, k-NN's
+    /// `knn.remote_index_build.client.timeout`); 3,600 s by default.
+    pub client_timeout: Duration,
+    /// How often the data node asks for a job's status
+    /// (`CLIENT_POLL_INTERVAL_SECONDS`, k-NN's
+    /// `knn.remote_index_build.poll.interval`); 5 s by default.
+    pub poll_interval: Duration,
+    /// The threads the data node builds a graph on itself
+    /// (`CPU_BUILD_THREADS`): when set, a job the data node would build
+    /// sooner itself is refused. Unset by default.
+    pub cpu_build: Option<CpuThreads>,
+    /// The GPU, as read at start; without one, no job is refused for its
+    /// device memory.
+    pub device: Option<Device>,
 }
 
 impl Default for Settings {
@@ -62,8 +86,23 @@ impl Default for Settings {
             ttl: Duration::from_mins(30),
             gpu_memory_limit: 24.0 * 1e9,
             cpu_memory_limit: 32.0 * 1e9,
+            client_timeout: Duration::from_mins(60),
+            poll_interval: Duration::from_secs(5),
+            cpu_build: None,
+            device: None,
         }
     }
+}
+
+/// The GPU the service builds on, as read when it starts.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Device {
+    /// The device memory free once the build's resources exist, in bytes:
+    /// what each build, one at a time, may take.
+    pub free_memory: u64,
+    /// The shared memory a block may take, in bytes, which decides the
+    /// kernels a build runs (`knn_gpu::shared_memory_per_block`).
+    pub shared_memory_per_block: usize,
 }
 
 /// A job's state: the status response's `task_status`, with its
@@ -131,6 +170,36 @@ pub enum Refusal {
         /// The request's vector path.
         vector_path: String,
     },
+    /// 507: the data node would see the job ended, as it polls, only past
+    /// its timeout, so it would wait for nothing.
+    #[error(
+        "Job {job_id} with vector path {vector_path} would be seen ended in about {seen} s, past the data node's timeout of {timeout} s"
+    )]
+    Late {
+        /// The request's job id.
+        job_id: JobId,
+        /// The request's vector path.
+        vector_path: String,
+        /// Seconds until the data node's poll would see the job ended, at
+        /// the latest, rounded up.
+        seen: u64,
+        /// The data node's timeout, in seconds.
+        timeout: u64,
+    },
+    /// 507: the data node would build the segment sooner itself.
+    #[error(
+        "Job {job_id} with vector path {vector_path} would be back in about {remote} s; the data node builds it in about {cpu} s"
+    )]
+    CpuSooner {
+        /// The request's job id.
+        job_id: JobId,
+        /// The request's vector path.
+        vector_path: String,
+        /// Seconds until the data node would have the index file.
+        remote: u64,
+        /// Seconds the data node would take to build it.
+        cpu: u64,
+    },
 }
 
 impl Refusal {
@@ -139,7 +208,10 @@ impl Refusal {
     pub fn status(&self) -> u16 {
         match self {
             Self::Conflict { .. } => 409,
-            Self::Full { .. } | Self::TooLarge { .. } => 507,
+            Self::Full { .. }
+            | Self::TooLarge { .. }
+            | Self::Late { .. }
+            | Self::CpuSooner { .. } => 507,
         }
     }
 }
@@ -154,6 +226,8 @@ pub struct Service {
 #[derive(Debug)]
 struct Inner {
     jobs: Jobs,
+    /// What lets a new job in, and learns from those that end.
+    gate: Gate,
     /// A task per running job, recording its outcome.
     recorders: JoinSet<()>,
 }
@@ -175,6 +249,7 @@ impl Service {
         Self {
             inner: Arc::new(Mutex::new(Inner {
                 jobs: Jobs::new(settings),
+                gate: Gate::new(&settings),
                 recorders: JoinSet::new(),
             })),
             pipeline: Pipeline::start(store, builder, host_memory),
@@ -210,10 +285,22 @@ impl Service {
                     Ok(job) => job,
                     Err(error) => {
                         tracing::info!(%job_id, vector_path, %error, "job failed at once");
-                        return State::ended(Err(error), now);
+                        return Ok(State::ended(Err(error), now));
                     }
                 };
-                tracing::info!(%job_id, vector_path, "job queued");
+                // Under the store's lock, so the next request's forecast
+                // counts this job.
+                let in_flight = self.pipeline.in_flight();
+                let admitted = inner
+                    .gate
+                    .admit(job_id, &vector_path, &job, &in_flight, now)?;
+                tracing::info!(
+                    %job_id,
+                    vector_path,
+                    forecast_s = admitted.ends_in.as_secs_f64(),
+                    "job queued"
+                );
+                let learned = job.clone();
                 let handle = self.pipeline.submit(job);
                 let canceler = handle.canceler();
                 let shared = Arc::clone(&self.inner);
@@ -223,9 +310,12 @@ impl Service {
                     let ended = Instant::now();
                     log_end(&job_id, &vector_path, &outcome);
                     let mut inner = shared.lock().expect(POISONED);
+                    if let Ok(built) = &outcome {
+                        inner.gate.learn(&learned, &built.timings);
+                    }
                     inner.jobs.end(&job_id, outcome, ended);
                 });
-                State::Running(canceler)
+                Ok(State::Running(canceler))
             });
         match &taken {
             Ok(job_id) if !started => tracing::info!(%job_id, vector_path, "job held already"),
@@ -412,19 +502,20 @@ impl Jobs {
     }
 
     /// Takes `request`: its job held, or a new one, held in the state
-    /// `start` puts it in. The check and the start are one call on one
-    /// borrow, so two identical requests at once start one job.
+    /// `start` puts it in, unless `start` refuses it. The check and the
+    /// start are one call on one borrow, so two identical requests at once
+    /// start one job.
     fn take(
         &mut self,
         request: BuildRequest,
         now: Instant,
-        start: impl FnOnce(&JobId, &BuildRequest, Instant) -> State,
+        start: impl FnOnce(&JobId, &BuildRequest, Instant) -> Result<State, Refusal>,
     ) -> Result<JobId, Refusal> {
         let job_id = match self.admit(&request, now)? {
             Admission::Held(job_id) => return Ok(job_id),
             Admission::New(job_id) => job_id,
         };
-        let state = start(&job_id, &request, now);
+        let state = start(&job_id, &request, now)?;
         let number = self.next;
         self.next += 1;
         self.held.insert(
@@ -584,7 +675,7 @@ mod tests {
         let job_id = jobs
             .take(request.clone(), now, |_, _, _| {
                 started = true;
-                State::Running(Canceler::detached())
+                Ok(State::Running(Canceler::detached()))
             })
             .unwrap();
         assert!(started, "{} held already", request.vector_path);
@@ -688,6 +779,11 @@ mod tests {
                 ttl,
                 gpu_memory_limit: defaults["gpu_memory_limit"].as_f64().unwrap(),
                 cpu_memory_limit: defaults["cpu_memory_limit"].as_f64().unwrap(),
+                // k-NN's own defaults (KNNSettings at 3.9.0.0).
+                client_timeout: Duration::from_secs(3_600),
+                poll_interval: Duration::from_secs(5),
+                cpu_build: None,
+                device: None,
             }
         );
     }
@@ -744,7 +840,7 @@ mod tests {
         for _ in 0..3 {
             let taken = jobs.take(request.clone(), now, |_, _, _| {
                 starts += 1;
-                State::Running(Canceler::detached())
+                Ok(State::Running(Canceler::detached()))
             });
             assert_eq!(taken, Ok(job_id.clone()));
         }

@@ -12,10 +12,30 @@
 //! for `half_float`, whose vectors are converted on download), graph degree
 //! g. The IVF-PQ build's k-means and its search cost about n^1.5 d, the
 //! graph's optimization n g^2, the dataset's copy n d s.
+//!
+//! Beside them, the build a data node runs itself when the service refuses
+//! a segment: Faiss's HNSW over the float vectors (M 16,
+//! `ef_construction` 100), timed with faiss-cpu 1.15.1 on the same machine's CPU on 1 and 4
+//! threads. An insertion visits about log n nodes, each a distance over d
+//! values and the bookkeeping around it. It under-estimates by 14 to 23% at
+//! 500,000 vectors, where HNSW slows faster than n log n, and a data node's
+//! CPU is not this one.
 
 use knn_gpu::BuildParams;
 
 use crate::{DataType, Job};
+
+/// The threads a data node builds a graph on itself
+/// (`knn.algo_param.index_thread_qty`): the two its CPU build was measured
+/// on, k-NN's defaults for a node of fewer than 32 processors and of 32 or
+/// more.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CpuThreads {
+    /// One thread.
+    One,
+    /// Four threads.
+    Four,
+}
 
 /// The fitted models, for one GPU.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,6 +43,15 @@ pub struct Fitted {
     /// The device's shared memory a block may take, in bytes:
     /// `knn_gpu::shared_memory_per_block`.
     pub shared_memory_per_block: usize,
+}
+
+/// The GPU the models were fitted on, the RTX 4070 Laptop GPU.
+impl Default for Fitted {
+    fn default() -> Self {
+        Self {
+            shared_memory_per_block: 101_376,
+        }
+    }
 }
 
 /// A stage's seconds, or all three.
@@ -175,7 +204,42 @@ impl Fitted {
             + 4.261_985_417_489_097 * n.min(500_000.0) * g;
         n * d * x.s + ivf_pq.max(graph)
     }
+
+    /// The device memory to have free for `job`'s build, in bytes: its
+    /// peak and a margin of [`DEVICE_MARGIN`].
+    #[must_use]
+    pub fn device_bytes_needed(job: &Job) -> u64 {
+        let needed = Self::device_peak_bytes(job) * (1.0 + DEVICE_MARGIN);
+        #[expect(
+            clippy::cast_possible_truncation,
+            clippy::cast_sign_loss,
+            reason = "a positive number of bytes, saturating past u64::MAX"
+        )]
+        let bytes = needed.ceil() as u64;
+        bytes
+    }
+
+    /// The seconds a data node takes to build `job`'s graph itself on
+    /// `threads`.
+    #[must_use]
+    pub fn cpu_seconds(job: &Job, threads: CpuThreads) -> f64 {
+        let x = Shape::of(job);
+        let n_log_n = x.n * x.n.max(1.0).log2();
+        match threads {
+            CpuThreads::One => {
+                3.236_285_214_401_488_3e-6 * n_log_n + 2.013_133_437_965_566e-8 * n_log_n * x.d
+            }
+            CpuThreads::Four => {
+                7.841_646_090_633_016e-7 * n_log_n + 5.601_684_767_440_988e-9 * n_log_n * x.d
+            }
+        }
+    }
 }
+
+/// The share of a build's modeled device peak kept free besides: twice
+/// the model's worst under-estimate on the grid it was fitted to (2.7%),
+/// and a little for what cuVS rounds its allocations up to.
+pub const DEVICE_MARGIN: f64 = 0.06;
 
 #[cfg(test)]
 mod tests {

@@ -158,8 +158,10 @@ impl<M: StageModel> Forecaster<M> {
         self.build.learn(0.0, seconds(timings.build), modeled.build);
     }
 
-    /// `job`'s stages as the forecast takes them: modeled, then corrected.
-    fn stages(&self, job: &Job) -> Stages {
+    /// `job`'s stages as the forecast takes them: modeled, then corrected
+    /// by what completed jobs took.
+    #[must_use]
+    pub fn stages(&self, job: &Job) -> Stages {
         let modeled = self.model.stages(job);
         let build = self
             .builds
@@ -296,13 +298,15 @@ impl Lanes {
 
     /// The earliest time from `at` on when `share` MiB fit in a budget of
     /// `total` beside the shares held then.
-    fn room(&self, at: f64, share: u32, total: u32) -> f64 {
-        let mut releases: Vec<(f64, u32)> = self
-            .held
-            .iter()
-            .copied()
-            .filter(|&(until, _)| until > at)
-            .collect();
+    ///
+    /// Shares given back by `at` are dropped for good: each queued job
+    /// asks from a time no earlier than the one before it did (the
+    /// download stage and the build slot never come free sooner), so they
+    /// would never count again, and the forecast stays linear in the jobs
+    /// played however long the queue.
+    fn room(&mut self, at: f64, share: u32, total: u32) -> f64 {
+        self.held.retain(|&(until, _)| until > at);
+        let mut releases = self.held.clone();
         releases.sort_by(|a, b| a.0.total_cmp(&b.0));
         let mut used: u64 = releases.iter().map(|&(_, mib)| u64::from(mib)).sum();
         let mut time = at;

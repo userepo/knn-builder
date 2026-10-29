@@ -1,6 +1,8 @@
 //! The service's settings, from the environment variables the upstream
 //! service reads, under its names and with its defaults, so a deployment's
-//! settings carry over; and two of knn-builder's own, for Basic Auth.
+//! settings carry over; two of knn-builder's own, for Basic Auth; and three
+//! for what it knows of the data node: k-NN's client timeout and poll
+//! interval, with k-NN's defaults, and the threads it builds on itself.
 //!
 //! A value the upstream service cannot read stops it at start; so does
 //! one here, with the variable named. Numbers are read as Rust reads
@@ -22,16 +24,19 @@ use std::time::Duration;
 
 use thiserror::Error;
 
+use crate::cost::CpuThreads;
 use crate::service;
 
 /// What the service reads from its environment. The defaults are the
 /// upstream service's.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Config {
-    /// The job store's size and TTL, and the memory limits:
-    /// `REQUEST_STORE_MAX_SIZE`, `REQUEST_STORE_TTL_SECONDS`,
-    /// `GPU_MEMORY_LIMIT` and `CPU_MEMORY_LIMIT`; their defaults by
-    /// default.
+    /// The job store's size and TTL, the memory limits, and the data
+    /// node's settings: `REQUEST_STORE_MAX_SIZE`,
+    /// `REQUEST_STORE_TTL_SECONDS`, `GPU_MEMORY_LIMIT`,
+    /// `CPU_MEMORY_LIMIT`, `CLIENT_TIMEOUT_SECONDS`,
+    /// `CLIENT_POLL_INTERVAL_SECONDS` and `CPU_BUILD_THREADS`; their
+    /// defaults by default. The GPU is the binary's to read.
     pub service: service::Settings,
     /// `LOG_LEVEL`: `INFO` by default. `DEBUG` adds each job's stage
     /// timings.
@@ -127,6 +132,32 @@ impl Config {
         if let Some(value) = var("CPU_MEMORY_LIMIT") {
             settings.cpu_memory_limit = gigabytes("CPU_MEMORY_LIMIT", &value)?;
         }
+        if let Some(value) = var("CLIENT_TIMEOUT_SECONDS") {
+            // With no time at all, every job would be refused.
+            let seconds: u64 = whole("CLIENT_TIMEOUT_SECONDS", &value)?;
+            if seconds == 0 {
+                return Err(error("CLIENT_TIMEOUT_SECONDS", "0 seconds"));
+            }
+            settings.client_timeout = Duration::from_secs(seconds);
+        }
+        if let Some(value) = var("CLIENT_POLL_INTERVAL_SECONDS") {
+            settings.poll_interval =
+                Duration::from_secs(whole("CLIENT_POLL_INTERVAL_SECONDS", &value)?);
+        }
+        if let Some(value) = var("CPU_BUILD_THREADS") {
+            settings.cpu_build = Some(match value.trim() {
+                "1" => CpuThreads::One,
+                "4" => CpuThreads::Four,
+                _ => {
+                    return Err(error(
+                        "CPU_BUILD_THREADS",
+                        &format!(
+                            "{value:?} is not 1 or 4, the thread counts the CPU build was measured on"
+                        ),
+                    ));
+                }
+            });
+        }
         // The service's thread pool refuses 0.
         if let Some(value) = var("MAX_WORKERS")
             && !value
@@ -172,12 +203,15 @@ impl Config {
 
 /// Every variable the service reads: its own, and S3's, which
 /// `knn_store::Settings::from_env` reads.
-const VARIABLES: [&str; 12] = [
+const VARIABLES: [&str; 15] = [
     "REQUEST_STORE_TYPE",
     "REQUEST_STORE_MAX_SIZE",
     "REQUEST_STORE_TTL_SECONDS",
     "GPU_MEMORY_LIMIT",
     "CPU_MEMORY_LIMIT",
+    "CLIENT_TIMEOUT_SECONDS",
+    "CLIENT_POLL_INTERVAL_SECONDS",
+    "CPU_BUILD_THREADS",
     "MAX_WORKERS",
     "INDEX_SERIALIZATION_MODE",
     "LOG_LEVEL",
@@ -240,6 +274,7 @@ mod tests {
     use std::time::Duration;
 
     use super::{Config, ConfigError, Credentials, VARIABLES};
+    use crate::cost::CpuThreads;
 
     fn read(vars: &[(&str, &str)]) -> Result<Config, ConfigError> {
         let vars: HashMap<String, String> = vars
@@ -262,6 +297,9 @@ mod tests {
             ("REQUEST_STORE_TTL_SECONDS", "60"),
             ("GPU_MEMORY_LIMIT", "8"),
             ("CPU_MEMORY_LIMIT", "64.5"),
+            ("CLIENT_TIMEOUT_SECONDS", "600"),
+            ("CLIENT_POLL_INTERVAL_SECONDS", "0"),
+            ("CPU_BUILD_THREADS", " 4 "),
             ("MAX_WORKERS", "4"),
             ("INDEX_SERIALIZATION_MODE", "MEMORY"),
             ("LOG_LEVEL", "debug"),
@@ -273,6 +311,9 @@ mod tests {
         assert_eq!(config.service.ttl, Duration::from_secs(60));
         assert_eq!(config.service.gpu_memory_limit, 8e9);
         assert_eq!(config.service.cpu_memory_limit, 64.5e9);
+        assert_eq!(config.service.client_timeout, Duration::from_secs(600));
+        assert_eq!(config.service.poll_interval, Duration::ZERO);
+        assert_eq!(config.service.cpu_build, Some(CpuThreads::Four));
         assert_eq!(config.log_level, tracing::Level::DEBUG);
         assert_eq!(
             config.auth,
@@ -298,6 +339,16 @@ mod tests {
             ),
             (&[("GPU_MEMORY_LIMIT", "nan")], "GPU_MEMORY_LIMIT"),
             (&[("CPU_MEMORY_LIMIT", "-1")], "CPU_MEMORY_LIMIT"),
+            (&[("CLIENT_TIMEOUT_SECONDS", "0")], "CLIENT_TIMEOUT_SECONDS"),
+            (
+                &[("CLIENT_TIMEOUT_SECONDS", "1h")],
+                "CLIENT_TIMEOUT_SECONDS",
+            ),
+            (
+                &[("CLIENT_POLL_INTERVAL_SECONDS", "-5")],
+                "CLIENT_POLL_INTERVAL_SECONDS",
+            ),
+            (&[("CPU_BUILD_THREADS", "8")], "CPU_BUILD_THREADS"),
             (&[("MAX_WORKERS", "0")], "MAX_WORKERS"),
             (&[("LOG_LEVEL", "LOUD")], "LOG_LEVEL"),
             (&[("BASIC_AUTH_USERNAME", "admin")], "BASIC_AUTH_PASSWORD"),

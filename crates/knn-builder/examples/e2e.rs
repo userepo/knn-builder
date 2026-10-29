@@ -27,7 +27,9 @@
 //! Under WSL2 the driver pages device memory out to the host when a build
 //! needs more than is free, so memory held with `--leave` lowers what the
 //! device reports free but does not make a build fail; on a native Linux
-//! driver a build that needs more than is left fails out of memory.
+//! driver a build that needs more than is left fails out of memory. The
+//! pipeline's own check of the free memory before each build is off here:
+//! a measuring tool builds what it is asked, to see what the build takes.
 
 #![allow(
     clippy::unwrap_used,
@@ -45,7 +47,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use knn_builder::{DataType, Job, Pipeline, SpaceType};
+use knn_builder::{BuildError, Builder, DataType, Job, Pipeline, SpaceType, Vectors};
 use knn_gpu::{Gpu, Reservation, device_memory};
 use knn_store::{Cancel, Settings, Store, Transfers};
 use serde_json::{Value, json};
@@ -143,6 +145,21 @@ fn reset_peak_rss() {
     fs::write("/proc/self/clear_refs", "5").unwrap();
 }
 
+/// The GPU, telling the pipeline nothing of its free memory, so no build
+/// is failed before it starts.
+struct Unchecked(Gpu);
+
+impl Builder for Unchecked {
+    fn build(
+        &mut self,
+        vectors: &Vectors,
+        dimension: usize,
+        params: &knn_gpu::BuildParams,
+    ) -> Result<Vec<u32>, BuildError> {
+        Builder::build(&mut self.0, vectors, dimension, params)
+    }
+}
+
 /// Reads the device's free memory every `every` until `stop` is set, and
 /// returns the least it saw.
 fn least_free(stop: Arc<AtomicBool>, every: Duration) -> thread::JoinHandle<usize> {
@@ -196,7 +213,7 @@ fn build_flags(mut args: &[String]) -> (BuildFlags, &[String]) {
 /// written before records carried their m.
 async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, args: &[String]) {
     let (flags, names) = build_flags(args);
-    let gpu = Gpu::new().unwrap();
+    let gpu = Unchecked(Gpu::new().unwrap());
     let after_init = peak_rss();
     // One job at a time, so no budget is needed.
     let pipeline = Pipeline::start(store.clone(), gpu, u64::MAX);
