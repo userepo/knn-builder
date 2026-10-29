@@ -200,24 +200,39 @@ impl Service {
         let mut guard = self.inner.lock().expect(POISONED);
         let inner = &mut *guard;
         while inner.recorders.try_join_next().is_some() {}
-        inner
+        let vector_path = request.vector_path.clone();
+        let mut started = false;
+        let taken = inner
             .jobs
             .take(request, Instant::now(), |job_id, request, now| {
+                started = true;
                 let job = match request.job() {
                     Ok(job) => job,
-                    Err(error) => return State::ended(Err(error), now),
+                    Err(error) => {
+                        tracing::info!(%job_id, vector_path, %error, "job failed at once");
+                        return State::ended(Err(error), now);
+                    }
                 };
+                tracing::info!(%job_id, vector_path, "job queued");
                 let handle = self.pipeline.submit(job);
                 let canceler = handle.canceler();
-                let (shared, job_id) = (Arc::clone(&self.inner), job_id.clone());
+                let shared = Arc::clone(&self.inner);
+                let (job_id, vector_path) = (job_id.clone(), vector_path.clone());
                 inner.recorders.spawn(async move {
                     let outcome = handle.outcome().await;
                     let ended = Instant::now();
+                    log_end(&job_id, &vector_path, &outcome);
                     let mut inner = shared.lock().expect(POISONED);
                     inner.jobs.end(&job_id, outcome, ended);
                 });
                 State::Running(canceler)
-            })
+            });
+        match &taken {
+            Ok(job_id) if !started => tracing::info!(%job_id, vector_path, "job held already"),
+            Ok(_) => {}
+            Err(refusal) => tracing::warn!(%refusal, "build request refused"),
+        }
+        taken
     }
 
     /// The status of the job `job_id`, or `None` when no job of that id is
@@ -256,6 +271,30 @@ impl Service {
         };
         self.pipeline.close().await;
         recorders.join_all().await;
+    }
+}
+
+/// A job's end in the logs: its status, and at `DEBUG` its stages' times.
+fn log_end(job_id: &JobId, vector_path: &str, outcome: &Result<Built, JobError>) {
+    match outcome {
+        Ok(built) => {
+            tracing::info!(%job_id, vector_path, file_name = built.file_name, "job completed");
+            let seconds = |span: crate::Span| span.duration().as_secs_f64();
+            tracing::debug!(
+                %job_id,
+                download_s = seconds(built.timings.download),
+                build_s = seconds(built.timings.build),
+                upload_s = seconds(built.timings.upload),
+                total_s = built
+                    .timings
+                    .upload
+                    .end
+                    .duration_since(built.timings.download.start)
+                    .as_secs_f64(),
+                "job stage times"
+            );
+        }
+        Err(error) => tracing::warn!(%job_id, vector_path, %error, "job failed"),
     }
 }
 

@@ -250,7 +250,48 @@ const VECTOR_PATH_PATTERN: &str = r".+\.knnvec$";
 
 const MODEL_TYPE: &str = "Input should be a valid dictionary or object to extract fields from";
 
-/// Reads a `POST /_build` body.
+/// Reads a `POST /_build` body sent with the `Content-Type` header
+/// `content_type`, as FastAPI reads one: as JSON, by [`parse`], when the
+/// header is missing or empty or its media type is `application/json` or
+/// `application/*+json`, in any case; otherwise as raw bytes, which the
+/// model refuses, unless there are none.
+///
+/// # Errors
+///
+/// The [`Rejection`] the service would answer with.
+pub fn parse_as(content_type: Option<&[u8]>, body: &[u8]) -> Result<BuildRequest, Rejection> {
+    if is_json(content_type) {
+        parse(body)
+    } else if body.is_empty() {
+        Err(single("body", "Field required", "missing"))
+    } else {
+        Err(single("body", MODEL_TYPE, "model_attributes_type"))
+    }
+}
+
+/// Whether FastAPI reads a body of `content_type` as JSON. It takes the
+/// media type as Python's `email.message` does: before any `;`, stripped,
+/// in lower case, and `text/plain` unless it has exactly one `/`.
+fn is_json(content_type: Option<&[u8]>) -> bool {
+    let Some(value) = content_type.filter(|value| !value.is_empty()) else {
+        return true;
+    };
+    let media = value
+        .split(|&b| b == b';')
+        .next()
+        .unwrap_or_default()
+        .trim_ascii()
+        .to_ascii_lowercase();
+    let mut parts = media.split(|&b| b == b'/');
+    match (parts.next(), parts.next(), parts.next()) {
+        (Some(b"application"), Some(subtype), None) => {
+            subtype == b"json" || subtype.ends_with(b"+json")
+        }
+        _ => false,
+    }
+}
+
+/// Reads a `POST /_build` body as JSON.
 ///
 /// # Errors
 ///
@@ -732,7 +773,7 @@ fn parse_int(text: &str) -> Option<i128> {
 
 #[cfg(test)]
 mod tests {
-    use super::{matches_vector_path, or_list, parse_int};
+    use super::{is_json, matches_vector_path, or_list, parse_int};
 
     #[test]
     fn reads_integers_from_strings_as_pydantic() {
@@ -760,6 +801,31 @@ mod tests {
         assert!(!matches_vector_path("a/b.vec"));
         assert!(!matches_vector_path("a\n.knnvec"));
         assert!(!matches_vector_path("a.knnvec\n"));
+    }
+
+    #[test]
+    fn reads_json_by_its_media_type_as_fastapi() {
+        for json in [
+            None,
+            Some(&b""[..]),
+            Some(b"application/json"),
+            Some(b"application/json; charset=utf-8"),
+            Some(b"  Application/JSON ;x=y"),
+            Some(b"application/vnd.api+json"),
+        ] {
+            assert!(is_json(json), "{json:?}");
+        }
+        for other in [
+            &b"text/plain"[..],
+            b"application",
+            b" ",
+            b"application/json/x",
+            b"application/x-www-form-urlencoded",
+            b"application /json",
+            b"text/json",
+        ] {
+            assert!(!is_json(Some(other)), "{other:?}");
+        }
     }
 
     #[test]

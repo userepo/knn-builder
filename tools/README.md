@@ -80,6 +80,12 @@ $RUN $API tools/oracle/requests.py crates/knn-builder/tests/data/requests.json
 $RUN $API tools/oracle/capacity.py crates/knn-builder/tests/data/capacity.json
 ```
 
+`oracle/routes.py` records how the service answers HTTP requests, for `knn-builder`'s routes: the status, the headers that matter and the body, for each route and method, the content types a build request may come with, paths no route takes, and the status of a job running, completed and failed. Its jobs never start, so it needs no S3. Run it in the api image:
+
+```sh
+$RUN $API tools/oracle/routes.py crates/knn-builder/tests/data/routes.json
+```
+
 ## Parity
 
 `knn-gpu`'s `build_inputs` example builds inputs as the service does, with `knn-gpu` and `knn-write`, and writes a `runs.json` that `baseline/score.py` scores like the service's (it carries its own timings and has no log). In WSL, in the conda environment:

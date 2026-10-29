@@ -1,0 +1,595 @@
+{
+ "cases": [
+  {
+   "case": "heart beat",
+   "method": "GET",
+   "path": "/_heart_beat",
+   "headers": {},
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "\"remote-vector-index-builder-api\""
+  },
+  {
+   "case": "heart beat, HEAD",
+   "method": "HEAD",
+   "path": "/_heart_beat",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "GET"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "heart beat, POST",
+   "method": "POST",
+   "path": "/_heart_beat",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "GET"
+   },
+   "response_body": "{\"detail\":\"Method Not Allowed\"}"
+  },
+  {
+   "case": "heart beat, query",
+   "method": "GET",
+   "path": "/_heart_beat?x=1",
+   "headers": {},
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "\"remote-vector-index-builder-api\""
+  },
+  {
+   "case": "heart beat, trailing slash",
+   "method": "GET",
+   "path": "/_heart_beat/",
+   "headers": {},
+   "body": null,
+   "status": 307,
+   "response_headers": {
+    "location": "http://testserver/_heart_beat"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "heart beat, trailing slash and query",
+   "method": "GET",
+   "path": "/_heart_beat/?x=1&y=2",
+   "headers": {},
+   "body": null,
+   "status": 307,
+   "response_headers": {
+    "location": "http://testserver/_heart_beat?x=1&y=2"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "status, trailing slash",
+   "method": "GET",
+   "path": "/_status/0123abc/",
+   "headers": {},
+   "body": null,
+   "status": 307,
+   "response_headers": {
+    "location": "http://testserver/_status/0123abc"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "heart beat, two trailing slashes",
+   "method": "GET",
+   "path": "/_heart_beat//",
+   "headers": {},
+   "body": null,
+   "status": 307,
+   "response_headers": {
+    "location": "http://testserver/_heart_beat"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "heart beat, an Authorization header",
+   "method": "GET",
+   "path": "/_heart_beat",
+   "headers": {
+    "authorization": "Basic dXNlcjpwYXNz"
+   },
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "\"remote-vector-index-builder-api\""
+  },
+  {
+   "case": "root",
+   "method": "GET",
+   "path": "/",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "case": "no such path",
+   "method": "GET",
+   "path": "/nope",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "case": "no such path, POST",
+   "method": "POST",
+   "path": "/nope",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "case": "build",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f\"}"
+  },
+  {
+   "case": "build again",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f\"}"
+  },
+  {
+   "case": "build, GET",
+   "method": "GET",
+   "path": "/_build",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "POST"
+   },
+   "response_body": "{\"detail\":\"Method Not Allowed\"}"
+  },
+  {
+   "case": "build, PUT",
+   "method": "PUT",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "POST"
+   },
+   "response_body": "{\"detail\":\"Method Not Allowed\"}"
+  },
+  {
+   "case": "build, OPTIONS",
+   "method": "OPTIONS",
+   "path": "/_build",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "POST"
+   },
+   "response_body": "{\"detail\":\"Method Not Allowed\"}"
+  },
+  {
+   "case": "build, HEAD",
+   "method": "HEAD",
+   "path": "/_build",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "POST"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "build, no content type",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {},
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_none.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"bf34ffdd5d897bb37aab499e92d2ac2bcc03530744c789ff8fb5d575231e4d36\"}"
+  },
+  {
+   "case": "build, charset",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json; charset=utf-8"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_charset.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"50924fb6766309824e92ea19e3f7b77e5c45bdead72e1e2e197e4700c4465cc1\"}"
+  },
+  {
+   "case": "build, upper case type",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "Application/JSON"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_upper.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"8862c8901ef92789ba552e393d1f319c6740b7b40e3c8bcef9a23de10043c35b\"}"
+  },
+  {
+   "case": "build, +json type",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/vnd.api+json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_plus.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"3c3282cbf6fbeef4897c6379d9c1609d44bbb263777e53eca45e4e08a65ddd67\"}"
+  },
+  {
+   "case": "build, text/plain",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "text/plain"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_text.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 422,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Validation Error\",\"errors\":[{\"field\":\"body\",\"message\":\"Input should be a valid dictionary or object to extract fields from\",\"type\":\"model_attributes_type\"}]}"
+  },
+  {
+   "case": "build, form type",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/x-www-form-urlencoded"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_form.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 422,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Validation Error\",\"errors\":[{\"field\":\"body\",\"message\":\"Input should be a valid dictionary or object to extract fields from\",\"type\":\"model_attributes_type\"}]}"
+  },
+  {
+   "case": "build, type without subtype",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_bare.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 422,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Validation Error\",\"errors\":[{\"field\":\"body\",\"message\":\"Input should be a valid dictionary or object to extract fields from\",\"type\":\"model_attributes_type\"}]}"
+  },
+  {
+   "case": "build, text/plain and empty",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "text/plain"
+   },
+   "body": "",
+   "status": 422,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Validation Error\",\"errors\":[{\"field\":\"body\",\"message\":\"Field required\",\"type\":\"missing\"}]}"
+  },
+  {
+   "case": "build, invalid",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 4}",
+   "status": 422,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Validation Error\",\"errors\":[{\"field\":\"body.doc_count\",\"message\":\"Input should be greater than 4\",\"type\":\"greater_than\"}]}"
+  },
+  {
+   "case": "build, too large",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_large.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 100000000}",
+   "status": 507,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Insufficient available resources to process job 841ee66bfb204848aae75a512c479f080afcfb95e496bbee8eae254f150776c4 with vector path a/_0_large.knnvec\"}"
+  },
+  {
+   "case": "build, same path, other parameters",
+   "method": "POST",
+   "path": "/_build",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 16, \"doc_count\": 1000000}",
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"job_id\":\"96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f\"}"
+  },
+  {
+   "case": "build, trailing slash",
+   "method": "POST",
+   "path": "/_build/",
+   "headers": {
+    "content-type": "application/json"
+   },
+   "body": "{\"container_name\": \"bucket\", \"vector_path\": \"a/_0_slash.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000}",
+   "status": 307,
+   "response_headers": {
+    "location": "http://testserver/_build"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "status, no such job",
+   "method": "GET",
+   "path": "/_status/0123abc",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Job not found\"}"
+  },
+  {
+   "case": "status, empty id",
+   "method": "GET",
+   "path": "/_status/",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "case": "status, past the id",
+   "method": "GET",
+   "path": "/_status/0123abc/x",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "case": "status, POST",
+   "method": "POST",
+   "path": "/_status/0123abc",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "GET"
+   },
+   "response_body": "{\"detail\":\"Method Not Allowed\"}"
+  },
+  {
+   "case": "status, HEAD, no such job",
+   "method": "HEAD",
+   "path": "/_status/0123abc",
+   "headers": {},
+   "body": null,
+   "status": 405,
+   "response_headers": {
+    "content-type": "application/json",
+    "allow": "GET"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "status, an id not UTF-8",
+   "method": "GET",
+   "path": "/_status/%FF",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Job not found\"}"
+  },
+  {
+   "case": "status, an encoded id",
+   "method": "GET",
+   "path": "/_status/%C3%A9",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Job not found\"}"
+  },
+  {
+   "case": "status, an encoded percent",
+   "method": "GET",
+   "path": "/_status/%2541",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Job not found\"}"
+  },
+  {
+   "case": "status, an encoded slash",
+   "method": "GET",
+   "path": "/_status/a%2Fb",
+   "headers": {},
+   "body": null,
+   "status": 404,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "case": "status, an encoded trailing slash",
+   "method": "GET",
+   "path": "/_status/a%2F",
+   "headers": {},
+   "body": null,
+   "status": 307,
+   "response_headers": {
+    "location": "http://testserver/_status/a"
+   },
+   "response_body": ""
+  },
+  {
+   "case": "heart beat, encoded",
+   "method": "GET",
+   "path": "/_heart%5Fbeat",
+   "headers": {},
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "\"remote-vector-index-builder-api\""
+  },
+  {
+   "case": "jobs",
+   "method": "GET",
+   "path": "/_jobs",
+   "headers": {},
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "\"{\\n    \\\"96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f\\\": {\\n        \\\"id\\\": \\\"96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f\\\",\\n        \\\"status\\\": \\\"RUNNING_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"segments/_0_target_field.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": null\\n    },\\n    \\\"bf34ffdd5d897bb37aab499e92d2ac2bcc03530744c789ff8fb5d575231e4d36\\\": {\\n        \\\"id\\\": \\\"bf34ffdd5d897bb37aab499e92d2ac2bcc03530744c789ff8fb5d575231e4d36\\\",\\n        \\\"status\\\": \\\"RUNNING_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_none.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": null\\n    },\\n    \\\"50924fb6766309824e92ea19e3f7b77e5c45bdead72e1e2e197e4700c4465cc1\\\": {\\n        \\\"id\\\": \\\"50924fb6766309824e92ea19e3f7b77e5c45bdead72e1e2e197e4700c4465cc1\\\",\\n        \\\"status\\\": \\\"RUNNING_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_charset.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": null\\n    },\\n    \\\"8862c8901ef92789ba552e393d1f319c6740b7b40e3c8bcef9a23de10043c35b\\\": {\\n        \\\"id\\\": \\\"8862c8901ef92789ba552e393d1f319c6740b7b40e3c8bcef9a23de10043c35b\\\",\\n        \\\"status\\\": \\\"RUNNING_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_upper.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": null\\n    },\\n    \\\"3c3282cbf6fbeef4897c6379d9c1609d44bbb263777e53eca45e4e08a65ddd67\\\": {\\n        \\\"id\\\": \\\"3c3282cbf6fbeef4897c6379d9c1609d44bbb263777e53eca45e4e08a65ddd67\\\",\\n        \\\"status\\\": \\\"RUNNING_INDEX_BUILD\\\",\\n        \\\"request_parameters\\\": {\\n            \\\"vector_path\\\": \\\"a/_0_plus.knnvec\\\",\\n            \\\"tenant_id\\\": \\\"\\\"\\n        },\\n        \\\"file_name\\\": null,\\n        \\\"error_message\\\": null\\n    }\\n}\""
+  },
+  {
+   "case": "docs",
+   "method": "GET",
+   "path": "/docs",
+   "headers": {},
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "text/html; charset=utf-8"
+   },
+   "response_body": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/favicon.png\">\n    <title>remote-vector-index-builder-api - Swagger UI</title>\n    </head>\n    <body>\n    <div id=\"swagger-ui\">\n    </div>\n    <script src=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js\"></script>\n    <!-- `SwaggerUIBundle` is now available on the page -->\n    <script>\n    const ui = SwaggerUIBundle({\n        url: '/openapi.json',\n    \"dom_id\": \"#swagger-ui\",\n\"layout\": \"BaseLayout\",\n\"deepLinking\": true,\n\"showExtensions\": true,\n\"showCommonExtensions\": true,\noauth2RedirectUrl: window.location.origin + '/docs/oauth2-redirect',\n    presets: [\n        SwaggerUIBundle.presets.apis,\n        SwaggerUIBundle.SwaggerUIStandalonePreset\n        ],\n    })\n    </script>\n    </body>\n    </html>\n    "
+  },
+  {
+   "case": "openapi",
+   "method": "GET",
+   "path": "/openapi.json",
+   "headers": {},
+   "body": null,
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"remote-vector-index-builder-api\",\"version\":\"0.1.0\"},\"paths\":{\"/_build\":{\"post\":{\"summary\":\"Create Job\",\"description\":\"Create a new index build job with the provided parameters.\\n\\nThis endpoint initiates a new job for building an index based on the provided\\nparameters. It handles job creation through the job service and manages\\npotential error scenarios.\\n\\nArgs:\\n    index_build_parameters (IndexBuildParameters): Parameters for the index build job\\n    request (Request): FastAPI request object containing application state\\n\\nReturns:\\n    CreateJobResponse: Response object containing the created job ID\\n\\nRaises:\\n    HTTPException:\\n        - 429 status code if a hash collision occurs\\n        - 507 status code if system memory capacity is exceeded\",\"operationId\":\"create_job__build_post\",\"requestBody\":{\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/IndexBuildParameters\"}}},\"required\":true},\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/CreateJobResponse\"}}}},\"422\":{\"description\":\"Validation Error\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/HTTPValidationError\"}}}}}}},\"/_status/{job_id}\":{\"get\":{\"summary\":\"Get Status\",\"description\":\"Retrieve the status of a specific job by its ID.\\n\\nArgs:\\n    job_id (str): The unique identifier of the job.\\n    request (Request): The FastAPI request object containing the application state.\\n\\nReturns:\\n    GetStatusResponse: A response object containing the job status and optional fields:\\n        - task_status: Current status of the job\\n        - file_name: Name of the file being processed (if available)\\n        - error_message: Error message if job failed (if available)\\n\\nRaises:\\n    HTTPException: 404 error if the job is not found\",\"operationId\":\"get_status__status__job_id__get\",\"parameters\":[{\"name\":\"job_id\",\"in\":\"path\",\"required\":true,\"schema\":{\"type\":\"string\",\"title\":\"Job Id\"}}],\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/GetStatusResponse\"}}}},\"422\":{\"description\":\"Validation Error\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"#/components/schemas/HTTPValidationError\"}}}}}}},\"/_heart_beat\":{\"get\":{\"summary\":\"Heart Beat\",\"description\":\"Health check endpoint to verify the service is running.\\n\\nThis endpoint provides a simple health check mechanism to verify that the service\\nis up and responding to requests.\\n\\nReturns:\\n    str: A simple response indicating the service is alive and responding.\",\"operationId\":\"heart_beat__heart_beat_get\",\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"string\",\"title\":\"Response Heart Beat  Heart Beat Get\"}}}}}}},\"/_jobs\":{\"get\":{\"summary\":\"Get Jobs\",\"description\":\"Retrieve all jobs from the job service.\\n\\nThis endpoint returns a list of all jobs in the system. The jobs are retrieved\\nfrom the job service stored in the application state and serialized to JSON.\\n\\nArgs:\\n    request (Request): The request object containing the application state\\n                     with the job service.\\n\\nReturns:\\n    str: A JSON string containing all jobs, with each job's attributes serialized\\n         into a readable format with proper indentation.\",\"operationId\":\"get_jobs__jobs_get\",\"responses\":{\"200\":{\"description\":\"Successful Response\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"string\",\"title\":\"Response Get Jobs  Jobs Get\"}}}}}}}},\"components\":{\"schemas\":{\"Algorithm\":{\"type\":\"string\",\"enum\":[\"hnsw\"],\"title\":\"Algorithm\",\"description\":\"Supported algorithms for vector indexing.\\n\\nAttributes:\\n    HNSW: Hierarchical Navigable Small World graph\"},\"AlgorithmParameters\":{\"properties\":{\"ef_construction\":{\"type\":\"integer\",\"title\":\"Ef Construction\",\"default\":100},\"ef_search\":{\"type\":\"integer\",\"title\":\"Ef Search\",\"default\":100},\"m\":{\"type\":\"integer\",\"title\":\"M\",\"default\":16}},\"additionalProperties\":true,\"type\":\"object\",\"title\":\"AlgorithmParameters\",\"description\":\"Configuration parameters for the HNSW algorithm.\\n\\nAttributes:\\n    ef_construction (int): Size of the dynamic candidate list for constructing\\n        the HNSW graph. Higher values lead to better quality but slower\\n        index construction. Defaults to 100.\\n    ef_search (int): The size of the dynamic list used during k-NN searches.\\n        Higher values result in more accurate but slower searches.\\n    m (int): Number of bi-directional links created for every new element\\n        during construction. Higher values lead to better search speed but\\n        more memory consumption. Defaults to 16.\\nNote:\\n    The class is configured to allow extra attributes using the ConfigDict class.\"},\"CreateJobResponse\":{\"properties\":{\"job_id\":{\"type\":\"string\",\"title\":\"Job Id\"}},\"type\":\"object\",\"required\":[\"job_id\"],\"title\":\"CreateJobResponse\",\"description\":\"Response model for job creation endpoint.\\n\\nAttributes:\\n    job_id (str): Unique identifier for the created job.\"},\"DataType\":{\"type\":\"string\",\"enum\":[\"float\",\"half_float\",\"byte\",\"binary\"],\"title\":\"DataType\",\"description\":\"Supported data types for vector values.\\n\\nAttributes:\\n    FLOAT: 32-bit floating point values\"},\"Engine\":{\"type\":\"string\",\"enum\":[\"faiss\"],\"title\":\"Engine\",\"description\":\"Available vector search engines.\\n\\nAttributes:\\n    FAISS: Facebook AI Similarity Search\"},\"GetStatusResponse\":{\"properties\":{\"task_status\":{\"$ref\":\"#/components/schemas/JobStatus\"},\"file_name\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"File Name\"},\"error_message\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"null\"}],\"title\":\"Error Message\"}},\"type\":\"object\",\"required\":[\"task_status\"],\"title\":\"GetStatusResponse\",\"description\":\"Response model for retrieving job status.\\n\\nAttributes:\\n    task_status (JobStatus): Current status of the task.\\n    file_name (Optional[str]): Name of the file uploaded to remote storage, if present\\n    error_message (Optional[str]): Error message if task encountered an error.\"},\"HTTPValidationError\":{\"properties\":{\"detail\":{\"items\":{\"$ref\":\"#/components/schemas/ValidationError\"},\"type\":\"array\",\"title\":\"Detail\"}},\"type\":\"object\",\"title\":\"HTTPValidationError\"},\"IndexBuildParameters\":{\"properties\":{\"repository_type\":{\"$ref\":\"#/components/schemas/ObjectStoreType\",\"default\":\"s3\"},\"container_name\":{\"type\":\"string\",\"title\":\"Container Name\"},\"vector_path\":{\"type\":\"string\",\"pattern\":\".+\\\\.knnvec$\",\"title\":\"Vector Path\"},\"doc_id_path\":{\"type\":\"string\",\"title\":\"Doc Id Path\"},\"tenant_id\":{\"type\":\"string\",\"title\":\"Tenant Id\",\"default\":\"\"},\"dimension\":{\"type\":\"integer\",\"exclusiveMinimum\":0.0,\"title\":\"Dimension\"},\"doc_count\":{\"type\":\"integer\",\"exclusiveMinimum\":4.0,\"title\":\"Doc Count\"},\"data_type\":{\"$ref\":\"#/components/schemas/DataType\",\"default\":\"float\"},\"engine\":{\"$ref\":\"#/components/schemas/Engine\",\"default\":\"faiss\"},\"index_parameters\":{\"$ref\":\"#/components/schemas/IndexParameters\"},\"skip_stored_vectors\":{\"type\":\"boolean\",\"title\":\"Skip Stored Vectors\",\"default\":false}},\"additionalProperties\":false,\"type\":\"object\",\"required\":[\"container_name\",\"vector_path\",\"doc_id_path\",\"dimension\",\"doc_count\"],\"title\":\"IndexBuildParameters\",\"description\":\"Parameters required for building a vector index.\\n\\nThis class encapsulates all necessary parameters for constructing a vector index,\\nincluding data source information, vector specifications, and index configuration.\\n\\nAttributes:\\n    repository_type (str): The type of repository where the vector data is stored.\\n        Defaults to s3\\n    container_name (str): Name of the container (e.g., S3 bucket) containing the vector data.\\n    vector_path (VectorPathRegex): Path to the vector data file. Must end with .knnvec extension.\\n    doc_id_path (str): Path to the document IDs corresponding to the vectors.\\n    tenant_id (str): Optional identifier for multi-tenant scenarios. Defaults to empty string.\\n    dimension (int): The dimensionality of the vectors to be indexed.\\n    doc_count (int): Total number of documents/vectors to be indexed.\\n    data_type (DataType): The numerical format of the vector data.\\n        Defaults to FLOAT32.\\n    engine (Engine): The vector search engine to use for indexing.\\n        Defaults to FAISS.\\n    index_parameters (IndexParameters): Configuration for the index structure\\n        and algorithm. Defaults to standard HNSW configuration.\\n\\nNote:\\n    The class is configured to forbid extra attributes using the ConfigDict class,\\n    ensuring strict parameter validation.\"},\"IndexParameters\":{\"properties\":{\"algorithm\":{\"$ref\":\"#/components/schemas/Algorithm\",\"default\":\"hnsw\"},\"space_type\":{\"$ref\":\"#/components/schemas/SpaceType\",\"default\":\"l2\"},\"algorithm_parameters\":{\"$ref\":\"#/components/schemas/AlgorithmParameters\"}},\"type\":\"object\",\"title\":\"IndexParameters\",\"description\":\"Configuration parameters for vector index construction.\\n\\nThis class defines the core index configuration including the algorithm type,\\ndistance metric, and algorithm-specific parameters.\\n\\nAttributes:\\n    algorithm (Algorithm): The vector indexing algorithm to use.\\n        Defaults to HNSW (Hierarchical Navigable Small World).\\n    space_type (SpaceType): The distance metric to use for vector comparisons.\\n        Defaults to L2 (Euclidean distance).\\n    algorithm_parameters (AlgorithmParameters): Specific parameters for the chosen\\n        algorithm. Defaults to standard HNSW parameters (ef_construction=128, m=16).\"},\"JobStatus\":{\"type\":\"string\",\"enum\":[\"RUNNING_INDEX_BUILD\",\"FAILED_INDEX_BUILD\",\"COMPLETED_INDEX_BUILD\"],\"title\":\"JobStatus\",\"description\":\"Enumeration of possible job status states.\\n\\nAttributes:\\n    RUNNING (str): Indicates the index build is currently in progress\\n    FAILED (str): Indicates the index build failed to complete\\n    COMPLETED (str): Indicates the index build completed successfully\"},\"ObjectStoreType\":{\"type\":\"string\",\"enum\":[\"s3\"],\"title\":\"ObjectStoreType\",\"description\":\"Enumeration of supported object store types.\\n\\nThis enum inherits from both str and Enum to provide string-based\\nenumeration values, allowing for easy serialization and comparison.\\n\\nAttributes:\\n    S3 (str): Represents Amazon S3 object storage service\"},\"SpaceType\":{\"type\":\"string\",\"enum\":[\"l2\",\"innerproduct\",\"hamming\"],\"title\":\"SpaceType\",\"description\":\"Distance method used for measuring vector similarities.\\n\\nAttributes:\\n    L2: Euclidean distance\\n    INNERPRODUCT: Dot product similarity\"},\"ValidationError\":{\"properties\":{\"loc\":{\"items\":{\"anyOf\":[{\"type\":\"string\"},{\"type\":\"integer\"}]},\"type\":\"array\",\"title\":\"Location\"},\"msg\":{\"type\":\"string\",\"title\":\"Message\"},\"type\":{\"type\":\"string\",\"title\":\"Error Type\"}},\"type\":\"object\",\"required\":[\"loc\",\"msg\",\"type\"],\"title\":\"ValidationError\"}}}}"
+  }
+ ],
+ "statuses": {
+  "running": {
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"task_status\":\"RUNNING_INDEX_BUILD\",\"file_name\":null,\"error_message\":null}"
+  },
+  "completed": {
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"task_status\":\"COMPLETED_INDEX_BUILD\",\"file_name\":\"_0_states.faiss\",\"error_message\":null}"
+  },
+  "failed": {
+   "status": 200,
+   "response_headers": {
+    "content-type": "application/json"
+   },
+   "response_body": "{\"task_status\":\"FAILED_INDEX_BUILD\",\"file_name\":null,\"error_message\":\"it failed\"}"
+  }
+ }
+}

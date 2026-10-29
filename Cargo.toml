@@ -52,6 +52,16 @@ aws-smithy-http-client = { version = "1.5.2", features = ["rustls-ring"] }
 futures-util = "0.3.34"
 tokio = "1.54.1"
 
+# knn-builder's HTTP API: axum on hyper, HTTP/1.1 as k-NN's client speaks
+# it; logs through tracing; Basic Auth's credentials in base64.
+axum = { version = "0.8.9", default-features = false, features = ["http1", "json", "tokio"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["fmt", "std"] }
+base64 = "0.23.1"
+# knn-builder's API wraps its router in a path decoding, and its tests
+# drive it without a socket.
+tower = { version = "0.5.3", features = ["util"] }
+
 [workspace.lints.rust]
 ambiguous_negative_literals = "warn"
 missing_debug_implementations = "warn"
