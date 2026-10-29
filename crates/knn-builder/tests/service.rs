@@ -199,3 +199,36 @@ async fn cancels_its_jobs_when_closed() {
     assert_eq!(s3.pending_uploads().await, 0);
     s3.remove().await;
 }
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn drops_the_jobs_the_data_node_stopped_waiting_for() {
+    let s3 = S3::new("service-deadline").await;
+    let first = request(&s3, "first", &json!({}));
+    let second = request(&s3, "second", &json!({}));
+    for request in [&first, &second] {
+        put_inputs(&s3, request).await;
+    }
+    // Each forecast to end within a second, so both are taken; but the
+    // first's build takes 3 s, past the data node's 2 s.
+    let settings = Settings {
+        client_timeout: Duration::from_secs(2),
+        poll_interval: Duration::ZERO,
+        ..Settings::default()
+    };
+    let builder = FakeBuilder::new(Duration::from_secs(3));
+    let service = Service::start(s3.store.clone(), builder.clone(), settings);
+    let ids = [first.clone(), second.clone()].map(|request| service.submit(request).unwrap());
+    let dropped = Status::Failed {
+        error_message: "the data node's timeout of 2 s passed, so the job was dropped".to_owned(),
+    };
+    // The first ran its build to the end, then stored nothing; the second,
+    // waiting for the builder, never built.
+    for (job_id, name) in ids.iter().zip(["first", "second"]) {
+        assert_eq!(ended(&service, job_id).await, dropped, "{name}");
+        assert!(s3.get(&format!("{name}/_0_vectors.faiss")).await.is_none());
+    }
+    assert_eq!(builder.builds(), 1);
+    service.close().await;
+    s3.remove().await;
+}

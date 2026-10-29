@@ -70,6 +70,13 @@ pub enum JobError {
     /// The job was canceled. Nothing was stored.
     #[error("the job was canceled")]
     Canceled,
+    /// The data node stopped waiting for the job, and it was canceled.
+    /// Nothing was stored.
+    #[error("the data node's timeout of {seconds} s passed, so the job was dropped")]
+    PastDeadline {
+        /// The data node's timeout, in seconds.
+        seconds: u64,
+    },
     /// The pipeline stopped before the job ended.
     #[error("the pipeline stopped before the job ended")]
     Stopped,

@@ -22,6 +22,10 @@
 //!   the service fails one whose estimate does not fit beside the jobs
 //!   running. Either way the jobs held in memory stay within the limit;
 //!   here measured by the buffers they take, there by their estimates.
+//! - A job the data node has stopped waiting for, its timeout counted
+//!   from the request, is canceled: one queued never starts, a transfer
+//!   stops, and a build runs to its end but stores nothing. The service
+//!   builds such a job anyway.
 //! - A new job also gets 507 at once when the GPU's memory cannot hold its
 //!   build, with the service's message, or when the data node, as it
 //!   polls, would see it ended only past its timeout, or, when asked, when
@@ -276,6 +280,7 @@ impl Service {
         let inner = &mut *guard;
         while inner.recorders.try_join_next().is_some() {}
         let vector_path = request.vector_path.clone();
+        let timeout = inner.jobs.settings.client_timeout;
         let mut started = false;
         let taken = inner
             .jobs
@@ -303,10 +308,30 @@ impl Service {
                 let learned = job.clone();
                 let handle = self.pipeline.submit(job);
                 let canceler = handle.canceler();
+                let stop = canceler.clone();
                 let shared = Arc::clone(&self.inner);
                 let (job_id, vector_path) = (job_id.clone(), vector_path.clone());
+                // The data node's wait starts as this request returns; a
+                // timeout too long to count to never passes.
+                let deadline = now.checked_add(timeout);
                 inner.recorders.spawn(async move {
-                    let outcome = handle.outcome().await;
+                    let outcome = handle.outcome();
+                    tokio::pin!(outcome);
+                    let outcome = tokio::select! {
+                        outcome = &mut outcome => outcome,
+                        () = past(deadline) => {
+                            tracing::info!(%job_id, vector_path, "past the data node's timeout: canceling the job");
+                            stop.cancel();
+                            // An upload that sent its last request first
+                            // has stored the index.
+                            outcome.await.map_err(|error| match error {
+                                JobError::Canceled => JobError::PastDeadline {
+                                    seconds: timeout.as_secs(),
+                                },
+                                error => error,
+                            })
+                        }
+                    };
                     let ended = Instant::now();
                     log_end(&job_id, &vector_path, &outcome);
                     let mut inner = shared.lock().expect(POISONED);
@@ -372,6 +397,14 @@ impl Service {
         };
         self.pipeline.close().await;
         recorders.join_all().await;
+    }
+}
+
+/// Returns once `deadline` has passed; never when there is none.
+async fn past(deadline: Option<Instant>) {
+    match deadline {
+        Some(deadline) => tokio::time::sleep_until(deadline.into()).await,
+        None => std::future::pending().await,
     }
 }
 
