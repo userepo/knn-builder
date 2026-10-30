@@ -1,5 +1,5 @@
 //! Builds on the GPU: the graph's shape and quality on random vectors, in
-//! both element types and both metrics, and the input checks. Needs the
+//! every element type and both metrics, and the input checks. Needs the
 //! `gpu` feature, a CUDA GPU and the conda environment in
 //! `environment.yml`.
 
@@ -52,21 +52,36 @@ fn distance(metric: Metric, a: &[f32], b: &[f32]) -> f32 {
     }
 }
 
+/// The vectors' element type.
+#[derive(Clone, Copy)]
+enum Kind {
+    F32,
+    F16,
+    I8,
+}
+
 /// Builds and checks: n x degree, every id in range and not the node
 /// itself, and, over a sample of nodes, the nearest neighbor in most rows.
-fn check(metric: Metric, half: bool) {
+fn check(metric: Metric, kind: Kind) {
     const ROWS: usize = 5_000;
     const DIM: usize = 32;
     const SAMPLE: usize = 500;
-    let values = random_vectors(ROWS * DIM, 0x9E37_79B9_7F4A_7C15);
+    let mut values = random_vectors(ROWS * DIM, 0x9E37_79B9_7F4A_7C15);
     let f16s: Vec<u16> = values.iter().map(|&x| fp16::f32_to_f16(x)).collect();
-    let vectors = if half {
-        HostVectors::F16(&f16s)
-    } else {
-        HostVectors::F32(&values)
+    // Scaled to -127..=127; the nearest neighbors are then found among
+    // these whole values, as the build sees them.
+    #[expect(clippy::cast_possible_truncation, reason = "within -127..=127")]
+    let i8s: Vec<i8> = values.iter().map(|&x| (x * 254.0).round() as i8).collect();
+    let vectors = match kind {
+        Kind::F32 => HostVectors::F32(&values),
+        Kind::F16 => HostVectors::F16(&f16s),
+        Kind::I8 => HostVectors::I8(&i8s),
     };
     let params = BuildParams::new(5_000, 32, 16, metric).unwrap();
     let graph = build(vectors, DIM, &params).unwrap();
+    if let Kind::I8 = kind {
+        values = i8s.iter().map(|&x| f32::from(x)).collect();
+    }
 
     let degree = params.graph_degree as usize;
     assert_eq!(graph.degree(), degree);
@@ -104,17 +119,27 @@ fn check(metric: Metric, half: bool) {
 
 #[test]
 fn builds_l2_float32() {
-    check(Metric::L2, false);
+    check(Metric::L2, Kind::F32);
 }
 
 #[test]
 fn builds_inner_product_float32() {
-    check(Metric::InnerProduct, false);
+    check(Metric::InnerProduct, Kind::F32);
 }
 
 #[test]
 fn builds_l2_float16() {
-    check(Metric::L2, true);
+    check(Metric::L2, Kind::F16);
+}
+
+#[test]
+fn builds_l2_int8() {
+    check(Metric::L2, Kind::I8);
+}
+
+#[test]
+fn builds_inner_product_int8() {
+    check(Metric::InnerProduct, Kind::I8);
 }
 
 #[test]

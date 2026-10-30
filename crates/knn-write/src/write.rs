@@ -17,9 +17,12 @@ const HEADER_LEN: u64 = 4 + 8 + 8 + 8 + 1 + 4;
 const BASE_LEVEL_ENTRY_POINTS: i32 = 32;
 /// `ScalarQuantizer::QT_fp16`.
 const QT_FP16: i32 = 4;
+/// `ScalarQuantizer::QT_8bit_direct_signed`.
+const QT_8BIT_DIRECT_SIGNED: i32 = 8;
 /// Faiss's `NumericType`.
 const NUMERIC_FLOAT32: i32 = 0;
 const NUMERIC_FLOAT16: i32 = 1;
+const NUMERIC_INT8: i32 = 3;
 /// Bytes gathered before each write to the sink.
 const CHUNK: usize = 1 << 16;
 
@@ -58,6 +61,9 @@ pub enum Vectors<'a> {
     /// IEEE half-precision bit patterns: an `IxSQ` storage of `QT_fp16`
     /// codes.
     F16(&'a [u16]),
+    /// Int8 values: an `IxSQ` storage of `QT_8bit_direct_signed` codes,
+    /// each value plus 128 as a byte.
+    I8(&'a [i8]),
 }
 
 impl Vectors<'_> {
@@ -65,6 +71,7 @@ impl Vectors<'_> {
         match self {
             Self::F32(v) => v.len(),
             Self::F16(v) => v.len(),
+            Self::I8(v) => v.len(),
         }
     }
 
@@ -72,6 +79,7 @@ impl Vectors<'_> {
         match self {
             Self::F32(_) => NUMERIC_FLOAT32,
             Self::F16(_) => NUMERIC_FLOAT16,
+            Self::I8(_) => NUMERIC_INT8,
         }
     }
 }
@@ -82,6 +90,7 @@ impl fmt::Debug for Vectors<'_> {
         match self {
             Self::F32(v) => write!(f, "F32({} values)", v.len()),
             Self::F16(v) => write!(f, "F16({} values)", v.len()),
+            Self::I8(v) => write!(f, "I8({} values)", v.len()),
         }
     }
 }
@@ -303,16 +312,17 @@ impl<'a> IndexFile<'a> {
                     w.vector(values.len(), values.iter().map(|x| x.to_le_bytes()))?;
                 }
                 Vectors::F16(values) => {
-                    w.header(*b"IxSQ", d, n, true, metric)?;
-                    w.i32(QT_FP16)?;
-                    w.i32(0)?; // rangestat
-                    w.bytes(&0.0_f32.to_le_bytes())?; // rangestat_arg
-                    let dim = u64::from(d.unsigned_abs());
-                    w.bytes(&dim.to_le_bytes())?;
-                    w.bytes(&(dim * 2).to_le_bytes())?; // code_size
-                    w.bytes(&0_u64.to_le_bytes())?; // trained: empty
+                    w.scalar_quantizer(d, n, metric, QT_FP16, 2)?;
                     // The codes are a vector of bytes, two per value.
                     w.vector(values.len() * 2, values.iter().map(|x| x.to_le_bytes()))?;
+                }
+                Vectors::I8(values) => {
+                    w.scalar_quantizer(d, n, metric, QT_8BIT_DIRECT_SIGNED, 1)?;
+                    // One byte per value, shifted from -128..127 to 0..255.
+                    w.vector(
+                        values.len(),
+                        values.iter().map(|&x| [x.cast_unsigned() ^ 0x80]),
+                    )?;
                 }
             }
         }
@@ -340,6 +350,7 @@ fn file_size(spec: &IndexSpec<'_>, table: &LevelTable, neighbor_slots: u64) -> O
             // qtype, rangestat, rangestat_arg, d, code_size, the empty
             // trained vector, then the codes.
             Vectors::F16(_) => (header + 4 + 4 + 4 + 8 + 8 + 8).checked_add(vector(values, 2)?)?,
+            Vectors::I8(_) => (header + 4 + 4 + 4 + 8 + 8 + 8).checked_add(vector(values, 1)?)?,
         }
     };
     [
@@ -402,6 +413,26 @@ impl<W: Write> Sink<W> {
         self.bytes(&[u8::from(is_trained)])?;
         // A metric above 1 would add metric_arg; L2 and inner product do not.
         self.i32(metric)
+    }
+
+    /// An `IndexScalarQuantizer`'s header and quantizer, up to its codes:
+    /// `qtype`, codes of `width` bytes per component, and no trained values.
+    fn scalar_quantizer(
+        &mut self,
+        d: i32,
+        ntotal: i64,
+        metric: i32,
+        qtype: i32,
+        width: u64,
+    ) -> io::Result<()> {
+        self.header(*b"IxSQ", d, ntotal, true, metric)?;
+        self.i32(qtype)?;
+        self.i32(0)?; // rangestat
+        self.bytes(&0.0_f32.to_le_bytes())?; // rangestat_arg
+        let dim = u64::from(d.unsigned_abs());
+        self.bytes(&dim.to_le_bytes())?;
+        self.bytes(&(dim * width).to_le_bytes())?; // code_size
+        self.bytes(&0_u64.to_le_bytes()) // trained: empty
     }
 
     /// `WRITEVECTOR`: the element count as a u64, then the elements.
@@ -499,9 +530,11 @@ mod tests {
     #[test]
     fn needs_only_the_type_of_skipped_vectors() {
         let halves = [0_u16; 10];
+        let int8s = [0_i8; 10];
         for (full, empty) in [
             (Vectors::F32(&VECTORS), Vectors::F32(&[])),
             (Vectors::F16(&halves), Vectors::F16(&[])),
+            (Vectors::I8(&int8s), Vectors::I8(&[])),
         ] {
             let bytes = |vectors| {
                 let file = IndexFile::new(IndexSpec {
@@ -524,6 +557,25 @@ mod tests {
             }),
             Error::VectorsLength { .. }
         ));
+    }
+
+    #[test]
+    fn writes_int8_values_as_codes_plus_128() {
+        let values = [-128, -1, 0, 1, 127, 5, 6, 7, 8, 9];
+        let file = IndexFile::new(IndexSpec {
+            vectors: Vectors::I8(&values),
+            ..spec()
+        })
+        .unwrap();
+        let mut out = Vec::new();
+        file.write_to(&mut out).unwrap();
+        // The codes' vector ends where the ID map's ids, a count and five
+        // 8-byte ids, begin.
+        let ids = out.len() - 8 - IDS.len() * 8;
+        let codes = &out[ids - values.len()..ids];
+        assert_eq!(codes, [0, 127, 128, 129, 255, 133, 134, 135, 136, 137]);
+        let count = &out[ids - values.len() - 8..ids - values.len()];
+        assert_eq!(count, 10_u64.to_le_bytes());
     }
 
     #[test]

@@ -34,8 +34,8 @@ import tempfile
 import faiss
 import numpy as np
 
-# faiss.Float32 and faiss.Float16 (NumericType), as copyTo records them.
-NUMERIC = {"float": faiss.Float32, "half_float": faiss.Float16}
+# Faiss's NumericType for each data type, as copyTo records it.
+NUMERIC = {"float": faiss.Float32, "half_float": faiss.Float16, "byte": faiss.Int8}
 METRIC = {"l2": faiss.METRIC_L2, "innerproduct": faiss.METRIC_INNER_PRODUCT}
 
 
@@ -97,8 +97,10 @@ def build(graph, vectors, ids, meta):
     m = degree // 2
     if numeric == faiss.Float32:
         storage = faiss.IndexFlatL2(d) if metric == faiss.METRIC_L2 else faiss.IndexFlatIP(d)
-    else:
+    elif numeric == faiss.Float16:
         storage = faiss.IndexScalarQuantizer(d, faiss.ScalarQuantizer.QT_fp16, metric)
+    else:
+        storage = faiss.IndexScalarQuantizer(d, faiss.ScalarQuantizer.QT_8bit_direct_signed, metric)
     storage.this.disown()
     cpu.storage = storage
     cpu.own_fields = True
@@ -114,9 +116,14 @@ def build(graph, vectors, ids, meta):
     if not meta["skip_stored_vectors"]:
         if numeric == faiss.Float32:
             storage.add(vectors)
-        else:
+        elif numeric == faiss.Float16:
             # The fp16 values are the QT_fp16 codes, as copyTo adds them.
             storage.add_sa_codes(vectors.view(np.uint8).reshape(n, -1))
+        else:
+            # copyTo encodes each int8 value as QT_8bit_direct_signed does,
+            # plus 128 as a byte, and adds those codes.
+            codes = (vectors.astype(np.int16) + 128).astype(np.uint8)
+            storage.add_sa_codes(codes)
     cpu.ntotal = n
 
     # Level 0 of every node from the CAGRA graph; upper levels stay -1.

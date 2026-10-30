@@ -28,6 +28,7 @@ struct Input {
     meta: Value,
     f32s: Vec<f32>,
     f16s: Vec<u16>,
+    i8s: Vec<i8>,
     ids: Vec<i32>,
 }
 
@@ -36,7 +37,7 @@ impl Input {
         let meta: Value =
             serde_json::from_slice(&fs::read(dir.join("input.json")).unwrap()).unwrap();
         let blob = fs::read(dir.join("vectors.knnvec")).unwrap();
-        let (mut f32s, mut f16s) = (Vec::new(), Vec::new());
+        let (mut f32s, mut f16s, mut i8s) = (Vec::new(), Vec::new(), Vec::new());
         match (
             meta["data_type"].as_str().unwrap(),
             meta["blob_dtype"].as_str().unwrap(),
@@ -49,6 +50,7 @@ impl Input {
                 f16s = vec![0; values.len()];
                 fp16::convert(&values, &mut f16s);
             }
+            ("byte", "<i1") => i8s = blob.iter().map(|&b| b.cast_signed()).collect(),
             other => panic!("unsupported input {other:?}"),
         }
         Self {
@@ -60,6 +62,18 @@ impl Input {
             meta,
             f32s,
             f16s,
+            i8s,
+        }
+    }
+
+    /// The vectors as the build takes them, and as the writer stores them.
+    fn vectors(&self) -> (HostVectors<'_>, Vectors<'_>) {
+        if !self.i8s.is_empty() {
+            (HostVectors::I8(&self.i8s), Vectors::I8(&self.i8s))
+        } else if !self.f16s.is_empty() {
+            (HostVectors::F16(&self.f16s), Vectors::F16(&self.f16s))
+        } else {
+            (HostVectors::F32(&self.f32s), Vectors::F32(&self.f32s))
         }
     }
 
@@ -88,11 +102,7 @@ fn build(gpu: &mut Gpu, input: &Input, out: &Path, run: usize) -> Value {
         metric,
     )
     .unwrap();
-    let host = if input.f16s.is_empty() {
-        HostVectors::F32(&input.f32s)
-    } else {
-        HostVectors::F16(&input.f16s)
-    };
+    let (host, vectors) = input.vectors();
 
     let started = Instant::now();
     let graph = match gpu.build(host, dimension as usize, &params) {
@@ -113,11 +123,7 @@ fn build(gpu: &mut Gpu, input: &Input, out: &Path, run: usize) -> Value {
         },
         graph: graph.neighbors(),
         graph_degree: graph.degree(),
-        vectors: if input.f16s.is_empty() {
-            Vectors::F32(&input.f32s)
-        } else {
-            Vectors::F16(&input.f16s)
-        },
+        vectors,
         ids: &input.ids,
         ef_construction: i32::try_from(input.number("ef_construction")).unwrap(),
         ef_search: i32::try_from(input.number("ef_search")).unwrap(),

@@ -1,0 +1,226 @@
+[
+ {
+  "input": "l2-100000x128-byte",
+  "threads": 4,
+  "seconds": 2.277,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 128,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x384-byte",
+  "threads": 4,
+  "seconds": 4.178,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 384,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x768-byte",
+  "threads": 4,
+  "seconds": 7.134,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 768,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x128-byte",
+  "threads": 4,
+  "seconds": 6.85,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 128,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x384-byte",
+  "threads": 4,
+  "seconds": 14.651,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 384,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x768-byte",
+  "threads": 4,
+  "seconds": 24.719,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 768,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x128-byte",
+  "threads": 4,
+  "seconds": 18.37,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 128,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x384-byte",
+  "threads": 4,
+  "seconds": 37.277,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 384,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x768-byte",
+  "threads": 4,
+  "seconds": 58.494,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 768,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x128-byte",
+  "threads": 1,
+  "seconds": 8.464,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 128,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x384-byte",
+  "threads": 1,
+  "seconds": 17.234,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 384,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-100000x768-byte",
+  "threads": 1,
+  "seconds": 28.316,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 768,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x128-byte",
+  "threads": 1,
+  "seconds": 29.788,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 128,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x384-byte",
+  "threads": 1,
+  "seconds": 61.686,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 384,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-250000x768-byte",
+  "threads": 1,
+  "seconds": 94.781,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 768,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "l2-500000x128-byte",
+  "threads": 1,
+  "seconds": 66.049,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 128,
+   "data_type": "byte",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ }
+]

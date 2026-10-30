@@ -18,7 +18,7 @@ extern "C" {
 typedef struct knn_cagra_gpu knn_cagra_gpu;
 
 /* Vector types. */
-enum { KNN_CAGRA_F32 = 0, KNN_CAGRA_F16 = 1 };
+enum { KNN_CAGRA_F32 = 0, KNN_CAGRA_F16 = 1, KNN_CAGRA_I8 = 2 };
 
 /* Metrics. */
 enum { KNN_CAGRA_L2 = 0, KNN_CAGRA_INNER_PRODUCT = 1 };

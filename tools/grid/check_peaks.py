@@ -30,6 +30,8 @@ sys.dont_write_bytecode = True  # no __pycache__ in the checkout
 
 import run_grid  # noqa: E402
 
+WARM_UP = run_grid.WARM_UP["grid"]
+
 # Each phase's largest builds, both data types, and the smallest build
 # with the largest overhead for its size.
 CASES = [
@@ -46,7 +48,7 @@ SHORT = 0.9
 
 def build(e2e, inputs, target, name, m, *flags):
     run_grid.run(
-        e2e, "build", run_grid.BUCKET, inputs, target, "--m", m, *flags, run_grid.WARM_UP, name
+        e2e, "build", run_grid.BUCKET, inputs, target, "--m", m, *flags, WARM_UP, name
     )
     return next(
         r
@@ -63,12 +65,12 @@ def main():
         for r in runs
         if r["task_status"] == "COMPLETED_INDEX_BUILD"
     }
-    run_grid.write(inputs, run_grid.WARM_UP)
-    run_grid.run(e2e, "put", run_grid.BUCKET, inputs, run_grid.WARM_UP)
+    run_grid.write(inputs, "grid", WARM_UP)
+    run_grid.run(e2e, "put", run_grid.BUCKET, inputs, WARM_UP)
     results = []
     for name, m in CASES:
         peak = sampled[(name, m)]
-        run_grid.write(inputs, name)
+        run_grid.write(inputs, "grid", name)
         run_grid.run(e2e, "put", run_grid.BUCKET, inputs, name)
         tight = build(e2e, inputs, out / "tight", name, m, "--every", 0)
         held = {}

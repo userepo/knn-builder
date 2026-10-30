@@ -1,8 +1,8 @@
 # The index file a remote build writes
 
-What `knn-write` must reproduce exactly: the file the upstream remote-vector-index-builder uploads for a float or fp16 field, written by `GpuIndexCagra::copyTo` and `write_index` in its Faiss (`0ca9df4` with rvib's `base_image/patches`). knn-inspect's `docs/format-notes.md` ("CAGRA graphs") covers how k-NN reads these files; this note covers how they are written.
+What `knn-write` must reproduce exactly: the file the upstream remote-vector-index-builder uploads for a float, fp16 or byte field, written by `GpuIndexCagra::copyTo` and `write_index` in its Faiss (`0ca9df4` with rvib's `base_image/patches`). knn-inspect's `docs/format-notes.md` ("CAGRA graphs") covers how k-NN reads these files; this note covers how they are written.
 
-Every statement below was checked on files the service built (`fixtures/service/`): the field values decode as stated and the sizes add up to the file's length. The oracle (`tools/oracle/oracle.py`) rebuilds an identical copy of all 46 files of the M1 baseline from the CAGRA graph, the input blobs and the request alone.
+Every statement below was checked on files the service built (`fixtures/service/`, `fixtures/byte/service/`): the field values decode as stated and the sizes add up to the file's length. The oracle (`tools/oracle/oracle.py`) rebuilds an identical copy of all 46 files of the M1 baseline, and of all 60 service builds of the byte inputs (five of each committed one, 20 of each 20,000 x 128 one), from the CAGRA graph, the input blobs and the request alone.
 
 ## Layout
 
@@ -21,7 +21,7 @@ All integers are little-endian. A vector is a `u64` element count followed by th
 | | `keep_max_size_level0` | u8 | 1 |
 | | `base_level_only` | u8 | 1 |
 | | `num_base_level_search_entrypoints` | i32 | 32 |
-| | `numeric_type_` | i32 | 0 for float32, 1 for fp16 |
+| | `numeric_type_` | i32 | 0 for float32, 1 for fp16, 3 for int8 (Faiss's `NumericType::Int8`) |
 | HNSW | `assign_probas` | vector of f64 | see Levels |
 | | `cum_nneighbor_per_level` | vector of i32 | 0, 2M, 3M, 4M, ... one more entry than `assign_probas` |
 | | `levels` | vector of i32, n entries | each node's level + 1, see Levels |
@@ -40,6 +40,13 @@ All integers are little-endian. A vector is a `u64` element count followed by th
 | | `d`, `code_size` | u64, u64 | dimension, 2 x dimension |
 | | `trained` | vector of f32 | empty |
 | | `codes` | vector of u8, n x 2d | the fp16 values, row-major, in input order |
+| storage, byte | fourcc | 4 bytes | `IxSQ` |
+| | header | as above | `d`, n, dummies, `is_trained` 1, metric |
+| | `qtype`, `rangestat` | i32, i32 | 8 (`QT_8bit_direct_signed`), 0 |
+| | `rangestat_arg` | f32 | 0.0 |
+| | `d`, `code_size` | u64, u64 | dimension, dimension |
+| | `trained` | vector of f32 | empty |
+| | `codes` | vector of u8, n x d | each int8 value plus 128, row-major, in input order: `copyTo` encodes them so before `add_sa_codes` |
 | storage, `skip_stored_vectors` | fourcc | 4 bytes | `null`, and nothing else; the graph header still records n |
 | ID map | `id_map` | vector of i64, n entries | the doc ids from the `.knndid` blob, widened from i32, in input order |
 

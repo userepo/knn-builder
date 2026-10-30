@@ -9,9 +9,18 @@
 //! about what the 4070 had; no larger GPU has been measured yet.
 //!
 //! The terms: n vectors of dimension d, s bytes a value on the device (2
-//! for `half_float`, whose vectors are converted on download), graph degree
-//! g. The IVF-PQ build's k-means and its search cost about n^1.5 d, the
-//! graph's optimization n g^2, the dataset's copy n d s.
+//! for `half_float`, whose vectors are converted on download, 1 for
+//! `byte`), graph degree g. The IVF-PQ build's k-means and its search
+//! cost about n^1.5 d, the graph's optimization n g^2, the dataset's copy
+//! n d s.
+//!
+//! The models were not fitted to byte builds, only checked against them
+//! (`fixtures/grid/byte-runs.json`): their device peaks are off by the
+//! same bytes as the float builds of the same shape, and their stage times
+//! and file sizes as close as those of the builds fitted, but a byte build
+//! takes as long as a float one, 0.99 to 1.25 times on that grid, so the
+//! build's time counts a byte value as 4 bytes. A data node's own byte
+//! build takes as long as a float one too (`byte-cpu.json`).
 //!
 //! Beside them, the build a data node runs itself when the service refuses
 //! a segment: Faiss's HNSW over the float vectors (M 16,
@@ -72,6 +81,8 @@ struct Shape {
     d: f64,
     /// Bytes a value on the device and in the file.
     s: f64,
+    /// Bytes a value as the build's time counts it.
+    build_s: f64,
     /// Bytes a value in the vector blob.
     blob_s: f64,
     /// Bytes a value in the index file: none when it leaves the vectors
@@ -88,6 +99,7 @@ impl Shape {
         let s = match job.data_type {
             DataType::Float => 4.0,
             DataType::HalfFloat => 2.0,
+            DataType::Byte => 1.0,
         };
         // A job whose parameters fail is built by no one; its forecast
         // only has to be finite.
@@ -102,11 +114,21 @@ impl Shape {
             n: f64::from(job.doc_count),
             d: f64::from(job.dimension),
             s,
-            // A `half_float` blob holds fp16 values from a half_float
-            // field or fp32 values from a float field with the fp16
-            // quantizer, which only its size tells apart once the download
-            // starts: counted as fp32 until then.
-            blob_s: 4.0,
+            build_s: if job.data_type == DataType::Byte {
+                4.0
+            } else {
+                s
+            },
+            // A byte blob holds a byte a value. A `half_float` blob holds
+            // fp16 values from a half_float field or fp32 values from a
+            // float field with the fp16 quantizer, which only its size
+            // tells apart once the download starts: counted as fp32 until
+            // then.
+            blob_s: if job.data_type == DataType::Byte {
+                1.0
+            } else {
+                4.0
+            },
             file_s: if job.skip_stored_vectors { 0.0 } else { s },
             degree: params.map_or(0, |p| p.graph_degree),
             g: params.map_or(0.0, |p| f64::from(p.graph_degree)),
@@ -148,7 +170,7 @@ impl Fitted {
         Stages {
             download: 0.004_586_874_751_921_019 + 2.440_557_794_472_648_3e-9 * n * d * x.blob_s,
             build: 0.462_016_340_462_556_74
-                + 2.646_071_502_409_124e-9 * n * d * x.s
+                + 2.646_071_502_409_124e-9 * n * d * x.build_s
                 + 8.893_904_400_583_446e-12 * n.powf(1.5) * d
                 + 1.473_025_728_723_046_4e-10 * n * g * g
                 + 8.832_281_977_621_297e-11 * slow,
@@ -238,7 +260,9 @@ impl Fitted {
 
 /// The share of a build's modeled device peak kept free besides: twice
 /// the model's worst under-estimate on the grid it was fitted to (2.7%),
-/// and a little for what cuVS rounds its allocations up to.
+/// and a little for what cuVS rounds its allocations up to. A byte build
+/// is off by the same bytes as a float one of its shape, which is up to
+/// 3.0% of its smaller peak.
 pub const DEVICE_MARGIN: f64 = 0.06;
 
 #[cfg(test)]

@@ -1,6 +1,7 @@
 //! The writer against the files the upstream service built
-//! (`fixtures/service/`): from each file only the CAGRA graph is taken,
-//! everything else comes from the build input (`fixtures/inputs/`), as it
+//! (`fixtures/service/`, and `fixtures/byte/service/` for byte vectors):
+//! from each file only the CAGRA graph is taken, everything else comes from
+//! the build input (`fixtures/inputs/`, `fixtures/byte/inputs/`), as it
 //! reaches the service, and the written file must equal the service's.
 
 // The clippy.toml test allowances cover `#[test]` functions, not the
@@ -54,14 +55,19 @@ fn le_chunks<const N: usize>(bytes: &[u8]) -> impl Iterator<Item = [u8; N]> + '_
     chunks.iter().copied()
 }
 
-/// Writes the input `name` with the graph of its service-built file.
-fn rewrite(name: &str) -> (Vec<u8>, Vec<u8>) {
-    let input = fixtures().join("inputs").join(name);
+/// Writes the input `name` of the fixture set `set` (`fixtures/` or
+/// `fixtures/byte/`) with the graph of its service-built file.
+fn rewrite(set: &Path, name: &str) -> (Vec<u8>, Vec<u8>) {
+    let input = set.join("inputs").join(name);
     let meta: Value = serde_json::from_slice(&fs::read(input.join("input.json")).unwrap()).unwrap();
-    let service = fs::read(fixtures().join("service").join(format!("{name}.faiss"))).unwrap();
+    let service = fs::read(set.join("service").join(format!("{name}.faiss"))).unwrap();
 
     let blob = fs::read(input.join("vectors.knnvec")).unwrap();
-    let f32s: Vec<f32> = le_chunks(&blob).map(f32::from_le_bytes).collect();
+    let f32s: Vec<f32> = if meta["blob_dtype"] == "<f4" {
+        le_chunks(&blob).map(f32::from_le_bytes).collect()
+    } else {
+        Vec::new()
+    };
     let f16s: Vec<u16> = match (meta["data_type"].as_str(), meta["blob_dtype"].as_str()) {
         (Some("half_float"), Some("<f2")) => le_chunks(&blob).map(u16::from_le_bytes).collect(),
         // The service converts an fp32 blob under half_float on download,
@@ -72,10 +78,11 @@ fn rewrite(name: &str) -> (Vec<u8>, Vec<u8>) {
             .collect(),
         _ => Vec::new(),
     };
-    let vectors = if meta["data_type"] == "half_float" {
-        Vectors::F16(&f16s)
-    } else {
-        Vectors::F32(&f32s)
+    let i8s: Vec<i8> = blob.iter().map(|&b| b.cast_signed()).collect();
+    let vectors = match meta["data_type"].as_str().unwrap() {
+        "half_float" => Vectors::F16(&f16s),
+        "byte" => Vectors::I8(&i8s),
+        _ => Vectors::F32(&f32s),
     };
     let ids: Vec<i32> = le_chunks(&fs::read(input.join("doc_ids.knndid")).unwrap())
         .map(i32::from_le_bytes)
@@ -106,7 +113,15 @@ fn rewrite(name: &str) -> (Vec<u8>, Vec<u8>) {
 }
 
 fn assert_same(name: &str) {
-    let (ours, theirs) = rewrite(name);
+    assert_same_in(&fixtures(), name);
+}
+
+fn assert_same_byte(name: &str) {
+    assert_same_in(&fixtures().join("byte"), name);
+}
+
+fn assert_same_in(set: &Path, name: &str) {
+    let (ours, theirs) = rewrite(set, name);
     if let Some(at) = ours.iter().zip(&theirs).position(|(a, b)| a != b) {
         panic!("{name}: first difference at byte {at}");
     }
@@ -144,8 +159,28 @@ fn skip_stored_vectors() {
 }
 
 #[test]
-fn every_fixture_is_covered() {
-    let mut names: Vec<String> = fs::read_dir(fixtures().join("service"))
+fn l2_byte() {
+    assert_same_byte("l2-1000x64-byte");
+}
+
+#[test]
+fn inner_product_byte() {
+    assert_same_byte("ip-1000x64-byte");
+}
+
+#[test]
+fn lowered_m_byte() {
+    assert_same_byte("l2-150x64-byte");
+}
+
+#[test]
+fn skip_stored_vectors_byte() {
+    assert_same_byte("l2-1000x64-byte-skip");
+}
+
+/// The service-built files of a fixture set, by input name.
+fn service_files(set: &Path) -> Vec<String> {
+    let mut names: Vec<String> = fs::read_dir(set.join("service"))
         .unwrap()
         .filter_map(|entry| {
             let name = entry.unwrap().file_name().into_string().unwrap();
@@ -153,8 +188,13 @@ fn every_fixture_is_covered() {
         })
         .collect();
     names.sort();
+    names
+}
+
+#[test]
+fn every_fixture_is_covered() {
     assert_eq!(
-        names,
+        service_files(&fixtures()),
         [
             "ip-1000x64",
             "l2-1000x64",
@@ -162,6 +202,15 @@ fn every_fixture_is_covered() {
             "l2-1000x64-fp16from32",
             "l2-1000x64-skip",
             "l2-150x64"
+        ]
+    );
+    assert_eq!(
+        service_files(&fixtures().join("byte")),
+        [
+            "ip-1000x64-byte",
+            "l2-1000x64-byte",
+            "l2-1000x64-byte-skip",
+            "l2-150x64-byte"
         ]
     );
 }

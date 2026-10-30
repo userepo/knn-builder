@@ -16,6 +16,8 @@ pub enum Vectors {
     F32(Vec<f32>),
     /// IEEE half-precision bit patterns.
     F16(Vec<u16>),
+    /// int8 values.
+    I8(Vec<i8>),
 }
 
 impl Vectors {
@@ -25,6 +27,7 @@ impl Vectors {
         match self {
             Self::F32(v) => v.len(),
             Self::F16(v) => v.len(),
+            Self::I8(v) => v.len(),
         }
     }
 
@@ -40,6 +43,7 @@ impl Vectors {
         match self {
             Self::F32(v) => *v = Vec::new(),
             Self::F16(v) => *v = Vec::new(),
+            Self::I8(v) => *v = Vec::new(),
         }
     }
 
@@ -49,6 +53,7 @@ impl Vectors {
         match self {
             Self::F32(v) => knn_write::Vectors::F32(v),
             Self::F16(v) => knn_write::Vectors::F16(v),
+            Self::I8(v) => knn_write::Vectors::I8(v),
         }
     }
 }
@@ -59,6 +64,7 @@ impl fmt::Debug for Vectors {
         match self {
             Self::F32(v) => write!(f, "F32({} values)", v.len()),
             Self::F16(v) => write!(f, "F16({} values)", v.len()),
+            Self::I8(v) => write!(f, "I8({} values)", v.len()),
         }
     }
 }
@@ -109,6 +115,7 @@ impl Builder for knn_gpu::Gpu {
         let host = match vectors {
             Vectors::F32(v) => knn_gpu::HostVectors::F32(v),
             Vectors::F16(v) => knn_gpu::HostVectors::F16(v),
+            Vectors::I8(v) => knn_gpu::HostVectors::I8(v),
         };
         let graph = knn_gpu::Gpu::build(self, host, dimension, params)?;
         Ok(graph.into_neighbors())

@@ -20,12 +20,16 @@ From Git Bash on Windows, Docker needs a Windows path and no path rewriting: `ex
 
 ## Inputs
 
-`make_inputs.py` writes build inputs in the format k-NN uploads (float32 or float16 vectors, int32 doc ids) with 100 held-out queries each:
+`make_inputs.py` writes build inputs in the format k-NN uploads (float32, float16 or int8 vectors, int32 doc ids) with 100 held-out queries each:
 
 ```sh
 $RUN $API tools/make_inputs.py small fixtures/inputs       # committed
 $RUN $API tools/make_inputs.py large target/inputs-large   # for the recall spread
+$RUN $API tools/make_inputs.py byte fixtures/byte/inputs   # committed
+$RUN $API tools/make_inputs.py byte-large target/inputs-byte-large
 ```
+
+A byte input's vectors are int8 values drawn uniformly over -128 to 127, and its queries the same values as float32, as k-NN takes a byte field's queries.
 
 ## Baseline
 
@@ -39,6 +43,8 @@ docker compose -f tools/baseline/docker-compose.yml down -v
 python tools/baseline/score.py $OUT $INPUTS ../knn-inspect/target/release/knn-inspect
 ```
 
+The byte fixtures come from the same runs, with `INPUTS=fixtures/byte/inputs` and, for the recall spread, `INPUTS=target/inputs-byte-large RUNS=20`.
+
 `score.py` adds each build's per-step times from the service's DEBUG log and knn-inspect `verify` and `recall` (its seeded search, seed 1, k = 10, over the held-out queries) to `$OUT/summary.json`, with the knn-inspect version: its recall is that version's search. The request's `m`, `ef_construction` and `ef_search` come from each input's `input.json`.
 
 ## Oracle
@@ -48,6 +54,7 @@ python tools/baseline/score.py $OUT $INPUTS ../knn-inspect/target/release/knn-in
 ```sh
 $RUN $BASE tools/oracle/oracle.py check fixtures/service fixtures/inputs
 $RUN $BASE tools/oracle/oracle.py check target/baseline/small fixtures/inputs
+$RUN $BASE tools/oracle/oracle.py check fixtures/byte/service fixtures/byte/inputs
 ```
 
 `oracle/levels.py` computes the HNSW level table those files hold without Faiss, as `knn-write` must:
@@ -94,7 +101,7 @@ $RUN $API tools/oracle/routes.py crates/knn-builder/tests/data/routes.json
 cargo run --release -p knn-gpu --features gpu --example build_inputs -- target/inputs-large target/rust-baseline/large20 20
 ```
 
-Then, from Windows or Linux, `python tools/baseline/score.py target/rust-baseline/large20 target/inputs-large ../knn-inspect/target/release/knn-inspect`, and the service's own 20 builds with `RUNS=20` as above.
+Then, from Windows or Linux, `python tools/baseline/score.py target/rust-baseline/large20 target/inputs-large ../knn-inspect/target/release/knn-inspect`, and the service's own 20 builds with `RUNS=20` as above. The byte parity files come from `target/inputs-byte-large` with 20 runs and `fixtures/byte/inputs` with 5, and `oracle.py check` on the example's output directory rebuilds each file it wrote.
 
 ## End to end
 
@@ -121,13 +128,15 @@ $EXTRACT --count 2000 --out target/cluster/float --spaces cosinesimil innerprodu
 $EXTRACT --out target/cluster/half-float --encoding half-float --spaces l2
 $EXTRACT --count 2000 --out target/cluster/half-float --encoding half-float --spaces cosinesimil
 $EXTRACT --out target/cluster/on-disk --encoding on-disk --spaces l2
+$EXTRACT --out target/cluster/byte --encoding byte --spaces l2
+$EXTRACT --count 2000 --out target/cluster/byte --encoding byte --spaces innerproduct
 KNN_INSPECT=../knn-inspect/target/release/knn-inspect
 $KNN_INSPECT scan target/cluster
 for f in target/cluster/*/*/*.faiss ../knn-inspect/fixtures/opensearch-3.9.0-remote/*/*/*.faiss; do echo "$f"; $KNN_INSPECT recall "$f" --sample 200; done
 docker compose -f tools/cluster/docker-compose.yml down -v
 ```
 
-Where the fixtures hold the same segment built by the upstream service (float `l2` and `cosinesimil`, half_float `l2`, on-disk `l2`), knn-builder's file has its layout and its size. On a run of 2026-10-29 it also had its recall@10 on 200 of its own vectors (1.0, 0.9995, 1.0 and 0.984); the GPU build is not deterministic, so another run's recall can differ in its last digits. cuVS refuses a CAGRA build of a small inner-product or cosine set, 500 random vectors here, as it did for the upstream service when those fixtures were built, and the node then builds the segment itself; 2,000 build. knn-builder does not build `byte` or `binary` vectors yet: their build requests get a 422, and the node builds those segments itself too.
+Where the fixtures hold the same segment built by the upstream service (float `l2` and `cosinesimil`, half_float `l2`, on-disk `l2`, byte `l2`), knn-builder's file has its layout and its size. On a run of 2026-10-29 it also had its recall@10 on 200 of its own vectors (1.0, 0.9995, 1.0, 0.984 and 1.0; 0.9995 for byte `innerproduct`), and each byte index found every one of 20 of its own vectors among its 10 nearest when searched; the GPU build is not deterministic, so another run's recall can differ in its last digits. cuVS refuses a CAGRA build of a small inner-product or cosine set, 500 random vectors here, as it did for the upstream service when those fixtures were built, and the node then builds the segment itself; 2,000 build. knn-builder does not build `binary` vectors yet: their build requests get a 422, and the node builds those segments itself too.
 
 ## Burst
 
@@ -186,6 +195,16 @@ $FAISS_PY tools/grid/cpu_hnsw.py ~/knn-grid/cpu target/grid 1 $CPU l2-500000x128
 $FAISS_PY tools/grid/fit.py target/grid target/grid
 ```
 
-`fixtures/grid/` holds the RTX 4070's results and fits.
+The models are checked, not fitted, on byte builds: `--set grid-byte` runs `make_inputs.py`'s `grid-byte` set (100k, 250k, 500k and 1M byte vectors of dimension 128, 384 and 768), each build after a warm-up on a small byte input, and `cpu_hnsw.py` builds a byte input as k-NN builds a byte field, over `HNSW16,SQ8_direct_signed`:
+
+```sh
+python tools/grid/run_grid.py $CARGO_TARGET_DIR/release/examples/e2e ~/knn-grid/byte target/grid-byte --set grid-byte
+CPU="l2-100000x128-byte l2-100000x384-byte l2-100000x768-byte l2-250000x128-byte l2-250000x384-byte l2-250000x768-byte"
+$FAISS_PY tools/make_inputs.py grid-byte ~/knn-grid/cpu-byte $CPU l2-500000x128-byte l2-500000x384-byte l2-500000x768-byte
+$FAISS_PY tools/grid/cpu_hnsw.py ~/knn-grid/cpu-byte target/grid-byte 4 $CPU l2-500000x128-byte l2-500000x384-byte l2-500000x768-byte
+$FAISS_PY tools/grid/cpu_hnsw.py ~/knn-grid/cpu-byte target/grid-byte 1 $CPU l2-500000x128-byte
+```
+
+`fixtures/grid/` holds the RTX 4070's results and fits, the byte ones as `byte-runs.json` and `byte-cpu.json`, which `crates/knn-builder/tests/cost.rs` holds the models to.
 
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

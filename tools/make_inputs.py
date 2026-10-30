@@ -2,9 +2,11 @@
 OpenSearch k-NN uploads for a remote build, plus held-out queries.
 
 Each input is a directory holding
-  vectors.knnvec  row-major little-endian float32 (or float16 for fp16 blobs)
+  vectors.knnvec  row-major little-endian float32 (float16 for fp16 blobs,
+                  int8 for byte ones)
   doc_ids.knndid  little-endian int32, one per vector
   queries.f32     row-major little-endian float32, for knn-inspect recall
+                  (whole numbers for a byte input, as k-NN takes its queries)
   input.json      the build request's fields (with m, ef_construction and
                   ef_search, which the baseline runner and the oracle read
                   from here) and how the data was drawn
@@ -12,7 +14,7 @@ Each input is a directory holding
 The doc ids are a shuffled, spread-out set rather than 0..n, so a writer
 that confuses positions and ids cannot pass by accident.
 
-Usage: python make_inputs.py {small,large,peak,grid} OUT_DIR [NAME...]
+Usage: python make_inputs.py {small,large,peak,grid,byte,byte-large,grid-byte} OUT_DIR [NAME...]
   small  the committed fixtures (fixtures/inputs)
   large  the inputs for measuring recall spread (not committed)
   peak   1M x 768 fp32, for measuring peak host memory (not committed;
@@ -23,6 +25,12 @@ Usage: python make_inputs.py {small,large,peak,grid} OUT_DIR [NAME...]
          128 and 384, for timing the stages and measuring device memory
          (not committed; 22 GB in all, so tools/grid/run_grid.py writes
          one at a time), and a small input to warm the GPU up with
+  byte        the committed byte fixtures (fixtures/byte/inputs): int8
+              values drawn uniformly over -128..127
+  byte-large  byte inputs for measuring recall spread (not committed)
+  grid-byte   byte inputs of 100k, 250k, 500k and 1M vectors of dimension
+              128, 384 and 768, for checking the grid's models on byte
+              builds (not committed), and a small one to warm up with
 With NAMEs, only those inputs of the set.
 
 Runs in the remote-vector-index-builder image, for its numpy.
@@ -98,6 +106,31 @@ SETS = {
         "l2-2000000x128": (2028, 2_000_000, 128, "l2", "float", "<f4", False),
         "l2-2000000x384": (2029, 2_000_000, 384, "l2", "float", "<f4", False),
     },
+    "byte": {
+        "ip-1000x64-byte": (3000, 1000, 64, "innerproduct", "byte", "<i1", False),
+        "l2-1000x64-byte": (3001, 1000, 64, "l2", "byte", "<i1", False),
+        "l2-1000x64-byte-skip": (3002, 1000, 64, "l2", "byte", "<i1", True),
+        "l2-150x64-byte": (3003, 150, 64, "l2", "byte", "<i1", False),
+    },
+    "byte-large": {
+        "ip-20000x128-byte": (3004, 20000, 128, "innerproduct", "byte", "<i1", False),
+        "l2-20000x128-byte": (3005, 20000, 128, "l2", "byte", "<i1", False),
+    },
+    "grid-byte": {
+        "l2-10000x128-byte": (3010, 10_000, 128, "l2", "byte", "<i1", False),
+        "l2-100000x128-byte": (3011, 100_000, 128, "l2", "byte", "<i1", False),
+        "l2-100000x384-byte": (3012, 100_000, 384, "l2", "byte", "<i1", False),
+        "l2-100000x768-byte": (3013, 100_000, 768, "l2", "byte", "<i1", False),
+        "l2-250000x128-byte": (3014, 250_000, 128, "l2", "byte", "<i1", False),
+        "l2-250000x384-byte": (3015, 250_000, 384, "l2", "byte", "<i1", False),
+        "l2-250000x768-byte": (3016, 250_000, 768, "l2", "byte", "<i1", False),
+        "l2-500000x128-byte": (3017, 500_000, 128, "l2", "byte", "<i1", False),
+        "l2-500000x384-byte": (3018, 500_000, 384, "l2", "byte", "<i1", False),
+        "l2-500000x768-byte": (3019, 500_000, 768, "l2", "byte", "<i1", False),
+        "l2-1000000x128-byte": (3020, 1_000_000, 128, "l2", "byte", "<i1", False),
+        "l2-1000000x384-byte": (3021, 1_000_000, 384, "l2", "byte", "<i1", False),
+        "l2-1000000x768-byte": (3022, 1_000_000, 768, "l2", "byte", "<i1", False),
+    },
 }
 
 # Above this many values an input's vectors are drawn in float32 chunks and
@@ -121,13 +154,23 @@ def draw32(rng, rows, dim, unit):
     return x
 
 
+def draw_bytes(rng, rows, dim):
+    return rng.integers(-128, 128, size=(rows, dim), dtype=np.int8)
+
+
 def write_input(out, name, spec):
     seed, doc_count, dim, space, data_type, blob_dtype, skip = spec
     rng = np.random.default_rng(seed)
-    unit = space == "innerproduct"
+    byte = data_type == "byte"
+    # Byte vectors cannot be scaled to unit length; inner product takes them as drawn.
+    unit = space == "innerproduct" and not byte
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
-    if doc_count * dim > CHUNKED_VALUES:
+    if byte:
+        vectors = draw_bytes(rng, doc_count, dim)
+        queries = draw_bytes(rng, QUERIES, dim)
+        (d / "vectors.knnvec").write_bytes(vectors.astype(blob_dtype).tobytes())
+    elif doc_count * dim > CHUNKED_VALUES:
         with (d / "vectors.knnvec").open("wb") as f:
             for start in range(0, doc_count, CHUNK_ROWS):
                 rows = min(CHUNK_ROWS, doc_count - start)
@@ -151,8 +194,10 @@ def write_input(out, name, spec):
         **ALGORITHM_PARAMETERS,
         "queries": QUERIES,
         "seed": seed,
-        "distribution": "standard normal" + (", unit length" if unit else "")
-        + (", float32 draws in chunks" if doc_count * dim > CHUNKED_VALUES else ""),
+        "distribution": "uniform integers -128..127" if byte else (
+            "standard normal" + (", unit length" if unit else "")
+            + (", float32 draws in chunks" if doc_count * dim > CHUNKED_VALUES else "")
+        ),
         "doc_ids": "permutation of 0..doc_count, times 3 plus 7",
     }
     (d / "input.json").write_bytes((json.dumps(meta, indent=2) + "\n").encode())

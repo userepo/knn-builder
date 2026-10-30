@@ -26,6 +26,7 @@ mod ffi {
 
     pub(super) const F32: c_int = 0;
     pub(super) const F16: c_int = 1;
+    pub(super) const I8: c_int = 2;
 
     pub(super) const L2: i32 = 0;
     pub(super) const INNER_PRODUCT: i32 = 1;
@@ -261,6 +262,8 @@ pub enum HostVectors<'a> {
     F32(&'a [f32]),
     /// IEEE half-precision bit patterns (see [`crate::fp16`]).
     F16(&'a [u16]),
+    /// Int8 values.
+    I8(&'a [i8]),
 }
 
 impl HostVectors<'_> {
@@ -268,6 +271,7 @@ impl HostVectors<'_> {
         match self {
             Self::F32(v) => v.len(),
             Self::F16(v) => v.len(),
+            Self::I8(v) => v.len(),
         }
     }
 
@@ -275,6 +279,7 @@ impl HostVectors<'_> {
         match self {
             Self::F32(v) => v.as_ptr().cast(),
             Self::F16(v) => v.as_ptr().cast(),
+            Self::I8(v) => v.as_ptr().cast(),
         }
     }
 
@@ -282,6 +287,7 @@ impl HostVectors<'_> {
         match self {
             Self::F32(_) => ffi::F32,
             Self::F16(_) => ffi::F16,
+            Self::I8(_) => ffi::I8,
         }
     }
 }
@@ -292,6 +298,7 @@ impl fmt::Debug for HostVectors<'_> {
         match self {
             Self::F32(v) => write!(f, "F32({} values)", v.len()),
             Self::F16(v) => write!(f, "F16({} values)", v.len()),
+            Self::I8(v) => write!(f, "I8({} values)", v.len()),
         }
     }
 }

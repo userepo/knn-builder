@@ -716,6 +716,7 @@ fn estimate(request: &BuildRequest) -> (f64, f64) {
     let size: u8 = match request.data_type {
         DataType::Float => 4,
         DataType::HalfFloat => 2,
+        DataType::Byte => 1,
     };
     let (dimension, doc_count) = (request.dimension, request.doc_count);
     // dimension * size + m * EDGE_SIZE: within i128 for any u64 and i64.
@@ -802,6 +803,16 @@ mod tests {
         }
     }
 
+    /// A recorded case's data type.
+    fn data_type(name: &Value) -> DataType {
+        match name.as_str().unwrap() {
+            "float" => DataType::Float,
+            "half_float" => DataType::HalfFloat,
+            "byte" => DataType::Byte,
+            other => panic!("data type {other}"),
+        }
+    }
+
     #[test]
     fn estimates_as_the_service_does() {
         let table: Value = serde_json::from_str(CAPACITY).unwrap();
@@ -813,10 +824,7 @@ mod tests {
             let mut request = request("a/_0_f.knnvec", case["dimension"].as_u64().unwrap());
             request.doc_count = case["doc_count"].as_u64().unwrap();
             request.m = case["m"].as_i64().unwrap();
-            request.data_type = match case["data_type"].as_str().unwrap() {
-                "float" => DataType::Float,
-                _ => DataType::HalfFloat,
-            };
+            request.data_type = data_type(&case["data_type"]);
             let (gpu, cpu) = estimate(&request);
             let want = (case["gpu"].as_f64().unwrap(), case["cpu"].as_f64().unwrap());
             assert_eq!(
@@ -858,9 +866,7 @@ mod tests {
             let mut request = request("a/_0_f.knnvec", case["dimension"].as_u64().unwrap());
             request.doc_count = case["doc_count"].as_u64().unwrap();
             request.m = case["m"].as_i64().unwrap();
-            if case["data_type"] == "half_float" {
-                request.data_type = DataType::HalfFloat;
-            }
+            request.data_type = data_type(&case["data_type"]);
             let mut jobs = Jobs::new(Settings {
                 gpu_memory_limit: case["limits"]["gpu"].as_f64().unwrap(),
                 cpu_memory_limit: case["limits"]["cpu"].as_f64().unwrap(),

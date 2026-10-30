@@ -45,13 +45,21 @@ impl XorShift {
     }
 }
 
+/// The vectors' type, and so the storage's.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Kind {
+    F32,
+    F16,
+    I8,
+}
+
 #[derive(Debug, Clone)]
 struct Case {
     n: usize,
     degree: usize,
     dimension: usize,
     metric: Metric,
-    fp16: bool,
+    kind: Kind,
     skip: bool,
     ef_construction: i32,
     ef_search: i32,
@@ -67,7 +75,7 @@ fn cases() -> impl Strategy<Value = Case> {
                 (2..=((n - 1) / 2).min(8)).prop_map(|m| m * 2),
                 1_usize..=12,
                 prop_oneof![Just(Metric::L2), Just(Metric::InnerProduct)],
-                any::<bool>(),
+                prop_oneof![Just(Kind::F32), Just(Kind::F16), Just(Kind::I8)],
                 any::<bool>(),
                 1_i32..=512,
                 1_i32..=512,
@@ -75,12 +83,12 @@ fn cases() -> impl Strategy<Value = Case> {
             )
         })
         .prop_map(
-            |(n, degree, dimension, metric, fp16, skip, ef_construction, ef_search, seed)| Case {
+            |(n, degree, dimension, metric, kind, skip, ef_construction, ef_search, seed)| Case {
                 n,
                 degree,
                 dimension,
                 metric,
-                fp16,
+                kind,
                 skip,
                 ef_construction,
                 ef_search,
@@ -89,9 +97,18 @@ fn cases() -> impl Strategy<Value = Case> {
         )
 }
 
+/// A case's graph, its vectors in every type, and its ids.
+struct Data {
+    graph: Vec<u32>,
+    f32s: Vec<f32>,
+    f16s: Vec<u16>,
+    i8s: Vec<i8>,
+    ids: Vec<i32>,
+}
+
 /// A graph of distinct neighbors other than the node itself, vectors and
 /// distinct ids, all from the case's seed.
-fn data(case: &Case) -> (Vec<u32>, Vec<f32>, Vec<u16>, Vec<i32>) {
+fn data(case: &Case) -> Data {
     let mut rng = XorShift(case.seed);
     let mut graph = Vec::with_capacity(case.n * case.degree);
     for node in 0..case.n {
@@ -110,21 +127,37 @@ fn data(case: &Case) -> (Vec<u32>, Vec<f32>, Vec<u16>, Vec<i32>) {
         .iter()
         .map(|&x| half::f16::from_f32(x).to_bits())
         .collect();
+    // Every int8 value, -128 and 127 included, from 8 random bits each.
+    let i8s = (0..case.n * case.dimension)
+        .map(|_| i8::from_le_bytes([u8::try_from(rng.next() >> 56).unwrap()]))
+        .collect();
     let mut ids: Vec<i32> = (0..case.n)
         .map(|i| i32::try_from(i * 3 + 7).unwrap())
         .collect();
     for i in (1..ids.len()).rev() {
         ids.swap(i, rng.below(i + 1));
     }
-    (graph, f32s, f16s, ids)
+    Data {
+        graph,
+        f32s,
+        f16s,
+        i8s,
+        ids,
+    }
 }
 
 fn check(case: &Case) {
-    let (graph, f32s, f16s, ids) = data(case);
-    let vectors = if case.fp16 {
-        Vectors::F16(&f16s)
-    } else {
-        Vectors::F32(&f32s)
+    let Data {
+        graph,
+        f32s,
+        f16s,
+        i8s,
+        ids,
+    } = data(case);
+    let vectors = match case.kind {
+        Kind::F32 => Vectors::F32(&f32s),
+        Kind::F16 => Vectors::F16(&f16s),
+        Kind::I8 => Vectors::I8(&i8s),
     };
     let file = IndexFile::new(IndexSpec {
         dimension: case.dimension,
@@ -175,14 +208,20 @@ fn check(case: &Case) {
     };
     assert!(fields.keep_max_size_level0 && fields.base_level_only);
     assert_eq!(fields.search_entry_points, 32);
-    assert_eq!(fields.numeric_type, Some(i32::from(case.fp16)));
+    // Faiss's NumericType: Float32 0, Float16 1, Int8 3.
+    let numeric = match case.kind {
+        Kind::F32 => 0,
+        Kind::F16 => 1,
+        Kind::I8 => 3,
+    };
+    assert_eq!(fields.numeric_type, Some(numeric));
 
     check_hnsw(case, &index.graph, &graph);
 
     // The storage.
-    match (&index.storage, case.skip, case.fp16) {
+    match (&index.storage, case.skip, case.kind) {
         (None, true, _) => {}
-        (Some(Storage::Flat(flat)), false, false) => {
+        (Some(Storage::Flat(flat)), false, Kind::F32) => {
             let fourcc = if metric == 1 { *b"IxF2" } else { *b"IxFI" };
             assert_eq!(flat.fourcc.0, fourcc);
             assert_eq!((flat.header.d, flat.header.ntotal), (d, n));
@@ -191,17 +230,27 @@ fn check(case: &Case) {
             let codes: Vec<f32> = flat.codes.iter().map(|c| c.get()).collect();
             assert_eq!(codes, f32s);
         }
-        (Some(Storage::Sq(sq)), false, true) => {
-            assert_eq!(sq.format, CodeFormat::Fp16);
+        (Some(Storage::Sq(sq)), false, kind @ (Kind::F16 | Kind::I8)) => {
+            let (format, width, codes): (_, u64, Vec<u8>) = if kind == Kind::F16 {
+                let codes = f16s.iter().flat_map(|x| x.to_le_bytes()).collect();
+                (CodeFormat::Fp16, 2, codes)
+            } else {
+                // Each value plus 128, computed apart from the writer's xor.
+                let codes = i8s
+                    .iter()
+                    .map(|&x| u8::try_from(i16::from(x) + 128).unwrap())
+                    .collect();
+                (CodeFormat::Byte, 1, codes)
+            };
+            assert_eq!(sq.format, format);
             assert_eq!((sq.header.d, sq.header.ntotal), (d, n));
             assert!(sq.header.is_trained);
             assert_eq!(sq.header.metric_type, metric);
             assert_eq!(sq.quantizer.d, case.dimension as u64);
-            assert_eq!(sq.quantizer.code_size, 2 * case.dimension as u64);
-            let codes: Vec<u8> = f16s.iter().flat_map(|x| x.to_le_bytes()).collect();
+            assert_eq!(sq.quantizer.code_size, width * case.dimension as u64);
             assert_eq!(sq.codes, &codes[..]);
         }
-        (storage, skip, fp16) => panic!("storage {storage:?} for skip {skip}, fp16 {fp16}"),
+        (storage, skip, kind) => panic!("storage {storage:?} for skip {skip}, {kind:?}"),
     }
 
     let report = knn_check::verify(&bytes, &Options::default());

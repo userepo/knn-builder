@@ -116,6 +116,7 @@ fn job(bucket: &str, name: &str, meta: &Value, m: Option<u32>) -> Job {
         data_type: match meta["data_type"].as_str().unwrap() {
             "float" => DataType::Float,
             "half_float" => DataType::HalfFloat,
+            "byte" => DataType::Byte,
             other => panic!("data_type {other}"),
         },
         space_type: match meta["space_type"].as_str().unwrap() {

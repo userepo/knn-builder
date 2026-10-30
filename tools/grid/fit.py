@@ -9,10 +9,13 @@ the points it saw. Writes OUT/fits.json.
   python tools/grid/fit.py RUNS_DIR OUT
 
 The terms, from docs/params.md: n vectors of dimension d, s bytes a value
-(4, or 2 for fp16), graph degree g = 4m. The IVF-PQ build's k-means runs on
-n/10 vectors over sqrt(n) lists, and its search probes 5 lists of about
-sqrt(n) vectors for each of n queries, so both cost about n^1.5 d; the
-graph's optimization costs about n g^2; the dataset copy n d s.
+(4, 2 for fp16, 1 for byte), graph degree g = 4m. The IVF-PQ build's
+k-means runs on n/10 vectors over sqrt(n) lists, and its search probes 5
+lists of about sqrt(n) vectors for each of n queries, so both cost about
+n^1.5 d; the graph's optimization costs about n g^2; the dataset copy
+n d s. A byte build takes as long as a float one, so the build's time
+counts a byte value as 4 bytes (build_size), as knn-builder's cost model
+does.
 
 That search keeps its fast kernel only while the lookup table (pq_dim x
 256 fp16 values, pq_dim = d/4) and the fused top-k of g candidates fit in
@@ -54,8 +57,14 @@ MIB = 1 << 20
 
 def shape_of(record):
     shape = record["shape"]
-    s = 4 if shape["blob_dtype"] == "<f4" else 2
+    s = {"<f4": 4, "<f2": 2, "<i1": 1}[shape["blob_dtype"]]
     return shape["doc_count"], shape["dimension"], s, 4 * shape["m"]
+
+
+def build_size(s):
+    """Bytes a value as the build's time counts it: a byte one as a float
+    one, which it builds as fast as."""
+    return 4 if s == 1 else s
 
 
 def slow_search(d, g):
@@ -66,7 +75,7 @@ TERMS = {
     "download_seconds": lambda n, d, s, g: {"1": 1.0, "n d s": n * d * s, "n": n},
     "build_seconds": lambda n, d, s, g: {
         "1": 1.0,
-        "n d s": n * d * s,
+        "n d s": n * d * build_size(s),
         "n^1.5 d": n**1.5 * d,
         "n g^2": n * g * g,
         "n^1.5 d, slow search": n**1.5 * d if slow_search(d, g) else 0.0,

@@ -5,9 +5,9 @@
 //! `tests/data/requests.json` holds the service's own answers, recorded by
 //! `tools/oracle/requests.py`.
 //!
-//! Where the service accepts a request knn-builder cannot build yet, byte
-//! and binary vectors and the hamming space, the error is an `unsupported`
-//! one on that field, so k-NN builds the segment itself.
+//! Where the service accepts a request knn-builder cannot build yet,
+//! binary vectors and the hamming space, the error is an `unsupported` one
+//! on that field, so k-NN builds the segment itself.
 //!
 //! The body is read as JSON (RFC 8259) in UTF-8, after a UTF-8 BOM if
 //! there is one. Python's `json.loads` reads more, none of which k-NN's
@@ -176,6 +176,7 @@ impl BuildRequest {
             "data_type": match self.data_type {
                 DataType::Float => "float",
                 DataType::HalfFloat => "half_float",
+                DataType::Byte => "byte",
             },
             "engine": "faiss",
             "index_parameters": {
@@ -358,6 +359,7 @@ pub fn parse(body: &[u8]) -> Result<BuildRequest, Rejection> {
         .and_then(|choice| match choice {
             "float" => Some(DataType::Float),
             "half_float" => Some(DataType::HalfFloat),
+            "byte" => Some(DataType::Byte),
             other => {
                 errors.unsupported("body.data_type", &format!("{other} vectors"));
                 None

@@ -243,6 +243,16 @@ extern "C" int knn_cagra_build(knn_cagra_gpu* gpu,
                          graph_len,
                          message,
                          message_len);
+    case KNN_CAGRA_I8:
+      return build_graph(gpu->res,
+                         static_cast<const std::int8_t*>(vectors),
+                         rows,
+                         dimension,
+                         *params,
+                         graph,
+                         graph_len,
+                         message,
+                         message_len);
     default: set_message(message, message_len, "unknown vector type"); return KNN_CAGRA_ARGUMENTS;
   }
 }

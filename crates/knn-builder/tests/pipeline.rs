@@ -43,6 +43,7 @@ impl Inputs for S3 {
                 .iter()
                 .flat_map(|v| v.to_le_bytes())
                 .collect(),
+            Blob::I8 => int8s(values).iter().flat_map(|v| v.to_le_bytes()).collect(),
         };
         self.put(&job.vector_path, vectors, kms_key).await;
         self.put(&job.doc_id_path, le_ids(&ids(job.doc_count)), None)
@@ -55,11 +56,13 @@ impl Inputs for S3 {
     }
 }
 
-/// How a test encodes a vector blob.
+/// How a test encodes a vector blob, and what the index file stores.
 #[derive(Debug, Clone, Copy)]
 enum Blob {
     F32,
     F16,
+    /// One int8 value for each of `values`, from its position (`int8s`).
+    I8,
 }
 
 fn job(bucket: &str, name: &str, doc_count: u32, dimension: u32) -> Job {
@@ -91,24 +94,31 @@ fn halves(values: &[f32]) -> Vec<u16> {
     out
 }
 
+/// A byte blob's values in place of `values`: every int8 value in turn.
+fn int8s(values: &[f32]) -> Vec<i8> {
+    (0..values.len())
+        .map(|i| i8::from_le_bytes([u8::try_from(i % 256).unwrap()]))
+        .collect()
+}
+
 /// The file the pipeline must store for `job`: knn-write's, from the
-/// inputs as stored (`halves` when they are fp16) and the fake's graph.
-fn expected(job: &Job, values: &[f32], half: bool) -> Vec<u8> {
+/// inputs as `stored` says the file keeps them and the fake's graph.
+fn expected(job: &Job, values: &[f32], stored: Blob) -> Vec<u8> {
     let metric = job.space_type.build_metric();
     let params = BuildParams::new(job.doc_count, job.dimension, job.m, metric).unwrap();
     let degree = params.graph_degree as usize;
     let graph = FakeBuilder::graph(job.doc_count as usize, degree);
-    let halves = halves(values);
+    let (halves, int8s) = (halves(values), int8s(values));
     let ids = ids(job.doc_count);
     let file = IndexFile::new(IndexSpec {
         dimension: job.dimension as usize,
         metric: job.space_type.file_metric(),
         graph: &graph,
         graph_degree: degree,
-        vectors: if half {
-            Vectors::F16(&halves)
-        } else {
-            Vectors::F32(values)
+        vectors: match stored {
+            Blob::F32 => Vectors::F32(values),
+            Blob::F16 => Vectors::F16(&halves),
+            Blob::I8 => Vectors::I8(&int8s),
         },
         ids: &ids,
         ef_construction: job.ef_construction,
@@ -136,13 +146,17 @@ async fn stores_the_index_of_each_kind_of_job() {
     skipped.skip_stored_vectors = true;
     // A small count, whose m the service lowers.
     let small = job(&s3.bucket, "small", 40, 8);
+    let mut byte = job(&s3.bucket, "byte", 600, 16);
+    byte.data_type = DataType::Byte;
+    byte.space_type = SpaceType::InnerProduct;
 
     let cases = [
-        (&float, Blob::F32, false),
-        (&fp16_blob, Blob::F16, true),
-        (&fp32_blob, Blob::F32, true),
-        (&skipped, Blob::F32, false),
-        (&small, Blob::F32, false),
+        (&float, Blob::F32, Blob::F32),
+        (&fp16_blob, Blob::F16, Blob::F16),
+        (&fp32_blob, Blob::F32, Blob::F16),
+        (&skipped, Blob::F32, Blob::F32),
+        (&small, Blob::F32, Blob::F32),
+        (&byte, Blob::I8, Blob::I8),
     ];
     for &(job, blob, _) in &cases {
         s3.put_inputs(job, &values(job), blob, None).await;
@@ -152,12 +166,12 @@ async fn stores_the_index_of_each_kind_of_job() {
         .iter()
         .map(|&(job, ..)| pipeline.submit(job.clone()))
         .collect();
-    for (handle, &(job, _, half)) in handles.into_iter().zip(&cases) {
+    for (handle, &(job, _, stored_as)) in handles.into_iter().zip(&cases) {
         let built = handle.outcome().await.unwrap();
         assert_eq!(built.file_name, "_0_vectors.faiss");
         let stored = s3.get(&job.index_key()).await.unwrap();
         assert!(
-            stored == expected(job, &values(job), half),
+            stored == expected(job, &values(job), stored_as),
             "{} differs",
             job.vector_path
         );

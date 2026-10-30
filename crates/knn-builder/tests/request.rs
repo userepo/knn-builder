@@ -31,8 +31,7 @@ type Divergent = (&'static str, u16, &'static [(&'static str, &'static str)]);
 /// - Bodies Python's `json.loads` reads and knn-builder does not: forms
 ///   outside RFC 8259 JSON in UTF-8, and JSON past `serde_json`'s limits,
 ///   none of which k-NN's client sends (the module's docs).
-const DIVERGENT: [Divergent; 13] = [
-    ("byte data", 422, &[("body.data_type", "unsupported")]),
+const DIVERGENT: [Divergent; 12] = [
     (
         "binary data, hamming",
         422,

@@ -10,6 +10,8 @@ pub enum DataType {
     /// tells them apart, and fp32 values become fp16 on download, as the
     /// service converts them.
     HalfFloat,
+    /// `byte`: int8 values.
+    Byte,
 }
 
 /// The request's `space_type`.
@@ -99,6 +101,7 @@ impl Job {
         let value_size = match self.data_type {
             DataType::Float => 4,
             DataType::HalfFloat => 2,
+            DataType::Byte => 1,
         };
         // No graph when the parameters fail; the job fails before one.
         let degree = knn_gpu::BuildParams::new(
@@ -163,6 +166,8 @@ pub(crate) mod tests {
             .graph_degree;
         let (ids, graph) = (600 * 4, 600 * u64::from(degree) * 4);
         assert_eq!(job.host_bytes(), 600 * 16 * 4 + ids + graph);
+        job.data_type = DataType::Byte;
+        assert_eq!(job.host_bytes(), 600 * 16 + ids + graph);
         job.data_type = DataType::HalfFloat;
         assert_eq!(job.host_bytes(), 600 * 16 * 2 + ids + graph);
         job.m = 0;

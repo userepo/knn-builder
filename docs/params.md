@@ -1,6 +1,6 @@
 # CAGRA build parameters
 
-The parameters the upstream remote-vector-index-builder builds a float or fp16 CAGRA graph with, as `knn-gpu` must reproduce them, and where each comes from. Sources are pinned:
+The parameters the upstream remote-vector-index-builder builds a float, fp16 or byte CAGRA graph with, as `knn-gpu` must reproduce them, and where each comes from. Sources are pinned:
 
 - **rvib**: [remote-vector-index-builder](https://github.com/opensearch-project/remote-vector-index-builder) at `3a02e64`, paths under `remote_vector_index_builder/core/`.
 - **Faiss**: Faiss `0ca9df4` with the three patches in rvib's `base_image/patches` applied; paths under `faiss/gpu/`.
@@ -19,12 +19,12 @@ Computed from the request's `doc_count`, `dimension` and `m` (`index_builder/fai
 | `intermediate_graph_degree` | effective m x 4, equal to `graph_degree` | `faiss_index_build_service.py:115` |
 | `pq_dim` | `int(dimension / 4)` (`PQ_DIM_COMPRESSION_FACTOR`); 0 below 4 dimensions, which leaves the choice to cuVS | `faiss_index_build_service.py:50, 109-111` |
 | metric | `l2` gives cuVS `L2Expanded`, `innerproduct` gives `InnerProduct` | `index_builder_utils.py:84-88`; Faiss `utils/CuvsUtils.h:36-43` (`metricFaissToCuvs(metric, false)`) |
-| numeric type | `float` builds over float32, `half_float` over float16 (an fp32 blob is converted to fp16 on download) | `common/models/index_builder/faiss/faiss_gpu_index_cagra_builder.py:179-186` |
+| numeric type | `float` builds over float32, `half_float` over float16 (an fp32 blob is converted to fp16 on download), `byte` over int8, with every other parameter as for float | `common/models/index_builder/faiss/faiss_gpu_index_cagra_builder.py:179-186` |
 | `efConstruction`, `efSearch` | the request's `ef_construction` and `ef_search` (defaults 100 and 100), written into the file, not used by the build | `common/models/index_builder/faiss/faiss_index_hnsw_cagra_builder.py:30-33, 72-73` |
 
 Example: 150 vectors with m = 16 give `n_lists` 12, 62 candidates, a maximum degree of 31 and an effective m of 7, so degree 28; the service logs "Using m=7 instead of m=16". 1,000 vectors keep m = 16 (degree 64).
 
-The binary path (NN-descent, `faiss_index_build_service.py:117-124`) is outside v1.
+Binary vectors take another path, an NN-descent build with no IVF-PQ settings (`faiss_index_build_service.py:117-124`), which this page does not cover yet.
 
 ## Fixed
 

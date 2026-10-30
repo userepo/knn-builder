@@ -3,8 +3,10 @@ segment: Faiss's HNSW over the float vectors (M 16, ef_construction 100,
 k-NN's defaults), with doc ids, on 1 and 4 threads (k-NN builds on
 knn.algo_param.index_thread_qty threads: 4 on a node of 32 processors or
 more, 1 below). Appends a record per build to OUT/cpu.json; fit.py reads
-it. The input's float32 vectors stand in for any field's: k-NN builds a
-half_float field's graph over fp16 values, which this does not time.
+it. The input's float32 vectors stand in for a float or half_float field's:
+k-NN builds a half_float field's graph over fp16 values, which this does
+not time. A byte input is built as k-NN builds a byte field, over
+"HNSW16,SQ8_direct_signed", its int8 values added as floats.
 
 In WSL, with faiss-cpu 1.15.1 (the version knn-inspect pins), after
 make_inputs.py grid has written the inputs:
@@ -31,7 +33,13 @@ def build(inputs, name, threads):
     vectors = vectors.astype(np.float32).reshape(n, d)
     ids = np.fromfile(inputs / name / "doc_ids.knndid", dtype="<i4").astype(np.int64)
     faiss.omp_set_num_threads(threads)
-    hnsw = faiss.IndexHNSWFlat(d, M)
+    if meta["data_type"] == "byte":
+        # Its direct quantizer needs no training. `made` owns the index;
+        # the downcast only views it, so both stay referenced.
+        made = faiss.index_factory(d, f"HNSW{M},SQ8_direct_signed")
+        hnsw = faiss.downcast_index(made)
+    else:
+        hnsw = faiss.IndexHNSWFlat(d, M)
     hnsw.hnsw.efConstruction = EF_CONSTRUCTION
     index = faiss.IndexIDMap(hnsw)
     start = time.perf_counter()
@@ -41,7 +49,13 @@ def build(inputs, name, threads):
         "input": name,
         "threads": threads,
         "seconds": round(seconds, 3),
-        "shape": {"doc_count": n, "dimension": d, "m": M, "ef_construction": EF_CONSTRUCTION},
+        "shape": {
+            "doc_count": n,
+            "dimension": d,
+            "data_type": meta["data_type"],
+            "m": M,
+            "ef_construction": EF_CONSTRUCTION,
+        },
         "faiss": faiss.__version__,
         "simd": faiss.get_compile_options().strip(),
     }
