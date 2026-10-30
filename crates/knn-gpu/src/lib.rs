@@ -2,8 +2,9 @@
 //! of the upstream remote-vector-index-builder, and owns the per-GPU
 //! resources the builds share.
 //!
-//! [`BuildParams`] (the service's rules, `docs/params.md`) and [`fp16`]
-//! (its fp32 to fp16 conversion) build anywhere. The build itself, `Gpu`,
+//! [`BuildParams`] and [`BinaryParams`] (the service's rules,
+//! `docs/params.md`) and [`fp16`] (its fp32 to fp16 conversion) build
+//! anywhere. The build itself, `Gpu`,
 //! is behind the `gpu` feature, which needs Linux, a C++20 compiler and
 //! the conda environment in `environment.yml`; it is named, not linked,
 //! here, since without the feature it does not exist.
@@ -23,4 +24,4 @@ pub use error::Error;
 pub use gpu::{
     DeviceMemory, Gpu, Graph, HostVectors, Reservation, device_memory, shared_memory_per_block,
 };
-pub use params::{BuildParams, Metric};
+pub use params::{BinaryParams, BuildParams, Metric};

@@ -24,7 +24,7 @@ use knn_builder::forecast::Forecaster;
 use knn_builder::{
     Builder, Built, DataType, FakeBuilder, Job, JobError, Pipeline, SpaceType, Span, Stage,
 };
-use knn_gpu::{BuildParams, fp16};
+use knn_gpu::fp16;
 use knn_write::{IndexFile, IndexSpec, Vectors};
 
 /// What the pipeline tests do with their bucket.
@@ -44,6 +44,7 @@ impl Inputs for S3 {
                 .flat_map(|v| v.to_le_bytes())
                 .collect(),
             Blob::I8 => int8s(values).iter().flat_map(|v| v.to_le_bytes()).collect(),
+            Blob::Bits => bits(values),
         };
         self.put(&job.vector_path, vectors, kms_key).await;
         self.put(&job.doc_id_path, le_ids(&ids(job.doc_count)), None)
@@ -63,6 +64,8 @@ enum Blob {
     F16,
     /// One int8 value for each of `values`, from its position (`int8s`).
     I8,
+    /// One byte of packed bits for every 8 of `values` (`bits`).
+    Bits,
 }
 
 fn job(bucket: &str, name: &str, doc_count: u32, dimension: u32) -> Job {
@@ -101,24 +104,31 @@ fn int8s(values: &[f32]) -> Vec<i8> {
         .collect()
 }
 
+/// A binary blob in place of `values`: a byte for each 8, from its
+/// position.
+fn bits(values: &[f32]) -> Vec<u8> {
+    (0..values.len() / 8)
+        .map(|i| u8::try_from(i * 37 % 256).unwrap())
+        .collect()
+}
+
 /// The file the pipeline must store for `job`: knn-write's, from the
 /// inputs as `stored` says the file keeps them and the fake's graph.
 fn expected(job: &Job, values: &[f32], stored: Blob) -> Vec<u8> {
-    let metric = job.space_type.build_metric();
-    let params = BuildParams::new(job.doc_count, job.dimension, job.m, metric).unwrap();
-    let degree = params.graph_degree as usize;
+    let degree = job.graph_params().unwrap().degree_for(job.doc_count) as usize;
     let graph = FakeBuilder::graph(job.doc_count as usize, degree);
-    let (halves, int8s) = (halves(values), int8s(values));
+    let (halves, int8s, bits) = (halves(values), int8s(values), bits(values));
     let ids = ids(job.doc_count);
     let file = IndexFile::new(IndexSpec {
         dimension: job.dimension as usize,
-        metric: job.space_type.file_metric(),
+        metric: job.file_metric(),
         graph: &graph,
         graph_degree: degree,
         vectors: match stored {
             Blob::F32 => Vectors::F32(values),
             Blob::F16 => Vectors::F16(&halves),
             Blob::I8 => Vectors::I8(&int8s),
+            Blob::Bits => Vectors::Bits(&bits),
         },
         ids: &ids,
         ef_construction: job.ef_construction,
@@ -149,6 +159,13 @@ async fn stores_the_index_of_each_kind_of_job() {
     let mut byte = job(&s3.bucket, "byte", 600, 16);
     byte.data_type = DataType::Byte;
     byte.space_type = SpaceType::InnerProduct;
+    // 600 vectors of 64 bits, and 40, whose degree cuVS's rule lowers.
+    let mut binary = job(&s3.bucket, "binary", 600, 64);
+    binary.data_type = DataType::Binary;
+    binary.space_type = SpaceType::Hamming;
+    let mut few_bits = job(&s3.bucket, "few-bits", 40, 64);
+    few_bits.data_type = DataType::Binary;
+    few_bits.space_type = SpaceType::Hamming;
 
     let cases = [
         (&float, Blob::F32, Blob::F32),
@@ -157,6 +174,8 @@ async fn stores_the_index_of_each_kind_of_job() {
         (&skipped, Blob::F32, Blob::F32),
         (&small, Blob::F32, Blob::F32),
         (&byte, Blob::I8, Blob::I8),
+        (&binary, Blob::Bits, Blob::Bits),
+        (&few_bits, Blob::Bits, Blob::Bits),
     ];
     for &(job, blob, _) in &cases {
         s3.put_inputs(job, &values(job), blob, None).await;
@@ -443,6 +462,13 @@ async fn fails_jobs_without_storing_anything() {
         .await;
     let mut zero_m = job(&s3.bucket, "zero-m", 600, 16);
     zero_m.m = 0;
+    // Binary vectors of 12 bits: the service downloads int(12 / 8) = 1 byte
+    // a vector, then fails the build, as Faiss takes whole bytes alone.
+    let mut odd_bits = job(&s3.bucket, "odd-bits", 600, 12);
+    odd_bits.data_type = DataType::Binary;
+    odd_bits.space_type = SpaceType::Hamming;
+    s3.put(&odd_bits.vector_path, vec![0; 600], None).await;
+    s3.put(&odd_bits.doc_id_path, le_ids(&ids(600)), None).await;
     let good = job(&s3.bucket, "good", 600, 16);
     // Blobs of 600 x 16 values for the rest.
     for job in [&short, &zero_m, &good] {
@@ -475,6 +501,14 @@ async fn fails_jobs_without_storing_anything() {
     assert!(matches!(error, JobError::HalfFloatSize { .. }), "{error}");
     let error = outcome(&zero_m).await.unwrap_err();
     assert!(matches!(error, JobError::Params(_)), "{error}");
+    let error = outcome(&odd_bits).await.unwrap_err();
+    assert!(
+        matches!(
+            error,
+            JobError::Params(knn_gpu::Error::Bits { dimension: 12 })
+        ),
+        "{error}"
+    );
     // The pipeline carries on.
     outcome(&good).await.unwrap();
     pipeline.close().await;

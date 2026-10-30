@@ -13,17 +13,21 @@ pub enum Error {
         /// The vector count, from the ids.
         count: usize,
     },
-    /// A dimension of 0, or past Faiss's 32-bit `d`.
-    #[error("dimension {dimension}: must be from 1 to 2147483647")]
+    /// A dimension of 0, past Faiss's 32-bit `d`, or for binary vectors
+    /// not a whole number of bytes.
+    #[error(
+        "dimension {dimension}: must be from 1 to 2147483647, and a multiple of 8 for binary vectors"
+    )]
     Dimension {
         /// The dimension given.
         dimension: usize,
     },
-    /// A graph degree the HNSW layout cannot hold: odd, below 4 (Faiss's
-    /// level table needs M = degree / 2 of at least 2), or so large that
-    /// its cumulative neighbor counts overflow `i32`.
+    /// A graph degree the HNSW layout cannot hold: odd but for binary
+    /// vectors, below 4 (Faiss's level table needs M = degree / 2 of at
+    /// least 2), or so large that its cumulative neighbor counts overflow
+    /// `i32`.
     #[error(
-        "graph degree {degree}: must be even, at least 4, and small enough that its cumulative neighbor counts fit a 32-bit integer"
+        "graph degree {degree}: must be even unless the vectors are binary, at least 4, and small enough that its cumulative neighbor counts fit a 32-bit integer"
     )]
     GraphDegree {
         /// The degree given.
@@ -61,7 +65,8 @@ pub enum Error {
         /// The vector count.
         count: usize,
     },
-    /// Vector values that are not one row of `dimension` per id.
+    /// Vector values, or for binary vectors bytes, that are not one row of
+    /// `dimension` (bits, for binary vectors) per id.
     #[error(
         "{actual} vector values, where {count} vectors of dimension {dimension} need {expected}"
     )]
@@ -74,6 +79,14 @@ pub enum Error {
         count: usize,
         /// The dimension.
         dimension: usize,
+    },
+    /// Binary vectors without the Hamming metric, or the Hamming metric
+    /// without binary vectors: Faiss's binary indexes measure in Hamming
+    /// distance alone, and its other indexes never do.
+    #[error("{}", if *binary { "binary vectors need the hamming metric" } else { "the hamming metric needs binary vectors" })]
+    Hamming {
+        /// Whether the vectors are binary.
+        binary: bool,
     },
     /// A count past what the platform can hold: the file's length past
     /// `u64`, or the graph's or vectors' expected length past `usize`

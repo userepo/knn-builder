@@ -26,7 +26,7 @@ pub(crate) fn write_index(
     }
     let file = IndexFile::new(IndexSpec {
         dimension: job.dimension as usize,
-        metric: job.space_type.file_metric(),
+        metric: job.file_metric(),
         graph,
         graph_degree: degree,
         vectors: dataset.vectors.as_write(),

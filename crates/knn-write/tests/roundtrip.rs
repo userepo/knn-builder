@@ -1,6 +1,8 @@
 //! Random small specs, written and read back with knn-inspect's reader
 //! (knn-format) and checks (knn-check): every field must come back as
-//! given or as the layout fixes it, and `verify` must find nothing.
+//! given or as the layout fixes it, and `verify` must find nothing. Binary
+//! specs take odd degrees too, and keep their vectors: knn-format reads no
+//! binary graph without them.
 //!
 //! knn-format was validated against Faiss independently of this crate, so
 //! the round trip is not circular; the golden tests hold the writer to the
@@ -17,7 +19,7 @@
 )]
 
 use knn_check::{Options, Status};
-use knn_format::faiss::{CodeFormat, GraphKind, HnswGraph, Inner, Storage};
+use knn_format::faiss::{CodeFormat, GraphKind, HeaderKind, HnswGraph, Inner, Storage};
 use knn_write::{IndexFile, IndexSpec, LevelTable, Metric, Vectors};
 use proptest::prelude::*;
 
@@ -51,6 +53,8 @@ enum Kind {
     F32,
     F16,
     I8,
+    /// Packed bits; the case's dimension counts bits.
+    Bits,
 }
 
 #[derive(Debug, Clone)]
@@ -103,7 +107,37 @@ struct Data {
     f32s: Vec<f32>,
     f16s: Vec<u16>,
     i8s: Vec<i8>,
+    bits: Vec<u8>,
     ids: Vec<i32>,
+}
+
+/// Binary cases: Hamming, any degree from 4 to the vectors less one, odd
+/// ones too, and 8 to 96 bits.
+fn binary_cases() -> impl Strategy<Value = Case> {
+    (6_usize..=40)
+        .prop_flat_map(|n| {
+            (
+                Just(n),
+                4..=(n - 1).min(17),
+                1_usize..=12,
+                1_i32..=512,
+                1_i32..=512,
+                1_u64..,
+            )
+        })
+        .prop_map(
+            |(n, degree, bytes, ef_construction, ef_search, seed)| Case {
+                n,
+                degree,
+                dimension: bytes * 8,
+                metric: Metric::Hamming,
+                kind: Kind::Bits,
+                skip: false,
+                ef_construction,
+                ef_search,
+                seed,
+            },
+        )
 }
 
 /// A graph of distinct neighbors other than the node itself, vectors and
@@ -131,6 +165,9 @@ fn data(case: &Case) -> Data {
     let i8s = (0..case.n * case.dimension)
         .map(|_| i8::from_le_bytes([u8::try_from(rng.next() >> 56).unwrap()]))
         .collect();
+    let bits = (0..case.n * case.dimension / 8)
+        .map(|_| u8::try_from(rng.next() >> 56).unwrap())
+        .collect();
     let mut ids: Vec<i32> = (0..case.n)
         .map(|i| i32::try_from(i * 3 + 7).unwrap())
         .collect();
@@ -142,30 +179,28 @@ fn data(case: &Case) -> Data {
         f32s,
         f16s,
         i8s,
+        bits,
         ids,
     }
 }
 
 fn check(case: &Case) {
-    let Data {
-        graph,
-        f32s,
-        f16s,
-        i8s,
-        ids,
-    } = data(case);
+    let data = data(case);
+    let (graph, ids) = (&data.graph, &data.ids);
     let vectors = match case.kind {
-        Kind::F32 => Vectors::F32(&f32s),
-        Kind::F16 => Vectors::F16(&f16s),
-        Kind::I8 => Vectors::I8(&i8s),
+        Kind::F32 => Vectors::F32(&data.f32s),
+        Kind::F16 => Vectors::F16(&data.f16s),
+        Kind::I8 => Vectors::I8(&data.i8s),
+        Kind::Bits => Vectors::Bits(&data.bits),
     };
+    let binary = case.kind == Kind::Bits;
     let file = IndexFile::new(IndexSpec {
         dimension: case.dimension,
         metric: case.metric,
-        graph: &graph,
+        graph,
         graph_degree: case.degree,
         vectors,
-        ids: &ids,
+        ids,
         ef_construction: case.ef_construction,
         ef_search: case.ef_search,
         skip_stored_vectors: case.skip,
@@ -177,17 +212,24 @@ fn check(case: &Case) {
 
     let n = i64::try_from(case.n).unwrap();
     let d = i32::try_from(case.dimension).unwrap();
+    // A binary index records Faiss's default, METRIC_L2.
     let metric = match case.metric {
-        Metric::L2 => 1,
+        Metric::L2 | Metric::Hamming => 1,
         Metric::InnerProduct => 0,
     };
+    let header_kind = |kind: HeaderKind| match kind {
+        HeaderKind::Binary { code_size } => Some(code_size),
+        HeaderKind::Float { .. } => None,
+    };
+    let code_size = binary.then(|| i32::try_from(case.dimension / 8).unwrap());
     let parsed = knn_format::parse(&bytes).unwrap();
     assert_eq!(parsed.trailing, 0);
     assert_eq!(parsed.payload_len, bytes.len());
 
     // The ID map.
     let map = &parsed.index;
-    assert_eq!(map.fourcc.0, *b"IxMp");
+    assert_eq!(map.fourcc.0, if binary { *b"IBMp" } else { *b"IxMp" });
+    assert_eq!(header_kind(map.header.kind), code_size);
     assert_eq!((map.header.d, map.header.ntotal), (d, n));
     assert!(!map.header.is_trained);
     assert_eq!(map.header.metric_type, metric);
@@ -199,27 +241,53 @@ fn check(case: &Case) {
     let Inner::Hnsw(index) = &map.index else {
         panic!("not an HNSW index");
     };
-    assert_eq!(index.fourcc.0, *b"IHc2");
+    assert_eq!(index.fourcc.0, if binary { *b"IBHc" } else { *b"IHc2" });
+    assert_eq!(header_kind(index.header.kind), code_size);
     assert_eq!((index.header.d, index.header.ntotal), (d, n));
     assert!(index.header.is_trained);
     assert_eq!(index.header.metric_type, metric);
     let GraphKind::Cagra(fields) = &index.kind else {
         panic!("not a CAGRA graph");
     };
-    assert!(fields.keep_max_size_level0 && fields.base_level_only);
+    // copyTo leaves keep_max_size_level0 false for a binary graph alone.
+    assert_eq!(fields.keep_max_size_level0, !binary);
+    assert!(fields.base_level_only);
     assert_eq!(fields.search_entry_points, 32);
-    // Faiss's NumericType: Float32 0, Float16 1, Int8 3.
+    // Faiss's NumericType: Float32 0, Float16 1, Int8 3; a binary graph
+    // records none.
     let numeric = match case.kind {
-        Kind::F32 => 0,
-        Kind::F16 => 1,
-        Kind::I8 => 3,
+        Kind::F32 => Some(0),
+        Kind::F16 => Some(1),
+        Kind::I8 => Some(3),
+        Kind::Bits => None,
     };
-    assert_eq!(fields.numeric_type, Some(numeric));
+    assert_eq!(fields.numeric_type, numeric);
 
-    check_hnsw(case, &index.graph, &graph);
+    check_hnsw(case, &index.graph, graph);
 
-    // The storage.
-    match (&index.storage, case.skip, case.kind) {
+    check_storage(case, index.storage.as_ref(), &data);
+
+    let report = knn_check::verify(&bytes, &Options::default());
+    assert_eq!(report.status, Status::Clean, "{report:#?}");
+}
+
+/// The HNSW block: Faiss's level table, the graph on level 0, nothing
+/// above, and the fields the layout fixes.
+/// The storage, or its absence, as the case says the file keeps it.
+fn check_storage(case: &Case, storage: Option<&Storage<'_>>, data: &Data) {
+    let n = i64::try_from(case.n).unwrap();
+    let d = i32::try_from(case.dimension).unwrap();
+    // A binary index records Faiss's default, METRIC_L2.
+    let metric = match case.metric {
+        Metric::L2 | Metric::Hamming => 1,
+        Metric::InnerProduct => 0,
+    };
+    let header_kind = |kind: HeaderKind| match kind {
+        HeaderKind::Binary { code_size } => Some(code_size),
+        HeaderKind::Float { .. } => None,
+    };
+    let code_size = (case.kind == Kind::Bits).then(|| i32::try_from(case.dimension / 8).unwrap());
+    match (storage, case.skip, case.kind) {
         (None, true, _) => {}
         (Some(Storage::Flat(flat)), false, Kind::F32) => {
             let fourcc = if metric == 1 { *b"IxF2" } else { *b"IxFI" };
@@ -228,15 +296,16 @@ fn check(case: &Case) {
             assert!(flat.header.is_trained);
             assert_eq!(flat.header.metric_type, metric);
             let codes: Vec<f32> = flat.codes.iter().map(|c| c.get()).collect();
-            assert_eq!(codes, f32s);
+            assert_eq!(codes, data.f32s);
         }
         (Some(Storage::Sq(sq)), false, kind @ (Kind::F16 | Kind::I8)) => {
             let (format, width, codes): (_, u64, Vec<u8>) = if kind == Kind::F16 {
-                let codes = f16s.iter().flat_map(|x| x.to_le_bytes()).collect();
+                let codes = data.f16s.iter().flat_map(|x| x.to_le_bytes()).collect();
                 (CodeFormat::Fp16, 2, codes)
             } else {
                 // Each value plus 128, computed apart from the writer's xor.
-                let codes = i8s
+                let codes = data
+                    .i8s
                     .iter()
                     .map(|&x| u8::try_from(i16::from(x) + 128).unwrap())
                     .collect();
@@ -250,17 +319,22 @@ fn check(case: &Case) {
             assert_eq!(sq.quantizer.code_size, width * case.dimension as u64);
             assert_eq!(sq.codes, &codes[..]);
         }
+        (Some(Storage::Binary(storage)), false, Kind::Bits) => {
+            assert_eq!((storage.header.d, storage.header.ntotal), (d, n));
+            assert!(storage.header.is_trained);
+            assert_eq!(storage.header.metric_type, 1);
+            assert_eq!(header_kind(storage.header.kind), code_size);
+            assert_eq!(storage.codes, &data.bits[..]);
+        }
         (storage, skip, kind) => panic!("storage {storage:?} for skip {skip}, {kind:?}"),
     }
-
-    let report = knn_check::verify(&bytes, &Options::default());
-    assert_eq!(report.status, Status::Clean, "{report:#?}");
 }
 
-/// The HNSW block: Faiss's level table, the graph on level 0, nothing
-/// above, and the fields the layout fixes.
+/// Level 0 holds the first `case.degree / 2 * 2` of each row: all of an
+/// even one, all but the last of an odd binary one.
 fn check_hnsw(case: &Case, hnsw: &HnswGraph<'_>, graph: &[u32]) {
     let table = LevelTable::new(u32::try_from(case.degree / 2).unwrap()).unwrap();
+    let kept = case.degree / 2 * 2;
     let probas: Vec<f64> = hnsw.assign_probas.iter().map(|p| p.get()).collect();
     assert_eq!(probas, table.assign_probas());
     let cum: Vec<i32> = hnsw
@@ -277,9 +351,9 @@ fn check_hnsw(case: &Case, hnsw: &HnswGraph<'_>, graph: &[u32]) {
         let end = usize::try_from(hnsw.offsets[node + 1].get()).unwrap();
         let slots: Vec<i32> = hnsw.neighbors[start..end].iter().map(|s| s.get()).collect();
         let row_ids: Vec<i32> = row.iter().map(|&id| i32::try_from(id).unwrap()).collect();
-        assert_eq!(slots[..case.degree], row_ids[..], "node {node}: level 0");
+        assert_eq!(slots[..kept], row_ids[..kept], "node {node}: level 0");
         assert!(
-            slots[case.degree..].iter().all(|&s| s == -1),
+            slots[kept..].iter().all(|&s| s == -1),
             "node {node}: upper levels"
         );
     }
@@ -294,6 +368,11 @@ fn check_hnsw(case: &Case, hnsw: &HnswGraph<'_>, graph: &[u32]) {
 proptest! {
     #[test]
     fn written_files_read_back(case in cases()) {
+        check(&case);
+    }
+
+    #[test]
+    fn written_binary_files_read_back(case in binary_cases()) {
         check(&case);
     }
 }

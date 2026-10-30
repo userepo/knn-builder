@@ -6,7 +6,9 @@ more, 1 below). Appends a record per build to OUT/cpu.json; fit.py reads
 it. The input's float32 vectors stand in for a float or half_float field's:
 k-NN builds a half_float field's graph over fp16 values, which this does
 not time. A byte input is built as k-NN builds a byte field, over
-"HNSW16,SQ8_direct_signed", its int8 values added as floats.
+"HNSW16,SQ8_direct_signed", its int8 values added as floats, and a binary
+one as k-NN builds a binary field, "BHNSW16,Flat" from Faiss's binary
+index factory over the packed bits.
 
 In WSL, with faiss-cpu 1.15.1 (the version knn-inspect pins), after
 make_inputs.py grid has written the inputs:
@@ -30,9 +32,18 @@ def build(inputs, name, threads):
     meta = json.loads((inputs / name / "input.json").read_text())
     n, d = meta["doc_count"], meta["dimension"]
     vectors = np.fromfile(inputs / name / "vectors.knnvec", dtype=meta["blob_dtype"])
-    vectors = vectors.astype(np.float32).reshape(n, d)
     ids = np.fromfile(inputs / name / "doc_ids.knndid", dtype="<i4").astype(np.int64)
     faiss.omp_set_num_threads(threads)
+    if meta["data_type"] == "binary":
+        vectors = vectors.reshape(n, d // 8)
+        made = faiss.index_binary_factory(d, f"BHNSW{M},Flat")
+        hnsw = faiss.downcast_IndexBinary(made)
+        hnsw.hnsw.efConstruction = EF_CONSTRUCTION
+        index = faiss.IndexBinaryIDMap(hnsw)
+        start = time.perf_counter()
+        index.add_with_ids(vectors, ids)
+        return record(name, threads, time.perf_counter() - start, meta)
+    vectors = vectors.astype(np.float32).reshape(n, d)
     if meta["data_type"] == "byte":
         # Its direct quantizer needs no training. `made` owns the index;
         # the downcast only views it, so both stay referenced.
@@ -44,14 +55,17 @@ def build(inputs, name, threads):
     index = faiss.IndexIDMap(hnsw)
     start = time.perf_counter()
     index.add_with_ids(vectors, ids)
-    seconds = time.perf_counter() - start
+    return record(name, threads, time.perf_counter() - start, meta)
+
+
+def record(name, threads, seconds, meta):
     return {
         "input": name,
         "threads": threads,
         "seconds": round(seconds, 3),
         "shape": {
-            "doc_count": n,
-            "dimension": d,
+            "doc_count": meta["doc_count"],
+            "dimension": meta["dimension"],
             "data_type": meta["data_type"],
             "m": M,
             "ef_construction": EF_CONSTRUCTION,

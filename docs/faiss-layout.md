@@ -1,8 +1,8 @@
 # The index file a remote build writes
 
-What `knn-write` must reproduce exactly: the file the upstream remote-vector-index-builder uploads for a float, fp16 or byte field, written by `GpuIndexCagra::copyTo` and `write_index` in its Faiss (`0ca9df4` with rvib's `base_image/patches`). knn-inspect's `docs/format-notes.md` ("CAGRA graphs") covers how k-NN reads these files; this note covers how they are written.
+What `knn-write` must reproduce exactly: the file the upstream remote-vector-index-builder uploads for a float, fp16 or byte field, written by `GpuIndexCagra::copyTo` and `write_index` in its Faiss, and for a binary field by `GpuIndexBinaryCagra::copyTo` and `write_index_binary` (see Binary vectors) (`0ca9df4` with rvib's `base_image/patches`). knn-inspect's `docs/format-notes.md` ("CAGRA graphs") covers how k-NN reads these files; this note covers how they are written.
 
-Every statement below was checked on files the service built (`fixtures/service/`, `fixtures/byte/service/`): the field values decode as stated and the sizes add up to the file's length. The oracle (`tools/oracle/oracle.py`) rebuilds an identical copy of all 46 files of the M1 baseline, and of all 60 service builds of the byte inputs (five of each committed one, 20 of each 20,000 x 128 one), from the CAGRA graph, the input blobs and the request alone.
+Every statement below was checked on files the service built (`fixtures/service/`, `fixtures/byte/service/`, `fixtures/binary/service/`): the field values decode as stated and the sizes add up to the file's length. The oracle (`tools/oracle/oracle.py`) rebuilds an identical copy of all 46 files of the M1 baseline, of all 60 service builds of the byte inputs (five of each committed one, 20 of each 20,000 x 128 one), and of all 70 of the binary inputs (five of each committed one, 20 of each 20,000-vector one), from the CAGRA graph, the input blobs and the request alone.
 
 ## Layout
 
@@ -55,6 +55,25 @@ M is half the CAGRA graph degree (`copyTo`: `M = graph_degree / 2`), so level 0 
 For an fp16 field built from an fp32 blob (a float field with the fp16 quantizer), the codes are the service's conversion on download: numpy `astype(float16)`, round to nearest even.
 
 For n = 1,000 at degree 64 (M = 32), with 864 empty upper-level slots: 37 + 47 + 56 + 36 + 4,008 + 8,016 + (8 + 4 x 64,864) + 20 + (4 + 33 + 8 + 256,000) + 8,008 = 535,737 bytes, the size of `fixtures/service/l2-1000x64.faiss`.
+
+## Binary vectors
+
+A binary field's file has the same HNSW block between other headers and storage. A binary header (`write_index_binary_header`) is `d` (i32, in bits), `code_size` (i32, d / 8), `ntotal` (i64), `is_trained` (u8) and `metric_type` (i32): 21 bytes, with no dummies and no `metric_arg`. `metric_type` is 1 in all three, `METRIC_L2`, the default a binary index keeps whatever its distance.
+
+| Part | Field | Type | Value |
+| --- | --- | --- | --- |
+| ID map | fourcc, header | 4 bytes, binary | `IBMp`; `is_trained` **0** |
+| graph | fourcc, header | 4 bytes, binary | `IBHc`; `is_trained` 1 |
+| | `keep_max_size_level0` | u8 | **0**: `copyTo` sets it false when done |
+| | `base_level_only` | u8 | 1 |
+| | `num_base_level_search_entrypoints` | i32 | 32; no numeric type follows |
+| HNSW | as above | | M is half the graph's degree, truncated |
+| storage | fourcc, header | 4 bytes, binary | `IBxF`; `is_trained` 1 |
+| | `xb` | vector of u8, n x d / 8 | the packed bits, row-major, in input order |
+| storage, `skip_stored_vectors` | fourcc | 4 bytes | `null`: rvib's patch 0001 passes the flag through `write_index_binary` too. k-NN never sets it for a binary field, and its loader takes a binary CAGRA graph only over its vectors |
+| ID map | `id_map` | vector of i64, n entries | the doc ids, widened from i32, in input order |
+
+cuVS can return an odd degree for a binary build, lowered to one less than the vector count (39 for 40 vectors at m 16). `copyTo` then takes M = 19 and fills level 0's 38 slots with the first 38 of each node's 39 neighbors.
 
 ## Levels
 

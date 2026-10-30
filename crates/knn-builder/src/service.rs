@@ -716,7 +716,7 @@ fn estimate(request: &BuildRequest) -> (f64, f64) {
     let size: u8 = match request.data_type {
         DataType::Float => 4,
         DataType::HalfFloat => 2,
-        DataType::Byte => 1,
+        DataType::Byte | DataType::Binary => 1,
     };
     let (dimension, doc_count) = (request.dimension, request.doc_count);
     // dimension * size + m * EDGE_SIZE: within i128 for any u64 and i64.
@@ -809,6 +809,7 @@ mod tests {
             "float" => DataType::Float,
             "half_float" => DataType::HalfFloat,
             "byte" => DataType::Byte,
+            "binary" => DataType::Binary,
             other => panic!("data type {other}"),
         }
     }

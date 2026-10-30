@@ -1,0 +1,534 @@
+{
+  "knn_inspect": "knn-inspect 0.17.0",
+  "recall": {
+    "seed": 1,
+    "k": 10,
+    "queries": "the input's queries.f32, or queries.u8 for binary"
+  },
+  "inputs": {
+    "hamming-1000x1024-binary-clustered": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 1024,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4002,
+        "distribution": "20 centers of uniform bits, each bit flipped with probability 0.1",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407697,
+          "seconds": {
+            "build": 0.315,
+            "write": 0.014
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407697,
+          "seconds": {
+            "build": 0.544,
+            "write": 0.01
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407697,
+          "seconds": {
+            "build": 0.273,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407697,
+          "seconds": {
+            "build": 0.256,
+            "write": 0.008
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 407697,
+          "seconds": {
+            "build": 0.367,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.256,
+        "max": 0.544,
+        "mean": 0.351
+      }
+    },
+    "hamming-1000x256-binary": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4000,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.223,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.285,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.263,
+            "write": 0.01
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.48,
+            "write": 0.007
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.251,
+            "write": 0.012
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.223,
+        "max": 0.48,
+        "mean": 0.3004
+      }
+    },
+    "hamming-1000x256-binary-clustered": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4001,
+        "distribution": "20 centers of uniform bits, each bit flipped with probability 0.1",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.255,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.427,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.273,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.461,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 311697,
+          "seconds": {
+            "build": 0.343,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.255,
+        "max": 0.461,
+        "mean": 0.3518
+      }
+    },
+    "hamming-1000x256-binary-skip": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": true,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4003,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279668,
+          "seconds": {
+            "build": 0.266,
+            "write": 0.013
+          },
+          "out_of_range": 0,
+          "verify": "failed"
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279668,
+          "seconds": {
+            "build": 0.277,
+            "write": 0.01
+          },
+          "out_of_range": 0,
+          "verify": "failed"
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279668,
+          "seconds": {
+            "build": 0.226,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "failed"
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279668,
+          "seconds": {
+            "build": 0.257,
+            "write": 0.011
+          },
+          "out_of_range": 0,
+          "verify": "failed"
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 279668,
+          "seconds": {
+            "build": 0.499,
+            "write": 0.01
+          },
+          "out_of_range": 0,
+          "verify": "failed"
+        }
+      ],
+      "build_seconds": {
+        "min": 0.226,
+        "max": 0.499,
+        "mean": 0.305
+      }
+    },
+    "hamming-150x256-binary": {
+      "input": {
+        "doc_count": 150,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4004,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 46953,
+          "seconds": {
+            "build": 0.69,
+            "write": 0.006
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 46953,
+          "seconds": {
+            "build": 0.292,
+            "write": 0.007
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 46953,
+          "seconds": {
+            "build": 0.227,
+            "write": 0.008
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 46953,
+          "seconds": {
+            "build": 0.297,
+            "write": 0.007
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 46953,
+          "seconds": {
+            "build": 0.567,
+            "write": 0.008
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.227,
+        "max": 0.69,
+        "mean": 0.4146
+      }
+    },
+    "hamming-40x256-binary": {
+      "input": {
+        "doc_count": 40,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4005,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8729,
+          "seconds": {
+            "build": 0.059,
+            "write": 0.009
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8729,
+          "seconds": {
+            "build": 0.01,
+            "write": 0.006
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8729,
+          "seconds": {
+            "build": 0.012,
+            "write": 0.006
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8729,
+          "seconds": {
+            "build": 0.068,
+            "write": 0.01
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8729,
+          "seconds": {
+            "build": 0.065,
+            "write": 0.006
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.01,
+        "max": 0.068,
+        "mean": 0.0428
+      }
+    }
+  }
+}

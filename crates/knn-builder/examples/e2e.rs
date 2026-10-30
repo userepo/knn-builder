@@ -47,7 +47,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use knn_builder::{BuildError, Builder, DataType, Job, Pipeline, SpaceType, Vectors};
+use knn_builder::{BuildError, Builder, DataType, GraphParams, Job, Pipeline, SpaceType, Vectors};
 use knn_gpu::{Gpu, Reservation, device_memory};
 use knn_store::{Cancel, Settings, Store, Transfers};
 use serde_json::{Value, json};
@@ -117,11 +117,13 @@ fn job(bucket: &str, name: &str, meta: &Value, m: Option<u32>) -> Job {
             "float" => DataType::Float,
             "half_float" => DataType::HalfFloat,
             "byte" => DataType::Byte,
+            "binary" => DataType::Binary,
             other => panic!("data_type {other}"),
         },
         space_type: match meta["space_type"].as_str().unwrap() {
             "l2" => SpaceType::L2,
             "innerproduct" => SpaceType::InnerProduct,
+            "hamming" => SpaceType::Hamming,
             other => panic!("space_type {other}"),
         },
         m: m.unwrap_or_else(|| u32::try_from(number("m")).unwrap()),
@@ -155,8 +157,8 @@ impl Builder for Unchecked {
         &mut self,
         vectors: &Vectors,
         dimension: usize,
-        params: &knn_gpu::BuildParams,
-    ) -> Result<Vec<u32>, BuildError> {
+        params: &GraphParams,
+    ) -> Result<(Vec<u32>, usize), BuildError> {
         Builder::build(&mut self.0, vectors, dimension, params)
     }
 }

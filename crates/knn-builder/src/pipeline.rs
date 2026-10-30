@@ -22,7 +22,6 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use knn_gpu::BuildParams;
 use knn_store::{Cancel, Store};
 use tokio::runtime::Handle;
 use tokio::sync::{OwnedSemaphorePermit, Semaphore, mpsc, oneshot};
@@ -641,17 +640,10 @@ fn build<B: Builder>(builder: &mut B, job: &Loaded) -> Result<(Vec<u32>, usize),
             });
         }
     }
-    let params = BuildParams::new(
-        request.doc_count,
-        request.dimension,
-        request.m,
-        request.space_type.build_metric(),
-    )
-    .map_err(JobError::Params)?;
-    let graph = builder
+    let params = request.graph_params().map_err(JobError::Params)?;
+    builder
         .build(&job.dataset.vectors, request.dimension as usize, &params)
-        .map_err(|e| JobError::Build(e.to_string()))?;
-    Ok((graph, params.graph_degree as usize))
+        .map_err(|e| JobError::Build(e.to_string()))
 }
 
 /// The upload stage.

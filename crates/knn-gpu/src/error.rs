@@ -14,6 +14,13 @@ pub enum Error {
         /// The requested m.
         m: u32,
     },
+    /// A binary dimension that is not whole bytes: Faiss packs 8 bits to a
+    /// byte and refuses any other count.
+    #[error("a binary dimension of {dimension} bits is not a multiple of 8")]
+    Bits {
+        /// The dimension, in bits.
+        dimension: usize,
+    },
     /// Vector values that are not whole rows of the dimension, or none.
     #[error("{values} vector values do not make rows of dimension {dimension}")]
     Vectors {
@@ -26,9 +33,10 @@ pub enum Error {
     #[error("{call} failed: {message}")]
     Cuvs {
         /// The step: `raft::resources`, `make_device_padded_dataset`,
-        /// `cagra::build` or `raft::copy`; `knn_cagra_build` for arguments
-        /// the shim refused, `the cuVS shim` for a status it did not
-        /// document; `cudaMemGetInfo`, `cudaMalloc`, `cudaGetDevice` or
+        /// `cagra::build` or `raft::copy`; `knn_cagra_build` or
+        /// `knn_cagra_build_binary` for arguments the shim refused,
+        /// `the cuVS shim` for a status it did not document;
+        /// `cudaMemGetInfo`, `cudaMalloc`, `cudaGetDevice` or
         /// `cudaDeviceGetAttribute` for the CUDA runtime's calls.
         call: &'static str,
         /// Its message.

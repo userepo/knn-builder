@@ -24,7 +24,22 @@ Computed from the request's `doc_count`, `dimension` and `m` (`index_builder/fai
 
 Example: 150 vectors with m = 16 give `n_lists` 12, 62 candidates, a maximum degree of 31 and an effective m of 7, so degree 28; the service logs "Using m=7 instead of m=16". 1,000 vectors keep m = 16 (degree 64).
 
-Binary vectors take another path, an NN-descent build with no IVF-PQ settings (`faiss_index_build_service.py:117-124`), which this page does not cover yet.
+Binary vectors take another path, below.
+
+## Binary vectors
+
+A `binary` request builds through Faiss's `GpuIndexBinaryCagra` (rvib `faiss_gpu_index_cagra_builder.py:189-207`) and its `BinaryCuvsCagra` (Faiss `impl/BinaryCuvsCagra.cu`, with rvib's patch 0003): an NN-descent graph in Hamming distance over the packed bits, d / 8 bytes a vector. None of the IVF-PQ settings above apply, and neither does the refinement rate.
+
+| Parameter | Value | Source |
+| --- | --- | --- |
+| `graph_degree`, `intermediate_graph_degree` | the requested m x 4, both: no effective m | rvib `faiss_index_build_service.py:117-124` |
+| graph build algorithm | NN-descent, `nn_descent_params(intermediate_graph_degree)` | Faiss `BinaryCuvsCagra.cu:154-161` |
+| NN-descent `max_iterations` | 20, Faiss's `nn_descent_niter` default, which rvib leaves | Faiss `GpuIndexCagra.h:184` |
+| metric | `BitwiseHamming`, for the CAGRA build and for NN-descent; the request's `space_type` is not read | Faiss `BinaryCuvsCagra.cu:65, 160` |
+| `attach_dataset_on_build` | cuVS's default: patch 0003 drops Faiss's assignment | rvib `base_image/patches/0003` |
+| dataset | the host bits copied to a padded device dataset, built on through its view, as for float | Faiss `BinaryCuvsCagra.cu:180-188` with patch 0003 |
+
+Every other `cagra::index_params` field keeps libcuvs 26.08.01's default. cuVS lowers both degrees where the vectors are too few, to their count less one: at m 16, a build of 40 vectors has degree 39, logged as warnings. `knn-gpu` builds through the shim's `knn_cagra_build_binary`, which reports the degree cuVS built.
 
 ## Fixed
 

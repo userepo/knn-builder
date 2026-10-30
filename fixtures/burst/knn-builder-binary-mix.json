@@ -1,0 +1,238 @@
+{
+ "label": "knn-builder-binary-mix",
+ "service": "http://service:1025",
+ "jobs": 24,
+ "inputs": [
+  "hamming-1000000x1024-binary-clustered",
+  "hamming-500000x256-binary-clustered",
+  "l2-500000x384",
+  "l2-100000x768"
+ ],
+ "timeout_seconds": 90.0,
+ "poll_seconds": 5.0,
+ "seed": 1,
+ "outcomes": {
+  "refused": 14,
+  "built": 6,
+  "failed": 4
+ },
+ "to_cpu": 18,
+ "cpu_wait_seconds": 238.3,
+ "built_seen_after_max": 80.3,
+ "records": [
+  {
+   "index": 0,
+   "input": "hamming-1000000x1024-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 441a470650b23b9fa039abf482e393cc20796cd73b078b42c31db7b3398a88c5 with vector path hamming-1000000x1024-binary-clustered/vectors.knnvec would be seen ended in about 103 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.043856987002072856
+  },
+  {
+   "index": 1,
+   "input": "hamming-500000x256-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 62c9d3640bed34fe45ed1d5bfba3b88c8b1332f6f69c85211abb876dea146b06 with vector path hamming-500000x256-binary-clustered/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.05066092099878006
+  },
+  {
+   "index": 2,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 83951e3b0249e4912bb8153a7362703acb8c6be8918550eb3de74d6fcc6afcc9 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04952236299868673
+  },
+  {
+   "index": 3,
+   "input": "l2-100000x768",
+   "post_seconds": 0.047498563973931596,
+   "outcome": "built",
+   "seen_after": 74.95319469898823
+  },
+  {
+   "index": 4,
+   "input": "hamming-1000000x1024-binary-clustered",
+   "post_seconds": 0.04184026797884144,
+   "outcome": "built",
+   "seen_after": 60.301667635998456
+  },
+  {
+   "index": 5,
+   "input": "hamming-500000x256-binary-clustered",
+   "post_seconds": 0.046498173993313685,
+   "outcome": "built",
+   "seen_after": 80.30210501499823
+  },
+  {
+   "index": 6,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 8429b64da85d27aa2e84336de073e841d2276cb51dced577d2fc491a275a4128 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.051228650991106406
+  },
+  {
+   "index": 7,
+   "input": "l2-100000x768",
+   "post_seconds": 0.04591464198892936,
+   "outcome": "built",
+   "seen_after": 78.5493735979835
+  },
+  {
+   "index": 8,
+   "input": "hamming-1000000x1024-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 3ac5f9cf9d947b7e917d8cf759657770320b0b2c5ae3443200e72fccc0e00d37 with vector path hamming-1000000x1024-binary-clustered/vectors.knnvec would be seen ended in about 103 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04571941998437978
+  },
+  {
+   "index": 9,
+   "input": "hamming-500000x256-binary-clustered",
+   "post_seconds": 0.04550353897502646,
+   "outcome": "built",
+   "seen_after": 71.39385251799831
+  },
+  {
+   "index": 10,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 585249499b0664fb7b512c0782657831ea1e653834f56b22647d89d5d4a8c7a1 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050942685978952795
+  },
+  {
+   "index": 11,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job eaa9ce271b6850301a3b8dc69f20819e3ead2aa4de44eca1e9a4576567bd548f with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.051184479001676664
+  },
+  {
+   "index": 12,
+   "input": "hamming-1000000x1024-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 5549b9dfb82e5ee2e9b61d3844884b605d482eadf3a5aab995246432dd5599e4 with vector path hamming-1000000x1024-binary-clustered/vectors.knnvec would be seen ended in about 125 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04882802299107425
+  },
+  {
+   "index": 13,
+   "input": "hamming-500000x256-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 7766443383042fc1c2ba6e169b13e4871be5a04513c29c00625fbfeb23a99298 with vector path hamming-500000x256-binary-clustered/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.048750444984762
+  },
+  {
+   "index": 14,
+   "input": "l2-500000x384",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 0bae8fae78bdb4495d3d91dc4884ee3b99d1f15203772139fee184bee1a538e6 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.049987076985416934
+  },
+  {
+   "index": 15,
+   "input": "l2-100000x768",
+   "post_seconds": 0.04856009699869901,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 57.90353431197582
+  },
+  {
+   "index": 16,
+   "input": "hamming-1000000x1024-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 6410b9c99b869bff9db00a8c0577807065fe13f083623974ee2aa4a9a90adf84 with vector path hamming-1000000x1024-binary-clustered/vectors.knnvec would be seen ended in about 133 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.04964168497826904
+  },
+  {
+   "index": 17,
+   "input": "hamming-500000x256-binary-clustered",
+   "post_seconds": 0.044252714986214414,
+   "outcome": "built",
+   "seen_after": 67.12422508298187
+  },
+  {
+   "index": 18,
+   "input": "l2-500000x384",
+   "post_seconds": 0.048072684003273025,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 61.009569725982146
+  },
+  {
+   "index": 19,
+   "input": "l2-100000x768",
+   "post_seconds": 0.048727549001341686,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 59.904990605980856
+  },
+  {
+   "index": 20,
+   "input": "hamming-1000000x1024-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 70a4e5f102248a5c49c905563b52cddc86506381a72fd6992baf8aca09e73f20 with vector path hamming-1000000x1024-binary-clustered/vectors.knnvec would be seen ended in about 103 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.0455019130022265
+  },
+  {
+   "index": 21,
+   "input": "hamming-500000x256-binary-clustered",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job c968afb53cc8f55c399a01aeea628ce94063870a5895ff106cfdfb7587ba6f37 with vector path hamming-500000x256-binary-clustered/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.050163262989372015
+  },
+  {
+   "index": 22,
+   "input": "l2-500000x384",
+   "post_seconds": 0.046735405980143696,
+   "outcome": "failed",
+   "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+   "cpu_after": 58.75421079900116
+  },
+  {
+   "index": 23,
+   "input": "l2-100000x768",
+   "outcome": "refused",
+   "status": 507,
+   "detail": {
+    "detail": "Job 21bf9e415e607dbddd5a8e5cb01437499f7e105d8745c8f082ba1ba3344f8d2d with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s"
+   },
+   "cpu_after": 0.05127455899491906
+  }
+ ]
+}

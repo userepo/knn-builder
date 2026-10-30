@@ -1,0 +1,123 @@
+{
+ "failed_builds": [],
+ "build_seconds": {
+  "terms": {
+   "n d": 4.4841684196301954e-08,
+   "n g": 1.7818066055479995e-08,
+   "n g^2": 3.2536174297985036e-11,
+   "n g^2 d": 9.243215069359727e-14
+  },
+  "train": {
+   "points": 22,
+   "median_abs": 0.1014,
+   "max_abs": 0.2067,
+   "most_under": -0.1637
+  },
+  "held_out": {
+   "points": 8,
+   "median_abs": 0.0432,
+   "max_abs": 0.0992,
+   "most_under": -0.0992
+  }
+ },
+ "file_bytes": {
+  "terms": {
+   "1": 6901.013298726097,
+   "n d / 8": 1.000002637373886,
+   "n g": 3.998690043805443,
+   "n": 24.212232411297077
+  },
+  "train": {
+   "points": 22,
+   "median_abs": 0.0,
+   "max_abs": 0.0,
+   "most_under": -0.0
+  },
+  "held_out": {
+   "points": 8,
+   "median_abs": 0.0,
+   "max_abs": 0.0001,
+   "most_under": -0.0
+  }
+ },
+ "device_peak_bytes": {
+  "model": "n d / 8 + max(n d / 8 + 4 n g + NN-descent phase, 4 n g + graph phase)",
+  "nn_descent_phase": {
+   "1": 5701632.0
+  },
+  "graph_phase": {
+   "1": 5741063.172462075,
+   "n g": 0.0016859524715302499,
+   "min(n, rows) g": 4.139523539509295
+  },
+  "rows": 520000,
+  "rows_within_1_percent": [
+   520000,
+   520000
+  ],
+  "train": {
+   "points": 22,
+   "median_abs": 0.0043,
+   "max_abs": 0.018,
+   "most_under": -0.0118
+  },
+  "held_out": {
+   "points": 8,
+   "median_abs": 0.0072,
+   "max_abs": 0.0248,
+   "most_under": 0.0027
+  }
+ },
+ "download_seconds": {
+  "float_model": {
+   "points": 30,
+   "median_abs": 0.0574,
+   "max_abs": 0.3471,
+   "most_under": -0.2125
+  }
+ },
+ "upload_seconds": {
+  "float_model": {
+   "points": 30,
+   "median_abs": 0.0583,
+   "max_abs": 0.384,
+   "most_under": -0.384
+  }
+ },
+ "cpu_seconds_1_threads": {
+  "terms": {
+   "n log2(n)": 2.5621403254416333e-06,
+   "n log2(n) d": 3.3259213988006543e-09
+  },
+  "train": {
+   "points": 5,
+   "median_abs": 0.0831,
+   "max_abs": 0.1756,
+   "most_under": -0.1756
+  },
+  "held_out": {
+   "points": 1,
+   "median_abs": 0.1989,
+   "max_abs": 0.1989,
+   "most_under": -0.1989
+  }
+ },
+ "cpu_seconds_4_threads": {
+  "terms": {
+   "n log2(n)": 7.079431515444463e-07,
+   "n log2(n) d": 8.526998939344604e-10
+  },
+  "train": {
+   "points": 5,
+   "median_abs": 0.0801,
+   "max_abs": 0.1728,
+   "most_under": -0.1728
+  },
+  "held_out": {
+   "points": 3,
+   "median_abs": 0.2347,
+   "max_abs": 0.3513,
+   "most_under": -0.3513
+  }
+ }
+}

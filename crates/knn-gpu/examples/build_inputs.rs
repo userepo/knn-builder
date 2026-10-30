@@ -19,7 +19,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use knn_gpu::{BuildParams, Gpu, HostVectors, Metric, fp16};
+use knn_gpu::{BinaryParams, BuildParams, Gpu, Graph, HostVectors, Metric, fp16};
 use knn_write::{IndexFile, IndexSpec, Vectors};
 use serde_json::{Value, json};
 
@@ -29,6 +29,8 @@ struct Input {
     f32s: Vec<f32>,
     f16s: Vec<u16>,
     i8s: Vec<i8>,
+    /// A binary input's packed bits.
+    bits: Vec<u8>,
     ids: Vec<i32>,
 }
 
@@ -37,7 +39,8 @@ impl Input {
         let meta: Value =
             serde_json::from_slice(&fs::read(dir.join("input.json")).unwrap()).unwrap();
         let blob = fs::read(dir.join("vectors.knnvec")).unwrap();
-        let (mut f32s, mut f16s, mut i8s) = (Vec::new(), Vec::new(), Vec::new());
+        let (mut f32s, mut f16s, mut i8s, mut bits) =
+            (Vec::new(), Vec::new(), Vec::new(), Vec::new());
         match (
             meta["data_type"].as_str().unwrap(),
             meta["blob_dtype"].as_str().unwrap(),
@@ -51,6 +54,7 @@ impl Input {
                 fp16::convert(&values, &mut f16s);
             }
             ("byte", "<i1") => i8s = blob.iter().map(|&b| b.cast_signed()).collect(),
+            ("binary", "<u1") => bits = blob,
             other => panic!("unsupported input {other:?}"),
         }
         Self {
@@ -63,10 +67,12 @@ impl Input {
             f32s,
             f16s,
             i8s,
+            bits,
         }
     }
 
-    /// The vectors as the build takes them, and as the writer stores them.
+    /// A float, fp16 or byte input's vectors as the build takes them, and
+    /// as the writer stores them.
     fn vectors(&self) -> (HostVectors<'_>, Vectors<'_>) {
         if !self.i8s.is_empty() {
             (HostVectors::I8(&self.i8s), Vectors::I8(&self.i8s))
@@ -88,24 +94,49 @@ fn le<const N: usize, T>(bytes: &[u8], from: fn([u8; N]) -> T) -> Vec<T> {
     chunks.iter().copied().map(from).collect()
 }
 
-fn build(gpu: &mut Gpu, input: &Input, out: &Path, run: usize) -> Value {
-    let dimension = input.number("dimension");
-    let metric = match input.meta["space_type"].as_str().unwrap() {
-        "l2" => Metric::L2,
-        "innerproduct" => Metric::InnerProduct,
+/// The input's graph, the metric its file records, and its vectors as the
+/// file stores them.
+fn build_graph<'a>(
+    gpu: &mut Gpu,
+    input: &'a Input,
+) -> (
+    Result<Graph, knn_gpu::Error>,
+    knn_write::Metric,
+    Vectors<'a>,
+) {
+    let (doc_count, dimension, m) = (
+        input.number("doc_count"),
+        input.number("dimension"),
+        input.number("m"),
+    );
+    if !input.bits.is_empty() {
+        let params = BinaryParams::new(doc_count, dimension, m).unwrap();
+        let graph = gpu.build_binary(&input.bits, dimension as usize, &params);
+        return (
+            graph,
+            knn_write::Metric::Hamming,
+            Vectors::Bits(&input.bits),
+        );
+    }
+    let (metric, file_metric) = match input.meta["space_type"].as_str().unwrap() {
+        "l2" => (Metric::L2, knn_write::Metric::L2),
+        "innerproduct" => (Metric::InnerProduct, knn_write::Metric::InnerProduct),
         other => panic!("space type {other}"),
     };
-    let params = BuildParams::new(
-        input.number("doc_count"),
-        dimension,
-        input.number("m"),
-        metric,
-    )
-    .unwrap();
+    let params = BuildParams::new(doc_count, dimension, m, metric).unwrap();
     let (host, vectors) = input.vectors();
+    (
+        gpu.build(host, dimension as usize, &params),
+        file_metric,
+        vectors,
+    )
+}
 
+fn build(gpu: &mut Gpu, input: &Input, out: &Path, run: usize) -> Value {
+    let dimension = input.number("dimension");
     let started = Instant::now();
-    let graph = match gpu.build(host, dimension as usize, &params) {
+    let (graph, metric, vectors) = build_graph(gpu, input);
+    let graph = match graph {
         Ok(graph) => graph,
         Err(error) => {
             return json!({"input": input.name, "run": run, "task_status": "FAILED_INDEX_BUILD",
@@ -117,10 +148,7 @@ fn build(gpu: &mut Gpu, input: &Input, out: &Path, run: usize) -> Value {
     let started = Instant::now();
     let file = IndexFile::new(IndexSpec {
         dimension: dimension as usize,
-        metric: match metric {
-            Metric::L2 => knn_write::Metric::L2,
-            Metric::InnerProduct => knn_write::Metric::InnerProduct,
-        },
+        metric,
         graph: graph.neighbors(),
         graph_degree: graph.degree(),
         vectors,

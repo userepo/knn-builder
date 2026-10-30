@@ -1697,6 +1697,246 @@
    ]
   },
   {
+   "dimension": 1024,
+   "doc_count": 13966478,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8849160460.800001,
+   "cpu": 31999994393.600002,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 13966479,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8849161094.4,
+   "cpu": 31999996684.8,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 13966480,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8849161728.0,
+   "cpu": 31999998976.0,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 13966481,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8849162361.6,
+   "cpu": 32000001267.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 13966482,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8849162995.2,
+   "cpu": 32000003558.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 27932958,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 17698322188.8,
+   "cpu": 63999993369.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 27932959,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 17698322822.4,
+   "cpu": 63999995660.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 27932960,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 17698323456.0,
+   "cpu": 63999997952.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 27932961,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 17698324089.600002,
+   "cpu": 64000000243.200005,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 27932962,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 17698324723.2,
+   "cpu": 64000002534.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 37878785,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 23999998176.0,
+   "cpu": 86787872192.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 37878786,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 23999998809.600002,
+   "cpu": 86787874483.20001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 37878787,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 23999999443.2,
+   "cpu": 86787876774.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 37878788,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 24000000076.8,
+   "cpu": 86787879065.6,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 37878789,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 24000000710.4,
+   "cpu": 86787881356.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 12626260,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 7999998336.0,
+   "cpu": 28929286912.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 12626261,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 7999998969.6,
+   "cpu": 28929289203.2,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 12626262,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 7999999603.200001,
+   "cpu": 28929291494.4,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 12626263,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8000000236.8,
+   "cpu": 28929293785.6,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 12626264,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 8000000870.400001,
+   "cpu": 28929296076.800003,
+   "fits": [
+    true,
+    false
+   ]
+  },
+  {
    "dimension": 6,
    "doc_count": 50,
    "data_type": "float",
@@ -6041,6 +6281,486 @@
    ]
   },
   {
+   "dimension": 256,
+   "doc_count": 1039127508,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 219463729689.6,
+   "cpu": 704944101427.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 2393600.0000000005,
+   "cpu": 8883200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 633600.0,
+   "cpu": 2291200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 11264.0,
+   "cpu": 43008.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 2288000.0,
+   "cpu": 4640000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 784514986,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 441838840115.2,
+   "cpu": 1687021025894.4,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 11616.000000000002,
+   "cpu": 43712.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 684305819,
+   "data_type": "binary",
+   "m": -1,
+   "gpu": 382390091657.2001,
+   "cpu": 1465509341970.4001,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1424007240,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 3208003510272.0005,
+   "cpu": 12248740675584.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1603893798,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 903312987033.6001,
+   "cpu": 3449013223219.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 145200000.00000003,
+   "cpu": 298400000.00000006,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 22.0,
+   "cpu": 84.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 14080.0,
+   "cpu": 33280.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 176000.0,
+   "cpu": 416000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 74800.00000000001,
+   "cpu": 157600.00000000003,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 105600.00000000001,
+   "cpu": 275200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": -1,
+   "gpu": 0.0,
+   "cpu": 8000000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 2323200.0000000005,
+   "cpu": 8742400.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 256,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 281600.0,
+   "cpu": 819200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 2816000.0,
+   "cpu": 6656000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": -1,
+   "gpu": 11242.0,
+   "cpu": 42964.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 105600000.00000001,
+   "cpu": 275200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 374.00000000000006,
+   "cpu": 788.0000000000001,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 4400.0,
+   "cpu": 16800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 35200000.0,
+   "cpu": 134400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 2288000.0,
+   "cpu": 4640000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 256,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 281600000.0,
+   "cpu": 819200000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 3016753011,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 8495176478976.0,
+   "cpu": 20079508041216.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 22.0,
+   "cpu": 84.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 3259667334,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 14686757140070.4,
+   "cpu": 42725111680204.8,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 11968.000000000002,
+   "cpu": 44416.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 2323200000.0000005,
+   "cpu": 8742400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1122735681,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 2529298942156.8003,
+   "cpu": 9657323233689.602,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 14080.0,
+   "cpu": 33280.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 4096,
+   "doc_count": 1000,
+   "data_type": "binary",
+   "m": -1,
+   "gpu": 2248400.0,
+   "cpu": 8592800.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 512,
+   "gpu": 11440.0,
+   "cpu": 23200.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 256,
+   "doc_count": 1000000,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 211200000.00000003,
+   "cpu": 678400000.0,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
+   "dimension": 256,
+   "doc_count": 2973646315,
+   "data_type": "binary",
+   "m": 0,
+   "gpu": 418689401152.00006,
+   "cpu": 1598632258944.0,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 64,
+   "doc_count": 1478868866,
+   "data_type": "binary",
+   "m": 16,
+   "gpu": 156168552249.6,
+   "cpu": 406984711923.2,
+   "fits": [
+    false,
+    false
+   ]
+  },
+  {
+   "dimension": 8,
+   "doc_count": 5,
+   "data_type": "binary",
+   "m": 32,
+   "gpu": 726.0000000000001,
+   "cpu": 1492.0000000000002,
+   "fits": [
+    true,
+    true
+   ]
+  },
+  {
    "dimension": 4294967296,
    "doc_count": 4294967296,
    "data_type": "float",
@@ -6279,6 +6999,39 @@
    "limits": {
     "gpu": 15296793.600000001,
     "cpu": 51452851.199999996
+   },
+   "fits": false
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 54321,
+   "data_type": "binary",
+   "m": 16,
+   "limits": {
+    "gpu": 34417785.6,
+    "cpu": 124460275.2
+   },
+   "fits": true
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 54321,
+   "data_type": "binary",
+   "m": 16,
+   "limits": {
+    "gpu": 34417785.599999994,
+    "cpu": 124460275.2
+   },
+   "fits": false
+  },
+  {
+   "dimension": 1024,
+   "doc_count": 54321,
+   "data_type": "binary",
+   "m": 16,
+   "limits": {
+    "gpu": 34417785.6,
+    "cpu": 124460275.19999999
    },
    "fits": false
   }

@@ -84,6 +84,51 @@ impl BuildParams {
     }
 }
 
+/// What a binary build asks of cuVS: an NN-descent graph in Hamming
+/// distance (`GpuIndexBinaryCagra`), of the requested m x 4 neighbors,
+/// which the service, unlike for float vectors, does not lower. cuVS lowers
+/// it itself where the vectors are too few, so the graph a build returns
+/// can be narrower.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BinaryParams {
+    /// The graph degree and the intermediate graph degree, equal: m x 4,
+    /// saturating at `u32::MAX`, which cuVS lowers to the vector count less
+    /// one as it lowers any degree past that.
+    pub graph_degree: u32,
+}
+
+impl BinaryParams {
+    /// NN-descent's iterations: Faiss's `GpuIndexCagraConfig::nn_descent_niter`
+    /// default, which the service leaves.
+    pub const NN_DESCENT_NITER: u32 = 20;
+
+    /// The parameters for `doc_count` vectors of `dimension` bits and a
+    /// request for `m`, as `FaissIndexBuildService.build_index` sets them
+    /// for binary vectors.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Request`] for a count, dimension or m of 0, and
+    /// [`Error::Bits`] for a dimension that is not a multiple of 8.
+    pub fn new(doc_count: u32, dimension: u32, m: u32) -> Result<Self, Error> {
+        if doc_count == 0 || dimension == 0 || m == 0 {
+            return Err(Error::Request {
+                doc_count,
+                dimension,
+                m,
+            });
+        }
+        if !dimension.is_multiple_of(8) {
+            return Err(Error::Bits {
+                dimension: usize::try_from(dimension).unwrap_or(usize::MAX),
+            });
+        }
+        Ok(Self {
+            graph_degree: m.saturating_mul(BuildParams::GRAPH_DEGREE_PER_M),
+        })
+    }
+}
+
 /// `calculate_effective_m`: m lowered until the graph degree fits half the
 /// candidates an IVF-PQ search of `N_PROBES` lists sees, and the vector
 /// count less one; at least 1.
@@ -99,8 +144,33 @@ fn effective_m(m: u32, doc_count: u32, n_lists: u32) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use super::{BuildParams, Metric};
+    use super::{BinaryParams, BuildParams, Metric};
     use crate::Error;
+
+    #[test]
+    fn keeps_m_for_binary_vectors() {
+        // Where the float rule lowers m (docs/params.md), binary keeps it.
+        assert_eq!(BinaryParams::new(150, 256, 16).unwrap().graph_degree, 64);
+        assert_eq!(BinaryParams::new(40, 256, 16).unwrap().graph_degree, 64);
+        assert_eq!(
+            BinaryParams::new(1000, 8, u32::MAX).unwrap().graph_degree,
+            u32::MAX
+        );
+    }
+
+    #[test]
+    fn refuses_bits_that_are_not_whole_bytes() {
+        assert_eq!(
+            BinaryParams::new(10, 12, 16),
+            Err(Error::Bits { dimension: 12 })
+        );
+        assert!(matches!(
+            BinaryParams::new(10, 0, 16),
+            Err(Error::Request { .. })
+        ));
+        assert!(BinaryParams::new(0, 8, 16).is_err());
+        assert!(BinaryParams::new(10, 8, 0).is_err());
+    }
 
     #[test]
     fn lowers_m_for_a_small_count() {

@@ -14,11 +14,9 @@
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
-use knn_gpu::BuildParams;
-
 use crate::cost::{Fitted, Stages};
 use crate::pipeline::Budget;
-use crate::{DataType, InFlight, Job, SpaceType, Stage, Timings};
+use crate::{DataType, GraphParams, InFlight, Job, SpaceType, Stage, Timings};
 
 /// How long a job's stages take, before what completed jobs teach.
 pub trait StageModel {
@@ -80,17 +78,22 @@ struct Configuration {
 
 impl Configuration {
     fn of(job: &Job) -> Self {
-        let params = BuildParams::new(
-            job.doc_count,
-            job.dimension,
-            job.m,
-            job.space_type.build_metric(),
-        )
-        .ok();
+        let pq_dim = match job.graph_params() {
+            Ok(GraphParams::IvfPq(params)) => params.pq_dim,
+            Ok(GraphParams::Binary(_)) | Err(_) => 0,
+        };
+        // The space the kernels run in: a binary build is in Hamming
+        // distance whatever the request says, and any other build under
+        // hamming runs as under l2, so those requests share a key.
+        let space_type = match (job.data_type, job.space_type) {
+            (DataType::Binary, _) => SpaceType::Hamming,
+            (_, SpaceType::Hamming) => SpaceType::L2,
+            (_, space_type) => space_type,
+        };
         Self {
-            pq_dim: params.map_or(0, |p| p.pq_dim),
-            degree: params.map_or(0, |p| p.graph_degree),
-            space_type: job.space_type,
+            pq_dim,
+            degree: job.graph_degree().unwrap_or(0),
+            space_type,
             data_type: job.data_type,
         }
     }

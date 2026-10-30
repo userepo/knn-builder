@@ -15,7 +15,7 @@
 
 use std::sync::Mutex;
 
-use knn_gpu::{BuildParams, Error, Gpu, Graph, HostVectors, Metric, fp16};
+use knn_gpu::{BinaryParams, BuildParams, Error, Gpu, Graph, HostVectors, Metric, fp16};
 
 /// Held through each test's build: cargo runs the tests on parallel
 /// threads, and two builds at once can crash the process (see `Gpu`).
@@ -28,6 +28,26 @@ fn build(vectors: HostVectors<'_>, dimension: usize, params: &BuildParams) -> Re
     let _gpu = GPU.lock().expect("a build panicked holding the GPU lock");
     let mut gpu = Gpu::new()?;
     gpu.build(vectors, dimension, params)
+}
+
+/// A binary build on a `Gpu` of its own, one test at a time.
+fn build_binary(bits: &[u8], dimension: usize, params: BinaryParams) -> Result<Graph, Error> {
+    let _gpu = GPU.lock().expect("a build panicked holding the GPU lock");
+    let mut gpu = Gpu::new()?;
+    gpu.build_binary(bits, dimension, &params)
+}
+
+/// Bytes from a fixed-seed xorshift generator.
+fn random_bytes(count: usize, seed: u64) -> Vec<u8> {
+    let mut state = seed;
+    (0..count)
+        .map(|_| {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            state.to_le_bytes()[7]
+        })
+        .collect()
 }
 
 /// Values in [-0.5, 0.5) from a fixed-seed xorshift generator.
@@ -140,6 +160,103 @@ fn builds_l2_int8() {
 #[test]
 fn builds_inner_product_int8() {
     check(Metric::InnerProduct, Kind::I8);
+}
+
+/// The graph of random binary vectors: n x degree, every id in range and
+/// not the node itself, and, over a sample, the nearest in Hamming distance
+/// in most rows.
+#[test]
+fn builds_binary_vectors_in_hamming_distance() {
+    const ROWS: usize = 5_000;
+    const BITS: usize = 256;
+    const SAMPLE: usize = 500;
+    let bits = random_bytes(ROWS * BITS / 8, 0x2545_F491_4F6C_DD1D);
+    let params = BinaryParams::new(5_000, 256, 16).unwrap();
+    let graph = build_binary(&bits, BITS, params).unwrap();
+    let degree = params.graph_degree as usize;
+    assert_eq!(graph.degree(), degree);
+    assert_eq!(graph.neighbors().len(), ROWS * degree);
+    assert_eq!(graph.out_of_range(), 0);
+    let row = |i: usize| &bits[i * BITS / 8..(i + 1) * BITS / 8];
+    let hamming =
+        |a: &[u8], b: &[u8]| -> u32 { a.iter().zip(b).map(|(x, y)| (x ^ y).count_ones()).sum() };
+    let mut found = 0;
+    for (node, neighbors) in graph.neighbors().chunks_exact(degree).enumerate() {
+        assert!(
+            neighbors.iter().all(|&n| n as usize != node),
+            "node {node} lists itself"
+        );
+        if node % (ROWS / SAMPLE) != 0 {
+            continue;
+        }
+        let nearest = (0..ROWS)
+            .filter(|&other| other != node)
+            .min_by_key(|&other| hamming(row(node), row(other)))
+            .unwrap();
+        // Ties are common in Hamming distance: any vector as near counts.
+        let best = hamming(row(node), row(nearest));
+        found += usize::from(
+            neighbors
+                .iter()
+                .any(|&n| hamming(row(node), row(n as usize)) == best),
+        );
+    }
+    assert!(
+        found * 2 >= SAMPLE,
+        "{found} of {SAMPLE} sampled rows hold a nearest"
+    );
+}
+
+/// With fewer vectors than the degree asked for, cuVS lowers the degree
+/// to their count less one, as it did for the upstream service's builds of
+/// 40 vectors at m 16.
+#[test]
+fn takes_the_degree_cuvs_lowers_for_few_binary_vectors() {
+    let bits = random_bytes(40 * 32, 7);
+    let params = BinaryParams::new(40, 256, 16).unwrap();
+    let graph = build_binary(&bits, 256, params).unwrap();
+    assert_eq!(graph.degree(), 39);
+    assert_eq!(graph.neighbors().len(), 40 * 39);
+    assert_eq!(graph.out_of_range(), 0);
+    // A degree far past the vectors takes no more host memory: cuVS lowers
+    // it the same way.
+    let wide = BinaryParams {
+        graph_degree: u32::MAX,
+    };
+    let graph = build_binary(&bits, 256, wide).unwrap();
+    assert_eq!(graph.degree(), 39);
+}
+
+#[test]
+fn refuses_binary_partial_rows() {
+    let bits = random_bytes(100, 1);
+    let params = BinaryParams::new(10, 80, 16).unwrap();
+    assert_eq!(
+        build_binary(&bits[..99], 80, params),
+        Err(Error::Vectors {
+            values: 99,
+            dimension: 80
+        })
+    );
+    assert_eq!(
+        build_binary(&bits, 12, params),
+        Err(Error::Bits { dimension: 12 })
+    );
+}
+
+/// `BinaryParams::new` refuses an m of 0; a degree of 0 set directly is
+/// the shim's to refuse, naming the entry point.
+#[test]
+fn refuses_a_binary_degree_of_zero() {
+    let bits = random_bytes(100, 1);
+    let params = BinaryParams { graph_degree: 0 };
+    match build_binary(&bits, 80, params) {
+        Err(Error::Cuvs { call, message }) => {
+            assert_eq!(call, "knn_cagra_build_binary");
+            assert!(message.contains("graph degree 0"), "{message}");
+        }
+        other => panic!("{other:?}"),
+    }
 }
 
 #[test]

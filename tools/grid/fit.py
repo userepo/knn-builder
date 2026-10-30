@@ -7,6 +7,12 @@ leaves out the grid's 250,000- and 750,000-vector builds and the CPU's
 the points it saw. Writes OUT/fits.json.
 
   python tools/grid/fit.py RUNS_DIR OUT
+  python tools/grid/fit.py binary RUNS_DIR OUT
+
+The second fits the binary build's models instead, to RUNS_DIR/
+binary-runs.json and binary-cpu.json, scores the float transfer models of
+RUNS_DIR/fits.json on those builds, and writes OUT/binary-fits.json: see
+binary_main.
 
 The terms, from docs/params.md: n vectors of dimension d, s bytes a value
 (4, 2 for fp16, 1 for byte), graph degree g = 4m. The IVF-PQ build's
@@ -244,7 +250,204 @@ def device(train, held):
     }
 
 
+# The binary build, NN-descent in Hamming distance, with d counting bits: the
+# NN-descent iterations compare a node with pairs of its g candidates, each
+# comparison over d bits, so about n g^2 d; the graph's optimization n g^2;
+# the dataset copy n d / 8 bytes.
+BINARY_TERMS = {
+    "build_seconds": lambda n, d, g: {
+        "1": 1.0,
+        "n d": n * d,
+        "n g": n * g,
+        "n g^2": n * g * g,
+        "n g^2 d": n * g * g * d,
+    },
+    "file_bytes": lambda n, d, g: {"1": 1.0, "n d / 8": n * d / 8, "n g": n * g, "n": n},
+}
+
+
+def binary_shape(record):
+    shape = record["shape"]
+    return shape["doc_count"], shape["dimension"], 4 * shape["m"]
+
+
+# The binary build's device peak: the dataset, d / 8 bytes a vector, held
+# throughout, and the larger of two phases. NN-descent holds a copy of the
+# dataset and its graph of g ids a vector, its floor; the graph's
+# optimization the finished graph and, as for float, a buffer of g ids over
+# at most a fixed number of rows.
+def nn_descent_phase(n, d, g, cap):
+    return {"1": 1.0, "n": n, "n g": n * g}
+
+
+def nn_descent_floor(n, d, g):
+    return n * d / 8 + 4 * n * g
+
+
+def binary_graph_phase(n, d, g, cap):
+    return {"1": 1.0, "n g": n * g, "min(n, rows) g": min(n, cap) * g}
+
+
+def binary_graph_floor(n, d, g):
+    return 4 * n * g
+
+
+BINARY_PHASES = ((nn_descent_phase, nn_descent_floor), (binary_graph_phase, binary_graph_floor))
+
+
+def binary_phase_peak(models, which, shape, cap):
+    terms, floor = BINARY_PHASES[which]
+    return floor(*shape) + predict(models[which], terms(*shape, cap))
+
+
+def binary_device_peak(models, record, cap):
+    n, d, g = shape = binary_shape(record)
+    return n * d / 8 + max(binary_phase_peak(models, w, shape, cap) for w in (0, 1))
+
+
+def binary_device_fit(train, cap):
+    """The two phases' models for one row cap, fitted in turn to the builds
+    each bounds until none changes phase, as `device_fit` does for float;
+    and their squared relative error."""
+    over = [r["device"]["peak_bytes"] - binary_shape(r)[0] * binary_shape(r)[1] / 8 for r in train]
+    # Start from the floors: the phase whose floor is larger.
+    phase = [
+        int(binary_graph_floor(*binary_shape(r)) + 4 * min(binary_shape(r)[0], cap) * binary_shape(r)[2]
+            > nn_descent_floor(*binary_shape(r)))
+        for r in train
+    ]
+    models = [{}, {}]
+    for _ in range(20):
+        for which, (terms, floor) in enumerate(BINARY_PHASES):
+            mine = [(r, o) for r, o, p in zip(train, over, phase) if p == which]
+            if mine:
+                models[which] = fit(
+                    [terms(*binary_shape(r), cap) for r, _ in mine],
+                    [o - floor(*binary_shape(r)) for r, o in mine],
+                    [r["device"]["peak_bytes"] for r, _ in mine],
+                )
+        new = [
+            int(
+                binary_phase_peak(models, 1, binary_shape(r), cap)
+                > binary_phase_peak(models, 0, binary_shape(r), cap)
+            )
+            for r in train
+        ]
+        if new == phase:
+            break
+        phase = new
+    error = sum(
+        (binary_device_peak(models, r, cap) / r["device"]["peak_bytes"] - 1.0) ** 2 for r in train
+    )
+    return error, models
+
+
+def binary_device(train, held):
+    caps = range(100_000, 2_000_001, 20_000)
+    fitted = [binary_device_fit(train, cap) + (cap,) for cap in caps]
+    error, models, cap = min(fitted, key=lambda f: f[0])
+    near = [c for e, _, c in fitted if e <= error * 1.01]
+    ys = lambda rs: [r["device"]["peak_bytes"] for r in rs]  # noqa: E731
+    return {
+        "model": "n d / 8 + max(n d / 8 + 4 n g + NN-descent phase, 4 n g + graph phase)",
+        "nn_descent_phase": models[0],
+        "graph_phase": models[1],
+        "rows": cap,
+        "rows_within_1_percent": [min(near), max(near)],
+        "train": errors([binary_device_peak(models, r, cap) for r in train], ys(train)),
+        "held_out": errors([binary_device_peak(models, r, cap) for r in held], ys(held)),
+    }
+
+
+def binary_main(runs_dir, out):
+    """The binary build's models, fitted to the grid-binary builds less
+    the 250,000- and 750,000-vector ones, and scored on those: its build
+    seconds, its file's size, and its device peak, the dataset and the
+    graph plus fitted terms. The download and upload are the float
+    models' (a binary blob is d / 8 bytes a vector), scored here. The CPU
+    build, Faiss's binary HNSW, is fitted per thread count, leaving out
+    the 500,000-vector builds."""
+    runs = json.loads((runs_dir / "binary-runs.json").read_text())
+    builds = [
+        r
+        for r in runs
+        if r["task_status"] == "COMPLETED_INDEX_BUILD" and r["shape"]["doc_count"] >= 100_000
+    ]
+    train = [r for r in builds if r["shape"]["doc_count"] not in GPU_HELD_OUT]
+    held = [r for r in builds if r["shape"]["doc_count"] in GPU_HELD_OUT]
+    fits = {
+        "failed_builds": [
+            {"input": r["input"], "m": r["shape"]["m"], "error": r["error_message"]}
+            for r in runs
+            if r["task_status"] != "COMPLETED_INDEX_BUILD"
+        ]
+    }
+    for target, terms in BINARY_TERMS.items():
+        model = fit([terms(*binary_shape(r)) for r in train], [OBSERVED[target](r) for r in train])
+
+        def score(records, model=model, terms=terms, target=target):
+            return errors(
+                [predict(model, terms(*binary_shape(r))) for r in records],
+                [OBSERVED[target](r) for r in records],
+            )
+
+        fits[target] = {"terms": model, "train": score(train), "held_out": score(held)}
+
+    fits["device_peak_bytes"] = binary_device(train, held)
+
+    # The float models of the transfers, on a blob of d / 8 bytes a vector.
+    float_fits = json.loads((runs_dir / "fits.json").read_text())
+    for target in ("download_seconds", "upload_seconds"):
+        float_terms = TERMS[target]
+        fits[target] = {
+            "float_model": errors(
+                [
+                    predict(float_fits[target]["terms"], float_terms(n, d, 1 / 8, g))
+                    for n, d, g in map(binary_shape, builds)
+                ],
+                [OBSERVED[target](r) for r in builds],
+            )
+        }
+
+    cpu_path = runs_dir / "binary-cpu.json"
+    if cpu_path.exists():
+        fits.update(cpu_fits(json.loads(cpu_path.read_text())))
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "binary-fits.json").write_bytes((json.dumps(fits, indent=1) + "\n").encode())
+    print(json.dumps(fits, indent=1))
+
+
+def cpu_fits(cpu):
+    """The CPU build's model per thread count, the 500,000-vector builds
+    left out."""
+    fits = {}
+    for threads in sorted({r["threads"] for r in cpu}):
+        mine = [r for r in cpu if r["threads"] == threads]
+        cpu_train = [r for r in mine if r["shape"]["doc_count"] != CPU_HELD_OUT]
+        cpu_held = [r for r in mine if r["shape"]["doc_count"] == CPU_HELD_OUT]
+
+        def rows(records):
+            return [cpu_terms(r["shape"]["doc_count"], r["shape"]["dimension"]) for r in records]
+
+        model = fit(rows(cpu_train), [r["seconds"] for r in cpu_train])
+
+        def score(records, model=model):
+            return errors(
+                [predict(model, row) for row in rows(records)], [r["seconds"] for r in records]
+            )
+
+        fits[f"cpu_seconds_{threads}_threads"] = {
+            "terms": model,
+            "train": score(cpu_train),
+            "held_out": score(cpu_held),
+        }
+    return fits
+
+
 def main():
+    if sys.argv[1] == "binary":
+        binary_main(pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]))
+        return
     runs_dir, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
     runs = json.loads((runs_dir / "runs.json").read_text())
     builds = [
@@ -266,26 +469,7 @@ def main():
     fits["device_peak_bytes"] = device(train, held)
     cpu_path = runs_dir / "cpu.json"
     if cpu_path.exists():
-        cpu = json.loads(cpu_path.read_text())
-        for threads in sorted({r["threads"] for r in cpu}):
-            mine = [r for r in cpu if r["threads"] == threads]
-            cpu_train = [r for r in mine if r["shape"]["doc_count"] != CPU_HELD_OUT]
-            cpu_held = [r for r in mine if r["shape"]["doc_count"] == CPU_HELD_OUT]
-            rows = lambda rs: [  # noqa: E731
-                cpu_terms(r["shape"]["doc_count"], r["shape"]["dimension"]) for r in rs
-            ]
-            model = fit(rows(cpu_train), [r["seconds"] for r in cpu_train])
-
-            def score(records, model=model, rows=rows):
-                return errors(
-                    [predict(model, row) for row in rows(records)], [r["seconds"] for r in records]
-                )
-
-            fits[f"cpu_seconds_{threads}_threads"] = {
-                "terms": model,
-                "train": score(cpu_train),
-                "held_out": score(cpu_held),
-            }
+        fits.update(cpu_fits(json.loads(cpu_path.read_text())))
     out.mkdir(parents=True, exist_ok=True)
     (out / "fits.json").write_bytes((json.dumps(fits, indent=1) + "\n").encode())
     print(json.dumps(fits, indent=1))

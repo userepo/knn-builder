@@ -23,5 +23,5 @@ mod write;
 
 pub use builder::{BuildError, Builder, FakeBuilder, Vectors};
 pub use error::JobError;
-pub use job::{DataType, Job, SpaceType};
+pub use job::{DataType, GraphParams, Job, SpaceType};
 pub use pipeline::{Built, Canceler, Flights, InFlight, JobHandle, Pipeline, Span, Stage, Timings};

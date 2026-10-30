@@ -11,8 +11,9 @@ settings the service reads (tools/README.md):
   python tools/grid/run_grid.py E2E INPUTS OUT [--set SET] [NAME...]
 
 E2E is the built example binary, INPUTS a scratch directory, SET the
-make_inputs.py set to run (grid, the default, or grid-byte, whose builds
-warm up on a byte input of their own), NAMEs a subset of it.
+make_inputs.py set to run (grid, the default, grid-byte or grid-binary,
+whose builds warm up on an input of their own type), NAMEs a subset of
+it.
 """
 
 import pathlib
@@ -22,7 +23,11 @@ import sys
 
 BUCKET = "grid"
 # Each set's small input, built before every build to warm its kernels up.
-WARM_UP = {"grid": "l2-10000x128", "grid-byte": "l2-10000x128-byte"}
+WARM_UP = {
+    "grid": "l2-10000x128",
+    "grid-byte": "l2-10000x128-byte",
+    "grid-binary": "hamming-10000x256-binary-clustered",
+}
 MS = (16, 32)
 TOOLS = pathlib.Path(__file__).resolve().parent.parent
 

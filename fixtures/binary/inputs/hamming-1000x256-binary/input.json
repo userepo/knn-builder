@@ -1,0 +1,15 @@
+{
+  "doc_count": 1000,
+  "dimension": 256,
+  "space_type": "hamming",
+  "data_type": "binary",
+  "blob_dtype": "<u1",
+  "skip_stored_vectors": false,
+  "m": 16,
+  "ef_construction": 100,
+  "ef_search": 100,
+  "queries": 100,
+  "seed": 4000,
+  "distribution": "uniform bits",
+  "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+}

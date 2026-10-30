@@ -7,7 +7,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::thread;
 use std::time::Duration;
 
-use knn_gpu::BuildParams;
+use crate::GraphParams;
 
 /// A job's vectors in host memory, row-major, as downloaded.
 #[derive(Clone, PartialEq)]
@@ -18,6 +18,8 @@ pub enum Vectors {
     F16(Vec<u16>),
     /// int8 values.
     I8(Vec<i8>),
+    /// Binary vectors' packed bits, dimension / 8 bytes each.
+    Bits(Vec<u8>),
 }
 
 impl Vectors {
@@ -28,7 +30,18 @@ impl Vectors {
             Self::F32(v) => v.len(),
             Self::F16(v) => v.len(),
             Self::I8(v) => v.len(),
+            Self::Bits(v) => v.len(),
         }
+    }
+
+    /// Vectors of `dimension`, counted in bits for binary ones.
+    #[must_use]
+    pub fn rows(&self, dimension: usize) -> usize {
+        let width = match self {
+            Self::Bits(_) => dimension / 8,
+            Self::F32(_) | Self::F16(_) | Self::I8(_) => dimension,
+        };
+        self.len().checked_div(width).unwrap_or(0)
     }
 
     /// Whether there are no values.
@@ -44,6 +57,7 @@ impl Vectors {
             Self::F32(v) => *v = Vec::new(),
             Self::F16(v) => *v = Vec::new(),
             Self::I8(v) => *v = Vec::new(),
+            Self::Bits(v) => *v = Vec::new(),
         }
     }
 
@@ -54,6 +68,7 @@ impl Vectors {
             Self::F32(v) => knn_write::Vectors::F32(v),
             Self::F16(v) => knn_write::Vectors::F16(v),
             Self::I8(v) => knn_write::Vectors::I8(v),
+            Self::Bits(v) => knn_write::Vectors::Bits(v),
         }
     }
 }
@@ -65,6 +80,7 @@ impl fmt::Debug for Vectors {
             Self::F32(v) => write!(f, "F32({} values)", v.len()),
             Self::F16(v) => write!(f, "F16({} values)", v.len()),
             Self::I8(v) => write!(f, "I8({} values)", v.len()),
+            Self::Bits(v) => write!(f, "Bits({} bytes)", v.len()),
         }
     }
 }
@@ -75,8 +91,10 @@ pub type BuildError = Box<dyn StdError + Send + Sync>;
 /// Builds a job's CAGRA graph. The pipeline gives its builder a thread of
 /// its own and calls it for one job at a time.
 pub trait Builder: Send + 'static {
-    /// The graph of `vectors`, rows of `dimension`: `params.graph_degree`
-    /// neighbor ids per vector, row-major, row i for the i-th vector.
+    /// The graph of `vectors`, rows of `dimension`, and its degree: as many
+    /// neighbor ids per vector, row-major, row i for the i-th vector. The
+    /// degree is `params`', or for a binary build what cuVS lowered it to
+    /// ([`GraphParams::degree_for`]).
     ///
     /// # Errors
     ///
@@ -85,8 +103,8 @@ pub trait Builder: Send + 'static {
         &mut self,
         vectors: &Vectors,
         dimension: usize,
-        params: &BuildParams,
-    ) -> Result<Vec<u32>, BuildError>;
+        params: &GraphParams,
+    ) -> Result<(Vec<u32>, usize), BuildError>;
 
     /// The device memory free for the next build, in bytes, when the
     /// builder can tell; the pipeline fails a job whose build needs more
@@ -110,15 +128,27 @@ impl Builder for knn_gpu::Gpu {
         &mut self,
         vectors: &Vectors,
         dimension: usize,
-        params: &BuildParams,
-    ) -> Result<Vec<u32>, BuildError> {
-        let host = match vectors {
-            Vectors::F32(v) => knn_gpu::HostVectors::F32(v),
-            Vectors::F16(v) => knn_gpu::HostVectors::F16(v),
-            Vectors::I8(v) => knn_gpu::HostVectors::I8(v),
+        params: &GraphParams,
+    ) -> Result<(Vec<u32>, usize), BuildError> {
+        let graph = match (vectors, params) {
+            (Vectors::Bits(bits), GraphParams::Binary(params)) => {
+                knn_gpu::Gpu::build_binary(self, bits, dimension, params)?
+            }
+            (Vectors::F32(v), GraphParams::IvfPq(params)) => {
+                knn_gpu::Gpu::build(self, knn_gpu::HostVectors::F32(v), dimension, params)?
+            }
+            (Vectors::F16(v), GraphParams::IvfPq(params)) => {
+                knn_gpu::Gpu::build(self, knn_gpu::HostVectors::F16(v), dimension, params)?
+            }
+            (Vectors::I8(v), GraphParams::IvfPq(params)) => {
+                knn_gpu::Gpu::build(self, knn_gpu::HostVectors::I8(v), dimension, params)?
+            }
+            (vectors, params) => {
+                return Err(format!("{vectors:?} cannot be built with {params:?}").into());
+            }
         };
-        let graph = knn_gpu::Gpu::build(self, host, dimension, params)?;
-        Ok(graph.into_neighbors())
+        let degree = graph.degree();
+        Ok((graph.into_neighbors(), degree))
     }
 }
 
@@ -211,21 +241,21 @@ impl Builder for FakeBuilder {
         &mut self,
         vectors: &Vectors,
         dimension: usize,
-        params: &BuildParams,
-    ) -> Result<Vec<u32>, BuildError> {
+        params: &GraphParams,
+    ) -> Result<(Vec<u32>, usize), BuildError> {
         self.builds.fetch_add(1, Ordering::SeqCst);
         thread::sleep(self.delay);
-        let rows = vectors.len().checked_div(dimension).unwrap_or(0);
-        let degree = params.graph_degree as usize;
+        let rows = vectors.rows(dimension);
+        let degree = params.degree_for(u32::try_from(rows).unwrap_or(u32::MAX)) as usize;
         match &self.outcome {
-            Fake::Graph => Ok(Self::graph(rows, degree)),
+            Fake::Graph => Ok((Self::graph(rows, degree), degree)),
             Fake::Fails(message) => Err(message.clone().into()),
             Fake::NamesMissingVectors => {
                 let mut graph = Self::graph(rows, degree);
                 if let Some(first) = graph.first_mut() {
                     *first = u32::try_from(rows).unwrap_or(u32::MAX);
                 }
-                Ok(graph)
+                Ok((graph, degree))
             }
         }
     }

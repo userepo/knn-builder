@@ -6,7 +6,8 @@ Usage: python score.py OUT_DIR INPUTS_DIR KNN_INSPECT
                plus service.log, the service container's log; or what
                knn-gpu's build_inputs example wrote, whose runs.json carries
                each build's seconds itself and which has no log
-  INPUTS_DIR   the inputs the run built (for queries.f32 and input.json)
+  INPUTS_DIR   the inputs the run built (for input.json and the queries:
+               queries.f32, or a binary input's packed bits, queries.u8)
   KNN_INSPECT  path to the knn-inspect binary
 
 Writes OUT_DIR/summary.json, recording the knn-inspect version. Recall is
@@ -23,7 +24,7 @@ import statistics
 import subprocess
 import sys
 
-RECALL = {"seed": 1, "k": 10, "queries": "the input's queries.f32"}
+RECALL = {"seed": 1, "k": 10, "queries": "the input's queries.f32, or queries.u8 for binary"}
 
 START = r"Starting task execution for vector path: (\S+)"
 STEPS = {
@@ -95,8 +96,11 @@ def main():
             index = out / name / f"run-{run}.faiss"
             row["verify"] = knn_inspect(binary, "verify", str(index))["status"]
             if not meta["skip_stored_vectors"]:
+                queries = inputs / name / "queries.u8"
+                if not queries.exists():
+                    queries = inputs / name / "queries.f32"
                 report = knn_inspect(
-                    binary, "recall", "--queries", str(inputs / name / "queries.f32"),
+                    binary, "recall", "--queries", str(queries),
                     "--seed", str(RECALL["seed"]), "--k", str(RECALL["k"]), str(index),
                 )
                 row["recall_at_10"] = report["recall"]

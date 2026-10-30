@@ -1,0 +1,710 @@
+{
+  "knn_inspect": "knn-inspect 0.17.0",
+  "recall": {
+    "seed": 1,
+    "k": 10,
+    "queries": "the input's queries.f32, or queries.u8 for binary"
+  },
+  "inputs": {
+    "hamming-20000x256-binary": {
+      "input": {
+        "doc_count": 20000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4006,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.811,
+          "size": 6242545,
+          "sha256": "608689b02d607008033cf0ebde18a1106be3f0312b9c7143ade7276be3bd18bf",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.68,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.893
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.612,
+          "size": 6242545,
+          "sha256": "68527847cc207843317d9049a7f4662b28ae56927750375dee00248deec90010",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.889
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.615,
+          "size": 6242545,
+          "sha256": "72aa73a8ac7bdc7c680ca70f00aa37fff205b2f62988d772bc3b0cd46427916b",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.37,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.887
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.614,
+          "size": 6242545,
+          "sha256": "510142b97f0cc31cdb58f55aa7ab6f8bb412edae055492131bc70b76fc0888d2",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.892
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.609,
+          "size": 6242545,
+          "sha256": "44b7fcfc8173dc2f1879eec47d0d5b22cb69a2a6ee8a9fb597888777873c3e12",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.37,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.881
+        },
+        {
+          "run": 6,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.614,
+          "size": 6242545,
+          "sha256": "30c524ac5f9924d21c9667f9610238102e6d3f4e22c1d0c88c76030e287fc40d",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.891
+        },
+        {
+          "run": 7,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.613,
+          "size": 6242545,
+          "sha256": "59c057c0bb42b5fc534d2287a291f3d282e2addfcd0efc2f7e2c14cb93486ff5",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.88
+        },
+        {
+          "run": 8,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.632,
+          "size": 6242545,
+          "sha256": "ccb8b4f48572a8e8999b2a99e3dc824af431d21d7bbe9986d57d1623acd1b2dc",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.04
+          },
+          "verify": "clean",
+          "recall_at_10": 0.885
+        },
+        {
+          "run": 9,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "bca0bd8943dc85ff7edd046c372834805519831333f508cd7279ae146064d919",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.895
+        },
+        {
+          "run": 10,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "834bf696ad560094b208ccb47a1314c8a044f22fbf96ddb7e2253bb6255191c2",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.37,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.882
+        },
+        {
+          "run": 11,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.612,
+          "size": 6242545,
+          "sha256": "7ac3f15c83e18b59337232fe2136b58fcf6d8842dfd75da551d8a333b0e463d7",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.894
+        },
+        {
+          "run": 12,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "735405e723fa2c3e1d5c21b04b53471f5ae4a942d12eeb67c927bb6677324010",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.34,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.887
+        },
+        {
+          "run": 13,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.609,
+          "size": 6242545,
+          "sha256": "134363aa5892e459ad764c84bf7b349528889eb344f842b935e3bcc8052ddc08",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.886
+        },
+        {
+          "run": 14,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "9b09fc2c18ddf945a29a43229f87dcc042fad52c2f016fbbb6472b28cdfbe68a",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.34,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.891
+        },
+        {
+          "run": 15,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.612,
+          "size": 6242545,
+          "sha256": "eeced4cfe093f5cbfd2b41cde846368def6af6e60baaa845da0901dd2d92487f",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.36,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.878
+        },
+        {
+          "run": 16,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "38d81c7337ca3fd4cb633347bdb7fd2a9c9d75a809c63ad17ff131ebdb9bf6ce",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.892
+        },
+        {
+          "run": 17,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "b2f896adfa32a64dbe7fa6a490f8c57f3dc905759265bafce26ffbfae13e8fd7",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.36,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.895
+        },
+        {
+          "run": 18,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.611,
+          "size": 6242545,
+          "sha256": "d3ab1f41d6d10b077c7a9dd17afe4e26a9cf6123d8deb15d23cbba46d4b21376",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.36,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.886
+        },
+        {
+          "run": 19,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "b2dced25a55e9bad8ee09889053f99f0ddeaa5edc0b0f96ca1ee9981a3e08123",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.894
+        },
+        {
+          "run": 20,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.611,
+          "size": 6242545,
+          "sha256": "f7f6445a79553801aa1394008d95586e6219aca13f19f6f741604cdeb171fcf2",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.35,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 0.888
+        }
+      ],
+      "recall_at_10": {
+        "min": 0.878,
+        "max": 0.895,
+        "mean": 0.8883
+      },
+      "build_seconds": {
+        "min": 0.34,
+        "max": 0.68,
+        "mean": 0.37
+      },
+      "distinct_files": 20
+    },
+    "hamming-20000x256-binary-clustered": {
+      "input": {
+        "doc_count": 20000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4007,
+        "distribution": "400 centers of uniform bits, each bit flipped with probability 0.1",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.61,
+          "size": 6242545,
+          "sha256": "bc14d38a76c71701aa2fc174ae968117a0d902a9cdeb52ba283b606f8afd3d96",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.34,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 6242545,
+          "sha256": "d4fc5807aec5ba4195cad2e8b033b8d1ecea1a2e27e734ab5fcd04f142e8dae0",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 6242545,
+          "sha256": "7b613e34c1d29737ed4b43627615c836cf02b69e6878ce6c49e789ad43eb7ff1",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 6242545,
+          "sha256": "c4efb74863e1af1a2af3510101303e8b94406684b3a6975568b0f9fcf5ffb584",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 6242545,
+          "sha256": "7c93d8cb1a216e3afec73ebdb0afdb73fa06d62f5d2c4238911525812c40b87f",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.3,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 6,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "fb90c18ee3a8b9b7e0231f1029cd6d5592cc262f528f4648cccbdcccc69c9647",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.32,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 7,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 6242545,
+          "sha256": "9920ecdd97f3478ee322a264e85d86058dfbfa8105d376657f8bcc7eb20885c2",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.3,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 8,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "585c5ae4c2c032996dc1c62a37d0b76eed7882d7a67cf7d93cbc929c055727ee",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.32,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 9,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 6242545,
+          "sha256": "d93c302fbb5d887e3288d002cab8c38d83f80576aa38e9d94fbb71e94c74d1af",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.32,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 10,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 6242545,
+          "sha256": "5593bd36e51e3b6bb6cbb52a2985ee9ce1c7189220191757f5fd27285ef0d3b8",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 11,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "377c7a3f50f3ae1fec71660cb8b458da70b5796d38a529a5129f3fcb138b2000",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 12,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 6242545,
+          "sha256": "ca89ec6ba6e79c04f952905e720084dcda6b1dcd37e5bd62a75ab4c9092883d4",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 13,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 6242545,
+          "sha256": "a6911216385f2e907d8903a87c654b874b86972d57e557e74c8efd6336383583",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 14,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 6242545,
+          "sha256": "06b4aa951be8d5df6a15768f98b0b6415a6143cb3d6708fa9f741d884f575a6e",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 15,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "b913174730f9de607153a5a53e913af41070878503cdb373a637be0739000177",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 16,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "14de50a5e605bbc4a424ca91c9eed0f917d8c0fbecbf74edd90e2790d078ef47",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.32,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 17,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "873289eaf6428241ab31f8066e7d041ef62434f0b607189e25d734d0b6b9c351",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 18,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "198b4cce106f494c1bcf96d83ffec1a77db4423417c3285a329de0a5cd3223da",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.32,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 19,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "29d8c30c3790fc0a5880748281ad7e7aa0708279dec1774e1ff3a37b8588e16d",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.32,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 20,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 6242545,
+          "sha256": "2ced430bae174ed391780f8fb7ca446ac9c080aff45c109657154e6ca0fbe45e",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.31,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.02
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.3,
+        "max": 0.34,
+        "mean": 0.3135
+      },
+      "distinct_files": 20
+    }
+  }
+}

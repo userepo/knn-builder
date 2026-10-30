@@ -1,0 +1,198 @@
+[
+ {
+  "input": "hamming-100000x256-binary-clustered",
+  "threads": 4,
+  "seconds": 1.516,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 256,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-100000x512-binary-clustered",
+  "threads": 4,
+  "seconds": 1.76,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 512,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-100000x1024-binary-clustered",
+  "threads": 4,
+  "seconds": 2.4,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 1024,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-250000x256-binary-clustered",
+  "threads": 4,
+  "seconds": 4.446,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 256,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-250000x1024-binary-clustered",
+  "threads": 4,
+  "seconds": 8.569,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 1024,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-500000x256-binary-clustered",
+  "threads": 4,
+  "seconds": 10.859,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 256,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-500000x512-binary-clustered",
+  "threads": 4,
+  "seconds": 14.157,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 512,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-500000x1024-binary-clustered",
+  "threads": 4,
+  "seconds": 23.072,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 1024,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-100000x256-binary-clustered",
+  "threads": 1,
+  "seconds": 5.62,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 256,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-100000x512-binary-clustered",
+  "threads": 1,
+  "seconds": 6.404,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 512,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-100000x1024-binary-clustered",
+  "threads": 1,
+  "seconds": 9.152,
+  "shape": {
+   "doc_count": 100000,
+   "dimension": 1024,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-250000x256-binary-clustered",
+  "threads": 1,
+  "seconds": 16.591,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 256,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-250000x1024-binary-clustered",
+  "threads": 1,
+  "seconds": 32.453,
+  "shape": {
+   "doc_count": 250000,
+   "dimension": 1024,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ },
+ {
+  "input": "hamming-500000x256-binary-clustered",
+  "threads": 1,
+  "seconds": 40.333,
+  "shape": {
+   "doc_count": 500000,
+   "dimension": 256,
+   "data_type": "binary",
+   "m": 16,
+   "ef_construction": 100
+  },
+  "faiss": "1.15.1",
+  "simd": "OPTIMIZE DD AVX2"
+ }
+]

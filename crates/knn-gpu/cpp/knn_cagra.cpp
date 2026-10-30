@@ -1,7 +1,8 @@
 // The CAGRA build through cuVS's C++ API, the API Faiss builds through, so
 // every IVF-PQ graph build and search setting reaches cuVS as the upstream
 // service passes it; cuVS's C API fixes two of the search settings
-// (docs/params.md).
+// (docs/params.md). Binary vectors build through NN-descent in Hamming
+// distance, as Faiss's BinaryCuvsCagra builds them.
 //
 // Device memory is owned by C++ objects that free it on every return, and
 // every exception is caught and returned as a status with its message.
@@ -12,6 +13,7 @@
 #include <cuvs/neighbors/cagra.hpp>
 #include <cuvs/neighbors/common.hpp>
 #include <cuvs/neighbors/ivf_pq.hpp>
+#include <cuvs/neighbors/nn_descent.hpp>
 #include <cuvs/version_config.h>
 #include <raft/core/host_mdspan.hpp>
 #include <raft/core/resource/cuda_stream.hpp>
@@ -49,6 +51,10 @@ static_assert(offsetof(knn_cagra_params, refinement_rate) == 40);
 static_assert(offsetof(knn_cagra_params, force_random_rotation) == 44);
 static_assert(offsetof(knn_cagra_params, conservative_memory_allocation) == 45);
 static_assert(sizeof(knn_cagra_params) == 48);
+static_assert(offsetof(knn_cagra_binary_params, graph_degree) == 0);
+static_assert(offsetof(knn_cagra_binary_params, intermediate_graph_degree) == 4);
+static_assert(offsetof(knn_cagra_binary_params, nn_descent_niter) == 8);
+static_assert(sizeof(knn_cagra_binary_params) == 12);
 
 // As cuVS's C API creates its resources handle (c/src/core/c_api.cpp).
 struct knn_cagra_gpu {
@@ -132,17 +138,39 @@ cuvs::neighbors::cagra::index_params faiss_index_params(const knn_cagra_params& 
   return params;
 }
 
+// The parameters of a binary build as Faiss's BinaryCuvsCagra sets them,
+// with rvib's patch 0003 applied (faiss/gpu/impl/BinaryCuvsCagra.cu:43-66,
+// 146-163): default-constructed, Hamming distance, both degrees, and an
+// NN-descent graph build of the intermediate degree.
+cuvs::neighbors::cagra::index_params faiss_binary_index_params(const knn_cagra_binary_params& p)
+{
+  namespace cagra = cuvs::neighbors::cagra;
+  cagra::index_params params;
+  params.intermediate_graph_degree = p.intermediate_graph_degree;
+  params.graph_degree              = p.graph_degree;
+  params.metric                    = cuvs::distance::DistanceType::BitwiseHamming;
+  cagra::graph_build_params::nn_descent_params graph_build(params.intermediate_graph_degree);
+  graph_build.max_iterations = p.nn_descent_niter;
+  graph_build.metric         = cuvs::distance::DistanceType::BitwiseHamming;
+  params.graph_build_params  = graph_build;
+  return params;
+}
+
 // Copies the host vectors to a padded device dataset, builds on it, and
 // copies the graph back, as Faiss's CuvsCagra::train does for host data
-// (faiss/gpu/impl/CuvsCagra.cu:214-223).
+// (faiss/gpu/impl/CuvsCagra.cu:214-223) and, with rvib's patch 0003,
+// BinaryCuvsCagra::train. The graph may be narrower than `max_degree`
+// where cuVS lowers the degree; `degree` receives the one it built.
 template <typename T>
 int build_graph(raft::resources& res,
                 const T* vectors,
                 std::int64_t rows,
                 std::int64_t dimension,
-                const knn_cagra_params& p,
+                const cuvs::neighbors::cagra::index_params& params,
+                std::uint32_t max_degree,
                 std::uint32_t* graph,
                 std::size_t graph_len,
+                std::uint32_t* degree,
                 char* message,
                 std::size_t len)
 {
@@ -156,13 +184,14 @@ int build_graph(raft::resources& res,
 
   std::optional<cuvs::neighbors::cagra::device_padded_index<T, std::uint32_t>> index;
   status = run(KNN_CAGRA_BUILD, message, len, [&] {
-    index.emplace(cuvs::neighbors::cagra::build(res, faiss_index_params(p), dataset->as_dataset_view()));
+    index.emplace(cuvs::neighbors::cagra::build(res, params, dataset->as_dataset_view()));
   });
   if (status != KNN_CAGRA_OK) { return status; }
 
   auto const view = index->graph();
-  if (view.extent(0) != rows || view.extent(1) != static_cast<std::int64_t>(p.graph_degree) ||
-      static_cast<std::size_t>(view.size()) != graph_len) {
+  if (view.extent(0) != rows || view.extent(1) < 1 ||
+      view.extent(1) > static_cast<std::int64_t>(max_degree) ||
+      static_cast<std::size_t>(view.size()) > graph_len) {
     if (message != nullptr && len > 0) {
       std::snprintf(message,
                     len,
@@ -170,14 +199,52 @@ int build_graph(raft::resources& res,
                     static_cast<long long>(view.extent(0)),
                     static_cast<long long>(view.extent(1)),
                     static_cast<long long>(rows),
-                    p.graph_degree);
+                    max_degree);
     }
     return KNN_CAGRA_GRAPH;
   }
+  *degree = static_cast<std::uint32_t>(view.extent(1));
   return run(KNN_CAGRA_COPY, message, len, [&] {
-    raft::copy(graph, view.data_handle(), graph_len, raft::resource::get_cuda_stream(res));
+    raft::copy(graph,
+               view.data_handle(),
+               static_cast<std::size_t>(view.size()),
+               raft::resource::get_cuda_stream(res));
     raft::resource::sync_stream(res);
   });
+}
+
+// An IVF-PQ build, whose degree the service's effective m keeps within
+// what cuVS builds: a graph of any other degree is refused.
+template <typename T>
+int build_ivf_pq_graph(raft::resources& res,
+                       const T* vectors,
+                       std::int64_t rows,
+                       std::int64_t dimension,
+                       const knn_cagra_params& p,
+                       std::uint32_t* graph,
+                       std::size_t graph_len,
+                       char* message,
+                       std::size_t len)
+{
+  std::uint32_t degree = 0;
+  int const status     = build_graph(res,
+                                 vectors,
+                                 rows,
+                                 dimension,
+                                 faiss_index_params(p),
+                                 p.graph_degree,
+                                 graph,
+                                 graph_len,
+                                 &degree,
+                                 message,
+                                 len);
+  if (status == KNN_CAGRA_OK && degree != p.graph_degree) {
+    if (message != nullptr && len > 0) {
+      std::snprintf(message, len, "degree %u where %u was asked for", degree, p.graph_degree);
+    }
+    return KNN_CAGRA_GRAPH;
+  }
+  return status;
 }
 
 }  // namespace
@@ -224,7 +291,7 @@ extern "C" int knn_cagra_build(knn_cagra_gpu* gpu,
   }
   switch (dtype) {
     case KNN_CAGRA_F32:
-      return build_graph(gpu->res,
+      return build_ivf_pq_graph(gpu->res,
                          static_cast<const float*>(vectors),
                          rows,
                          dimension,
@@ -234,7 +301,7 @@ extern "C" int knn_cagra_build(knn_cagra_gpu* gpu,
                          message,
                          message_len);
     case KNN_CAGRA_F16:
-      return build_graph(gpu->res,
+      return build_ivf_pq_graph(gpu->res,
                          static_cast<const half*>(vectors),
                          rows,
                          dimension,
@@ -244,7 +311,7 @@ extern "C" int knn_cagra_build(knn_cagra_gpu* gpu,
                          message,
                          message_len);
     case KNN_CAGRA_I8:
-      return build_graph(gpu->res,
+      return build_ivf_pq_graph(gpu->res,
                          static_cast<const std::int8_t*>(vectors),
                          rows,
                          dimension,
@@ -255,4 +322,35 @@ extern "C" int knn_cagra_build(knn_cagra_gpu* gpu,
                          message_len);
     default: set_message(message, message_len, "unknown vector type"); return KNN_CAGRA_ARGUMENTS;
   }
+}
+
+extern "C" int knn_cagra_build_binary(knn_cagra_gpu* gpu,
+                                      const std::uint8_t* bits,
+                                      std::int64_t rows,
+                                      std::int64_t dimension,
+                                      const knn_cagra_binary_params* params,
+                                      std::uint32_t* graph,
+                                      std::size_t graph_len,
+                                      std::uint32_t* degree,
+                                      char* message,
+                                      std::size_t message_len)
+{
+  if (gpu == nullptr || bits == nullptr || params == nullptr || graph == nullptr ||
+      degree == nullptr || rows <= 0 || dimension <= 0 || dimension % 8 != 0 ||
+      params->graph_degree == 0) {
+    set_message(
+      message, message_len, "null pointer, empty shape, bits not whole bytes or graph degree 0");
+    return KNN_CAGRA_ARGUMENTS;
+  }
+  return build_graph(gpu->res,
+                     bits,
+                     rows,
+                     dimension / 8,
+                     faiss_binary_index_params(*params),
+                     params->graph_degree,
+                     graph,
+                     graph_len,
+                     degree,
+                     message,
+                     message_len);
 }

@@ -5,10 +5,6 @@
 //! `tests/data/requests.json` holds the service's own answers, recorded by
 //! `tools/oracle/requests.py`.
 //!
-//! Where the service accepts a request knn-builder cannot build yet,
-//! binary vectors and the hamming space, the error is an `unsupported` one
-//! on that field, so k-NN builds the segment itself.
-//!
 //! The body is read as JSON (RFC 8259) in UTF-8, after a UTF-8 BOM if
 //! there is one. Python's `json.loads` reads more, none of which k-NN's
 //! client sends: forms outside the RFC, which are UTF-16 and UTF-32,
@@ -76,8 +72,7 @@ pub struct FieldError {
     pub field: String,
     /// The service's message.
     pub message: String,
-    /// The service's error type: `missing`, `greater_than`, `enum`, ...;
-    /// `unsupported` for what only knn-builder refuses.
+    /// The service's error type: `missing`, `greater_than`, `enum`, ...
     pub kind: &'static str,
 }
 
@@ -177,6 +172,7 @@ impl BuildRequest {
                 DataType::Float => "float",
                 DataType::HalfFloat => "half_float",
                 DataType::Byte => "byte",
+                DataType::Binary => "binary",
             },
             "engine": "faiss",
             "index_parameters": {
@@ -184,6 +180,7 @@ impl BuildRequest {
                 "space_type": match self.space_type {
                     SpaceType::L2 => "l2",
                     SpaceType::InnerProduct => "innerproduct",
+                    SpaceType::Hamming => "hamming",
                 },
                 "algorithm_parameters": algorithm_parameters,
             },
@@ -356,14 +353,13 @@ pub fn parse(body: &[u8]) -> Result<BuildRequest, Rejection> {
             &["float", "half_float", "byte", "binary"],
             "float",
         )
+        // `choice` returns only the values it lists.
         .and_then(|choice| match choice {
             "float" => Some(DataType::Float),
             "half_float" => Some(DataType::HalfFloat),
             "byte" => Some(DataType::Byte),
-            other => {
-                errors.unsupported("body.data_type", &format!("{other} vectors"));
-                None
-            }
+            "binary" => Some(DataType::Binary),
+            _ => None,
         });
     errors.choice("body.engine", field("engine"), &["faiss"], "faiss");
     let index = errors.index_parameters(field("index_parameters"));
@@ -459,16 +455,6 @@ impl Errors {
             message,
             kind,
         });
-    }
-
-    fn unsupported(&mut self, field: &str, what: &str) {
-        self.push(
-            field,
-            format!(
-                "knn-builder does not build {what} yet; the data node builds this segment itself"
-            ),
-            "unsupported",
-        );
     }
 
     fn required_string(&mut self, field: &str, value: Option<&Value>) -> Option<String> {
@@ -674,16 +660,12 @@ impl Errors {
                 &["l2", "innerproduct", "hamming"],
                 "l2",
             )
+            // `choice` returns only the values it lists.
             .and_then(|choice| match choice {
                 "l2" => Some(SpaceType::L2),
                 "innerproduct" => Some(SpaceType::InnerProduct),
-                other => {
-                    self.unsupported(
-                        "body.index_parameters.space_type",
-                        &format!("the {other} space"),
-                    );
-                    None
-                }
+                "hamming" => Some(SpaceType::Hamming),
+                _ => None,
             });
         let parameters = match object.get("algorithm_parameters") {
             None => &empty,

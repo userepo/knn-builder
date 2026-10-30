@@ -3,7 +3,9 @@
 //! `fixtures/grid/fits.json` say, so the constants are the fit's, and a
 //! refit that changes them fails here until the model follows. And against
 //! what it was not fitted to, byte builds (`fixtures/grid/byte-runs.json`,
-//! `byte-cpu.json`), predicted within the errors of the builds it was.
+//! `byte-cpu.json`), predicted within the errors of the builds it was. The
+//! binary models are held to `binary-fits.json` on every binary build alike
+//! (`binary-runs.json`, `binary-cpu.json`).
 
 #![allow(
     clippy::unwrap_used,
@@ -63,6 +65,7 @@ fn job(record: &Value) -> Job {
             "float" => DataType::Float,
             "half_float" => DataType::HalfFloat,
             "byte" => DataType::Byte,
+            "binary" => DataType::Binary,
             other => panic!("{other}"),
         },
         space_type: SpaceType::L2,
@@ -242,9 +245,12 @@ impl Errors {
 
     /// No worse than `bound` on the median, the largest and the most under.
     fn within(&self, bound: &Self) -> bool {
-        self.median_abs <= bound.median_abs
-            && self.max_abs <= bound.max_abs
-            && self.most_under >= bound.most_under
+        self.median_abs <= bound.median_abs && self.within_spread(bound)
+    }
+
+    /// No worse than `bound` on the largest and the most under.
+    fn within_spread(&self, bound: &Self) -> bool {
+        self.max_abs <= bound.max_abs && self.most_under >= bound.most_under
     }
 }
 
@@ -314,6 +320,122 @@ fn predicts_byte_builds_as_closely_as_the_float_ones() {
             "file bytes of {}: {predicted} for {observed}",
             record["shape"]
         );
+    }
+}
+
+#[test]
+fn costs_what_the_binary_fit_says() {
+    let fits = fixture("binary-fits.json");
+    let builds = completed("binary-runs.json");
+    assert_eq!(builds.len(), 30);
+    let device = &fits["device_peak_bytes"];
+    let rows = device["rows"].as_f64().unwrap();
+    for record in &builds {
+        let job = job(record);
+        let shape = &record["shape"];
+        let n = shape["doc_count"].as_f64().unwrap();
+        let d = shape["dimension"].as_f64().unwrap();
+        let g = 4.0 * shape["m"].as_f64().unwrap();
+        let build = evaluate(
+            &fits["build_seconds"]["terms"],
+            &[
+                ("1", 1.0),
+                ("n d", n * d),
+                ("n g", n * g),
+                ("n g^2", n * g * g),
+                ("n g^2 d", n * g * g * d),
+            ],
+        );
+        close(RTX_4070.stages(&job).build, build, "build seconds", record);
+        let file = evaluate(
+            &fits["file_bytes"]["terms"],
+            &[
+                ("1", 1.0),
+                ("n d / 8", n * d / 8.0),
+                ("n g", n * g),
+                ("n", n),
+            ],
+        );
+        close(Fitted::file_bytes(&job), file, "file bytes", record);
+        let nn_descent = n * d / 8.0
+            + 4.0 * n * g
+            + evaluate(
+                &device["nn_descent_phase"],
+                &[("1", 1.0), ("n", n), ("n g", n * g)],
+            );
+        let graph = 4.0 * n * g
+            + evaluate(
+                &device["graph_phase"],
+                &[
+                    ("1", 1.0),
+                    ("n g", n * g),
+                    ("min(n, rows) g", n.min(rows) * g),
+                ],
+            );
+        close(
+            Fitted::device_peak_bytes(&job),
+            n * d / 8.0 + nn_descent.max(graph),
+            "device peak",
+            record,
+        );
+        // The margin covers every peak.
+        assert!(
+            Fitted::device_bytes_needed(&job) >= record["device"]["peak_bytes"].as_u64().unwrap(),
+            "{shape}"
+        );
+    }
+    // The transfers are the float models', within the float grid's spread:
+    // a median over transfers of tenths of a second against LocalStack
+    // moves with LocalStack (5.7% for the downloads here, 5.5% there).
+    let float = fixture("fits.json");
+    let stages: [(&str, &str, StageOf); 2] = [
+        ("download_seconds", "download", |s| s.download),
+        ("upload_seconds", "upload", |s| s.upload),
+    ];
+    for (model, key, of) in stages {
+        let errors = Errors::of(builds.iter().map(|r| {
+            let observed = r["seconds"][key].as_f64().unwrap();
+            (of(&RTX_4070.stages(&job(r))), observed)
+        }));
+        let trained = Errors::trained(&float, model);
+        assert!(
+            errors.within_spread(&trained),
+            "{model}: {errors:?}, {trained:?}"
+        );
+    }
+}
+
+#[test]
+fn takes_the_binary_cpu_build_the_fit_says() {
+    let fits = fixture("binary-fits.json");
+    let template = job(&completed("binary-runs.json")[0]);
+    let Value::Array(cpu) = fixture("binary-cpu.json") else {
+        panic!("binary-cpu.json is a list")
+    };
+    assert_eq!(cpu.len(), 14);
+    for record in &cpu {
+        let shape = &record["shape"];
+        let n = shape["doc_count"].as_f64().unwrap();
+        let d = shape["dimension"].as_f64().unwrap();
+        let job = Job {
+            doc_count: u32::try_from(shape["doc_count"].as_u64().unwrap()).unwrap(),
+            dimension: u32::try_from(shape["dimension"].as_u64().unwrap()).unwrap(),
+            ..template.clone()
+        };
+        let (threads, key) = match record["threads"].as_u64().unwrap() {
+            1 => (CpuThreads::One, "cpu_seconds_1_threads"),
+            4 => (CpuThreads::Four, "cpu_seconds_4_threads"),
+            other => panic!("{other} threads"),
+        };
+        let fit = evaluate(
+            &fits[key]["terms"],
+            &[
+                ("1", 1.0),
+                ("n log2(n)", n * n.log2()),
+                ("n log2(n) d", n * n.log2() * d),
+            ],
+        );
+        close(Fitted::cpu_seconds(&job, threads), fit, key, record);
     }
 }
 

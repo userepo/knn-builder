@@ -12,6 +12,9 @@ pub enum DataType {
     HalfFloat,
     /// `byte`: int8 values.
     Byte,
+    /// `binary`: packed bits, the dimension / 8 bytes of each vector, built
+    /// through NN-descent in Hamming distance whatever the space type.
+    Binary,
 }
 
 /// The request's `space_type`.
@@ -21,24 +24,41 @@ pub enum SpaceType {
     L2,
     /// `innerproduct`.
     InnerProduct,
+    /// `hamming`, binary vectors' space. Other vectors build in L2 under
+    /// it, as the service's `configure_metric` falls back.
+    Hamming,
 }
 
 impl SpaceType {
-    /// The metric the graph is built for.
+    /// The metric an IVF-PQ graph is built for.
     #[must_use]
     pub fn build_metric(self) -> knn_gpu::Metric {
         match self {
-            Self::L2 => knn_gpu::Metric::L2,
+            Self::L2 | Self::Hamming => knn_gpu::Metric::L2,
             Self::InnerProduct => knn_gpu::Metric::InnerProduct,
         }
     }
+}
 
-    /// The metric the index file records.
+/// What a job's graph is built with: IVF-PQ for float, fp16 and byte
+/// vectors, NN-descent for binary ones.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GraphParams {
+    /// An IVF-PQ graph build.
+    IvfPq(knn_gpu::BuildParams),
+    /// An NN-descent graph build in Hamming distance.
+    Binary(knn_gpu::BinaryParams),
+}
+
+impl GraphParams {
+    /// The neighbors each of `doc_count` vectors gets: the degree asked
+    /// for, which for a binary build cuVS lowers to one less than the
+    /// vector count when that is fewer.
     #[must_use]
-    pub fn file_metric(self) -> knn_write::Metric {
+    pub fn degree_for(&self, doc_count: u32) -> u32 {
         match self {
-            Self::L2 => knn_write::Metric::L2,
-            Self::InnerProduct => knn_write::Metric::InnerProduct,
+            Self::IvfPq(params) => params.graph_degree,
+            Self::Binary(params) => params.graph_degree.min(doc_count.saturating_sub(1).max(1)),
         }
     }
 }
@@ -72,6 +92,58 @@ pub struct Job {
 }
 
 impl Job {
+    /// The parameters the job's graph is built with, as the service derives
+    /// them from its request.
+    ///
+    /// # Errors
+    ///
+    /// Returns knn-gpu's error for a count, dimension or m of 0, and for
+    /// binary vectors a dimension that is not whole bytes.
+    pub fn graph_params(&self) -> Result<GraphParams, knn_gpu::Error> {
+        match self.data_type {
+            DataType::Binary => knn_gpu::BinaryParams::new(self.doc_count, self.dimension, self.m)
+                .map(GraphParams::Binary),
+            DataType::Float | DataType::HalfFloat | DataType::Byte => knn_gpu::BuildParams::new(
+                self.doc_count,
+                self.dimension,
+                self.m,
+                self.space_type.build_metric(),
+            )
+            .map(GraphParams::IvfPq),
+        }
+    }
+
+    /// The metric the index file records: Hamming for binary vectors, and
+    /// otherwise the one the graph is built for.
+    #[must_use]
+    pub fn file_metric(&self) -> knn_write::Metric {
+        match (self.data_type, self.space_type.build_metric()) {
+            (DataType::Binary, _) => knn_write::Metric::Hamming,
+            (_, knn_gpu::Metric::L2) => knn_write::Metric::L2,
+            (_, knn_gpu::Metric::InnerProduct) => knn_write::Metric::InnerProduct,
+        }
+    }
+
+    /// The neighbors each vector gets, or `None` when the parameters fail
+    /// and the job fails before a graph.
+    pub(crate) fn graph_degree(&self) -> Option<u32> {
+        self.graph_params()
+            .ok()
+            .map(|params| params.degree_for(self.doc_count))
+    }
+
+    /// The bytes of one vector in its blob, as downloaded: fp16 for
+    /// `half_float`, whatever the blob holds.
+    pub(crate) fn vector_bytes(&self) -> u64 {
+        let dimension = u64::from(self.dimension);
+        match self.data_type {
+            DataType::Float => dimension * 4,
+            DataType::HalfFloat => dimension * 2,
+            DataType::Byte => dimension,
+            DataType::Binary => dimension / 8,
+        }
+    }
+
     /// The index file's key: the vector path with its last extension
     /// replaced by `.faiss`, next to the vectors, as the service names it.
     #[must_use]
@@ -94,26 +166,12 @@ impl Job {
     }
 
     /// The host memory the job's buffers take, in bytes: the vectors as
-    /// downloaded (fp16 for `half_float`, whatever the blob holds), the
-    /// doc ids, and the graph. Saturating, past any memory.
+    /// downloaded, the doc ids, and the graph. Saturating, past any memory.
     pub(crate) fn host_bytes(&self) -> u64 {
-        let (doc_count, dimension) = (u64::from(self.doc_count), u64::from(self.dimension));
-        let value_size = match self.data_type {
-            DataType::Float => 4,
-            DataType::HalfFloat => 2,
-            DataType::Byte => 1,
-        };
+        let doc_count = u64::from(self.doc_count);
         // No graph when the parameters fail; the job fails before one.
-        let degree = knn_gpu::BuildParams::new(
-            self.doc_count,
-            self.dimension,
-            self.m,
-            self.space_type.build_metric(),
-        )
-        .map_or(0, |params| u64::from(params.graph_degree));
-        let vectors = doc_count
-            .saturating_mul(dimension)
-            .saturating_mul(value_size);
+        let degree = self.graph_degree().map_or(0, u64::from);
+        let vectors = doc_count.saturating_mul(self.vector_bytes());
         let ids = doc_count * 4;
         let graph = doc_count.saturating_mul(degree).saturating_mul(4);
         vectors.saturating_add(ids).saturating_add(graph)
@@ -122,7 +180,7 @@ impl Job {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::{DataType, Job, SpaceType};
+    use super::{DataType, GraphParams, Job, SpaceType};
 
     /// A job on `bucket` for `doc_count` x `dimension` fp32 vectors.
     pub(crate) fn job(bucket: &str, doc_count: u32, dimension: u32) -> Job {
@@ -150,11 +208,35 @@ pub(crate) mod tests {
             SpaceType::InnerProduct.build_metric(),
             knn_gpu::Metric::InnerProduct
         );
-        assert_eq!(SpaceType::L2.file_metric(), knn_write::Metric::L2);
-        assert_eq!(
-            SpaceType::InnerProduct.file_metric(),
-            knn_write::Metric::InnerProduct
-        );
+        assert_eq!(SpaceType::Hamming.build_metric(), knn_gpu::Metric::L2);
+        let mut job = job("bucket", 10, 8);
+        assert_eq!(job.file_metric(), knn_write::Metric::L2);
+        job.space_type = SpaceType::InnerProduct;
+        assert_eq!(job.file_metric(), knn_write::Metric::InnerProduct);
+        // The service builds float vectors under hamming in L2.
+        job.space_type = SpaceType::Hamming;
+        assert_eq!(job.file_metric(), knn_write::Metric::L2);
+        // And binary vectors in Hamming distance under any space type.
+        job.data_type = DataType::Binary;
+        for space in [SpaceType::L2, SpaceType::InnerProduct, SpaceType::Hamming] {
+            job.space_type = space;
+            assert_eq!(job.file_metric(), knn_write::Metric::Hamming);
+        }
+    }
+
+    #[test]
+    fn builds_binary_vectors_through_nn_descent() {
+        let mut job = job("bucket", 40, 256);
+        job.data_type = DataType::Binary;
+        let params = job.graph_params().unwrap();
+        assert!(matches!(params, GraphParams::Binary(_)));
+        // m 16 asks 64 neighbors of 40 vectors; cuVS gives 39.
+        assert_eq!(params.degree_for(40), 39);
+        assert_eq!(job.graph_degree(), Some(39));
+        assert_eq!(job.vector_bytes(), 32);
+        assert_eq!(job.host_bytes(), 40 * 32 + 40 * 4 + 40 * 39 * 4);
+        job.dimension = 12;
+        assert!(job.graph_params().is_err());
     }
 
     #[test]

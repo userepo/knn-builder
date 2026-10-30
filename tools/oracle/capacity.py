@@ -74,8 +74,9 @@ def around_limits():
         (3, "float", 0),
         (768, "byte", 16),
         (4096, "byte", 32),
+        (1024, "binary", 16),
     ]:
-        size = {"float": 4, "half_float": 2, "byte": 1}[data_type]
+        size = {"float": 4, "half_float": 2, "byte": 1, "binary": 1}[data_type]
         index = (dimension * size + m * 8) * 1.1
         per_cpu = index + dimension * size
         per_gpu = index * 0.5
@@ -109,6 +110,15 @@ def spread():
             "byte",
             rng.choice([16, 32, 0, -1, 512]),
         )
+    # Binary requests: the service sizes a binary value, a bit, as a byte.
+    rng = random.Random(20261031)
+    for _ in range(40):
+        yield (
+            rng.choice([8, 64, 256, 1024, 4096]),
+            rng.choice([5, 1000, 10**6, rng.randrange(5, 2**32)]),
+            "binary",
+            rng.choice([16, 32, 0, -1, 512]),
+        )
     # Sizes far past every limit, up to 64-bit counts.
     for dimension, doc_count in [(2**32, 2**32), (2**63, 2**63), (2**64 - 1, 2**64 - 1)]:
         for m in [16, 2**63 - 1, -(2**63)]:
@@ -123,6 +133,7 @@ def at_limits():
         (100, 12345, "half_float", 7),
         (3, 5, "float", -1),
         (384, 54321, "byte", 16),
+        (1024, 54321, "binary", 16),
     ]:
         gpu, cpu = calculate_memory_requirements(
             request(dimension, doc_count, data_type, m)

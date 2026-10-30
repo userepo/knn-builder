@@ -11,7 +11,7 @@ use std::ffi::{CStr, c_char, c_int, c_void};
 use std::fmt;
 use std::ptr::{self, NonNull};
 
-use crate::{BuildParams, Error, Metric};
+use crate::{BinaryParams, BuildParams, Error, Metric};
 
 /// The shim's C interface, `cpp/knn_cagra.h`.
 mod ffi {
@@ -73,6 +73,21 @@ mod ffi {
         assert!(size_of::<Params>() == 48);
     };
 
+    /// `knn_cagra_binary_params`.
+    #[repr(C)]
+    pub(super) struct BinaryParams {
+        pub graph_degree: u32,
+        pub intermediate_graph_degree: u32,
+        pub nn_descent_niter: u32,
+    }
+
+    const _: () = {
+        assert!(offset_of!(BinaryParams, graph_degree) == 0);
+        assert!(offset_of!(BinaryParams, intermediate_graph_degree) == 4);
+        assert!(offset_of!(BinaryParams, nn_descent_niter) == 8);
+        assert!(size_of::<BinaryParams>() == 12);
+    };
+
     unsafe extern "C" {
         pub(super) fn knn_cagra_gpu_create(
             gpu: *mut *mut KnnCagraGpu,
@@ -91,6 +106,19 @@ mod ffi {
             params: *const Params,
             graph: *mut u32,
             graph_len: usize,
+            message: *mut c_char,
+            message_len: usize,
+        ) -> c_int;
+
+        pub(super) fn knn_cagra_build_binary(
+            gpu: *mut KnnCagraGpu,
+            bits: *const u8,
+            rows: i64,
+            dimension: i64,
+            params: *const BinaryParams,
+            graph: *mut u32,
+            graph_len: usize,
+            degree: *mut u32,
             message: *mut c_char,
             message_len: usize,
         ) -> c_int;
@@ -444,11 +472,96 @@ impl Gpu {
                 message.len(),
             )
         };
-        check(status, &message)?;
+        check(status, &message, "knn_cagra_build")?;
         // SAFETY: the capacity is at least `len`, and on success the shim
         // has copied exactly `len` ids into the buffer: it refuses a graph
-        // of any other size before copying.
+        // of more ids before copying, and a narrower one, which it copies,
+        // with a status other than success.
         unsafe { neighbors.set_len(len) };
+        Ok(Graph { neighbors, degree })
+    }
+
+    /// Builds the CAGRA graph of binary vectors, `bits` packed into
+    /// `dimension / 8` bytes each, as the upstream service does through
+    /// Faiss's `GpuIndexBinaryCagra`: the vectors are copied to a padded
+    /// device dataset, an NN-descent graph of `params.graph_degree`
+    /// neighbors is built in Hamming distance and pruned to that degree, and
+    /// copied back to the host. cuVS lowers the degree for too few vectors,
+    /// to one less than their count, and the graph has that degree.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Bits`] when `dimension` is not whole bytes,
+    /// [`Error::Vectors`] when the bytes are not whole rows, and otherwise
+    /// as [`Gpu::build`] does. Device memory is released either way.
+    pub fn build_binary(
+        &mut self,
+        bits: &[u8],
+        dimension: usize,
+        params: &BinaryParams,
+    ) -> Result<Graph, Error> {
+        let not_rows = || Error::Vectors {
+            values: bits.len(),
+            dimension,
+        };
+        if !dimension.is_multiple_of(8) {
+            return Err(Error::Bits { dimension });
+        }
+        let row_bytes = dimension / 8;
+        let rows = bits
+            .len()
+            .checked_div(row_bytes)
+            .filter(|&rows| rows > 0 && rows * row_bytes == bits.len())
+            .ok_or_else(not_rows)?;
+        let shape = (
+            i64::try_from(rows).map_err(|_| not_rows())?,
+            i64::try_from(dimension).map_err(|_| not_rows())?,
+        );
+        let max_degree = params.graph_degree as usize;
+        // cuVS builds no more neighbors than the other vectors, so a degree
+        // past them, which it lowers, takes no room.
+        let room = max_degree.min(rows.saturating_sub(1).max(1));
+        let (mut neighbors, len) = graph_buffer(rows, room)?;
+        let shim_params = ffi::BinaryParams {
+            graph_degree: params.graph_degree,
+            intermediate_graph_degree: params.graph_degree,
+            nn_descent_niter: BinaryParams::NN_DESCENT_NITER,
+        };
+        let mut degree = 0_u32;
+        let mut message = Message::new();
+        // SAFETY: the resources are live and used by this call alone
+        // (`&mut self`); `bits` holds rows x dimension / 8 bytes, `neighbors`
+        // has room for `len` ids, which the shim checks the graph against
+        // before copying, `degree` is a valid out-pointer and `message` a buffer
+        // of its length. The shim reads the bits and parameters, writes only
+        // the graph, the degree and the message, and keeps none of them.
+        let status = unsafe {
+            ffi::knn_cagra_build_binary(
+                self.resources.0.as_ptr(),
+                bits.as_ptr(),
+                shape.0,
+                shape.1,
+                &raw const shim_params,
+                neighbors.as_mut_ptr(),
+                len,
+                &raw mut degree,
+                message.as_mut_ptr(),
+                message.len(),
+            )
+        };
+        check(status, &message, "knn_cagra_build_binary")?;
+        let degree = degree as usize;
+        // On success the shim has copied rows x `degree` ids, at most `len`;
+        // it refuses a larger graph before copying.
+        let built = rows * degree;
+        if degree == 0 || built > len {
+            return Err(Error::Graph {
+                detail: format!("degree {degree} reported for at most {max_degree}"),
+            });
+        }
+        // SAFETY: the capacity is at least `len`, at least `built`, and on
+        // success the shim has written exactly `built` ids.
+        unsafe { neighbors.set_len(built) };
         Ok(Graph { neighbors, degree })
     }
 }
@@ -510,8 +623,9 @@ impl Message {
 }
 
 /// Turns a shim status into a result: [`Error::Graph`] for a graph of the
-/// wrong shape, [`Error::Cuvs`] naming the step for any other failure.
-fn check(status: c_int, message: &Message) -> Result<(), Error> {
+/// wrong shape, [`Error::Cuvs`] naming the step for any other failure, the
+/// shim's `entry` point for arguments it refused.
+fn check(status: c_int, message: &Message, entry: &'static str) -> Result<(), Error> {
     let call = match status {
         ffi::OK => return Ok(()),
         ffi::GRAPH => {
@@ -523,7 +637,7 @@ fn check(status: c_int, message: &Message) -> Result<(), Error> {
         ffi::DATASET => "make_device_padded_dataset",
         ffi::BUILD => "cagra::build",
         ffi::COPY => "raft::copy",
-        ffi::ARGUMENTS => "knn_cagra_build",
+        ffi::ARGUMENTS => entry,
         _ => "the cuVS shim",
     };
     Err(Error::Cuvs {
@@ -545,7 +659,7 @@ impl Resources {
         let status = unsafe {
             ffi::knn_cagra_gpu_create(&raw mut handle, message.as_mut_ptr(), message.len())
         };
-        check(status, &message)?;
+        check(status, &message, "knn_cagra_gpu_create")?;
         NonNull::new(handle).map(Self).ok_or_else(|| Error::Cuvs {
             call: "raft::resources",
             message: "no handle".to_owned(),

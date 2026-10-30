@@ -1,6 +1,7 @@
 //! Writes the Faiss index file the upstream remote-vector-index-builder
-//! hands back to OpenSearch k-NN: an ID map over an `IndexHNSWCagra`,
-//! from a CAGRA graph, the vectors and their doc ids, without Faiss. The
+//! hands back to OpenSearch k-NN: an ID map over an `IndexHNSWCagra`, or
+//! for binary vectors over an `IndexBinaryHNSWCagra`, from a CAGRA graph,
+//! the vectors and their doc ids, without Faiss. The
 //! output matches the service's own file exactly (`docs/faiss-layout.md`
 //! in the repository; the oracle in `tools/oracle` and the fixtures check
 //! it).

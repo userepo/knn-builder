@@ -355,6 +355,60 @@
     "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
   },
   {
+    "case": "binary data, l2",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"binary\", \"index_parameters\": {\"space_type\": \"l2\"}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "binary",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "float data, hamming",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"space_type\": \"hamming\"}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "hamming",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
     "case": "m 0",
     "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"m\": 0}}}",
     "status": 200,

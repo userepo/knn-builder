@@ -1,5 +1,6 @@
-//! Device memory after many builds, some failing inside cuVS: every build,
-//! finished or not, must give back what it took; a reservation holds what
+//! Device memory after many builds, some failing inside cuVS, and after
+//! many binary ones: every build, finished or not, must give back what it
+//! took; a reservation holds what
 //! it took until dropped; and the device's shared memory a block reads as a
 //! GPU's can. Needs the `gpu` feature, a CUDA GPU and the conda environment
 //! in `environment.yml`.
@@ -17,7 +18,7 @@
 use std::sync::Mutex;
 
 use knn_gpu::{
-    BuildParams, Error, Gpu, HostVectors, Metric, Reservation, device_memory,
+    BinaryParams, BuildParams, Error, Gpu, HostVectors, Metric, Reservation, device_memory,
     shared_memory_per_block,
 };
 
@@ -167,4 +168,34 @@ fn reads_the_shared_memory_a_block_may_take() {
     let bytes = shared_memory_per_block().unwrap();
     println!("{bytes} bytes of shared memory a block");
     assert!((48 << 10..256 << 10).contains(&bytes), "{bytes}");
+}
+
+#[test]
+fn binary_builds_return_their_device_memory() {
+    let _gpu = GPU.lock().expect("a GPU test failed holding the lock");
+    // 20,000 vectors of 256 bits: random bytes from the float draw's bits.
+    let bits: Vec<u8> = random_vectors(ROWS * 8, 11)
+        .iter()
+        .flat_map(|v| v.to_le_bytes())
+        .collect();
+    let params = BinaryParams::new(20_000, 256, 16).unwrap();
+    let mut gpu = Gpu::new().unwrap();
+    gpu.build_binary(&bits, 256, &params).unwrap();
+    let baseline = free_device_memory();
+    for _ in 0..40 {
+        gpu.build_binary(&bits, 256, &params).unwrap();
+    }
+    let after = free_device_memory();
+    println!(
+        "40 binary builds; free device memory {} MiB before, {} MiB after",
+        baseline / MIB,
+        after / MIB
+    );
+    // The graph alone is 5 MiB on the device, so a leak per build would
+    // lose some 200 MiB over 40.
+    assert!(
+        after + 64 * MIB >= baseline,
+        "{} MiB fewer free after 40 builds",
+        (baseline - after) / MIB
+    );
 }

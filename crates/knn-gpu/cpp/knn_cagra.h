@@ -31,11 +31,12 @@ enum {
   KNN_CAGRA_BUILD     = 3, /* the CAGRA build */
   KNN_CAGRA_GRAPH     = 4, /* a graph of another shape than asked for */
   KNN_CAGRA_COPY      = 5, /* copying the graph to the host */
-  KNN_CAGRA_ARGUMENTS = 6, /* a null pointer, an empty shape, an unknown type */
+  KNN_CAGRA_ARGUMENTS = 6, /* a null pointer, an empty shape, an unknown type or
+                              metric, bits not whole bytes, a graph degree of 0 */
 };
 
-/* The values the upstream service sets; the shim sets Faiss's own
- * defaults for the rest, as Faiss does. */
+/* The values the upstream service sets for an IVF-PQ build; the shim sets
+ * Faiss's own defaults for the rest, as Faiss does. */
 typedef struct knn_cagra_params {
   int32_t metric;
   uint32_t graph_degree;
@@ -50,6 +51,14 @@ typedef struct knn_cagra_params {
   bool force_random_rotation;
   bool conservative_memory_allocation;
 } knn_cagra_params;
+
+/* The values of a binary build, an NN-descent graph in Hamming distance,
+ * as Faiss's BinaryCuvsCagra sets them. */
+typedef struct knn_cagra_binary_params {
+  uint32_t graph_degree;
+  uint32_t intermediate_graph_degree;
+  uint32_t nn_descent_niter;
+} knn_cagra_binary_params;
 
 /*
  * Each function that can fail returns a status and, on failure, writes a
@@ -83,6 +92,27 @@ int knn_cagra_build(knn_cagra_gpu* gpu,
                     size_t graph_len,
                     char* message,
                     size_t message_len);
+
+/*
+ * Builds the CAGRA graph of `rows` binary vectors of `dimension` bits, a
+ * multiple of 8, packed into dimension / 8 bytes each, row-major, and
+ * copies it into `graph`, which has room for `graph_len` ids. cuVS lowers
+ * the degree for fewer vectors than it needs, so the graph can be narrower
+ * than rows x params->graph_degree: `degree` receives its degree, the graph
+ * fills the first rows x *degree ids, row-major, and a graph of more than
+ * `graph_len` ids is refused before copying. Frees everything it allocated
+ * on the device before returning, on failure too.
+ */
+int knn_cagra_build_binary(knn_cagra_gpu* gpu,
+                           const uint8_t* bits,
+                           int64_t rows,
+                           int64_t dimension,
+                           const knn_cagra_binary_params* params,
+                           uint32_t* graph,
+                           size_t graph_len,
+                           uint32_t* degree,
+                           char* message,
+                           size_t message_len);
 
 #ifdef __cplusplus
 }

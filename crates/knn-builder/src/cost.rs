@@ -22,6 +22,19 @@
 //! build's time counts a byte value as 4 bytes. A data node's own byte
 //! build takes as long as a float one too (`byte-cpu.json`).
 //!
+//! A binary build, NN-descent in Hamming distance with d counting bits, has
+//! models of its own, fitted to 30 builds by `tools/grid/fit.py binary`
+//! (`fixtures/grid/binary-runs.json`, `binary-fits.json`): its time about
+//! n d and n g^2 d, NN-descent comparing each node with pairs of its
+//! candidates; its device peak the dataset, n d / 8 bytes, and the larger of
+//! NN-descent's phase (a copy of the dataset and its graph) and the graph's
+//! optimization (the graph and a buffer over at most 520,000 rows); its
+//! file's size by terms of a float file's form, fitted anew. Its transfers are the float
+//! models', a binary blob being n d / 8 bytes, and well within their spread.
+//! A data node's own binary build, Faiss's binary HNSW, has its CPU model
+//! too (`binary-cpu.json`), as fast on 4 threads as the GPU's NN-descent
+//! at 500,000 vectors of 1,024 bits.
+//!
 //! Beside them, the build a data node runs itself when the service refuses
 //! a segment: Faiss's HNSW over the float vectors (M 16,
 //! `ef_construction` 100), timed with faiss-cpu 1.15.1 on the same machine's CPU on 1 and 4
@@ -32,7 +45,7 @@
 
 use knn_gpu::BuildParams;
 
-use crate::{DataType, Job};
+use crate::{DataType, GraphParams, Job};
 
 /// The threads a data node builds a graph on itself
 /// (`knn.algo_param.index_thread_qty`): the two its CPU build was measured
@@ -90,26 +103,28 @@ struct Shape {
     file_s: f64,
     /// The graph degree.
     degree: u32,
+    /// A binary build, NN-descent in Hamming distance, whose d counts bits.
+    binary: bool,
     g: f64,
     pq_dim: u32,
 }
 
 impl Shape {
     fn of(job: &Job) -> Self {
+        // A binary dimension counts bits, an eighth of a byte each.
         let s = match job.data_type {
             DataType::Float => 4.0,
             DataType::HalfFloat => 2.0,
             DataType::Byte => 1.0,
+            DataType::Binary => 0.125,
         };
         // A job whose parameters fail is built by no one; its forecast
         // only has to be finite.
-        let params = BuildParams::new(
-            job.doc_count,
-            job.dimension,
-            job.m,
-            job.space_type.build_metric(),
-        )
-        .ok();
+        let degree = job.graph_degree().unwrap_or(0);
+        let pq_dim = match job.graph_params() {
+            Ok(GraphParams::IvfPq(params)) => params.pq_dim,
+            Ok(GraphParams::Binary(_)) | Err(_) => 0,
+        };
         Self {
             n: f64::from(job.doc_count),
             d: f64::from(job.dimension),
@@ -124,15 +139,15 @@ impl Shape {
             // float field with the fp16 quantizer, which only its size
             // tells apart once the download starts: counted as fp32 until
             // then.
-            blob_s: if job.data_type == DataType::Byte {
-                1.0
-            } else {
-                4.0
+            blob_s: match job.data_type {
+                DataType::Byte | DataType::Binary => s,
+                DataType::Float | DataType::HalfFloat => 4.0,
             },
             file_s: if job.skip_stored_vectors { 0.0 } else { s },
-            degree: params.map_or(0, |p| p.graph_degree),
-            g: params.map_or(0.0, |p| f64::from(p.graph_degree)),
-            pq_dim: params.map_or(0, |p| p.pq_dim),
+            degree,
+            binary: job.data_type == DataType::Binary,
+            g: f64::from(degree),
+            pq_dim,
         }
     }
 }
@@ -167,13 +182,21 @@ impl Fitted {
         } else {
             0.0
         };
-        Stages {
-            download: 0.004_586_874_751_921_019 + 2.440_557_794_472_648_3e-9 * n * d * x.blob_s,
-            build: 0.462_016_340_462_556_74
+        let build = if x.binary {
+            4.484_168_419_630_195_4e-8 * n * d
+                + 1.781_806_605_547_999_5e-8 * n * g
+                + 3.253_617_429_798_503_6e-11 * n * g * g
+                + 9.243_215_069_359_727e-14 * n * g * g * d
+        } else {
+            0.462_016_340_462_556_74
                 + 2.646_071_502_409_124e-9 * n * d * x.build_s
                 + 8.893_904_400_583_446e-12 * n.powf(1.5) * d
                 + 1.473_025_728_723_046_4e-10 * n * g * g
-                + 8.832_281_977_621_297e-11 * slow,
+                + 8.832_281_977_621_297e-11 * slow
+        };
+        Stages {
+            download: 0.004_586_874_751_921_019 + 2.440_557_794_472_648_3e-9 * n * d * x.blob_s,
+            build,
             upload: 2.384_391_263_270_578_8e-9 * n * d * x.file_s
                 + 6.416_459_498_281_393_6e-9 * n * g
                 + 1.330_050_367_178_579_5e-7 * n,
@@ -202,6 +225,12 @@ impl Fitted {
     #[must_use]
     pub fn file_bytes(job: &Job) -> f64 {
         let x = Shape::of(job);
+        if x.binary {
+            return 6_901.013_298_726_097
+                + 1.000_002_637_373_886 * x.n * x.d * x.file_s
+                + 3.998_690_043_805_443 * x.n * x.g
+                + 24.212_232_411_297_077 * x.n;
+        }
         6_589.814_920_669_402
             + 1.000_000_492_050_695_3 * x.n * x.d * x.file_s
             + 3.998_668_335_023_911 * x.n * x.g
@@ -213,11 +242,23 @@ impl Fitted {
     /// bytes a vector, and a batch of about 127k rows of d floats) and the
     /// graph's optimization (the graph, 4 g bytes a vector, and a buffer of
     /// g ids over at most 500,000 rows). The codes and the graph are floors
-    /// the fitted terms only add to.
+    /// the fitted terms only add to. For a binary build, the dataset and the
+    /// larger of NN-descent's phase (a copy of the dataset and its graph)
+    /// and the graph's optimization (the graph and a buffer of g ids over at
+    /// most 520,000 rows), again on floors.
     #[must_use]
     pub fn device_peak_bytes(job: &Job) -> f64 {
         let x = Shape::of(job);
         let (n, d, g) = (x.n, x.d, x.g);
+        if x.binary {
+            let dataset = n * d * x.s;
+            let nn_descent = dataset + 4.0 * n * g + 5_701_632.0;
+            let graph = 4.0 * n * g
+                + 5_741_063.172_462_075
+                + 0.001_685_952_471_530_249_9 * n * g
+                + 4.139_523_539_509_295 * n.min(520_000.0) * g;
+            return dataset + nn_descent.max(graph);
+        }
         let ivf_pq =
             n * f64::from(x.pq_dim) + 509_470.100_899_898_9 * d + 0.067_215_460_416_540_28 * n * d;
         let graph = 4.0 * n * g
@@ -247,6 +288,17 @@ impl Fitted {
     pub fn cpu_seconds(job: &Job, threads: CpuThreads) -> f64 {
         let x = Shape::of(job);
         let n_log_n = x.n * x.n.max(1.0).log2();
+        if x.binary {
+            return match threads {
+                CpuThreads::One => {
+                    2.562_140_325_441_633_3e-6 * n_log_n
+                        + 3.325_921_398_800_654_3e-9 * n_log_n * x.d
+                }
+                CpuThreads::Four => {
+                    7.079_431_515_444_463e-7 * n_log_n + 8.526_998_939_344_604e-10 * n_log_n * x.d
+                }
+            };
+        }
         match threads {
             CpuThreads::One => {
                 3.236_285_214_401_488_3e-6 * n_log_n + 2.013_133_437_965_566e-8 * n_log_n * x.d
@@ -262,7 +314,7 @@ impl Fitted {
 /// the model's worst under-estimate on the grid it was fitted to (2.7%),
 /// and a little for what cuVS rounds its allocations up to. A byte build
 /// is off by the same bytes as a float one of its shape, which is up to
-/// 3.0% of its smaller peak.
+/// 3.0% of its smaller peak; the binary model is under by at most 1.2%.
 pub const DEVICE_MARGIN: f64 = 0.06;
 
 #[cfg(test)]

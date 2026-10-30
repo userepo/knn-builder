@@ -1,0 +1,68 @@
+[
+ {
+  "vector_path": "hamming-1000000x256-binary-clustered/vectors.knnvec",
+  "build_seconds": 13.96,
+  "samples": 242,
+  "peak_mib": 534
+ },
+ {
+  "vector_path": "hamming-100000x1024-binary-clustered/vectors.knnvec",
+  "build_seconds": 5.09,
+  "samples": 86,
+  "peak_mib": 76
+ },
+ {
+  "vector_path": "hamming-100000x256-binary-clustered/vectors.knnvec",
+  "build_seconds": 1.27,
+  "samples": 23,
+  "peak_mib": 66
+ },
+ {
+  "vector_path": "hamming-500000x1024-binary-clustered/vectors.knnvec",
+  "build_seconds": 26.04,
+  "samples": 429,
+  "peak_mib": 326
+ },
+ {
+  "vector_path": "hamming-500000x256-binary-clustered/vectors.knnvec",
+  "build_seconds": 6.79,
+  "samples": 117,
+  "peak_mib": 278
+ },
+ {
+  "vector_path": "hamming-1000000x1024-binary-clustered/vectors.knnvec",
+  "build_seconds": 54.9,
+  "samples": 909,
+  "peak_mib": 626
+ },
+ {
+  "vector_path": "hamming-1000000x256-binary-clustered/vectors.knnvec",
+  "build_seconds": 13.85,
+  "samples": 240,
+  "peak_mib": 534
+ },
+ {
+  "vector_path": "hamming-100000x1024-binary-clustered/vectors.knnvec",
+  "build_seconds": 5.07,
+  "samples": 84,
+  "peak_mib": 54
+ },
+ {
+  "vector_path": "hamming-100000x256-binary-clustered/vectors.knnvec",
+  "build_seconds": 1.26,
+  "samples": 23,
+  "peak_mib": 66
+ },
+ {
+  "vector_path": "hamming-500000x1024-binary-clustered/vectors.knnvec",
+  "build_seconds": 26.1,
+  "samples": 430,
+  "peak_mib": 326
+ },
+ {
+  "vector_path": "hamming-500000x256-binary-clustered/vectors.knnvec",
+  "build_seconds": 6.91,
+  "samples": 118,
+  "peak_mib": 280
+ }
+]

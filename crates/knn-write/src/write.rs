@@ -1,5 +1,7 @@
-//! The file: an `IxMp` ID map over an `IHc2` graph and its storage,
-//! written in file order. See `docs/faiss-layout.md` for every field.
+//! The file: an `IxMp` ID map over an `IHc2` graph and its storage, or
+//! for binary vectors an `IBMp` ID map over an `IBHc` graph and an `IBxF`
+//! storage, written in file order. See `docs/faiss-layout.md` for every
+//! field.
 
 use std::fmt;
 use std::io::{self, BufWriter, Write};
@@ -13,6 +15,9 @@ const HEADER_DUMMY: i64 = 1 << 20;
 /// A header's bytes after its fourcc: `d`, `ntotal`, two dummies,
 /// `is_trained`, `metric_type`.
 const HEADER_LEN: u64 = 4 + 8 + 8 + 8 + 1 + 4;
+/// A binary index's header after its fourcc (`write_index_binary_header`):
+/// `d`, `code_size`, `ntotal`, `is_trained`, `metric_type`.
+const BINARY_HEADER_LEN: u64 = 4 + 4 + 8 + 1 + 4;
 /// `IndexHNSWCagra::num_base_level_search_entrypoints`, at its default.
 const BASE_LEVEL_ENTRY_POINTS: i32 = 32;
 /// `ScalarQuantizer::QT_fp16`.
@@ -33,22 +38,27 @@ pub enum Metric {
     L2,
     /// `innerproduct`.
     InnerProduct,
+    /// `hamming`, binary vectors' space, and theirs alone.
+    Hamming,
 }
 
 impl Metric {
-    /// Faiss's `MetricType`.
+    /// Faiss's `MetricType`: a binary index records `METRIC_L2`, the
+    /// default it never changes, whatever its distance.
     fn faiss(self) -> i32 {
         match self {
             Self::InnerProduct => 0,
-            Self::L2 => 1,
+            Self::L2 | Self::Hamming => 1,
         }
     }
 
-    /// The flat storage's fourcc.
+    /// The flat storage's fourcc of float, fp16 or byte vectors. Binary
+    /// vectors, the only ones measured in Hamming distance, write `IBxF`
+    /// without it, so the Hamming arm never runs: it keeps the match whole.
     fn flat_fourcc(self) -> [u8; 4] {
         match self {
             Self::InnerProduct => *b"IxFI",
-            Self::L2 => *b"IxF2",
+            Self::L2 | Self::Hamming => *b"IxF2",
         }
     }
 }
@@ -64,6 +74,9 @@ pub enum Vectors<'a> {
     /// Int8 values: an `IxSQ` storage of `QT_8bit_direct_signed` codes,
     /// each value plus 128 as a byte.
     I8(&'a [i8]),
+    /// Binary vectors, packed bits, dimension / 8 bytes each: an `IBxF`
+    /// storage, under an `IBHc` graph. Only with [`Metric::Hamming`].
+    Bits(&'a [u8]),
 }
 
 impl Vectors<'_> {
@@ -72,6 +85,7 @@ impl Vectors<'_> {
             Self::F32(v) => v.len(),
             Self::F16(v) => v.len(),
             Self::I8(v) => v.len(),
+            Self::Bits(v) => v.len(),
         }
     }
 
@@ -80,7 +94,13 @@ impl Vectors<'_> {
             Self::F32(_) => NUMERIC_FLOAT32,
             Self::F16(_) => NUMERIC_FLOAT16,
             Self::I8(_) => NUMERIC_INT8,
+            // A binary graph records none.
+            Self::Bits(_) => 0,
         }
+    }
+
+    fn is_binary(&self) -> bool {
+        matches!(self, Self::Bits(_))
     }
 }
 
@@ -91,6 +111,7 @@ impl fmt::Debug for Vectors<'_> {
             Self::F32(v) => write!(f, "F32({} values)", v.len()),
             Self::F16(v) => write!(f, "F16({} values)", v.len()),
             Self::I8(v) => write!(f, "I8({} values)", v.len()),
+            Self::Bits(v) => write!(f, "Bits({} bytes)", v.len()),
         }
     }
 }
@@ -105,10 +126,15 @@ pub struct IndexSpec<'a> {
     /// The CAGRA graph, row-major: `graph_degree` neighbor ids per node,
     /// node i being the i-th vector.
     pub graph: &'a [u32],
-    /// Neighbors per node; even, as the service's m x 4 always is.
+    /// Neighbors per node; even, as the service's m x 4 always is, but
+    /// for binary vectors, whose degree cuVS lowers to one less than the
+    /// vector count when there are too few: an odd degree keeps the first
+    /// degree - 1 neighbors of each node, as `GpuIndexBinaryCagra::copyTo`
+    /// does.
     pub graph_degree: usize,
-    /// The vectors. Their type is recorded even when they are not
-    /// written; with `skip_stored_vectors`, only the type counts, and they
+    /// The vectors: values, or for [`Vectors::Bits`] bytes. Their type is
+    /// recorded even when they are not written; with
+    /// `skip_stored_vectors`, only the type counts, and they
     /// may be empty, so a caller can free them before the write.
     pub vectors: Vectors<'a>,
     /// The doc ids, one per vector, in node order.
@@ -160,10 +186,10 @@ impl<'a> IndexFile<'a> {
     /// # Errors
     ///
     /// Returns an [`Error`] when the counts disagree, the degree or
-    /// dimension is out of range, a neighbor id names no vector (which the
-    /// upstream service would write anyway; see
-    /// [`Error::NeighborOutOfRange`]), or the file would not fit a `u64`
-    /// length.
+    /// dimension is out of range, binary vectors and the Hamming metric do
+    /// not come together, a neighbor id names no vector (which the upstream
+    /// service would write anyway; see [`Error::NeighborOutOfRange`]), or
+    /// the file would not fit a `u64` length.
     pub fn new(spec: IndexSpec<'a>) -> Result<Self, Error> {
         let len = spec.ids.len();
         if len == 0 {
@@ -176,15 +202,25 @@ impl<'a> IndexFile<'a> {
             .ok_or(Error::Dimension {
                 dimension: spec.dimension,
             })?;
+        let binary = spec.vectors.is_binary();
+        if binary != (spec.metric == Metric::Hamming) {
+            return Err(Error::Hamming { binary });
+        }
+        if binary && !spec.dimension.is_multiple_of(8) {
+            return Err(Error::Dimension {
+                dimension: spec.dimension,
+            });
+        }
         let degree_error = Error::GraphDegree {
             degree: spec.graph_degree,
         };
-        if !spec.graph_degree.is_multiple_of(2) {
+        if !binary && !spec.graph_degree.is_multiple_of(2) {
             return Err(degree_error);
         }
         let m = u32::try_from(spec.graph_degree / 2).map_err(|_| degree_error.clone())?;
         let table = LevelTable::new(m).ok_or(degree_error)?;
-        // m and its doubled count fit i32, so the degree fits u32.
+        // m and its doubled count fit i32, so the degree fits u32. It is the
+        // slots of level 0: the graph's degree, less one where that is odd.
         let degree = m * 2;
 
         let expected = len.checked_mul(spec.graph_degree).ok_or(Error::TooLarge)?;
@@ -196,7 +232,12 @@ impl<'a> IndexFile<'a> {
                 degree: spec.graph_degree,
             });
         }
-        let expected = len.checked_mul(spec.dimension).ok_or(Error::TooLarge)?;
+        let row = if binary {
+            spec.dimension / 8
+        } else {
+            spec.dimension
+        };
+        let expected = len.checked_mul(row).ok_or(Error::TooLarge)?;
         if !spec.skip_stored_vectors && spec.vectors.len() != expected {
             return Err(Error::VectorsLength {
                 actual: spec.vectors.len(),
@@ -257,14 +298,26 @@ impl<'a> IndexFile<'a> {
         let len = self.count.unsigned_abs() as usize;
         let d = self.dimension;
         let metric = spec.metric.faiss();
+        let binary = spec.vectors.is_binary();
+        let code_size = d / 8;
 
-        // IndexIDMap: it wrapped the GPU index before training.
-        w.header(*b"IxMp", d, n, false, metric)?;
-        // IndexHNSWCagra and its four CAGRA fields.
-        w.header(*b"IHc2", d, n, true, metric)?;
-        w.bytes(&[1, 1])?; // keep_max_size_level0, base_level_only
-        w.i32(BASE_LEVEL_ENTRY_POINTS)?;
-        w.i32(spec.vectors.numeric_type())?;
+        if binary {
+            // IndexBinaryIDMap, wrapped before training, over
+            // IndexBinaryHNSWCagra and its three CAGRA fields; copyTo
+            // leaves keep_max_size_level0 false.
+            w.binary_header(*b"IBMp", d, code_size, n, false, metric)?;
+            w.binary_header(*b"IBHc", d, code_size, n, true, metric)?;
+            w.bytes(&[0, 1])?; // keep_max_size_level0, base_level_only
+            w.i32(BASE_LEVEL_ENTRY_POINTS)?;
+        } else {
+            // IndexIDMap: it wrapped the GPU index before training.
+            w.header(*b"IxMp", d, n, false, metric)?;
+            // IndexHNSWCagra and its four CAGRA fields.
+            w.header(*b"IHc2", d, n, true, metric)?;
+            w.bytes(&[1, 1])?; // keep_max_size_level0, base_level_only
+            w.i32(BASE_LEVEL_ENTRY_POINTS)?;
+            w.i32(spec.vectors.numeric_type())?;
+        }
 
         // The HNSW block.
         let probas = self.table.assign_probas();
@@ -290,8 +343,12 @@ impl<'a> IndexFile<'a> {
             .zip(self.table.levels(len))
             .flat_map(|(row, node): (&[u32], NodeLevel)| {
                 // Every id was checked to be below the count, at most
-                // i32::MAX, so reinterpreting it is exact.
-                let level0 = row.iter().map(|&id| id.cast_signed().to_le_bytes());
+                // i32::MAX, so reinterpreting it is exact. Level 0 holds
+                // the first `degree` of the row.
+                let level0 = row
+                    .iter()
+                    .take(degree as usize)
+                    .map(|&id| id.cast_signed().to_le_bytes());
                 let upper = node.slots.saturating_sub(degree) as usize;
                 level0.chain(iter::repeat_n((-1_i32).to_le_bytes(), upper))
             });
@@ -324,6 +381,10 @@ impl<'a> IndexFile<'a> {
                         values.iter().map(|&x| [x.cast_unsigned() ^ 0x80]),
                     )?;
                 }
+                Vectors::Bits(bytes) => {
+                    w.binary_header(*b"IBxF", d, code_size, n, true, metric)?;
+                    w.vector(bytes.len(), bytes.iter().map(|&b| [b]))?;
+                }
             }
         }
 
@@ -337,7 +398,12 @@ impl<'a> IndexFile<'a> {
 fn file_size(spec: &IndexSpec<'_>, table: &LevelTable, neighbor_slots: u64) -> Option<u64> {
     let n = u64::try_from(spec.ids.len()).ok()?;
     let values = u64::try_from(spec.vectors.len()).ok()?;
-    let header = 4 + HEADER_LEN;
+    let binary = spec.vectors.is_binary();
+    let header = 4 + if binary {
+        BINARY_HEADER_LEN
+    } else {
+        HEADER_LEN
+    };
     let vector = |count: u64, width: u64| count.checked_mul(width)?.checked_add(8);
     let probas = u64::try_from(table.assign_probas().len()).ok()?;
     let cum = u64::try_from(table.cum_nneighbor_per_level().len()).ok()?;
@@ -351,11 +417,15 @@ fn file_size(spec: &IndexSpec<'_>, table: &LevelTable, neighbor_slots: u64) -> O
             // trained vector, then the codes.
             Vectors::F16(_) => (header + 4 + 4 + 4 + 8 + 8 + 8).checked_add(vector(values, 2)?)?,
             Vectors::I8(_) => (header + 4 + 4 + 4 + 8 + 8 + 8).checked_add(vector(values, 1)?)?,
+            Vectors::Bits(_) => header.checked_add(vector(values, 1)?)?,
         }
     };
+    // The CAGRA fields: two flags, the entry points, and but for binary
+    // graphs the numeric type.
+    let cagra = if binary { 1 + 1 + 4 } else { 1 + 1 + 4 + 4 };
     [
-        header,                        // IxMp
-        header + 1 + 1 + 4 + 4,        // IHc2 and its CAGRA fields
+        header,                        // IxMp or IBMp
+        header + cagra,                // IHc2 or IBHc and its CAGRA fields
         vector(probas, 8)?,            // assign_probas
         vector(cum, 4)?,               // cum_nneighbor_per_level
         vector(n, 4)?,                 // levels
@@ -433,6 +503,24 @@ impl<W: Write> Sink<W> {
         self.bytes(&dim.to_le_bytes())?;
         self.bytes(&(dim * width).to_le_bytes())?; // code_size
         self.bytes(&0_u64.to_le_bytes()) // trained: empty
+    }
+
+    /// `write_index_binary_header`, after the structure's fourcc.
+    fn binary_header(
+        &mut self,
+        fourcc: [u8; 4],
+        d: i32,
+        code_size: i32,
+        ntotal: i64,
+        is_trained: bool,
+        metric: i32,
+    ) -> io::Result<()> {
+        self.bytes(&fourcc)?;
+        self.i32(d)?;
+        self.i32(code_size)?;
+        self.bytes(&ntotal.to_le_bytes())?;
+        self.bytes(&[u8::from(is_trained)])?;
+        self.i32(metric)
     }
 
     /// `WRITEVECTOR`: the element count as a u64, then the elements.
@@ -576,6 +664,106 @@ mod tests {
         assert_eq!(codes, [0, 127, 128, 129, 255, 133, 134, 135, 136, 137]);
         let count = &out[ids - values.len() - 8..ids - values.len()];
         assert_eq!(count, 10_u64.to_le_bytes());
+    }
+
+    /// Five binary vectors of 16 bits and a graph of `degree`.
+    fn binary_spec(graph: &[u32], degree: usize) -> IndexSpec<'_> {
+        IndexSpec {
+            dimension: 16,
+            metric: Metric::Hamming,
+            graph,
+            graph_degree: degree,
+            vectors: Vectors::Bits(&BITS),
+            ..spec()
+        }
+    }
+
+    const BITS: [u8; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+    fn bytes(spec: IndexSpec<'_>) -> Vec<u8> {
+        let file = IndexFile::new(spec).unwrap();
+        let mut out = Vec::new();
+        file.write_to(&mut out).unwrap();
+        assert_eq!(out.len() as u64, file.size());
+        out
+    }
+
+    #[test]
+    fn writes_an_odd_binary_degree_as_its_even_part() {
+        // Degree 4 plus one more neighbor a row: level 0 keeps the first
+        // four, so the file is the degree-4 graph's.
+        let odd: Vec<u32> = GRAPH
+            .as_chunks::<4>()
+            .0
+            .iter()
+            .enumerate()
+            .flat_map(|(node, row)| {
+                let extra = u32::try_from((node + 1) % 5).unwrap();
+                row.iter().copied().chain([extra])
+            })
+            .collect();
+        assert_eq!(bytes(binary_spec(&odd, 5)), bytes(binary_spec(&GRAPH, 4)));
+        let out = bytes(binary_spec(&GRAPH, 4));
+        assert_eq!(&out[..4], b"IBMp");
+        assert_eq!(&out[25..29], b"IBHc");
+        // An odd degree stays refused for other vectors.
+        assert_eq!(
+            error(IndexSpec {
+                graph: &odd,
+                graph_degree: 5,
+                ..spec()
+            }),
+            Error::GraphDegree { degree: 5 }
+        );
+    }
+
+    #[test]
+    fn pairs_binary_vectors_with_hamming_alone() {
+        assert_eq!(
+            error(IndexSpec {
+                metric: Metric::L2,
+                ..binary_spec(&GRAPH, 4)
+            }),
+            Error::Hamming { binary: true }
+        );
+        assert_eq!(
+            error(IndexSpec {
+                metric: Metric::Hamming,
+                ..spec()
+            }),
+            Error::Hamming { binary: false }
+        );
+        assert_eq!(
+            error(IndexSpec {
+                dimension: 12,
+                ..binary_spec(&GRAPH, 4)
+            }),
+            Error::Dimension { dimension: 12 }
+        );
+        // Binary vectors count in bytes: 5 vectors of 16 bits are 10.
+        assert!(matches!(
+            error(IndexSpec {
+                vectors: Vectors::Bits(&BITS[..9]),
+                ..binary_spec(&GRAPH, 4)
+            }),
+            Error::VectorsLength {
+                actual: 9,
+                expected: 10,
+                ..
+            }
+        ));
+        let skipped = bytes(IndexSpec {
+            skip_stored_vectors: true,
+            vectors: Vectors::Bits(&[]),
+            ..binary_spec(&GRAPH, 4)
+        });
+        assert_eq!(
+            skipped,
+            bytes(IndexSpec {
+                skip_stored_vectors: true,
+                ..binary_spec(&GRAPH, 4)
+            })
+        );
     }
 
     #[test]

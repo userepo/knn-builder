@@ -23,23 +23,12 @@ type Divergent = (&'static str, u16, &'static [(&'static str, &'static str)]);
 /// Cases knn-builder answers otherwise than the service, with its status
 /// and the field and type of each error:
 ///
-/// - Vectors it cannot build yet, which the service takes. Refused, k-NN
-///   builds the segment on the data node, rather than sending a job that
-///   would only fail.
 /// - Integers past 64 bits, which the service takes, as Python takes any
 ///   integer, and then refuses with 507: no build holds such a size.
 /// - Bodies Python's `json.loads` reads and knn-builder does not: forms
 ///   outside RFC 8259 JSON in UTF-8, and JSON past `serde_json`'s limits,
 ///   none of which k-NN's client sends (the module's docs).
-const DIVERGENT: [Divergent; 12] = [
-    (
-        "binary data, hamming",
-        422,
-        &[
-            ("body.data_type", "unsupported"),
-            ("body.index_parameters.space_type", "unsupported"),
-        ],
-    ),
+const DIVERGENT: [Divergent; 11] = [
     // serde_json reads an integer this large as a float.
     (
         "dimension 2**64",

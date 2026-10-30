@@ -80,6 +80,10 @@ CASES = {
     "bool as 0": with_(skip_stored_vectors=0),
     "byte data": with_(data_type="byte"),
     "binary data, hamming": with_(data_type="binary", index_parameters={"space_type": "hamming"}),
+    # Pairs k-NN never sends, which the service takes: binary builds in
+    # Hamming distance whatever the space, other vectors under hamming in L2.
+    "binary data, l2": with_(data_type="binary", index_parameters={"space_type": "l2"}),
+    "float data, hamming": with_(index_parameters={"space_type": "hamming"}),
     "m 0": params(m=0),
     "negative ef_search": params(ef_search=-1),
     "dimension padded string": with_(dimension=" 768 "),

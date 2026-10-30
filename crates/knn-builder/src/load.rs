@@ -24,6 +24,8 @@ pub(crate) enum Encoding {
     F32ToF16,
     /// int8 values, kept.
     I8,
+    /// Binary vectors' packed bits, kept.
+    Bits,
 }
 
 /// The vector blob's encoding, from the request's data type and the
@@ -36,6 +38,7 @@ pub(crate) fn encoding(job: &Job, size: u64) -> Result<Encoding, JobError> {
         // Of another size, the download refuses it.
         DataType::Float => Ok(Encoding::F32),
         DataType::Byte => Ok(Encoding::I8),
+        DataType::Binary => Ok(Encoding::Bits),
         DataType::HalfFloat if size == fp16 => Ok(Encoding::F16),
         DataType::HalfFloat if size == fp32 => Ok(Encoding::F32ToF16),
         DataType::HalfFloat => Err(JobError::HalfFloatSize {
@@ -121,6 +124,14 @@ fn fetch(
                 .download(bucket, key, vectors, &mut out, i8::from_le_bytes, cancel)
                 .map_err(JobError::download)?;
             Vectors::I8(out)
+        }
+        Encoding::Bits => {
+            // dimension / 8 bytes a vector, not one a value.
+            let mut out = zeroed(u64::from(job.doc_count) * (u64::from(job.dimension) / 8))?;
+            store
+                .download(bucket, key, vectors, &mut out, u8::from_le_bytes, cancel)
+                .map_err(JobError::download)?;
+            Vectors::Bits(out)
         }
     };
     let mut doc_ids = zeroed(u64::from(job.doc_count))?;
