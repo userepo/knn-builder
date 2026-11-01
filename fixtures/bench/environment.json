@@ -1,0 +1,47 @@
+{
+ "host": {
+  "cpu": "Intel Core i9-14900HX",
+  "memory_gb": 32,
+  "os": "Windows 11 Home 10.0.26300",
+  "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU, 8188 MiB",
+  "driver": "617.42"
+ },
+ "docker": {
+  "engine": "Docker Desktop 29.9.2 on WSL2 2.7.14.0, kernel 6.18.33.2-2",
+  "vm": "32 processors, 15 GB of memory",
+  "gpu": "NVIDIA container toolkit, --gpus all"
+ },
+ "services": {
+  "knn-builder": {
+   "image": "knn-builder:dev",
+   "image_id": "sha256:5cce1c77eec8bd7e2cb665b624f0878d02492104c63e551e517d306219aded29",
+   "commit": "d4af6b8",
+   "libcuvs": "26.08.01",
+   "cuda": "12.9",
+   "max_workers": "2, read and ignored: one build at a time on the GPU, the next job downloading and the last uploading meanwhile"
+  },
+  "upstream": {
+   "image": "opensearchstaging/remote-vector-index-builder:api-snapshot",
+   "image_id": "sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da",
+   "libcuvs": "26.08.01",
+   "faiss": "1.14.3",
+   "cuda": "12.9",
+   "python": "3.11.15",
+   "max_workers": 1,
+   "note": "one worker: two builds at once crash the service under WSL2"
+  },
+  "localstack": "localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a"
+ },
+ "settings": {
+  "gpu_memory_limit_gb": 8,
+  "client_timeout_seconds": 3600,
+  "client_poll_interval_seconds": 5,
+  "burst_timeout_seconds": 90,
+  "burst_poll_interval_seconds": 5
+ },
+ "runs": {
+  "knn-builder": {"started": "2026-10-31T20:50:42-05:00", "ended": "2026-11-01T01:23:17-05:00"},
+  "upstream": {"started": "2026-11-01T01:23:17-05:00", "ended": "2026-11-01T05:55:09-06:00"}
+ },
+ "recall": {"tool": "knn-inspect 0.17.0", "queries": 100, "k": 10, "seed": 1}
+}

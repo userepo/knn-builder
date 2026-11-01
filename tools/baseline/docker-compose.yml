@@ -51,6 +51,7 @@ services:
       INPUTS: /work/${INPUTS:?set INPUTS}
       OUT: /work/${OUT:?set OUT}
       RUNS: ${RUNS:-5}
+      NAMES: ${NAMES:-}
       <<: *aws
     volumes:
       - ../..:/work

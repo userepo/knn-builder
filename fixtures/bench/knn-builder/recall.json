@@ -1,0 +1,26 @@
+{
+ "knn_inspect": "knn-inspect 0.17.0",
+ "recall": {
+  "seed": 1,
+  "k": 10
+ },
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": 0.963,
+  "cohere-ip-1000000x768": 0.958,
+  "cohere-ip-1000000x768-byte": 0.948,
+  "cohere-l2-1000000x768": 0.969,
+  "cohere-l2-1000000x768-byte": 0.957,
+  "gist-ip-1000000x960": 0.985,
+  "gist-l2-1000000x960": 0.953,
+  "ms-marco-hamming-1000000x384-binary": 0.989,
+  "ms-marco-ip-1000000x384": 0.984,
+  "ms-marco-ip-1000000x384-byte": 0.98,
+  "ms-marco-l2-1000000x384": 0.975,
+  "ms-marco-l2-1000000x384-byte": 0.981,
+  "sift-hamming-1000000x128-binary": 1.0,
+  "sift-ip-1000000x128": 0.992,
+  "sift-ip-1000000x128-byte": 0.679,
+  "sift-l2-1000000x128": 0.996,
+  "sift-l2-1000000x128-byte": 0.993
+ }
+}

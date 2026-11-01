@@ -46,7 +46,7 @@ docker compose -f tools/baseline/docker-compose.yml down -v
 python tools/baseline/score.py $OUT $INPUTS ../knn-inspect/target/release/knn-inspect
 ```
 
-The byte fixtures come from the same runs, with `INPUTS=fixtures/byte/inputs` and, for the recall spread, `INPUTS=target/inputs-byte-large RUNS=20`, and the binary ones with `fixtures/binary/inputs` and `target/inputs-binary-large`.
+`NAMES`, comma separated, builds only those inputs. The byte fixtures come from the same runs, with `INPUTS=fixtures/byte/inputs` and, for the recall spread, `INPUTS=target/inputs-byte-large RUNS=20`, and the binary ones with `fixtures/binary/inputs` and `target/inputs-binary-large`.
 
 `baseline/device_peaks.py` gives each build's peak device memory from the GPU's memory sampled on the host as the run goes, for `binary-sizes`' first look at the NN-descent build's costs: the most memory used in a build's window less the least, the first build of the service's process, which makes its CUDA context, left out. Sample from the host, and keep the service's log with Docker's timestamps:
 
@@ -243,5 +243,35 @@ $FAISS_PY tools/grid/fit.py binary fixtures/grid fixtures/grid
 ```
 
 `fixtures/grid/` holds the RTX 4070's results and fits, the byte ones as `byte-runs.json` and `byte-cpu.json`, which `crates/knn-builder/tests/cost.rs` holds the models to, and the binary ones as `binary-runs.json`, `binary-cpu.json` and `binary-fits.json`, which it ties the binary models to.
+
+## Benchmarks
+
+`bench/datasets.py` fetches the datasets the upstream `benchmarking/` tool names and writes them as build inputs in `make_inputs.py`'s layout: sift-128 (ann-benchmarks), ms-marco-384 and cohere-768 (Hugging Face, `navneet1v/datasets`) and gist-960 (ann-benchmarks), 1M vectors each, 9.2 GB of HDF5 files kept in the first directory. Each dataset gives a float input in L2 and in inner product, with the vectors as they are, and the first three a byte input in both spaces, each component scaled over the dataset's range onto -128..127, and a binary one in Hamming space, a bit per component set where it is positive (SIFT's components are counts, so its bits mark the nonzero ones; 77% of them are set). The queries are the first 100 of each file's test set, converted the same way. A dataset is taken whole when the fitted models (`grid/fit.py`, `fixtures/grid/fits.json`) predict its float build's peak device memory within `--gpu-gb` (8, the GPU's), else cut to the most rows, in tens of thousands, that fit; all four fit whole on 8 GB, gist-960's float build predicted at 4.6 GB. Every `input.json` records the rows taken, the peak predicted for it and the upstream service's own estimate, and `datasets.json` the sources, their hashes (checked against those the script records) and the sizes chosen. In the conda environment of `bench/environment.yml` (numpy and h5py; apart from the root `environment.yml`, which the container image builds from):
+
+```sh
+conda env create -f tools/bench/environment.yml && conda activate knn-bench
+python tools/bench/datasets.py ~/knn-bench/hdf5 target/bench/inputs
+```
+
+The 17 inputs take 10 GB: the inner product input of each type hard-links its L2 one's blobs, and every input of a dataset its doc ids (copies where the file system has no links, 19 GB then).
+
+`bench/run.py` runs the metrics against one service, from `bench/docker-compose.yml` (the service at `GPU_MEMORY_LIMIT=8` with LocalStack for S3, the upstream one on one worker), driven from the host, where `nvidia-smi` samples the GPU's memory. Its phases: a warm-up build of one input of each data type; `single`, five builds of every input one at a time, each job's latency, the service process's peak resident memory (`VmHWM`, reset before each job through `docker compose exec`), the GPU's memory at its peak during the job less the least seen (sampled every 50 ms, `baseline/device_peaks.py`'s measure over the request's window) and its per-step times from the service's DEBUG log, with the first run's file kept for the recall; `concurrent`, per data type, five rounds of eight jobs sent at once as k-NN's data nodes send them (`burst/burst.py`'s model at k-NN's default timeout and poll interval), each job's latency as its data node sees it; `sustained`, per data type, four jobs kept in flight for an hour, the next sent as one completes, for jobs per hour (the jobs seen completed within the hour; those still in flight at its end are not counted); and `burst`, per data type, 48 requests at once over its L2 (binary: Hamming) inputs with the 90 s timeout and 5 s polls of `tools/burst`, the service restarted with them, and again before each data type after the first since the upstream service builds on the jobs a burst's data nodes gave up on, and warmed up each time. A run starts from fresh services, and one that fails or loses its service still takes them down and writes what it measured. Each job's file is deleted from the bucket once its job is seen completed, so LocalStack holds the inputs and the jobs in flight, 30 GB at most; under Docker Desktop its disk image on the host still grows with every block first written, by hundreds of GB over a run, until it is trimmed (`fstrim` in the `docker-desktop` distro) and compacted (`diskpart`'s `compact vdisk` on `docker_data.vhdx`, Docker Desktop quit). Each run writes `run.json`, `service.log`, `gpu.csv` and the first files to its directory; `bench/report.py` reduces the runs to the README's tables, knn-inspect `recall` on each first file (seed 1, k 10, cached in `recall.json`), medians over the single builds (the latency as the client saw it beside the sum of the steps from the service's own clock, since on this host the status requests through Docker Desktop's port forwarding paused for 10 to 30 s at the end of some builds of files of 1.5 GB or more), p50 and p99 over the concurrent jobs. `fixtures/bench/` keeps the README's runs (`run.json` and `recall.json` per service, `datasets.json`, and `environment.json` with the versions), from which `report.py` prints the README's tables again; the service logs and GPU samples, 15 MB a run, stay out. From the repository root, with Docker, `nvidia-smi` and Python on the host:
+
+```sh
+docker build -t knn-builder:dev .
+python tools/bench/run.py target/bench/knn-builder knn-builder
+python tools/bench/run.py target/bench/upstream upstream
+python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/knn-builder target/bench/upstream
+python tools/bench/report.py ../knn-inspect/target/release/knn-inspect fixtures/bench/knn-builder fixtures/bench/upstream
+```
+
+`--runs`, `--concurrent`, `--rounds`, `--queue`, `--sustain-seconds`, `--burst-jobs`, `--burst-timeout`, `--burst-poll`, `--phases` and `--seed` set the phases; `--inputs` (repeatable) and names pick the inputs. A dry run on the committed fixtures, every cell filled in a few minutes:
+
+```sh
+DRY="--inputs fixtures/inputs --inputs fixtures/byte/inputs --inputs fixtures/binary/inputs --runs 2 --concurrent 4 --rounds 1 --queue 2 --sustain-seconds 30 --burst-jobs 8"
+python tools/bench/run.py target/bench/dry/knn-builder knn-builder $DRY
+python tools/bench/run.py target/bench/dry/upstream upstream $DRY
+python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/dry/knn-builder target/bench/dry/upstream
+```
 
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

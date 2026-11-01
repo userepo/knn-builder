@@ -1,5 +1,6 @@
-"""Builds every input under $INPUTS $RUNS times through the remote vector
-index build service at $SERVICE_URL and keeps each index file it writes.
+"""Builds every input under $INPUTS (or those named in $NAMES, comma
+separated) $RUNS times through the remote vector index build service at
+$SERVICE_URL and keeps each index file it writes.
 
 Runs as the runner of docker-compose.yml, in the service's own image (for
 boto3). Builds run one at a time, so the service's per-step DEBUG timings
@@ -91,6 +92,12 @@ def main():
         sys.exit("LocalStack did not come up")
 
     names = sorted(p.name for p in inputs.iterdir() if (p / "input.json").exists())
+    if wanted := [n.strip() for n in os.environ.get("NAMES", "").split(",") if n.strip()]:
+        if missing := [name for name in wanted if name not in names]:
+            sys.exit(f"no input {', '.join(missing)} under {inputs}")
+        if len(set(wanted)) < len(wanted):
+            sys.exit("NAMES names an input twice")
+        names = wanted
     metas = {}
     for name in names:
         metas[name] = json.loads((inputs / name / "input.json").read_text())

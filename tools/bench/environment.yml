@@ -1,0 +1,14 @@
+# The environment tools/bench/datasets.py runs in: numpy and h5py, for the
+# benchmark datasets' HDF5 files. Apart from the GPU build environment
+# (environment.yml at the root), which the container image builds from,
+# so that this never widens the image's build.
+#
+#   conda env create -f tools/bench/environment.yml
+#   conda activate knn-bench
+name: knn-bench
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy=2.5.4
+  - h5py=3.16.0

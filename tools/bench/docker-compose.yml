@@ -1,0 +1,61 @@
+# One remote index build service on the GPU for the benchmark: knn-builder's
+# image, or the upstream service at the pinned commit (3a02e64, as the
+# api-snapshot image of that digest), with LocalStack for S3 and an
+# uploader for the inputs. tools/bench/run.py drives it from the host,
+# where nvidia-smi samples the GPU; it starts the services with the
+# settings each phase needs and takes them down.
+name: knn-builder-bench
+
+x-aws: &aws
+  AWS_ACCESS_KEY_ID: test
+  AWS_SECRET_ACCESS_KEY: test
+  AWS_DEFAULT_REGION: us-east-1
+
+services:
+  localstack:
+    # 4.14, the version upstream's e2e test uses.
+    image: localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a
+    environment:
+      SERVICES: s3
+      <<: *aws
+    ports:
+      - "${S3_PORT:-4568}:4566"
+
+  service:
+    image: ${SERVICE_IMAGE:?set SERVICE_IMAGE}
+    environment:
+      S3_ENDPOINT_URL: http://localstack:4566
+      # The GPU's memory, not the default 24: what the upstream service
+      # bounds its estimate by.
+      GPU_MEMORY_LIMIT: ${GPU_MEMORY_LIMIT:-8}
+      CLIENT_TIMEOUT_SECONDS: ${CLIENT_TIMEOUT_SECONDS:-3600}
+      CLIENT_POLL_INTERVAL_SECONDS: ${CLIENT_POLL_INTERVAL_SECONDS:-5}
+      # The upstream service's builds at once; knn-builder reads and
+      # ignores it. Under WSL2 two builds at once crash the process.
+      MAX_WORKERS: ${MAX_WORKERS:-1}
+      # Each job's stage times, in the logs of both services.
+      LOG_LEVEL: DEBUG
+      <<: *aws
+    ports:
+      - "${SERVICE_PORT:-1026}:1025"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    depends_on:
+      - localstack
+
+  uploader:
+    image: opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
+    entrypoint: ["python", "/work/tools/bench/upload.py"]
+    environment:
+      S3_ENDPOINT_URL: http://localstack:4566
+      INPUT_DIRS: ${INPUT_DIRS:-}
+      <<: *aws
+    volumes:
+      - ../..:/work
+    depends_on:
+      - localstack
