@@ -52,7 +52,7 @@ impl Store {
         let (done, writer_done) = oneshot::channel();
         let (result_sender, result) = oneshot::channel();
         let object = Object {
-            client: self.client.clone(),
+            client: self.client_for(bucket),
             bucket: bucket.to_owned(),
             key: key.to_owned(),
             size,

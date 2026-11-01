@@ -5,6 +5,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
+use aws_sdk_s3::Client;
 use aws_sdk_s3::types::ChecksumMode;
 use tokio::sync::Notify;
 
@@ -125,7 +126,7 @@ impl Store {
             });
         }
         let get = &Get {
-            store: self,
+            client: self.client_for(bucket),
             bucket,
             key,
             e_tag: blob.e_tag.as_deref(),
@@ -194,7 +195,8 @@ impl<'a, T> Work<'a, T> {
 
 /// The GETs of one blob.
 struct Get<'a> {
-    store: &'a Store,
+    /// The bucket's client.
+    client: Client,
     bucket: &'a str,
     key: &'a str,
     e_tag: Option<&'a str>,
@@ -247,7 +249,6 @@ impl Get<'_> {
         loop {
             self.check_cancel()?;
             let mut request = self
-                .store
                 .client
                 .get_object()
                 .bucket(self.bucket)

@@ -1,6 +1,8 @@
+use std::collections::HashMap;
 use std::env;
 use std::error::Error as StdError;
 use std::num::NonZero;
+use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -26,6 +28,20 @@ const MIN_PART: usize = 5 * MIB;
 /// The region boto3 signs S3 requests with when none is set.
 const FALLBACK_REGION: &str = "us-east-1";
 
+/// The header S3 names a bucket's region in when a request reaches the
+/// bucket through another region.
+const BUCKET_REGION: &str = "x-amz-bucket-region";
+
+/// The redirected clients' lock is held for a lookup or an insert,
+/// neither of which can panic; a poisoned lock is a bug.
+const REDIRECTED_POISONED: &str = "redirected clients lock poisoned: a holder panicked";
+
+/// Clients kept for redirected buckets, at most: a client is small, but a
+/// service sent ever new buckets would otherwise keep one for each
+/// forever. Past the cap the set starts over, and an old bucket's
+/// redirect is followed again.
+const REDIRECTED_BUCKETS: usize = 256;
+
 /// Where S3 is, from the environment variables the upstream service
 /// reads. Credentials come from the AWS SDK's default chain, as boto3's
 /// do: environment, profile, web identity, container or instance role.
@@ -38,10 +54,10 @@ pub struct Settings {
     /// `AWS_DEFAULT_REGION`. When unset with an endpoint, the profile's
     /// region, else `us-east-1`, as boto3 picks it. When unset without
     /// one, the SDK's chain: `AWS_REGION`, the profile, then the instance
-    /// metadata, which gives an EC2 instance its own region (the Rust SDK
-    /// does not follow S3's redirects to the bucket's region, as boto3
-    /// does) and takes a few seconds to time out anywhere else; failing
-    /// all of them, `us-east-1`.
+    /// metadata, which gives an EC2 instance its own region and takes a
+    /// few seconds to time out anywhere else; failing all of them,
+    /// `us-east-1`. A bucket in another region is reached through S3's
+    /// redirect to it, as boto3 reaches it.
     pub region: Option<String>,
 }
 
@@ -131,14 +147,26 @@ pub struct Blob {
 
 /// An S3 client and the transfer settings, shared by every job.
 ///
+/// A bucket in another region than the client's is reached as boto3
+/// reaches it: S3 answers a `HeadObject` that comes through the wrong
+/// region with a 301, or a 400 for a request signed for the wrong one,
+/// naming the bucket's region in a header (or in a `HeadBucket`'s, which
+/// always carries it), and the store keeps a client for that region per
+/// bucket, for the head's retry and every later request to the bucket.
+/// A download or upload redirected itself, for a bucket moved since its
+/// head, fails; the next head of the bucket follows the new redirect.
+///
 /// Downloads and uploads block their caller and run their requests on
 /// the Tokio runtime the store was created on, which must be
 /// multi-threaded, or driven by another thread meanwhile.
 ///
-/// Cloning is cheap: clones share the client and its connections.
+/// Cloning is cheap: clones share the clients and their connections.
 #[derive(Debug, Clone)]
 pub struct Store {
-    pub(crate) client: Client,
+    /// The client for every bucket S3 has not redirected.
+    client: Client,
+    /// A client per bucket S3 redirected, signing for its region.
+    redirected: Arc<Mutex<HashMap<String, Client>>>,
     pub(crate) transfers: Transfers,
     /// The runtime the requests run on, so downloads and uploads can be
     /// driven from blocking threads.
@@ -191,6 +219,7 @@ impl Store {
         }
         Self {
             client: Client::from_conf(s3.build()),
+            redirected: Arc::default(),
             transfers: transfers.floored(),
             runtime: Handle::current(),
         }
@@ -209,22 +238,82 @@ impl Store {
         &self.client
     }
 
-    /// Reads a blob's size, `ETag` and KMS key.
+    /// The client for `bucket`: the one for the region S3 redirected it
+    /// to, else the store's own.
+    pub(crate) fn client_for(&self, bucket: &str) -> Client {
+        let redirected = self.redirected.lock().expect(REDIRECTED_POISONED);
+        redirected
+            .get(bucket)
+            .cloned()
+            .unwrap_or_else(|| self.client.clone())
+    }
+
+    /// A client signing for `region`, the store's own in every other
+    /// setting, kept for `bucket`.
+    fn redirect(&self, bucket: &str, region: &str) -> Client {
+        let config = self
+            .client
+            .config()
+            .to_builder()
+            .region(Region::new(region.to_owned()))
+            .build();
+        let client = Client::from_conf(config);
+        let mut redirected = self.redirected.lock().expect(REDIRECTED_POISONED);
+        if redirected.len() >= REDIRECTED_BUCKETS && !redirected.contains_key(bucket) {
+            redirected.clear();
+        }
+        redirected.insert(bucket.to_owned(), client.clone());
+        client
+    }
+
+    /// Reads a blob's size, `ETag` and KMS key, through the bucket's
+    /// region once S3 names it.
     ///
     /// # Errors
     ///
     /// Returns [`Error::S3`] when the `HeadObject` fails, the blob missing
-    /// among other causes, or its response has no size.
+    /// among other causes, when S3 redirects it to a region it names
+    /// nowhere, to the one it was signed for, or to another region
+    /// twice, or when its response has no size.
     pub async fn head(&self, bucket: &str, key: &str) -> Result<Blob, Error> {
         let call = "HeadObject";
-        let head = self
-            .client
-            .head_object()
-            .bucket(bucket)
-            .key(key)
-            .send()
-            .await
-            .map_err(|e| s3_error(call, bucket, key, &e))?;
+        let mut client = self.client_for(bucket);
+        // The region a redirect was followed to, once one was.
+        let mut followed: Option<String> = None;
+        let head = loop {
+            let error = match client.head_object().bucket(bucket).key(key).send().await {
+                Ok(head) => break head,
+                Err(error) => error,
+            };
+            let Some(response) = redirect(&error) else {
+                return Err(s3_error(call, bucket, key, &error));
+            };
+            // The redirect names the region, or, for a 301 without it, a
+            // `HeadBucket` does, as boto3 reads them in that order. A 400
+            // without it is some other fault: S3 names the region on a
+            // 400 for the wrong one, and a round trip to find out would be
+            // spent on every other 400.
+            let named = match named_region(response) {
+                Some(region) => Some(region),
+                None if response.status().as_u16() == 301 => {
+                    head_bucket_region(&client, bucket).await
+                }
+                None => None,
+            };
+            // A redirect to the region signed for is some other fault too.
+            let region = match named {
+                Some(region) if !signs_for(&client, &region) => region,
+                _ => return Err(s3_error(call, bucket, key, &error)),
+            };
+            // One redirect, as boto3 allows a request: the region S3
+            // names is the bucket's, so a second redirect is some other
+            // fault.
+            if let Some(region) = &followed {
+                return Err(after_redirect(s3_error(call, bucket, key, &error), region));
+            }
+            client = self.redirect(bucket, &region);
+            followed = Some(region);
+        };
         let size = head
             .content_length()
             .and_then(|size| u64::try_from(size).ok())
@@ -281,6 +370,11 @@ where
             match (reply.code(), reply.message()) {
                 (Some(code), Some(text)) => format!("{code} (HTTP {status}): {text}"),
                 (Some(code), None) => format!("{code} (HTTP {status})"),
+                // S3's redirect to a bucket's region: a `HeadObject`'s
+                // response carries no body, so no code.
+                _ if status == 301 => {
+                    "PermanentRedirect (HTTP 301): the bucket is in another region".to_owned()
+                }
                 _ => format!("HTTP {status}: {}", causes(reply)),
             }
         }
@@ -292,6 +386,46 @@ where
         key: key.to_owned(),
         message,
     }
+}
+
+/// The response to a request that reached the bucket through another
+/// region: a 301, or a 400 for a request signed for the wrong one.
+fn redirect<E>(error: &SdkError<E, HttpResponse>) -> Option<&HttpResponse> {
+    let SdkError::ServiceError(service) = error else {
+        return None;
+    };
+    let response = service.raw();
+    matches!(response.status().as_u16(), 301 | 400).then_some(response)
+}
+
+/// The bucket's region, when the response names it in S3's header.
+fn named_region(response: &HttpResponse) -> Option<String> {
+    response.headers().get(BUCKET_REGION).map(str::to_owned)
+}
+
+/// The bucket's region from a `HeadBucket`, whose response names it
+/// whether the request got through or was redirected; `None` when
+/// neither response names it or the request failed otherwise.
+async fn head_bucket_region(client: &Client, bucket: &str) -> Option<String> {
+    match client.head_bucket().bucket(bucket).send().await {
+        Ok(output) => output.bucket_region().map(str::to_owned),
+        Err(SdkError::ServiceError(service)) => named_region(service.raw()),
+        Err(_) => None,
+    }
+}
+
+/// `error`, its message saying the redirect already followed.
+fn after_redirect(mut error: Error, region: &str) -> Error {
+    if let Error::S3 { message, .. } = &mut error {
+        message.push_str(", after a redirect to ");
+        message.push_str(region);
+    }
+    error
+}
+
+/// Whether `client` signs its requests for `region`.
+fn signs_for(client: &Client, region: &str) -> bool {
+    client.config().region().map(AsRef::as_ref) == Some(region)
 }
 
 /// [`Error::S3`] for a response body cut off.
@@ -320,14 +454,17 @@ fn causes(error: &(dyn StdError + 'static)) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::io::Write;
     use std::time::{Duration, Instant};
 
     use aws_config::retry::RetryConfig;
     use aws_config::timeout::TimeoutConfig;
+    use aws_sdk_s3::Client;
+    use tokio::runtime::Runtime;
 
-    use super::{MIB, Settings, Store, Transfers};
-    use crate::Error;
-    use crate::testing::{FakeS3Server, test_loader, test_store};
+    use super::{MIB, REDIRECTED_BUCKETS, Settings, Store, Transfers};
+    use crate::testing::{Elsewhere, FakeS3Server, Signed, test_loader, test_store};
+    use crate::{Cancel, Error};
 
     #[test]
     fn raises_transfers_to_their_floors() {
@@ -399,5 +536,224 @@ mod tests {
             "{error}"
         );
         assert!(start.elapsed() < Duration::from_secs(10));
+    }
+
+    /// Twelve bytes in a bucket in `region`, where the test store signs for
+    /// us-east-1; a request signed for another region is answered with
+    /// `status`, naming `names` as the bucket's region in turn.
+    fn elsewhere(region: &str, status: u16, names: &[&str]) -> FakeS3Server {
+        FakeS3Server::serving_elsewhere(
+            vec![7; 12],
+            Elsewhere {
+                region: region.to_owned(),
+                status,
+                names: names.iter().map(|&name| name.to_owned()).collect(),
+            },
+        )
+    }
+
+    fn signed(method: &str, path: &str, region: &str) -> Signed {
+        Signed {
+            method: method.to_owned(),
+            path: path.to_owned(),
+            region: Some(region.to_owned()),
+        }
+    }
+
+    fn region(client: &Client) -> &str {
+        client.config().region().map_or("", AsRef::as_ref)
+    }
+
+    const VECTORS: &str = "/bucket/vectors.knnvec";
+    const IDS: &str = "/bucket/doc_ids.knndid";
+    const INDEX: &str = "/bucket/index.faiss";
+
+    #[test]
+    fn follows_a_redirect_to_the_buckets_region() {
+        for status in [301, 400] {
+            let fake = elsewhere("eu-west-1", status, &["eu-west-1"]);
+            let runtime = Runtime::new().unwrap();
+            let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+            let blob = runtime
+                .block_on(store.head("bucket", "vectors.knnvec"))
+                .unwrap();
+            assert_eq!(blob.size, 12, "status {status}");
+            // Every later request to the bucket goes through its region,
+            // from the store's clones too.
+            let mut out = [0_u8; 12];
+            store
+                .clone()
+                .download(
+                    "bucket",
+                    "vectors.knnvec",
+                    &blob,
+                    &mut out,
+                    u8::from_le_bytes,
+                    &Cancel::new(),
+                )
+                .unwrap();
+            assert_eq!(out, [7; 12]);
+            runtime
+                .block_on(store.head("bucket", "doc_ids.knndid"))
+                .unwrap();
+            let mut upload = store.upload("bucket", "index.faiss", 12, None, &Cancel::new());
+            upload.write_all(&[7; 12]).unwrap();
+            upload.finish().unwrap();
+            assert_eq!(
+                fake.signed(),
+                [
+                    signed("HEAD", VECTORS, "us-east-1"),
+                    signed("HEAD", VECTORS, "eu-west-1"),
+                    signed("GET", VECTORS, "eu-west-1"),
+                    signed("HEAD", IDS, "eu-west-1"),
+                    signed("PUT", INDEX, "eu-west-1"),
+                ],
+                "status {status}"
+            );
+            assert_eq!(region(&store.client_for("bucket")), "eu-west-1");
+            // Other buckets keep the store's region.
+            assert_eq!(region(&store.client_for("other")), "us-east-1");
+        }
+    }
+
+    #[test]
+    fn asks_the_bucket_when_the_redirect_names_no_region() {
+        let fake = elsewhere("eu-west-1", 301, &["", "eu-west-1"]);
+        let runtime = Runtime::new().unwrap();
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        let blob = runtime
+            .block_on(store.head("bucket", "vectors.knnvec"))
+            .unwrap();
+        assert_eq!(blob.size, 12);
+        assert_eq!(
+            fake.signed(),
+            [
+                signed("HEAD", VECTORS, "us-east-1"),
+                signed("HEAD", "/bucket/", "us-east-1"),
+                signed("HEAD", VECTORS, "eu-west-1"),
+            ]
+        );
+        assert_eq!(region(&store.client_for("bucket")), "eu-west-1");
+    }
+
+    #[test]
+    fn keeps_a_redirect_that_names_no_region() {
+        let fake = elsewhere("eu-west-1", 301, &[]);
+        let runtime = Runtime::new().unwrap();
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        let error = runtime
+            .block_on(store.head("bucket", "vectors.knnvec"))
+            .unwrap_err();
+        assert_eq!(
+            error.to_string(),
+            "HeadObject s3://bucket/vectors.knnvec: \
+             PermanentRedirect (HTTP 301): the bucket is in another region"
+        );
+        assert_eq!(
+            fake.signed(),
+            [
+                signed("HEAD", VECTORS, "us-east-1"),
+                signed("HEAD", "/bucket/", "us-east-1"),
+            ]
+        );
+        assert_eq!(region(&store.client_for("bucket")), "us-east-1");
+    }
+
+    #[test]
+    fn keeps_a_redirect_to_the_region_signed_for() {
+        // A 400 naming the region the request was signed for is some
+        // other fault: no new client, no retry.
+        let fake = elsewhere("eu-west-1", 400, &["us-east-1"]);
+        let runtime = Runtime::new().unwrap();
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        let error = runtime
+            .block_on(store.head("bucket", "vectors.knnvec"))
+            .unwrap_err();
+        assert!(error.to_string().contains("HTTP 400"), "{error}");
+        assert_eq!(fake.signed(), [signed("HEAD", VECTORS, "us-east-1")]);
+        assert_eq!(region(&store.client_for("bucket")), "us-east-1");
+    }
+
+    #[test]
+    fn keeps_a_400_from_the_region_followed() {
+        // A redirect, then a 400 naming the region followed: some other
+        // fault in the bucket's own region, not a second redirect.
+        let fake = elsewhere("ap-south-1", 400, &["eu-west-1"]);
+        let runtime = Runtime::new().unwrap();
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        let error = runtime
+            .block_on(store.head("bucket", "vectors.knnvec"))
+            .unwrap_err();
+        let message = error.to_string();
+        assert!(message.contains("HTTP 400"), "{message}");
+        assert!(!message.contains("redirect"), "{message}");
+        assert_eq!(
+            fake.signed(),
+            [
+                signed("HEAD", VECTORS, "us-east-1"),
+                signed("HEAD", VECTORS, "eu-west-1"),
+            ]
+        );
+    }
+
+    #[test]
+    fn keeps_a_400_that_names_no_region() {
+        // No HeadBucket for it: S3 names the region on a 400 for the
+        // wrong one.
+        let fake = elsewhere("eu-west-1", 400, &[]);
+        let runtime = Runtime::new().unwrap();
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        let error = runtime
+            .block_on(store.head("bucket", "vectors.knnvec"))
+            .unwrap_err();
+        assert!(error.to_string().contains("HTTP 400"), "{error}");
+        assert_eq!(fake.signed(), [signed("HEAD", VECTORS, "us-east-1")]);
+    }
+
+    #[test]
+    fn follows_one_redirect_only() {
+        // The region named is not the bucket's, and the retry is sent on
+        // to a third: the error says which redirect was followed.
+        let fake = elsewhere("ap-south-1", 301, &["eu-west-1", "ap-southeast-2"]);
+        let runtime = Runtime::new().unwrap();
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        let error = runtime
+            .block_on(store.head("bucket", "vectors.knnvec"))
+            .unwrap_err();
+        assert_eq!(
+            error.to_string(),
+            "HeadObject s3://bucket/vectors.knnvec: \
+             PermanentRedirect (HTTP 301): the bucket is in another region, \
+             after a redirect to eu-west-1"
+        );
+        assert_eq!(
+            fake.signed(),
+            [
+                signed("HEAD", VECTORS, "us-east-1"),
+                signed("HEAD", VECTORS, "eu-west-1"),
+            ]
+        );
+        assert_eq!(region(&store.client_for("bucket")), "eu-west-1");
+    }
+
+    #[tokio::test]
+    async fn keeps_a_bounded_set_of_redirected_clients() {
+        let store = test_store(None, Transfers::default()).await;
+        for i in 0..REDIRECTED_BUCKETS {
+            store.redirect(&format!("bucket-{i}"), "eu-west-1");
+        }
+        assert_eq!(region(&store.client_for("bucket-0")), "eu-west-1");
+        // One past the cap starts the set over, with the new bucket in it.
+        store.redirect("bucket-more", "eu-west-1");
+        assert_eq!(region(&store.client_for("bucket-more")), "eu-west-1");
+        assert_eq!(region(&store.client_for("bucket-0")), "us-east-1");
+        assert_eq!(store.redirected.lock().unwrap().len(), 1);
+        // A bucket already in a full set is replaced in place.
+        for i in 1..REDIRECTED_BUCKETS {
+            store.redirect(&format!("bucket-{i}"), "eu-west-1");
+        }
+        store.redirect("bucket-more", "ap-south-1");
+        assert_eq!(region(&store.client_for("bucket-more")), "ap-south-1");
+        assert_eq!(store.redirected.lock().unwrap().len(), REDIRECTED_BUCKETS);
     }
 }
