@@ -335,12 +335,15 @@ impl Store {
 /// attempts per request, the SDK's 3.1-second connect timeout and boto3's
 /// 60-second read timeout, the longest a request waits from its start to
 /// its response's first byte. Without it, a response that never comes
-/// would hold a job forever.
+/// would hold a job forever. The attempts follow the SDK's behavior
+/// version named here: a retry of an error that is not throttling
+/// starts from a 50 ms backoff and reuses its connection, a 5xx
+/// included.
 pub(crate) fn loader() -> ConfigLoader {
     let https = aws_smithy_http_client::Builder::new()
         .tls_provider(tls::Provider::Rustls(CryptoMode::Ring))
         .build_https();
-    aws_config::defaults(BehaviorVersion::v2026_01_12())
+    aws_config::defaults(BehaviorVersion::v2026_11_10())
         .http_client(https)
         .retry_config(RetryConfig::standard().with_max_attempts(4))
         .timeout_config(

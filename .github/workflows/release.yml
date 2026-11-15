@@ -1,0 +1,98 @@
+# Pushing a tag `v<version>` checks the tag against the Cargo version and
+# the README's image line, builds the container image from the
+# Dockerfile (on a runner without a GPU: the build links against libcuvs
+# and runs nothing on it), opens a draft release, and pushes the image to
+# Docker Hub as userepo/knn-builder:<version>, and as :latest unless the
+# version is a pre-release. A patch release of an older line would take
+# :latest too: push that image by hand instead. Publishing the draft is a
+# manual step. The draft comes after the build and before the push, so a
+# build that fails leaves no draft, and a run that failed later can be
+# run again. Run by hand, without a tag, the workflow logs in to Docker
+# Hub, builds the image and pushes nothing, to prove the credentials and
+# the build.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: Container image
+    runs-on: ubuntu-latest
+    # The build stage alone takes the better part of an hour: the conda
+    # environment, the toolchain, the C++ shim and the release build.
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check that the tag matches the Cargo version and the README
+        if: github.event_name == 'push'
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          cargo_version="$(cargo pkgid -p knn-builder | sed 's/.*[#@]//')"
+          if [ "$version" != "$cargo_version" ]; then
+            echo "tag $GITHUB_REF_NAME but Cargo.toml says $cargo_version" >&2
+            exit 1
+          fi
+          if ! grep -q -- "userepo/knn-builder:$version" README.md; then
+            echo "README.md's docker run line does not name userepo/knn-builder:$version" >&2
+            exit 1
+          fi
+      # The build stage holds a conda environment with libcuvs and the CUDA
+      # runtime, the Rust toolchain and the release build, more than the
+      # runner's disk has left beside the software it comes with. Pinned
+      # by commit (v2.0.0): it runs as root in the job that pushes the image.
+      - uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6
+        with:
+          tool-cache: true
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/metadata-action@v6
+        id: meta
+        with:
+          images: userepo/knn-builder
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable=${{ github.event_name == 'push' && !contains(github.ref_name, '-') }}
+            type=sha,enable=${{ github.event_name == 'workflow_dispatch' }}
+      - name: Build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          provenance: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      # Once the image is built and before it is pushed, and only once: a
+      # second run for the same tag finds the draft in the listing, which
+      # shows drafts, where a lookup by tag may not. A listing that fails
+      # fails the step, so it is not taken for one without the tag.
+      - name: Create draft release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          releases="$(gh release list --limit 100 --json tagName --jq '.[].tagName')"
+          if ! grep -qxF -- "$GITHUB_REF_NAME" <<< "$releases"; then
+            gh release create "$GITHUB_REF_NAME" --draft --verify-tag --title "$GITHUB_REF_NAME" --generate-notes
+          fi
+      # The same build again, every layer from the builder's cache.
+      - name: Push
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          # A plain image, as the upstream service's is, not an index with
+          # an attestation beside it.
+          provenance: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
