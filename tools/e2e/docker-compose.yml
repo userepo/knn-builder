@@ -1,5 +1,5 @@
 # The upstream service's end-to-end test against knn-builder's image: its
-# client, unchanged, from its own e2e image at 3a02e64, run in knn-builder's
+# client, unchanged, from its own e2e image at ea7db9f, run in knn-builder's
 # network, where the address it calls, localhost:1025, is knn-builder's.
 # See tools/README.md for the images and the run.
 #
@@ -34,7 +34,7 @@ services:
       - localstack
 
   e2e:
-    image: ${E2E_IMAGE:-remote-vector-index-builder:e2e-3a02e64}
+    image: ${E2E_IMAGE:-remote-vector-index-builder:e2e-ea7db9f}
     command: python e2e/api/run_e2e.py
     network_mode: service:knn-builder
     environment:

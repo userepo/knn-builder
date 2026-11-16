@@ -1,5 +1,5 @@
 # The GPU build environment for knn-gpu: the libcuvs and CUDA versions of
-# the upstream remote-vector-index-builder base image at 3a02e64, plus the
+# the upstream remote-vector-index-builder base image at ea7db9f, plus the
 # CMake that knn-gpu builds its C++ shim over cuVS with.
 #
 #   conda env create -f environment.yml

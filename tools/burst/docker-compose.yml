@@ -1,6 +1,6 @@
 # A burst of build requests, as k-NN's data nodes send them, against one
 # remote index build service on the GPU: knn-builder's image, or the
-# upstream service at the pinned commit (3a02e64, as the api-snapshot image
+# upstream service at the pinned commit (ea7db9f, as the api-snapshot image
 # of that digest). burst.py drives it from the upstream image, for boto3,
 # with LocalStack for S3; knn-builder takes the data node's timeout and poll
 # interval as its own settings, which the upstream service has none of.
@@ -9,7 +9,7 @@
 #   SERVICE_IMAGE=knn-builder:dev LABEL=knn-builder \
 #     docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
 #   docker compose -f tools/burst/docker-compose.yml down
-#   SERVICE_IMAGE=opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da LABEL=upstream \
+#   SERVICE_IMAGE=opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc LABEL=upstream \
 #     docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
 #   docker compose -f tools/burst/docker-compose.yml down
 name: knn-builder-burst
@@ -50,7 +50,7 @@ services:
       - localstack
 
   driver:
-    image: opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
+    image: opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
     entrypoint: ["python", "/work/tools/burst/burst.py"]
     environment:
       SERVICE_URL: http://service:1025

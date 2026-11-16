@@ -1,5 +1,5 @@
 # Runs the upstream remote-vector-index-builder at the pinned commit
-# (3a02e64, as the api-snapshot image of that digest) against LocalStack,
+# (ea7db9f, as the api-snapshot image of that digest) against LocalStack,
 # and a runner that builds every input in INPUTS RUNS times.
 #
 # From the repository root:
@@ -12,7 +12,7 @@
 # graphs (graph degree m x 2, libcuvs 25.08).
 name: knn-builder-baseline
 
-x-image: &image opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
+x-image: &image opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
 x-aws: &aws
   AWS_ACCESS_KEY_ID: test
   AWS_SECRET_ACCESS_KEY: test

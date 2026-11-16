@@ -85,7 +85,7 @@ sys.path.insert(0, str(ROOT / "tools" / "burst"))
 sys.dont_write_bytecode = True  # no __pycache__ in the checkout
 import burst  # noqa: E402
 
-UPSTREAM = "opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da"
+UPSTREAM = "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc"
 # name: (image, MAX_WORKERS)
 SERVICES = {"knn-builder": ("knn-builder:dev", "2"), "upstream": (UPSTREAM, "1")}
 BUCKET = "bench"

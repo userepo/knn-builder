@@ -1,0 +1,502 @@
+{
+ "label": "upstream-2-workers-ea7db9f",
+ "service": "http://service:1025",
+ "jobs": 48,
+ "inputs": [
+  "l2-1000000x128",
+  "l2-500000x384",
+  "l2-250000x768",
+  "l2-100000x768"
+ ],
+ "timeout_seconds": 90.0,
+ "poll_seconds": 5.0,
+ "seed": 1,
+ "outcomes": {
+  "status_failed": 48
+ },
+ "to_cpu": 48,
+ "cpu_wait_seconds": 4373.7,
+ "built_seen_after_max": 0.0,
+ "records": [
+  {
+   "index": 0,
+   "input": "l2-1000000x128",
+   "job_id": "fdabc0f1358c02afe221da74fed819592501894315d22a84530c5510eab8f6b5",
+   "post_seconds": 0.12411967499997445,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11682650899999
+  },
+  {
+   "index": 1,
+   "input": "l2-500000x384",
+   "job_id": "32ba9416b3f04032ba0d8f818c4080c9a1c0727407ed9c905520a949e8868590",
+   "post_seconds": 0.11137714700001311,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11811090999998
+  },
+  {
+   "index": 2,
+   "input": "l2-250000x768",
+   "job_id": "1492525774cef714ed81c26f78d8d107d0c3ad0be0a5dfe98272edcc80a3c5c0",
+   "post_seconds": 0.10722922499999754,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.117009215
+  },
+  {
+   "index": 3,
+   "input": "l2-100000x768",
+   "job_id": "1028f8b5441c6d76e1ab1d4b398193ba627a80a347ce7404700d2423c851f432",
+   "post_seconds": 0.10500369099997897,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11784375599998
+  },
+  {
+   "index": 4,
+   "input": "l2-1000000x128",
+   "job_id": "0bd90546d70836d043f0528d098ba5a726dd5f8b0c1b0f4970dd80b804afc70f",
+   "post_seconds": 0.12790818599998488,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11820820099999
+  },
+  {
+   "index": 5,
+   "input": "l2-500000x384",
+   "job_id": "4e4a99e0bc54c40af63819b316433f04e161b5cc4efb7bb44afe0b0cc1f9480f",
+   "post_seconds": 0.11230519000000072,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11767619
+  },
+  {
+   "index": 6,
+   "input": "l2-250000x768",
+   "job_id": "f78589b9360918e672dc07055a6c45c312c8ef4fde6e1ffc919f22ea43a46cfc",
+   "post_seconds": 0.09661531100002207,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11872893099999
+  },
+  {
+   "index": 7,
+   "input": "l2-100000x768",
+   "job_id": "551f67a4d5719d0e15c0403fb82e8b9837dba77da7ba5204bb6b6b633a4197c4",
+   "post_seconds": 0.09932729199999812,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118459664
+  },
+  {
+   "index": 8,
+   "input": "l2-1000000x128",
+   "job_id": "4da2878927525982bb275e3adc9d8f7f7c0cbe4ec25e66387e3e8aec0b8b2b9d",
+   "post_seconds": 0.12824594700001057,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11888805999999
+  },
+  {
+   "index": 9,
+   "input": "l2-500000x384",
+   "job_id": "0dd18cb40b29be819ad9372ed738bf775681782b90ddcab5f88df902ffb4d1cc",
+   "post_seconds": 0.11387738599998443,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118579721
+  },
+  {
+   "index": 10,
+   "input": "l2-250000x768",
+   "job_id": "bfb38dcd6d7b9a2c4403ca6100bfbf19c764011dd9d22fabc391016930ed3d03",
+   "post_seconds": 0.041633990000008225,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.116069364
+  },
+  {
+   "index": 11,
+   "input": "l2-100000x768",
+   "job_id": "ec5b65eaca5eb1275c6e22cd4b389c076a7e5969d6c9b285576f4ccb4af86319",
+   "post_seconds": 0.1070689189999996,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118379938
+  },
+  {
+   "index": 12,
+   "input": "l2-1000000x128",
+   "job_id": "cd50b54d93aed7ab2e7df5f8103f2b157d46a3ecf8b7b86d17e75fa3977ff2b9",
+   "post_seconds": 0.1285092600000155,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11902459199999
+  },
+  {
+   "index": 13,
+   "input": "l2-500000x384",
+   "job_id": "c062bf18a795273436eb061c3c948a5b50c303d6f3a7daf8abf0968518b3ce8c",
+   "post_seconds": 0.12245586400001685,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11861403500001
+  },
+  {
+   "index": 14,
+   "input": "l2-250000x768",
+   "job_id": "5de2ef218c8b14f0a5cf1a90b268ce0711c22b52e737a836fd72fd4dc5722b21",
+   "post_seconds": 0.09422104600000125,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.117611036
+  },
+  {
+   "index": 15,
+   "input": "l2-100000x768",
+   "job_id": "d8c28a11893ee4aa1d1e75f74af35a6a5b44554c71c27fe47e53ed356350d48f",
+   "post_seconds": 0.09562287299999639,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.116914191
+  },
+  {
+   "index": 16,
+   "input": "l2-1000000x128",
+   "job_id": "84fad2bd7a0dd4de466f2ca2b8f22b96a1bb5a9acfcbe85b039e5d4155ded80e",
+   "post_seconds": 0.1264217359999975,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11755664500001
+  },
+  {
+   "index": 17,
+   "input": "l2-500000x384",
+   "job_id": "51426db8b7fd957f643ca7a728278a3272c11e9d2cec95633cd965ccbb6f862b",
+   "post_seconds": 0.12086190899998428,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11590075499998
+  },
+  {
+   "index": 18,
+   "input": "l2-250000x768",
+   "job_id": "6700a5c9ce9b2decd7d611cda46758fa00b808ae7c23bf19585603b165299945",
+   "post_seconds": 0.10161926699998958,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11656331699999
+  },
+  {
+   "index": 19,
+   "input": "l2-100000x768",
+   "job_id": "bd691293b746508986cdf2ed8dd01226e848a752c491e0aeef0418b30817d5c3",
+   "post_seconds": 0.10856850299998655,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.117274649
+  },
+  {
+   "index": 20,
+   "input": "l2-1000000x128",
+   "job_id": "548caef94688ed8ccd4d8dab48a7289e3503f0505843794e9c328f0ca9c00626",
+   "post_seconds": 0.12471923700002208,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118064557
+  },
+  {
+   "index": 21,
+   "input": "l2-500000x384",
+   "job_id": "4d00811c6af6004af7c529aedc36072b51b724957be25fe57b59739f7bc5635c",
+   "post_seconds": 0.1083495289999803,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11778657400001
+  },
+  {
+   "index": 22,
+   "input": "l2-250000x768",
+   "job_id": "704e679d50a97aca834cb62a41996b07790f2f0a4ab7d99373235787be017ffc",
+   "post_seconds": 0.10122776899999053,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11852295699998
+  },
+  {
+   "index": 23,
+   "input": "l2-100000x768",
+   "job_id": "9cdba18802e4414a9151df13896641b21ca44d9225bccf992f68b98e6f5fd9e2",
+   "post_seconds": 0.1158823560000144,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.117949931
+  },
+  {
+   "index": 24,
+   "input": "l2-1000000x128",
+   "job_id": "da5db9ba1f3e66e84781a4ca92ce2666608119c0928074dd279379a18b04eb2f",
+   "post_seconds": 0.1255321269999854,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11744838299998
+  },
+  {
+   "index": 25,
+   "input": "l2-500000x384",
+   "job_id": "bb750693da20cd31ee73f4378251d9a883ea07073a9af142b209c88e020f2172",
+   "post_seconds": 0.11866426500000671,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.116421103
+  },
+  {
+   "index": 26,
+   "input": "l2-250000x768",
+   "job_id": "c1589ea386540a60ab427196a8064c1e2b0a3c89a73308dbc283e286a9124784",
+   "post_seconds": 0.03576722200000404,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118975038
+  },
+  {
+   "index": 27,
+   "input": "l2-100000x768",
+   "job_id": "255ba41c6b1fd97eb21fe947a9ebbfeda76e84b281a95e88d31cadb5e335bd29",
+   "post_seconds": 0.09549535200000037,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11878476300001
+  },
+  {
+   "index": 28,
+   "input": "l2-1000000x128",
+   "job_id": "e3346f133aa8079a810b40809dd38e6baa0a8fd86cc98a621fe354d1964da042",
+   "post_seconds": 0.12830003700000248,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.119206219
+  },
+  {
+   "index": 29,
+   "input": "l2-500000x384",
+   "job_id": "0d723e8274d86213daefa9bf8efa29f1c6a9ddce8a5e1bde0746427b1bbe9a29",
+   "post_seconds": 0.11348089899999536,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11749927899999
+  },
+  {
+   "index": 30,
+   "input": "l2-250000x768",
+   "job_id": "bb1efbf2ee4dc11266c5fe94d1fa6cc36ecf659fcad377866cea80d561f80540",
+   "post_seconds": 0.03735909299999207,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.117074234
+  },
+  {
+   "index": 31,
+   "input": "l2-100000x768",
+   "job_id": "35bd98f86d090d173197efc42b4112a4eadaed8e742e4d553c6f3cd352def703",
+   "post_seconds": 0.10139130900000737,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.119131651
+  },
+  {
+   "index": 32,
+   "input": "l2-1000000x128",
+   "job_id": "6ac90ebe05fccaae32314ce2ea48b62c90d1280235d011485759624c245396f1",
+   "post_seconds": 0.12464698100001215,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118918791
+  },
+  {
+   "index": 33,
+   "input": "l2-500000x384",
+   "job_id": "c633eced94202ec0d189133b5e5d53467c7c395079ff2651935225894c665132",
+   "post_seconds": 0.10505022600000302,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11773553500001
+  },
+  {
+   "index": 34,
+   "input": "l2-250000x768",
+   "job_id": "cf935278c81512b34591b8e33443fb1cd159f91568350a9c7a3a02e650563252",
+   "post_seconds": 0.10360309200001439,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.117899749
+  },
+  {
+   "index": 35,
+   "input": "l2-100000x768",
+   "job_id": "05c5bab674012bccdad193e5fd37789549291672c38357da7194b3e3679c773c",
+   "post_seconds": 0.09687721199998123,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118009487
+  },
+  {
+   "index": 36,
+   "input": "l2-1000000x128",
+   "job_id": "69f75dea038c2649ba733e7e16f1f51dab47fcb70a8a2fa05915e76d7e7cff92",
+   "post_seconds": 0.12049774199999774,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11738945100001
+  },
+  {
+   "index": 37,
+   "input": "l2-500000x384",
+   "job_id": "5147632485bff3a92b043ea4c4e2dd9f024b819b00aadb99820ffcacb3b73bc9",
+   "post_seconds": 0.11487170099999844,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.119078847
+  },
+  {
+   "index": 38,
+   "input": "l2-250000x768",
+   "job_id": "0ff53fee5d9e297602a140060212ac2052d4b9e2da583f8d576f361b2df78582",
+   "post_seconds": 0.09167245800000501,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11816001599999
+  },
+  {
+   "index": 39,
+   "input": "l2-100000x768",
+   "job_id": "e7288413c8095b4845d23305054a3b93ad1afa5ebfc955589d888d07faa2d5f3",
+   "post_seconds": 0.09869248699999389,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11714403099998
+  },
+  {
+   "index": 40,
+   "input": "l2-1000000x128",
+   "job_id": "c473ef879927aa80ceedbce07ce927b3d88605cadc3ca7b6530b9fd167a741a2",
+   "post_seconds": 0.11641161000000011,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11832331
+  },
+  {
+   "index": 41,
+   "input": "l2-500000x384",
+   "job_id": "175aba3ef418c6eaff6d04c33b1ba1c9be429dea79c92966ab9eb8a5801502dd",
+   "post_seconds": 0.11661236000000486,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118840097
+  },
+  {
+   "index": 42,
+   "input": "l2-250000x768",
+   "job_id": "d2b9175c52609756a53359b6fd206be5dd823923c6deaa463afeb13d2b73ebff",
+   "post_seconds": 0.10190575400000057,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.118265165
+  },
+  {
+   "index": 43,
+   "input": "l2-100000x768",
+   "job_id": "ab72d51881917cefdbc3af084a8f2fe6ca5035de184b06ca7994052467be902e",
+   "post_seconds": 0.09965961899999343,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11867296700001
+  },
+  {
+   "index": 44,
+   "input": "l2-1000000x128",
+   "job_id": "8ed7da967a4afceecbc050ed8d8760edb12aa66a57d596e67e9d095ebb815298",
+   "post_seconds": 0.12553005700002018,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11675365599999
+  },
+  {
+   "index": 45,
+   "input": "l2-500000x384",
+   "job_id": "3e700f8d0f8625b96840f27b5b97155927ee55e61cba559d6e54a267e7cac41e",
+   "post_seconds": 0.10823345700001141,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11764438699998
+  },
+  {
+   "index": 46,
+   "input": "l2-250000x768",
+   "job_id": "9860cfee25cfbb932eb14b578254945af1301606ca295620709b5f430fe3dea8",
+   "post_seconds": 0.09980509600001142,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11649463399999
+  },
+  {
+   "index": 47,
+   "input": "l2-100000x768",
+   "job_id": "259bd6946ce5213e68717443822a3693d06ea0dea62cda685291ae93c38503c7",
+   "post_seconds": 0.10133732900001746,
+   "outcome": "status_failed",
+   "status": null,
+   "detail": "[Errno 104] Connection reset by peer",
+   "cpu_after": 91.11733838999999
+  }
+ ]
+}

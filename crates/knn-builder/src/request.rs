@@ -14,6 +14,15 @@
 //! Python) and nesting past 128 levels. Such a body is refused here, with
 //! 422 `json_invalid`, or with 400 where it is not UTF-8, as the service
 //! answers a body it cannot decode.
+//!
+//! One more answer differs, by choice. The service takes
+//! `algorithm_parameters.project_link_to_base_layer`, which links the
+//! graph's clusters through an HNSW layer built over a sample of the
+//! vectors; knn-builder does not build that layer, so it refuses `true`
+//! with 422 rather than return a graph whose clusters may be cut off from
+//! each other. k-NN's data node then builds the segment on its own CPU.
+//! For binary vectors the service ignores the field, and so does
+//! knn-builder.
 
 use std::fmt::{self, Write as _};
 
@@ -48,6 +57,10 @@ pub struct BuildRequest {
     pub ef_search: i64,
     /// `index_parameters.algorithm_parameters.m`.
     pub m: i64,
+    /// `index_parameters.algorithm_parameters.project_link_to_base_layer`:
+    /// `true` only for binary vectors, which the service builds without
+    /// the projection as well.
+    pub project_link_to_base_layer: bool,
     /// Any other `algorithm_parameters`, kept as the service keeps them.
     pub other_algorithm_parameters: Map<String, Value>,
     /// `skip_stored_vectors`.
@@ -159,6 +172,10 @@ impl BuildRequest {
         algorithm_parameters.insert("ef_construction".into(), self.ef_construction.into());
         algorithm_parameters.insert("ef_search".into(), self.ef_search.into());
         algorithm_parameters.insert("m".into(), self.m.into());
+        algorithm_parameters.insert(
+            "project_link_to_base_layer".into(),
+            self.project_link_to_base_layer.into(),
+        );
         algorithm_parameters.extend(self.other_algorithm_parameters.clone());
         json!({
             "repository_type": "s3",
@@ -250,9 +267,9 @@ const MODEL_TYPE: &str = "Input should be a valid dictionary or object to extrac
 
 /// Reads a `POST /_build` body sent with the `Content-Type` header
 /// `content_type`, as FastAPI reads one: as JSON, by [`parse`], when the
-/// header is missing or empty or its media type is `application/json` or
-/// `application/*+json`, in any case; otherwise as raw bytes, which the
-/// model refuses, unless there are none.
+/// header's media type is `application/json` or `application/*+json`, in
+/// any case; otherwise, the header missing or empty included, as raw
+/// bytes, which the model refuses, unless there are none.
 ///
 /// # Errors
 ///
@@ -267,12 +284,13 @@ pub fn parse_as(content_type: Option<&[u8]>, body: &[u8]) -> Result<BuildRequest
     }
 }
 
-/// Whether FastAPI reads a body of `content_type` as JSON. It takes the
-/// media type as Python's `email.message` does: before any `;`, stripped,
-/// in lower case, and `text/plain` unless it has exactly one `/`.
+/// Whether FastAPI reads a body of `content_type` as JSON: never without
+/// the header, or with it empty. It takes the media type as Python's
+/// `email.message` does: before any `;`, stripped, in lower case, and
+/// `text/plain` unless it has exactly one `/`.
 fn is_json(content_type: Option<&[u8]>) -> bool {
     let Some(value) = content_type.filter(|value| !value.is_empty()) else {
-        return true;
+        return false;
     };
     let media = value
         .split(|&b| b == b';')
@@ -313,11 +331,8 @@ pub fn parse(body: &[u8]) -> Result<BuildRequest, Rejection> {
             }]));
         }
     };
-    let object = match value {
-        Value::Object(object) => object,
-        // FastAPI takes a null body for no body.
-        Value::Null => return Err(single("body", "Field required", "missing")),
-        _ => return Err(single("body", MODEL_TYPE, "model_attributes_type")),
+    let Value::Object(object) = value else {
+        return Err(single("body", MODEL_TYPE, "model_attributes_type"));
     };
     let mut errors = Errors(Vec::new());
     let field = |name: &str| object.get(name);
@@ -362,7 +377,7 @@ pub fn parse(body: &[u8]) -> Result<BuildRequest, Rejection> {
             _ => None,
         });
     errors.choice("body.engine", field("engine"), &["faiss"], "faiss");
-    let index = errors.index_parameters(field("index_parameters"));
+    let index = errors.index_parameters(field("index_parameters"), data_type);
     let skip_stored_vectors = match field("skip_stored_vectors") {
         None => Some(false),
         Some(value) => errors.boolean("body.skip_stored_vectors", value),
@@ -393,6 +408,7 @@ pub fn parse(body: &[u8]) -> Result<BuildRequest, Rejection> {
             ef_construction: index.ef_construction,
             ef_search: index.ef_search,
             m: index.m,
+            project_link_to_base_layer: index.project_link_to_base_layer,
             other_algorithm_parameters: index.others,
             skip_stored_vectors: skip_stored_vectors?,
         })
@@ -442,8 +458,17 @@ struct Index {
     ef_construction: i64,
     ef_search: i64,
     m: i64,
+    project_link_to_base_layer: bool,
     others: Map<String, Value>,
 }
+
+/// The `algorithm_parameters` the service's model names, in its order.
+const ALGORITHM_PARAMETERS: [&str; 4] = [
+    "ef_construction",
+    "ef_search",
+    "m",
+    "project_link_to_base_layer",
+];
 
 /// The errors so far; each reader returns `None` after pushing one.
 struct Errors(Vec<FieldError>);
@@ -632,7 +657,13 @@ impl Errors {
         }
     }
 
-    fn index_parameters(&mut self, value: Option<&Value>) -> Option<Index> {
+    /// `index_parameters`; `data_type`, when it was read, decides whether
+    /// the projection can be asked for.
+    fn index_parameters(
+        &mut self,
+        value: Option<&Value>,
+        data_type: Option<DataType>,
+    ) -> Option<Index> {
         let empty = Map::new();
         let object = match value {
             None => &empty,
@@ -687,9 +718,25 @@ impl Errors {
         );
         let ef_search = self.int_or(&path("ef_search"), parameters.get("ef_search"), 100);
         let m = self.int_or(&path("m"), parameters.get("m"), 16);
+        let projection = path("project_link_to_base_layer");
+        let project_link_to_base_layer = match parameters.get("project_link_to_base_layer") {
+            None => Some(false),
+            Some(value) => self.boolean(&projection, value),
+        };
+        if project_link_to_base_layer == Some(true)
+            && data_type.is_some_and(|data_type| data_type != DataType::Binary)
+        {
+            self.push(
+                &projection,
+                "Value error, knn-builder does not project links into the base layer; \
+                 leave it false"
+                    .into(),
+                "value_error",
+            );
+        }
         let others = parameters
             .iter()
-            .filter(|(name, _)| !matches!(name.as_str(), "ef_construction" | "ef_search" | "m"))
+            .filter(|(name, _)| !ALGORITHM_PARAMETERS.contains(&name.as_str()))
             .map(|(name, value)| (name.clone(), value.clone()))
             .collect();
         Some(Index {
@@ -697,6 +744,7 @@ impl Errors {
             ef_construction: ef_construction?,
             ef_search: ef_search?,
             m: m?,
+            project_link_to_base_layer: project_link_to_base_layer?,
             others,
         })
     }
@@ -790,17 +838,17 @@ mod tests {
     #[test]
     fn reads_json_by_its_media_type_as_fastapi() {
         for json in [
-            None,
-            Some(&b""[..]),
-            Some(b"application/json"),
-            Some(b"application/json; charset=utf-8"),
-            Some(b"  Application/JSON ;x=y"),
-            Some(b"application/vnd.api+json"),
+            &b"application/json"[..],
+            b"application/json; charset=utf-8",
+            b"  Application/JSON ;x=y",
+            b"application/vnd.api+json",
         ] {
-            assert!(is_json(json), "{json:?}");
+            assert!(is_json(Some(json)), "{json:?}");
         }
+        assert!(!is_json(None));
         for other in [
-            &b"text/plain"[..],
+            &b""[..],
+            b"text/plain",
             b"application",
             b" ",
             b"application/json/x",

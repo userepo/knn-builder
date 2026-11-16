@@ -766,6 +766,7 @@ mod tests {
             ef_construction: 100,
             ef_search: 100,
             m: 16,
+            project_link_to_base_layer: false,
             other_algorithm_parameters: Map::new(),
             skip_stored_vectors: false,
         }

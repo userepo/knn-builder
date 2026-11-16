@@ -4,15 +4,15 @@ Scripts that produce and check the fixtures. The Python ones run in the upstream
 
 | Image | Digest | Used for |
 | --- | --- | --- |
-| `opensearchstaging/remote-vector-index-builder:api-snapshot` | `sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da` | the service at commit 3a02e64 (unreleased 1.3.0), `make_inputs.py`, the baseline runner |
-| `opensearchstaging/remote-vector-index-builder:faiss-base-snapshot` | `sha256:b3420e65b89c0d25a58ccc31dd1edfe1019383605ff356df563416b2d35bca9c` | the oracle: Faiss 1.14.3 at `0ca9df4` with the service's patches |
+| `opensearchstaging/remote-vector-index-builder:api-snapshot` | `sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc` | the service at commit ea7db9f (unreleased 1.3.0), `make_inputs.py`, the baseline runner |
+| `opensearchstaging/remote-vector-index-builder:faiss-base-snapshot` | `sha256:241eddbe1a2fa81c188aee5edc89a81bc14415a25963f24ecd923f04c4f3d9d1` | the oracle: Faiss 1.14.3 at `0ca9df4` with the service's patches |
 | `localstack/localstack:4.14` | `sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a` | S3 for the baseline, the version upstream's e2e test uses |
 
-Never use the `-latest` tags: they are release 1.2.0, which builds different graphs.
+Never use the `-latest` tags: they are release 1.2.0, which builds different graphs. Upstream built both snapshot images from f11f93c, the last commit before ea7db9f to change the service; ea7db9f changes only `MAINTAINERS.md`.
 
 ```sh
-API=opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
-BASE=opensearchstaging/remote-vector-index-builder@sha256:b3420e65b89c0d25a58ccc31dd1edfe1019383605ff356df563416b2d35bca9c
+API=opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
+BASE=opensearchstaging/remote-vector-index-builder@sha256:241eddbe1a2fa81c188aee5edc89a81bc14415a25963f24ecd923f04c4f3d9d1
 RUN="docker run --rm -v $PWD:/work -w /work --entrypoint python"
 ```
 
@@ -124,13 +124,13 @@ Then, from Windows or Linux, `python tools/baseline/score.py target/rust-baselin
 
 ## End to end
 
-`e2e/docker-compose.yml` runs the upstream service's end-to-end test against knn-builder's image: its client, unchanged, from upstream's own e2e image at 3a02e64, in knn-builder's container's network, where the address the client calls (`localhost:1025`) is knn-builder's, with LocalStack for S3. It builds an index of each of upstream's six test datasets (1M x 128, 384 and 768 float, two 100k half_float and a small one), checks each job through `/_status` and `/_jobs`, and exits 0 when all pass. Build the two images first, the upstream one from a checkout of upstream at 3a02e64 under `target/`, which git and the image's build leave out, on the `faiss-base` image pinned above:
+`e2e/docker-compose.yml` runs the upstream service's end-to-end test against knn-builder's image: its client, unchanged, from upstream's own e2e image at ea7db9f, in knn-builder's container's network, where the address the client calls (`localhost:1025`) is knn-builder's, with LocalStack for S3. It builds an index of each of upstream's six test datasets (1M x 128, 384 and 768 float, two 100k half_float and a small one), checks each job through `/_status` and `/_jobs`, and exits 0 when all pass. Build the two images first, the upstream one from a checkout of upstream at ea7db9f under `target/`, which git and the image's build leave out, on the `faiss-base` image pinned above:
 
 ```sh
 docker build -t knn-builder:dev .
-git clone https://github.com/opensearch-project/remote-vector-index-builder target/upstream && git -C target/upstream checkout 3a02e64
-docker tag opensearchstaging/remote-vector-index-builder@sha256:b3420e65b89c0d25a58ccc31dd1edfe1019383605ff356df563416b2d35bca9c opensearchstaging/remote-vector-index-builder:faiss-base-3a02e64
-docker build --build-arg BASE_IMAGE_TAG=faiss-base-3a02e64 -f target/upstream/e2e/api/Dockerfile -t remote-vector-index-builder:e2e-3a02e64 target/upstream
+git clone https://github.com/opensearch-project/remote-vector-index-builder target/upstream && git -C target/upstream checkout ea7db9f
+docker tag opensearchstaging/remote-vector-index-builder@sha256:241eddbe1a2fa81c188aee5edc89a81bc14415a25963f24ecd923f04c4f3d9d1 opensearchstaging/remote-vector-index-builder:faiss-base-ea7db9f
+docker build --build-arg BASE_IMAGE_TAG=faiss-base-ea7db9f -f target/upstream/e2e/api/Dockerfile -t remote-vector-index-builder:e2e-ea7db9f target/upstream
 docker compose -f tools/e2e/docker-compose.yml up --exit-code-from e2e
 ```
 

@@ -1,5 +1,5 @@
 # One remote index build service on the GPU for the benchmark: knn-builder's
-# image, or the upstream service at the pinned commit (3a02e64, as the
+# image, or the upstream service at the pinned commit (ea7db9f, as the
 # api-snapshot image of that digest), with LocalStack for S3 and an
 # uploader for the inputs. tools/bench/run.py drives it from the host,
 # where nvidia-smi samples the GPU; it starts the services with the
@@ -49,7 +49,7 @@ services:
       - localstack
 
   uploader:
-    image: opensearchstaging/remote-vector-index-builder@sha256:78ced9d04c4cbc1106cfceb98e32a772c71565b215c6e68be8fcdcbcdaab64da
+    image: opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
     entrypoint: ["python", "/work/tools/bench/upload.py"]
     environment:
       S3_ENDPOINT_URL: http://localstack:4566

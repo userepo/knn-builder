@@ -158,8 +158,10 @@ cuvs::neighbors::cagra::index_params faiss_binary_index_params(const knn_cagra_b
 
 // Copies the host vectors to a padded device dataset, builds on it, and
 // copies the graph back, as Faiss's CuvsCagra::train does for host data
-// (faiss/gpu/impl/CuvsCagra.cu:214-223) and, with rvib's patch 0003,
-// BinaryCuvsCagra::train. The graph may be narrower than `max_degree`
+// it is told to store (faiss/gpu/impl/CuvsCagra.cu:218-227) and, with
+// rvib's patch 0003, BinaryCuvsCagra::train. The service stores none, so
+// its float, fp16 and byte builds take the patch's host-memory path
+// instead (CuvsCagra.cu:228-249). The graph may be narrower than `max_degree`
 // where cuVS lowers the degree; `degree` receives the one it built.
 template <typename T>
 int build_graph(raft::resources& res,

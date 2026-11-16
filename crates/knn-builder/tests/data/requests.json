@@ -19,7 +19,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -46,7 +47,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -73,7 +75,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -100,7 +103,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": true
@@ -128,6 +132,7 @@
           "ef_construction": 100,
           "ef_search": 100,
           "m": 32,
+          "project_link_to_base_layer": false,
           "encoder": {
             "name": "sq",
             "bits": 4
@@ -158,7 +163,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -185,7 +191,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -212,7 +219,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -239,7 +247,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -266,7 +275,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": true
@@ -293,7 +303,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -320,7 +331,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -347,7 +359,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -374,7 +387,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -401,7 +415,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -428,7 +443,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 0
+          "m": 0,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -455,7 +471,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": -1,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -482,7 +499,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -509,7 +527,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -536,7 +555,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -563,7 +583,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": true
@@ -590,7 +611,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -617,7 +639,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": true
@@ -644,7 +667,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -671,7 +695,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -698,7 +723,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -725,7 +751,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -827,7 +854,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -854,7 +882,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": true
@@ -911,7 +940,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -998,7 +1028,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1025,7 +1056,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1067,7 +1099,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1510,6 +1543,226 @@
     }
   },
   {
+    "case": "projection false",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": false}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "project_link_to_base_layer": false
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "projection as a string",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": \"off\"}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "project_link_to_base_layer": false
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "projection true",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": true}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "float",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "project_link_to_base_layer": true
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "projection as yes, byte",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"byte\", \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": \"yes\"}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "byte",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "l2",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "project_link_to_base_layer": true
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "projection true, binary",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"binary\", \"index_parameters\": {\"space_type\": \"hamming\", \"algorithm_parameters\": {\"project_link_to_base_layer\": true}}}",
+    "status": 200,
+    "parsed": {
+      "repository_type": "s3",
+      "container_name": "bucket",
+      "vector_path": "segments/_0_target_field.knnvec",
+      "doc_id_path": "segments/_0_target_field.knndid",
+      "tenant_id": "",
+      "dimension": 768,
+      "doc_count": 1000000,
+      "data_type": "binary",
+      "engine": "faiss",
+      "index_parameters": {
+        "algorithm": "hnsw",
+        "space_type": "hamming",
+        "algorithm_parameters": {
+          "ef_construction": 100,
+          "ef_search": 100,
+          "m": 16,
+          "project_link_to_base_layer": true
+        }
+      },
+      "skip_stored_vectors": false
+    },
+    "job_id": "96c423eb32079f67c20f0ec969f6eef553e3cef4a79c92979e1f7a542218c58f"
+  },
+  {
+    "case": "projection true, data_type wrong",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"data_type\": \"int8\", \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": true}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.data_type",
+          "message": "Input should be 'float', 'half_float', 'byte' or 'binary'",
+          "type": "enum"
+        }
+      ]
+    }
+  },
+  {
+    "case": "projection true, doc_count wrong",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": true}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.doc_count",
+          "message": "Input should be greater than 4",
+          "type": "greater_than"
+        }
+      ]
+    }
+  },
+  {
+    "case": "projection text",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": \"maybe\"}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm_parameters.project_link_to_base_layer",
+          "message": "Input should be a valid boolean, unable to interpret input",
+          "type": "bool_parsing"
+        }
+      ]
+    }
+  },
+  {
+    "case": "projection null",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": null}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm_parameters.project_link_to_base_layer",
+          "message": "Input should be a valid boolean",
+          "type": "bool_type"
+        }
+      ]
+    }
+  },
+  {
+    "case": "projection before a bad m",
+    "body": "{\"container_name\": \"bucket\", \"vector_path\": \"segments/_0_target_field.knnvec\", \"doc_id_path\": \"segments/_0_target_field.knndid\", \"dimension\": 768, \"doc_count\": 1000000, \"index_parameters\": {\"algorithm_parameters\": {\"project_link_to_base_layer\": [], \"m\": \"x\"}}}",
+    "status": 422,
+    "response": {
+      "detail": "Validation Error",
+      "errors": [
+        {
+          "field": "body.index_parameters.algorithm_parameters.m",
+          "message": "Input should be a valid integer, unable to parse string as an integer",
+          "type": "int_parsing"
+        },
+        {
+          "field": "body.index_parameters.algorithm_parameters.project_link_to_base_layer",
+          "message": "Input should be a valid boolean",
+          "type": "bool_type"
+        }
+      ]
+    }
+  },
+  {
     "case": "not JSON",
     "body": "{",
     "status": 422,
@@ -1548,8 +1801,8 @@
       "errors": [
         {
           "field": "body",
-          "message": "Field required",
-          "type": "missing"
+          "message": "Input should be a valid dictionary or object to extract fields from",
+          "type": "model_attributes_type"
         }
       ]
     }
@@ -1604,7 +1857,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1661,7 +1915,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1719,7 +1974,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1746,7 +2002,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1773,7 +2030,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1800,7 +2058,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1827,7 +2086,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1869,7 +2129,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1896,7 +2157,8 @@
         "algorithm_parameters": {
           "ef_construction": 100,
           "ef_search": 100,
-          "m": 16
+          "m": 16,
+          "project_link_to_base_layer": false
         }
       },
       "skip_stored_vectors": false
@@ -1954,6 +2216,7 @@
           "ef_construction": 100,
           "ef_search": 100,
           "m": 16,
+          "project_link_to_base_layer": false,
           "x": 9007199254740992.0
         }
       },
@@ -1982,6 +2245,7 @@
           "ef_construction": 100,
           "ef_search": 100,
           "m": 16,
+          "project_link_to_base_layer": false,
           "x": 2.225073858507201e-308
         }
       },

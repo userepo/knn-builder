@@ -147,6 +147,33 @@ CASES = {
             "algorithm": "w",
         }
     ),
+    # The projection: taken as a bool, false by default; knn-builder
+    # refuses true where the service would project (tests/request.rs).
+    "projection false": params(project_link_to_base_layer=False),
+    "projection as a string": params(project_link_to_base_layer="off"),
+    "projection true": params(project_link_to_base_layer=True),
+    "projection as yes, byte": with_(
+        data_type="byte",
+        index_parameters={"algorithm_parameters": {"project_link_to_base_layer": "yes"}},
+    ),
+    "projection true, binary": with_(
+        data_type="binary",
+        index_parameters={
+            "space_type": "hamming",
+            "algorithm_parameters": {"project_link_to_base_layer": True},
+        },
+    ),
+    "projection true, data_type wrong": with_(
+        data_type="int8",
+        index_parameters={"algorithm_parameters": {"project_link_to_base_layer": True}},
+    ),
+    "projection true, doc_count wrong": with_(
+        doc_count=1,
+        index_parameters={"algorithm_parameters": {"project_link_to_base_layer": True}},
+    ),
+    "projection text": params(project_link_to_base_layer="maybe"),
+    "projection null": params(project_link_to_base_layer=None),
+    "projection before a bad m": params(project_link_to_base_layer=[], m="x"),
 }
 
 REQUIRED_JSON = json.dumps(REQUIRED)

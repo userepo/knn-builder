@@ -1,0 +1,660 @@
+{
+  "knn_inspect": "knn-inspect 0.17.0",
+  "recall": {
+    "seed": 1,
+    "k": 10,
+    "queries": "the input's queries.f32, or queries.u8 for binary"
+  },
+  "inputs": {
+    "hamming-1000x1024-binary-clustered": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 1024,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4002,
+        "distribution": "20 centers of uniform bits, each bit flipped with probability 0.1",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.615,
+          "size": 407697,
+          "sha256": "340f89fa2244f56f9ece166c65025eac824c87cbeb4e52e5d9d0d17b0b267ff3",
+          "seconds": {
+            "download": 0.05,
+            "build": 0.41,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.01
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 407697,
+          "sha256": "05cfc295606bec8692bf596de1e79523d2bb214975d26c94e44b1305fbfbe913",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.17,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 407697,
+          "sha256": "a86767cb081634d6d3bf7151a8aa39cb624dab80ba752148ab8637640a1e3958",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.17,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 407697,
+          "sha256": "3deeb1d3fdd063cfb6cd9a4da23251d4070e11d05d314dd04908e584a6f90feb",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.23,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 407697,
+          "sha256": "ae441a63b8da174a1ef95d398fd1a2c7b0eb20c9314dd353d18c6a79c339020c",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.33,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.01
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.17,
+        "max": 0.41,
+        "mean": 0.262
+      },
+      "distinct_files": 5
+    },
+    "hamming-1000x256-binary": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4000,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 311697,
+          "sha256": "bde99b545bfd51f555565367c180c94d71ddf0b20695f244b1e80d6d0a93eaee",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.16,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 311697,
+          "sha256": "616205668590a6c212a36d8207a0bc6e2b57002f1eb1c87ea3da2671af2b86bc",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.16,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.01
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 311697,
+          "sha256": "6a863c0db863bd21c6a10cee349da41d8ba047e9faf5f9f0ebf18b73c814545d",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.16,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 311697,
+          "sha256": "b755f7fbcadc9e8fe1503d274b8ae2f3dc038a38d2a0a67b0d5d36a74f831c8f",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.17,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 311697,
+          "sha256": "f4a20947143511617a5671b9568a60cdd1bb0b686c0ea96686bc7c2439b3e296",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.15,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.15,
+        "max": 0.17,
+        "mean": 0.16
+      },
+      "distinct_files": 5
+    },
+    "hamming-1000x256-binary-clustered": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4001,
+        "distribution": "20 centers of uniform bits, each bit flipped with probability 0.1",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 311697,
+          "sha256": "d73ccb7e48b177dd0cf40f2ab15457ab9c76d04e7f3e61dba307ff9032720c69",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.15,
+            "conversion": 0.02,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 311697,
+          "sha256": "aa8bc4ddc6908dcba18a1f207a898fcd02638af92978cae1613981499a7d4683",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.15,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 311697,
+          "sha256": "d7c104b2deca6db76c9bb3ad4f1e7bd58a738c6831aad538ee182c51a286b2d2",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.16,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 311697,
+          "sha256": "ddf27bd4ab3929d0d49f1f4f2b1792d74ab06160fcfc839723815ebfed08e07a",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.15,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 311697,
+          "sha256": "df2f031b53364a049db5d358f249b5fd715f9bdfe8d7ad040d2a6ee0ee91403c",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.15,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.15,
+        "max": 0.16,
+        "mean": 0.152
+      },
+      "distinct_files": 5
+    },
+    "hamming-1000x256-binary-skip": {
+      "input": {
+        "doc_count": 1000,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": true,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4003,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.206,
+          "size": 279668,
+          "sha256": "f8dea9fa60b62ccb39e4a8470307ad34a597e08a7d42241bcbc07dd2dba01d2d",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.14,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "failed"
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.407,
+          "size": 279668,
+          "sha256": "c57d0833a63a675e8b1c0cc48e65b1c9251921d13f545480edec62f88071095d",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.16,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "failed"
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.416,
+          "size": 279668,
+          "sha256": "f401172d63d841ad3816b725a6f847db77ba7afa5e652639027534335bd5296b",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.26,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "failed"
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 279668,
+          "sha256": "8c23df3d0fb61d1f100b6243984b5e3fa5302f8d00d6124019c751a5d11ddcd5",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.18,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "failed"
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.409,
+          "size": 279668,
+          "sha256": "f06af4c2ad571a8234dbd709f82776ddf5e998c85b195e5339b294d4706c77db",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.16,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "failed"
+        }
+      ],
+      "build_seconds": {
+        "min": 0.14,
+        "max": 0.26,
+        "mean": 0.18
+      },
+      "distinct_files": 5
+    },
+    "hamming-150x256-binary": {
+      "input": {
+        "doc_count": 150,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4004,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 46953,
+          "sha256": "b678351898042c110c339de6c5686d4c02a57e960e75f522b8fee599b6c8bdec",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.15,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 46953,
+          "sha256": "b0bbf3d3a2c068271b6d6b7d3b007018c55b368aa167ee3b0957571d4f71a2aa",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.14,
+            "conversion": 0.02,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.408,
+          "size": 46953,
+          "sha256": "2a9b990cadd020d32d4aade218c8cd9dc8342d3d485e301a2617e61e63ae12ff",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.17,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.206,
+          "size": 46953,
+          "sha256": "602a6f7f54d7931d4c67ba36784201837ffc81ceb39a19c53b5d184fcd2158db",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.11,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 46953,
+          "sha256": "594500bb710542c61023b6a4e7d647ddecb148696b7f11dc119087b233a12cfa",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.15,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.11,
+        "max": 0.17,
+        "mean": 0.144
+      },
+      "distinct_files": 5
+    },
+    "hamming-40x256-binary": {
+      "input": {
+        "doc_count": 40,
+        "dimension": 256,
+        "space_type": "hamming",
+        "data_type": "binary",
+        "blob_dtype": "<u1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 4005,
+        "distribution": "uniform bits",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.206,
+          "size": 8729,
+          "sha256": "9d6bcfbb4f36f3b60723dcfc208ab4dc560a2e21fcc5a2d55efe86ec35a85351",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.07,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.206,
+          "size": 8729,
+          "sha256": "9d6bcfbb4f36f3b60723dcfc208ab4dc560a2e21fcc5a2d55efe86ec35a85351",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.08,
+            "conversion": 0.02,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.205,
+          "size": 8729,
+          "sha256": "9d6bcfbb4f36f3b60723dcfc208ab4dc560a2e21fcc5a2d55efe86ec35a85351",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.07,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.206,
+          "size": 8729,
+          "sha256": "9d6bcfbb4f36f3b60723dcfc208ab4dc560a2e21fcc5a2d55efe86ec35a85351",
+          "seconds": {
+            "download": 0.02,
+            "build": 0.08,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "wall_seconds": 0.207,
+          "size": 8729,
+          "sha256": "9d6bcfbb4f36f3b60723dcfc208ab4dc560a2e21fcc5a2d55efe86ec35a85351",
+          "seconds": {
+            "download": 0.01,
+            "build": 0.08,
+            "conversion": 0.03,
+            "write": 0.0,
+            "upload": 0.0
+          },
+          "verify": "clean",
+          "recall_at_10": 1.0
+        }
+      ],
+      "recall_at_10": {
+        "min": 1.0,
+        "max": 1.0,
+        "mean": 1.0
+      },
+      "build_seconds": {
+        "min": 0.07,
+        "max": 0.08,
+        "mean": 0.076
+      },
+      "distinct_files": 1
+    }
+  }
+}
