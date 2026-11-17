@@ -14,15 +14,6 @@
 //! Python) and nesting past 128 levels. Such a body is refused here, with
 //! 422 `json_invalid`, or with 400 where it is not UTF-8, as the service
 //! answers a body it cannot decode.
-//!
-//! One more answer differs, by choice. The service takes
-//! `algorithm_parameters.project_link_to_base_layer`, which links the
-//! graph's clusters through an HNSW layer built over a sample of the
-//! vectors; knn-builder does not build that layer, so it refuses `true`
-//! with 422 rather than return a graph whose clusters may be cut off from
-//! each other. k-NN's data node then builds the segment on its own CPU.
-//! For binary vectors the service ignores the field, and so does
-//! knn-builder.
 
 use std::fmt::{self, Write as _};
 
@@ -58,8 +49,9 @@ pub struct BuildRequest {
     /// `index_parameters.algorithm_parameters.m`.
     pub m: i64,
     /// `index_parameters.algorithm_parameters.project_link_to_base_layer`:
-    /// `true` only for binary vectors, which the service builds without
-    /// the projection as well.
+    /// link the graph's clusters through an HNSW layer 1 built over a
+    /// sample of the vectors. For binary vectors the service ignores it,
+    /// and so does the job.
     pub project_link_to_base_layer: bool,
     /// Any other `algorithm_parameters`, kept as the service keeps them.
     pub other_algorithm_parameters: Map<String, Value>,
@@ -241,6 +233,8 @@ impl BuildRequest {
             ef_construction: signed("ef_construction", self.ef_construction)?,
             ef_search: signed("ef_search", self.ef_search)?,
             skip_stored_vectors: self.skip_stored_vectors,
+            project_link_to_base_layer: self.project_link_to_base_layer
+                && self.data_type != DataType::Binary,
         })
     }
 }
@@ -377,7 +371,7 @@ pub fn parse(body: &[u8]) -> Result<BuildRequest, Rejection> {
             _ => None,
         });
     errors.choice("body.engine", field("engine"), &["faiss"], "faiss");
-    let index = errors.index_parameters(field("index_parameters"), data_type);
+    let index = errors.index_parameters(field("index_parameters"));
     let skip_stored_vectors = match field("skip_stored_vectors") {
         None => Some(false),
         Some(value) => errors.boolean("body.skip_stored_vectors", value),
@@ -657,13 +651,8 @@ impl Errors {
         }
     }
 
-    /// `index_parameters`; `data_type`, when it was read, decides whether
-    /// the projection can be asked for.
-    fn index_parameters(
-        &mut self,
-        value: Option<&Value>,
-        data_type: Option<DataType>,
-    ) -> Option<Index> {
+    /// `index_parameters`.
+    fn index_parameters(&mut self, value: Option<&Value>) -> Option<Index> {
         let empty = Map::new();
         let object = match value {
             None => &empty,
@@ -718,22 +707,10 @@ impl Errors {
         );
         let ef_search = self.int_or(&path("ef_search"), parameters.get("ef_search"), 100);
         let m = self.int_or(&path("m"), parameters.get("m"), 16);
-        let projection = path("project_link_to_base_layer");
         let project_link_to_base_layer = match parameters.get("project_link_to_base_layer") {
             None => Some(false),
-            Some(value) => self.boolean(&projection, value),
+            Some(value) => self.boolean(&path("project_link_to_base_layer"), value),
         };
-        if project_link_to_base_layer == Some(true)
-            && data_type.is_some_and(|data_type| data_type != DataType::Binary)
-        {
-            self.push(
-                &projection,
-                "Value error, knn-builder does not project links into the base layer; \
-                 leave it false"
-                    .into(),
-                "value_error",
-            );
-        }
         let others = parameters
             .iter()
             .filter(|(name, _)| !ALGORITHM_PARAMETERS.contains(&name.as_str()))

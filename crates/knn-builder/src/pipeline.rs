@@ -1,17 +1,19 @@
 //! Jobs flow through three stages, one job at a time in each: the
 //! download, the build on the builder's own thread, then the write and
-//! upload. So the next job downloads while one builds, and the last one
-//! uploads meanwhile. A stage takes the next stage's one slot before it
+//! upload, after the projection for a job that asks for it. So the next
+//! job downloads while one builds, and the last one projects and uploads
+//! meanwhile. A stage takes the next stage's one slot before it
 //! takes up a job, so a finished job waits where it is until the next
 //! stage has room, and at most three jobs hold host memory: one
 //! downloading, one building, one uploading, or one in each stage's slot
 //! while the stage ahead finishes.
 //!
 //! Those jobs share a budget of host memory too: a job takes its
-//! buffers' share (vectors, doc ids, graph; not the transfers' own
-//! buffers) before it downloads and gives it back when it ends, so
-//! a large job waits until the ones ahead of it have made room. A job
-//! larger than the whole budget takes all of it, and runs alone.
+//! buffers' share (vectors, doc ids, graph, and the projection's buffers
+//! when it asks for one; not the transfers' own buffers) before it
+//! downloads and gives it back when it ends, so a large job waits until
+//! the ones ahead of it have made room. A job larger than the whole budget
+//! takes all of it, and runs alone.
 //!
 //! [`Pipeline::in_flight`] tells where each job is and since when, for a
 //! forecast of when each will end.
@@ -29,6 +31,7 @@ use tokio::task::JoinHandle;
 
 use crate::cost::Fitted;
 use crate::load::{Dataset, load};
+use crate::project::project;
 use crate::write::write_index;
 use crate::{Builder, Job, JobError};
 
@@ -48,10 +51,10 @@ impl Pipeline {
     /// Starts the stages: the download and upload stages on the current
     /// Tokio runtime, which must be multi-threaded (the transfers block
     /// threads of their own and run their requests on it), and `builder`
-    /// on a thread of its own. The jobs' buffers, their vectors, doc ids
-    /// and graphs, take `host_memory` bytes at most at once, counted in
-    /// whole MiB. The transfers' own buffers come on top: the one upload's
-    /// parts in memory, up to [`knn_store::Transfers`]'s
+    /// on a thread of its own. The jobs' buffers, their vectors, doc ids,
+    /// graphs and projections, take `host_memory` bytes at most at once,
+    /// counted in whole MiB. The transfers' own buffers come on top: the
+    /// one upload's parts in memory, up to [`knn_store::Transfers`]'s
     /// `upload_concurrency` plus two, of `part_size` or more (80 MiB at
     /// least by default).
     ///
@@ -219,10 +222,12 @@ pub struct Canceler {
 
 impl Canceler {
     /// Cancels the job: one still queued ends at once and never starts, a
-    /// download or upload stops at once, an upload aborts so nothing is
-    /// stored, and a build, which cannot be stopped, is thrown away when it
-    /// ends. The job then ends with [`JobError::Canceled`], unless its
-    /// upload had already sent its last request.
+    /// download or upload stops at once (a projection before the upload
+    /// between two batches of its layer 1, or once its pass over the graph
+    /// under way ends), an upload aborts so nothing is stored, and a build,
+    /// which cannot be stopped, is thrown away when it ends. The job then
+    /// ends with [`JobError::Canceled`], unless its upload had already sent
+    /// its last request.
     pub fn cancel(&self) {
         // Withdrawn before the flag is set, so a wait on the flag finds the
         // claim settled.
@@ -288,6 +293,11 @@ pub struct Timings {
     pub download: Span,
     /// Building the graph.
     pub build: Span,
+    /// Projecting layer-1 links into the graph, in the upload stage before
+    /// the write: only when it built layer 1 and wrote its links, not when
+    /// the job did not ask, the gate found the graph connected or it
+    /// failed.
+    pub projection: Option<Span>,
     /// Writing and uploading the index.
     pub upload: Span,
 }
@@ -303,7 +313,7 @@ pub struct Span {
 
 impl Span {
     /// From `start` until now.
-    fn since(start: Instant) -> Self {
+    pub(crate) fn since(start: Instant) -> Self {
         Self {
             start,
             end: Instant::now(),
@@ -331,7 +341,8 @@ pub enum Stage {
     Building,
     /// Built, in the upload slot until the upload stage takes it.
     Graphed,
-    /// Writing and uploading its index.
+    /// Projecting layer-1 links into its graph when it asks, then writing
+    /// and uploading its index.
     Uploading,
 }
 
@@ -608,8 +619,10 @@ fn builds<B: Builder>(
             .unwrap_or(Err(JobError::Panicked { stage: "build" }));
         match built {
             Ok((graph, degree)) => {
-                // Not in the file, so not needed past the build.
-                if job.queued.job.skip_stored_vectors {
+                // Not in the file, so not needed past the build, nor past
+                // the projection when the job asks for one.
+                if job.queued.job.skip_stored_vectors && !job.queued.job.project_link_to_base_layer
+                {
                     job.dataset.vectors.release_values();
                 }
                 let span = Span::since(start);
@@ -662,20 +675,28 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
             build,
         } = job;
         queued.track.enter(Stage::Uploading);
-        let start = Instant::now();
         let (store, request, cancel) = (store.clone(), queued.job.clone(), queued.cancel.clone());
         // The inputs and the graph are freed as the write ends.
         let written = tokio::task::spawn_blocking(move || {
+            let (mut dataset, mut graph) = (dataset, graph);
+            // A cancel stops the projection, then the write at once.
+            let projection = project(&request, &dataset.vectors, &mut graph, degree, &cancel);
+            if request.skip_stored_vectors {
+                dataset.vectors.release_values();
+            }
+            let start = Instant::now();
             write_index(&store, &request, &dataset, &graph, degree, &cancel)
+                .map(|()| (projection, Span::since(start)))
         })
         .await;
         let outcome = match written {
-            Ok(Ok(())) => Ok(Built {
+            Ok(Ok((projection, upload))) => Ok(Built {
                 file_name: queued.job.file_name(),
                 timings: Timings {
                     download,
                     build,
-                    upload: Span::since(start),
+                    projection,
+                    upload,
                 },
             }),
             Ok(Err(error)) => Err(error),

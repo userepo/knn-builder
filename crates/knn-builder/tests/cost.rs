@@ -19,6 +19,7 @@
 )]
 
 use std::fs;
+use std::num::NonZeroUsize;
 use std::path::Path;
 
 use knn_builder::cost::{CpuThreads, Fitted, Stages};
@@ -28,6 +29,7 @@ use serde_json::Value;
 /// The RTX 4070 Laptop GPU's shared memory a block, which the grid ran on.
 const RTX_4070: Fitted = Fitted {
     shared_memory_per_block: 101_376,
+    projection_threads: NonZeroUsize::MIN.saturating_add(7),
 };
 
 fn fixture(name: &str) -> Value {
@@ -88,6 +90,7 @@ fn job(record: &Value) -> Job {
         ef_construction: 100,
         ef_search: 100,
         skip_stored_vectors: false,
+        project_link_to_base_layer: false,
     }
 }
 
@@ -266,6 +269,7 @@ fn finds_the_slow_search_where_the_grid_did() {
     (job.dimension, job.m) = (768, 32);
     let larger = Fitted {
         shared_memory_per_block: 232_448,
+        ..RTX_4070
     };
     assert!(!larger.slow_search(&job));
 }
@@ -607,4 +611,39 @@ fn takes_the_cpu_build_the_fit_says() {
         );
         close(Fitted::cpu_seconds(&job, threads), fit, key, &record);
     }
+}
+
+/// The projection's model against what `knn-write`'s `projection_cost`
+/// test measured it to take (`fixtures/grid/projection.json`) where it built
+/// layer 1: within half and three times of each, the spread its fit left
+/// between vectors in clusters apart and overlapping, and at m 2.
+#[test]
+fn models_the_projection_within_its_spread() {
+    let Value::Array(records) = fixture("projection.json") else {
+        panic!("projection.json is a list")
+    };
+    let mut checked = 0;
+    for record in records.iter().filter(|r| r["outcome"] == "projected") {
+        let number = |key: &str| record[key].as_u64().unwrap();
+        let job = Job {
+            doc_count: u32::try_from(number("n")).unwrap(),
+            dimension: u32::try_from(number("dimension")).unwrap(),
+            m: u32::try_from(number("m")).unwrap(),
+            ef_construction: i32::try_from(number("ef_construction")).unwrap(),
+            project_link_to_base_layer: true,
+            ..job(&builds()[0])
+        };
+        // The service lowers no m of these counts.
+        let degree = job.graph_params().unwrap().degree_for(job.doc_count);
+        assert_eq!(degree, u32::try_from(number("degree")).unwrap());
+        let model = Fitted {
+            projection_threads: NonZeroUsize::new(usize::try_from(number("threads")).unwrap())
+                .unwrap(),
+            ..RTX_4070
+        };
+        let ratio = model.projection_seconds(&job) / record["seconds"].as_f64().unwrap();
+        assert!((0.5..=3.0).contains(&ratio), "{ratio}: {record}");
+        checked += 1;
+    }
+    assert!(checked >= 50, "{checked} records");
 }

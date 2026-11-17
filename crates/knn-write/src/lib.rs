@@ -13,6 +13,9 @@
 //! level table Faiss draws for every node is drawn again for each array
 //! that needs it ([`LevelTable`]).
 //!
+//! [`projection`] ports the change the service can make to a graph before
+//! it is written, when a request sets `project_link_to_base_layer`.
+//!
 //! ```
 //! use knn_write::{IndexFile, IndexSpec, Metric, Vectors};
 //!
@@ -39,6 +42,7 @@
 mod error;
 mod levels;
 mod mt19937;
+pub mod projection;
 mod write;
 
 pub use error::Error;

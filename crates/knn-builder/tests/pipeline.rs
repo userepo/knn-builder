@@ -16,15 +16,20 @@
 
 mod common;
 
+use std::num::NonZeroUsize;
 use std::time::{Duration, Instant};
 
 use common::{S3, ids, le_ids};
 use knn_builder::cost::{Fitted, Stages};
 use knn_builder::forecast::Forecaster;
 use knn_builder::{
-    Builder, Built, DataType, FakeBuilder, Job, JobError, Pipeline, SpaceType, Span, Stage,
+    Builder, Built, DataType, FakeBuilder, GraphParams, Job, JobError, Pipeline, SpaceType, Span,
+    Stage,
 };
 use knn_gpu::fp16;
+use knn_write::projection::{
+    Insertion, Outcome, Settings, max_reachable_share, project_upper_level,
+};
 use knn_write::{IndexFile, IndexSpec, Vectors};
 
 /// What the pipeline tests do with their bucket.
@@ -81,6 +86,7 @@ fn job(bucket: &str, name: &str, doc_count: u32, dimension: u32) -> Job {
         ef_construction: 100,
         ef_search: 100,
         skip_stored_vectors: false,
+        project_link_to_base_layer: false,
     }
 }
 
@@ -112,17 +118,27 @@ fn bits(values: &[f32]) -> Vec<u8> {
         .collect()
 }
 
+/// The graph degree of `job`.
+fn degree(job: &Job) -> usize {
+    job.graph_params().unwrap().degree_for(job.doc_count) as usize
+}
+
 /// The file the pipeline must store for `job`: knn-write's, from the
 /// inputs as `stored` says the file keeps them and the fake's graph.
 fn expected(job: &Job, values: &[f32], stored: Blob) -> Vec<u8> {
-    let degree = job.graph_params().unwrap().degree_for(job.doc_count) as usize;
-    let graph = FakeBuilder::graph(job.doc_count as usize, degree);
+    let graph = FakeBuilder::graph(job.doc_count as usize, degree(job));
+    expected_with(job, values, stored, &graph)
+}
+
+/// The file the pipeline must store for `job` whose graph is `graph`.
+fn expected_with(job: &Job, values: &[f32], stored: Blob, graph: &[u32]) -> Vec<u8> {
+    let degree = degree(job);
     let (halves, int8s, bits) = (halves(values), int8s(values), bits(values));
     let ids = ids(job.doc_count);
     let file = IndexFile::new(IndexSpec {
         dimension: job.dimension as usize,
         metric: job.file_metric(),
-        graph: &graph,
+        graph,
         graph_degree: degree,
         vectors: match stored {
             Blob::F32 => Vectors::F32(values),
@@ -197,6 +213,168 @@ async fn stores_the_index_of_each_kind_of_job() {
     }
     pipeline.close().await;
     assert_eq!(s3.pending_uploads().await, 0);
+    s3.remove().await;
+}
+
+/// Projects `graph` as the service does `job`'s, on its vectors as
+/// downloaded from a `blob` of `values`, with the service's settings
+/// spelled out: layer 1 the same on any number of threads, so on one.
+fn project(job: &Job, blob: Blob, values: &[f32], graph: &mut [u32], degree: usize) {
+    let GraphParams::IvfPq(params) = job.graph_params().unwrap() else {
+        panic!("{job:?}");
+    };
+    let settings = Settings {
+        m: params.effective_m,
+        ef_construction: usize::try_from(job.ef_construction).unwrap(),
+        metric: job.file_metric(),
+        insertion: Insertion::Batched {
+            threads: NonZeroUsize::MIN,
+        },
+        ..Settings::default()
+    };
+    let (halves, int8s) = (halves(values), int8s(values));
+    let downloaded = match blob {
+        Blob::F16 => Vectors::F16(&halves),
+        Blob::I8 => Vectors::I8(&int8s),
+        _ => Vectors::F32(values),
+    };
+    let outcome = project_upper_level(
+        graph,
+        degree,
+        downloaded,
+        job.dimension as usize,
+        &settings,
+        &|| false,
+    )
+    .unwrap();
+    assert!(
+        matches!(outcome, Outcome::Projected { links, .. } if links > 0),
+        "{outcome:?}"
+    );
+}
+
+/// Asked for, the projection links a clustered graph's clusters before the
+/// write, as `knn-write`'s projection does on the vectors as downloaded,
+/// raising the share a search reaches from one cluster's to nearly all.
+/// Binary vectors, and a job that does not ask, keep the graph as built.
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn projects_a_clustered_graph_when_asked() {
+    let s3 = S3::new("projection").await;
+    let asks = |name: &str| Job {
+        project_link_to_base_layer: true,
+        ..job(&s3.bucket, name, 600, 16)
+    };
+    let float = asks("float");
+    // fp16 vectors the file leaves out: kept for the projection.
+    let fp16_blob = Job {
+        data_type: DataType::HalfFloat,
+        skip_stored_vectors: true,
+        ..asks("fp16")
+    };
+    let byte = Job {
+        data_type: DataType::Byte,
+        space_type: SpaceType::InnerProduct,
+        ..asks("byte")
+    };
+    let binary = Job {
+        data_type: DataType::Binary,
+        space_type: SpaceType::Hamming,
+        dimension: 64,
+        ..asks("binary")
+    };
+    let plain = job(&s3.bucket, "plain", 600, 16);
+    let cases = [
+        (&float, Blob::F32),
+        (&fp16_blob, Blob::F16),
+        (&byte, Blob::I8),
+        (&binary, Blob::Bits),
+        (&plain, Blob::F32),
+    ];
+    for &(job, blob) in &cases {
+        s3.put_inputs(job, &values(job), blob, None).await;
+    }
+    let pipeline = s3.pipeline(FakeBuilder::clustered(Duration::ZERO, 4));
+    let handles: Vec<_> = cases
+        .iter()
+        .map(|&(job, _)| pipeline.submit(job.clone()))
+        .collect();
+    for (handle, &(job, blob)) in handles.into_iter().zip(&cases) {
+        let built = handle.outcome().await.unwrap();
+        let values = values(job);
+        let degree = degree(job);
+        let clustered = FakeBuilder::clustered_graph(600, degree, 4);
+        let mut graph = clustered.clone();
+        let projects = job.project_link_to_base_layer && job.data_type != DataType::Binary;
+        if projects {
+            project(job, blob, &values, &mut graph, degree);
+        }
+        // From a quarter of the nodes, one cluster, to nearly all.
+        let reachable = max_reachable_share(&graph, degree, 1.0).unwrap();
+        if projects {
+            assert!(reachable > 0.95, "{}: {reachable}", job.vector_path);
+        } else {
+            assert!(
+                (reachable - 0.25).abs() < 1e-9,
+                "{}: {reachable}",
+                job.vector_path
+            );
+        }
+        assert_eq!(
+            built.timings.projection.is_some(),
+            projects,
+            "{}",
+            job.vector_path
+        );
+        let stored = s3.get(&job.index_key()).await.unwrap();
+        assert!(
+            stored == expected_with(job, &values, blob, &graph),
+            "{} differs",
+            job.vector_path
+        );
+    }
+    pipeline.close().await;
+    s3.remove().await;
+}
+
+/// Asked for on a graph the gate finds connected, the fake's ring, the
+/// projection leaves it as built and reports no time of its own, so the
+/// forecast learns nothing from it; a job that leaves its vectors out of
+/// the file still writes it without them.
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn leaves_a_connected_graph_as_built() {
+    let s3 = S3::new("connected").await;
+    let asks = |name: &str| Job {
+        project_link_to_base_layer: true,
+        ..job(&s3.bucket, name, 600, 16)
+    };
+    let float = asks("float");
+    let skipped = Job {
+        skip_stored_vectors: true,
+        ..asks("skipped")
+    };
+    for job in [&float, &skipped] {
+        s3.put_inputs(job, &values(job), Blob::F32, None).await;
+    }
+    let pipeline = s3.pipeline(FakeBuilder::new(Duration::ZERO));
+    let handles: Vec<_> = [&float, &skipped]
+        .into_iter()
+        .map(|job| pipeline.submit(job.clone()))
+        .collect();
+    for (handle, job) in handles.into_iter().zip([&float, &skipped]) {
+        let built = handle.outcome().await.unwrap();
+        assert_eq!(built.timings.projection, None, "{}", job.vector_path);
+        let ring = FakeBuilder::graph(600, degree(job));
+        assert!(max_reachable_share(&ring, degree(job), 1.0).unwrap() >= 0.99);
+        let stored = s3.get(&job.index_key()).await.unwrap();
+        assert!(
+            stored == expected(job, &values(job), Blob::F32),
+            "{} differs",
+            job.vector_path
+        );
+    }
+    pipeline.close().await;
     s3.remove().await;
 }
 
@@ -358,6 +536,7 @@ async fn ends_the_jobs_when_the_forecast_says() {
         Stages {
             download: seconds(t.download),
             build: seconds(t.build),
+            projection: t.projection.map_or(0.0, seconds),
             upload: seconds(t.upload),
         }
     };

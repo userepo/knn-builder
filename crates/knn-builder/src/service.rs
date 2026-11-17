@@ -493,6 +493,7 @@ fn log_end(job_id: &JobId, vector_path: &str, outcome: &Result<Built, JobError>)
                 %job_id,
                 download_s = seconds(built.timings.download),
                 build_s = seconds(built.timings.build),
+                projection_s = built.timings.projection.map(seconds),
                 upload_s = seconds(built.timings.upload),
                 total_s = built
                     .timings
@@ -799,6 +800,7 @@ mod tests {
             timings: Timings {
                 download: span,
                 build: span,
+                projection: None,
                 upload: span,
             },
         }

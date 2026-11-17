@@ -48,11 +48,14 @@ pub(crate) struct Admitted {
 
 impl Gate {
     pub(crate) fn new(settings: &Settings) -> Self {
-        let model = settings
-            .device
-            .map_or_else(Fitted::default, |device| Fitted {
-                shared_memory_per_block: device.shared_memory_per_block,
-            });
+        let fitted = Fitted {
+            projection_threads: crate::project::threads(),
+            ..Fitted::default()
+        };
+        let model = settings.device.map_or(fitted, |device| Fitted {
+            shared_memory_per_block: device.shared_memory_per_block,
+            ..fitted
+        });
         #[expect(
             clippy::cast_possible_truncation,
             clippy::cast_sign_loss,

@@ -2,9 +2,9 @@
 //! would: the pipeline's own rules, played forward from where each job is.
 //! A job downloads once the builder has taken the job before it and the
 //! budget has room for its buffers, which it holds until its upload ends;
-//! it builds once it is downloaded and the upload slot is free; it uploads
-//! once it is built and the upload before it has ended. Each stage takes
-//! the jobs in the order they were submitted.
+//! it builds once it is downloaded and the upload slot is free; it projects
+//! when it asks, then uploads, once it is built and the upload before it
+//! has ended. Each stage takes the jobs in the order they were submitted.
 //!
 //! How long each stage takes comes from a [`StageModel`], corrected by what
 //! completed jobs took: a ratio of observed to modeled time per stage, and
@@ -62,6 +62,7 @@ pub struct Forecaster<M> {
     budget: u32,
     download: Ratio,
     build: Ratio,
+    projection: Ratio,
     upload: Ratio,
     /// Build ratios by configuration, where one is known.
     builds: HashMap<Configuration, Ratio>,
@@ -137,6 +138,7 @@ impl<M: StageModel> Forecaster<M> {
             budget: Budget::total(host_memory),
             download: Ratio::default(),
             build: Ratio::default(),
+            projection: Ratio::default(),
             upload: Ratio::default(),
             builds: HashMap::new(),
         }
@@ -151,6 +153,12 @@ impl<M: StageModel> Forecaster<M> {
             .learn(0.0, seconds(timings.download), modeled.download);
         self.upload
             .learn(0.0, seconds(timings.upload), modeled.upload);
+        // Only a projection that built layer 1: one the gate stopped took
+        // its search alone.
+        if let Some(projection) = timings.projection {
+            self.projection
+                .learn(0.0, seconds(projection), modeled.projection);
+        }
         // A configuration seen for the first time starts from what all
         // builds have shown so far.
         let prior = self.build.log;
@@ -174,6 +182,7 @@ impl<M: StageModel> Forecaster<M> {
         Stages {
             download: modeled.download * self.download.factor(),
             build: modeled.build * build.factor(),
+            projection: modeled.projection * self.projection.factor(),
             upload: modeled.upload * self.upload.factor(),
         }
     }
@@ -280,18 +289,16 @@ impl Lanes {
             Stage::Graphed | Stage::Uploading => 0.0,
         };
         self.build = self.build.max(built);
-        // Uploaded by: a canceled upload stops at once.
+        // Uploaded by, after the projection when it asks: a canceled upload
+        // stops at once, and so does its projection.
+        let upload = stages.projection + stages.upload;
         let uploaded = match stage {
             Stage::Uploading if canceled => 0.0,
-            Stage::Uploading => remaining(stages.upload, elapsed),
+            Stage::Uploading => remaining(upload, elapsed),
             _ => {
                 let start = built.max(self.upload);
                 self.upload_slot = start;
-                if canceled {
-                    start
-                } else {
-                    start + stages.upload
-                }
+                if canceled { start } else { start + upload }
             }
         };
         self.upload = self.upload.max(uploaded);
@@ -335,10 +342,15 @@ mod tests {
 
     /// One second to download, two to build, one to upload, whatever the
     /// job.
-    fn fixed(_: &Job) -> Stages {
+    fn fixed(job: &Job) -> Stages {
         Stages {
             download: 1.0,
             build: 2.0,
+            projection: if job.project_link_to_base_layer {
+                0.5
+            } else {
+                0.0
+            },
             upload: 1.0,
         }
     }
@@ -453,6 +465,7 @@ mod tests {
         Timings {
             download: span(0.0, download),
             build: span(download, download + build),
+            projection: None,
             upload: span(download + build, download + build + upload),
         }
     }
@@ -463,6 +476,50 @@ mod tests {
         let loaded = at(now, job.clone(), Stage::Loaded, 0.0, false);
         // The upload, modeled at a second, never learns here.
         forecaster.forecast(now, &[loaded], None).ends[0].as_secs_f64() - 1.0
+    }
+
+    #[test]
+    fn projects_before_the_upload_when_asked() {
+        let now = Instant::now();
+        let mut asks = job("bucket", 1_000, 64);
+        asks.project_link_to_base_layer = true;
+        let jobs = [
+            at(now, asks.clone(), Stage::Queued, 0.0, false),
+            at(now, job("bucket", 1_000, 64), Stage::Queued, 0.0, false),
+        ];
+        let forecast = Forecaster::new(fixed, u64::MAX).forecast(now, &jobs, None);
+        // Its upload stage takes the half second more; the next job's build
+        // ends after it, so its upload starts as it would have.
+        assert_eq!(seconds(&forecast.ends), [4.5, 6.0]);
+        // A second into the stage, the rest of the projection and the
+        // upload.
+        let partway = [at(now, asks, Stage::Uploading, 1.0, false)];
+        let forecast = Forecaster::new(fixed, u64::MAX).forecast(now, &partway, None);
+        assert_eq!(seconds(&forecast.ends), [0.5]);
+    }
+
+    #[test]
+    fn learns_the_projection_from_jobs_that_built_layer_1() {
+        let mut forecaster = Forecaster::new(fixed, u64::MAX);
+        let mut asks = job("bucket", 1_000, 64);
+        asks.project_link_to_base_layer = true;
+        // A projection the gate stopped teaches nothing.
+        forecaster.learn(&asks, &timings(1.0, 2.0, 1.0));
+        assert!((forecaster.stages(&asks).projection - 0.5).abs() < 1e-9);
+        // One that took twice as long moves it halfway, in its logarithm.
+        let mut built = timings(1.0, 2.0, 1.0);
+        built.projection = Some(Span {
+            start: built.build.end,
+            end: built.build.end + Duration::from_secs(1),
+        });
+        forecaster.learn(&asks, &built);
+        let projection = forecaster.stages(&asks).projection;
+        assert!(
+            (projection - 0.5 * 2f64.sqrt()).abs() < 1e-9,
+            "{projection}"
+        );
+        // The upload's ratio is its own.
+        assert!((forecaster.stages(&asks).upload - 1.0).abs() < 1e-9);
     }
 
     #[test]

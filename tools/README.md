@@ -88,6 +88,12 @@ $RUN $BASE tools/oracle/levels.py "fixtures/service/l2-1000x64*.faiss"
 $RUN $BASE tools/oracle/level_tables.py crates/knn-write/tests/data/level_tables.txt
 ```
 
+`oracle/projection.py` writes the test data for `knn-write`'s port of the upstream service's upper-level projection (`project_link_to_base_layer`), from the service's own module and the numpy and Faiss it runs on: the gate's three entry points for 269 graph sizes up to 2^31 - 1, the nodes promoted to layer 1 for 21 pairs of n and m (odd m too, since layer 1's M is the request's m), Faiss's level-0 probability for every m from 2 to 2,048, which alone decides a promotion, the reachable share the gate measures on ten synthetic graphs that the test builds again from the same parameters, and the slots `project_links` changes on ten more under 24 settings in all (shares of a full row from 0 to 1, the last-in-edge protection on and off), with layer 1 synthetic, built from the base graph's own links, or Faiss's `build_layer1` on random vectors; and the layer 1 `build_layer1` builds on 13 sets of vectors the test makes again (L2 and inner product, dimensions that leave 0 to 3 values past a multiple of 4, whole-number vectors whose scores tie, M from 2 to 16, efConstruction from 1 to 100). Faiss runs on one OpenMP thread there, where its HNSW insertion is the same every run (the service's runs on several and varies), so the file comes out the same each time. Run it in the api image:
+
+```sh
+$RUN $API tools/oracle/projection.py crates/knn-write/tests/data/projection.json
+```
+
 `oracle/build_tables.py` writes `knn-gpu`'s test data from the service's own code: the IVF-PQ list count and lowered m for every vector count up to 3,000, a stride of 97 to 60,000 (where m = 128 stops being lowered) and a spread to 2^31 - 1, the PQ dimension, and numpy's fp32 to fp16 conversion of 7,000 values. Run it in the api image, where the service's package is importable:
 
 ```sh
@@ -245,6 +251,12 @@ $FAISS_PY tools/grid/fit.py binary fixtures/grid fixtures/grid
 ```
 
 `fixtures/grid/` holds the RTX 4070's results and fits, the byte ones as `byte-runs.json` and `byte-cpu.json`, which `crates/knn-builder/tests/cost.rs` holds the models to, and the binary ones as `binary-runs.json`, `binary-cpu.json` and `binary-fits.json`, which it ties the binary models to.
+
+The projection a request may ask for runs on the CPU, so it needs no GPU or S3: `crates/knn-write/tests/projection_cost.rs` times it and takes its peak host memory through a counting allocator, on synthetic graphs whose clusters a search cannot leave (100,000 to 1M vectors of 128 and 768 dimensions at m 8 to 32, the vectors' clusters far apart and overlapping, and m 2 and 4 at 1M x 128; efConstruction 50 to 400 and 1 to 32 threads at 1M x m 16) and on connected graphs of 300,000 to 3M nodes, where the gate stops it. It writes `fixtures/grid/projection.json`, to which `cost.rs`'s projection model and `knn-write`'s memory bound (`projection::host_bytes`) are held. In WSL, from the repository's root, in release:
+
+```sh
+PROJECTION_COST_OUT=fixtures/grid/projection.json cargo test --release -p knn-write --test projection_cost -- --ignored
+```
 
 ## Benchmarks
 

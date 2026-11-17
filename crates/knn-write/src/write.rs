@@ -80,7 +80,8 @@ pub enum Vectors<'a> {
 }
 
 impl Vectors<'_> {
-    fn len(&self) -> usize {
+    /// Values, all vectors together; bytes for binary ones.
+    pub(crate) fn len(&self) -> usize {
         match self {
             Self::F32(v) => v.len(),
             Self::F16(v) => v.len(),

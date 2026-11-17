@@ -71,8 +71,10 @@ redundant_lifetimes = "warn"
 trivial_numeric_casts = "warn"
 unsafe_op_in_unsafe_fn = "warn"
 unused_lifetimes = "warn"
-# `unsafe` lives in knn-gpu's FFI module and the GPU test that reads the
-# CUDA runtime's memory counters; each opts out with an `expect`.
+# `unsafe` lives in knn-gpu's FFI module, the GPU test that reads the
+# CUDA runtime's memory counters, and the counting allocator of knn-write's
+# projection measurement (`tests/projection_cost.rs`); each opts out with
+# an `expect`.
 unsafe_code = "deny"
 
 [workspace.lints.clippy]

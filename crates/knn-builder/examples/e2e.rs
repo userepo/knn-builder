@@ -130,6 +130,8 @@ fn job(bucket: &str, name: &str, meta: &Value, m: Option<u32>) -> Job {
         ef_construction: i32::try_from(number("ef_construction")).unwrap(),
         ef_search: i32::try_from(number("ef_search")).unwrap(),
         skip_stored_vectors: meta["skip_stored_vectors"].as_bool().unwrap(),
+        // The baseline's requests leave it off.
+        project_link_to_base_layer: false,
     }
 }
 

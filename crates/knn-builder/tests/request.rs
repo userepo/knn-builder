@@ -28,10 +28,7 @@ type Divergent = (&'static str, u16, &'static [(&'static str, &'static str)]);
 /// - Bodies Python's `json.loads` reads and knn-builder does not: forms
 ///   outside RFC 8259 JSON in UTF-8, and JSON past `serde_json`'s limits,
 ///   none of which k-NN's client sends (the module's docs).
-/// - `project_link_to_base_layer` true for vectors that are not binary,
-///   which the service projects and knn-builder refuses, beside any other
-///   error the body has.
-const DIVERGENT: [Divergent; 14] = [
+const DIVERGENT: [Divergent; 11] = [
     // serde_json reads an integer this large as a float.
     (
         "dimension 2**64",
@@ -60,23 +57,7 @@ const DIVERGENT: [Divergent; 14] = [
         422,
         &[("body[326]", "json_invalid")],
     ),
-    ("projection true", 422, &[(PROJECTION, "value_error")]),
-    (
-        "projection as yes, byte",
-        422,
-        &[(PROJECTION, "value_error")],
-    ),
-    (
-        "projection true, doc_count wrong",
-        422,
-        &[
-            ("body.doc_count", "greater_than"),
-            (PROJECTION, "value_error"),
-        ],
-    ),
 ];
-
-const PROJECTION: &str = "body.index_parameters.algorithm_parameters.project_link_to_base_layer";
 
 fn cases() -> Vec<Value> {
     serde_json::from_str::<Value>(TABLE)
@@ -260,11 +241,11 @@ fn refuses_integers_past_64_bits() {
     assert!(request::parse(at_the_bounds.as_bytes()).is_ok());
 }
 
-/// The projection knn-builder does not build is refused with its reason;
-/// for binary vectors, which the service builds without it, it is taken
-/// and the job is the same.
+/// The projection goes to the job for float, fp16 and byte vectors; for
+/// binary vectors, which the service builds without it, it is taken and
+/// the job is the same.
 #[test]
-fn refuses_the_projection_with_its_reason() {
+fn passes_the_projection_on_to_the_job() {
     let body = |data_type: &str| {
         json!({
             "container_name": "b",
@@ -279,19 +260,14 @@ fn refuses_the_projection_with_its_reason() {
         })
         .to_string()
     };
-    let rejection = request::parse(body("half_float").as_bytes()).unwrap_err();
-    assert_eq!(
-        rejection.body(),
-        json!({
-            "detail": "Validation Error",
-            "errors": [{
-                "field": PROJECTION,
-                "message": "Value error, knn-builder does not project links into the base layer; \
-                            leave it false",
-                "type": "value_error",
-            }],
-        })
-    );
+    for data_type in ["float", "half_float", "byte"] {
+        let parsed = request::parse(body(data_type).as_bytes()).unwrap();
+        assert!(parsed.project_link_to_base_layer, "{data_type}");
+        assert!(
+            parsed.job().unwrap().project_link_to_base_layer,
+            "{data_type}"
+        );
+    }
     let binary = request::parse(body("binary").as_bytes()).unwrap();
     assert!(binary.project_link_to_base_layer);
     let mut without = binary.clone();

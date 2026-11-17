@@ -41,6 +41,23 @@ A `binary` request builds through Faiss's `GpuIndexBinaryCagra` (rvib `faiss_gpu
 
 Every other `cagra::index_params` field keeps libcuvs 26.08.01's default. cuVS lowers both degrees where the vectors are too few, to their count less one: at m 16, a build of 40 vectors has degree 39, logged as warnings. `knn-gpu` builds through the shim's `knn_cagra_build_binary`, which reports the degree cuVS built.
 
+## The projection
+
+With `project_link_to_base_layer` true, a float, fp16 or byte graph is changed after the build and before the write, as rvib changes it once the GPU index is copied to the CPU (`common/models/index_builder/faiss/faiss_index_hnsw_cagra_builder.py:145`, `index_builder/faiss/cagra_upper_level_projection.py:128-181`): when the gate finds less than 99% of the nodes reachable, the nodes an HNSW of the graph's m would put on level 1 get an HNSW level of their own, whose links are written into their rows. A binary request's field is ignored, as rvib ignores it. `knn-write`'s `projection` module ports rvib's, and its tests hold each step to rvib's on the same inputs.
+
+| Parameter | Value | Source |
+| --- | --- | --- |
+| layer 1's M, and its share of the nodes, 1 / M | the effective m above, a quarter of the graph's degree | rvib `faiss_index_build_service.py:105, 159` |
+| layer 1's efConstruction | the request's `ef_construction`, which `upper_level_ef_construction` 0 leaves | `faiss_index_hnsw_cagra_builder.py:63, 105` |
+| metric | the index's: L2, or inner product for `innerproduct` | `cagra_upper_level_projection.py:163` |
+| vectors | float32 copies of the promoted rows of the downloaded vectors (fp16 for `half_float`, int8 for `byte`) | `cagra_upper_level_projection.py:162` |
+| gate | the largest share a breadth-first search reaches from 3 nodes `numpy.random.default_rng(12345)` draws; at 0.99 or more (`upper_level_skip_if_reachable`) the graph stays as built | `cagra_upper_level_projection.py:189-210`; `faiss_index_hnsw_cagra_builder.py:73` |
+| `upper_level_max_share` | 0.5: a full row gives up at most half its slots, its last | `faiss_index_hnsw_cagra_builder.py:66` |
+| `upper_level_protect_last_in_edge` | true | `faiss_index_hnsw_cagra_builder.py:69` |
+| threads | a quarter of the processors, at least one, as rvib sets Faiss's OpenMP threads; but rvib counts the machine's (`os.cpu_count()`) and knn-builder those the process may use (`available_parallelism`, which honors its CPU affinity and cgroup quota), so in a container limited to fewer processors it takes fewer | rvib `index_builder/index_builder_utils.py:21-29`, `faiss_index_build_service.py:99` |
+
+Layer 1 is where the two part. Faiss inserts its nodes on several OpenMP threads, each seeing only part of the others' work, so rvib's layer differs from run to run. `knn-write` inserts them in deterministic batches instead, each batch's nodes searching the layer as the batches before left it, then linking in order: one layer whatever the thread count, held to Faiss's own one-thread layer in its link count, link length and reach (`crates/knn-write/tests/projection.rs`). In Faiss's order on one thread, it equals Faiss's layer entry for entry. A failure leaves the graph as built, with a warning, as rvib's does (`cagra_upper_level_projection.py:121-125`).
+
 ## Fixed
 
 Set by rvib on every build; where rvib leaves a Faiss field alone, Faiss's default is listed, since it differs from cuVS's in places.

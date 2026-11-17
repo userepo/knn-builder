@@ -1,5 +1,9 @@
 //! A build job, as the service's request describes it.
 
+use std::num::NonZeroUsize;
+
+use knn_write::projection;
+
 /// How k-NN encoded the vectors: the request's `data_type`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DataType {
@@ -89,6 +93,10 @@ pub struct Job {
     pub ef_search: i32,
     /// Leave the vectors out of the index file.
     pub skip_stored_vectors: bool,
+    /// Link the graph's clusters through an HNSW layer 1 before the write
+    /// (`project_link_to_base_layer`). Never for binary vectors, whose
+    /// requests the service builds without it.
+    pub project_link_to_base_layer: bool,
 }
 
 impl Job {
@@ -122,6 +130,30 @@ impl Job {
             (_, knn_gpu::Metric::L2) => knn_write::Metric::L2,
             (_, knn_gpu::Metric::InnerProduct) => knn_write::Metric::InnerProduct,
         }
+    }
+
+    /// How the job's graph is projected, on `threads`: as the service
+    /// projects it, with layer 1 of the m the graph was built with (a
+    /// quarter of its degree, which may be lowered from the request's) and
+    /// the request's efConstruction, in the index's metric. `None` when the
+    /// job does not ask, or its parameters fail and it fails before a
+    /// graph.
+    pub(crate) fn projection(&self, threads: NonZeroUsize) -> Option<projection::Settings> {
+        if !self.project_link_to_base_layer {
+            return None;
+        }
+        let GraphParams::IvfPq(params) = self.graph_params().ok()? else {
+            return None;
+        };
+        Some(projection::Settings {
+            m: params.effective_m,
+            // Faiss's int efConstruction meets the search's size_t heap
+            // sizes as a size_t: one below 0 bounds no search.
+            ef_construction: usize::try_from(self.ef_construction).unwrap_or(usize::MAX),
+            metric: self.file_metric(),
+            insertion: projection::Insertion::Batched { threads },
+            ..projection::Settings::default()
+        })
     }
 
     /// The neighbors each vector gets, or `None` when the parameters fail
@@ -166,7 +198,9 @@ impl Job {
     }
 
     /// The host memory the job's buffers take, in bytes: the vectors as
-    /// downloaded, the doc ids, and the graph. Saturating, past any memory.
+    /// downloaded, the doc ids, and the graph, and for a job that asks for
+    /// the projection the most its buffers take at once, counted for as
+    /// many threads as search at most. Saturating, past any memory.
     pub(crate) fn host_bytes(&self) -> u64 {
         let doc_count = u64::from(self.doc_count);
         // No graph when the parameters fail; the job fails before one.
@@ -174,12 +208,22 @@ impl Job {
         let vectors = doc_count.saturating_mul(self.vector_bytes());
         let ids = doc_count * 4;
         let graph = doc_count.saturating_mul(degree).saturating_mul(4);
-        vectors.saturating_add(ids).saturating_add(graph)
+        let projection = self.projection(NonZeroUsize::MAX).map_or(0, |settings| {
+            projection::host_bytes(doc_count, degree, u64::from(self.dimension), &settings)
+        });
+        vectors
+            .saturating_add(ids)
+            .saturating_add(graph)
+            .saturating_add(projection)
     }
 }
 
 #[cfg(test)]
 pub(crate) mod tests {
+    use std::num::NonZeroUsize;
+
+    use knn_write::projection;
+
     use super::{DataType, GraphParams, Job, SpaceType};
 
     /// A job on `bucket` for `doc_count` x `dimension` fp32 vectors.
@@ -196,6 +240,7 @@ pub(crate) mod tests {
             ef_construction: 100,
             ef_search: 100,
             skip_stored_vectors: false,
+            project_link_to_base_layer: false,
         }
     }
 
@@ -260,6 +305,40 @@ pub(crate) mod tests {
             ..job
         };
         assert_eq!(large.host_bytes(), u64::MAX);
+    }
+
+    #[test]
+    fn projects_as_the_service_does() {
+        let mut job = job("bucket", 600, 16);
+        assert_eq!(job.projection(NonZeroUsize::MIN), None, "not asked");
+        let plain = job.host_bytes();
+        job.project_link_to_base_layer = true;
+        let settings = job.projection(NonZeroUsize::MIN).unwrap();
+        // m 16, lowered to 15 at 600 vectors; the request's
+        // efConstruction; the file's metric; the service's defaults else.
+        assert_eq!(settings.m, 15);
+        assert_eq!(settings.ef_construction, 100);
+        assert_eq!(settings.metric, knn_write::Metric::L2);
+        assert_eq!(settings.links, projection::LinkSettings::default());
+        assert!((settings.skip_if_reachable - 0.99).abs() < f64::EPSILON);
+        // Its buffers join the job's, counted for the most threads that
+        // search.
+        let most = job.projection(NonZeroUsize::MAX).unwrap();
+        assert_eq!(
+            job.host_bytes(),
+            plain + projection::host_bytes(600, 60, 16, &most)
+        );
+        // Below 0, Faiss's efConstruction bounds no search; the buffers
+        // stay those of a search over every promoted node.
+        let asked = job.host_bytes();
+        job.ef_construction = -1;
+        let unbounded = job.projection(NonZeroUsize::MIN).unwrap();
+        assert_eq!(unbounded.ef_construction, usize::MAX);
+        assert!((asked..2 * asked).contains(&job.host_bytes()));
+        // Binary vectors are not projected.
+        job.data_type = DataType::Binary;
+        job.dimension = 64;
+        assert_eq!(job.projection(NonZeroUsize::MIN), None);
     }
 
     #[test]

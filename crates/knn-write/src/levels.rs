@@ -26,8 +26,10 @@ impl LevelTable {
     /// The probabilities go through the platform's `exp` and `ln`, as
     /// Faiss's go through the C library's. For every even `m` from 2 to
     /// 4096 (a field's m up to 2048), the tests hold them to the values
-    /// glibc gives, which wrote the service's files, on Linux and Windows;
-    /// a larger `m` is computed the same way but unverified.
+    /// glibc gives, which wrote the service's files, on Linux and Windows,
+    /// and for every `m` from 2 to 2048 the first of them, which decides
+    /// [`projection::promoted`](crate::projection::promoted); a larger `m`
+    /// is computed the same way but unverified.
     ///
     /// Returns `None` when `m` is below 2 (Faiss's `1 / log(1)` leaves no
     /// level to draw) or the neighbor counts overflow `i32`.

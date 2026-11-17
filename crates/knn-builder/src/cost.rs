@@ -41,6 +41,23 @@
 //! values and the bookkeeping around it. It under-estimates by 14 to 23% at
 //! 500,000 vectors, where HNSW slows faster than n log n, and a data node's
 //! CPU is not this one.
+//!
+//! And the projection a job may ask for, on the CPU between the build and
+//! the write, timed under WSL on the same machine's i9-14900HX on 8
+//! threads, a quarter of its 32 as the service takes, over 100,000 to
+//! 1,000,000 vectors of 128 and 768 dimensions at m 2 to 32 in 20 clusters,
+//! far apart and overlapping (`fixtures/grid/projection.json`, by
+//! `knn-write`'s `projection_cost` test): the gate's search over the graph,
+//! about n g; layer 1, about p ef sqrt(d) m^(1/3) for its p = n / m nodes;
+//! and its links, about n g again. The whole is within 0.53 to 2.9 times
+//! of each projection timed, overlapping clusters the slower and m 2 the
+//! one past 2.4. Layer 1 runs 5.5 to 5.7 times as fast on 8 threads as on
+//! one, about as a share of 5% done on one thread would; past 8 this
+//! CPU's slower cores gain little, and the model counts no more. It is
+//! counted in full whenever a job asks, though the gate leaves a graph
+//! that is already connected as built after its search alone.
+
+use std::num::NonZeroUsize;
 
 use knn_gpu::BuildParams;
 
@@ -64,24 +81,32 @@ pub struct Fitted {
     /// The device's shared memory a block may take, in bytes:
     /// `knn_gpu::shared_memory_per_block`.
     pub shared_memory_per_block: usize,
+    /// The threads the projection builds layer 1 on.
+    pub projection_threads: NonZeroUsize,
 }
 
-/// The GPU the models were fitted on, the RTX 4070 Laptop GPU.
+/// The machine the models were fitted on: the RTX 4070 Laptop GPU, and a
+/// quarter of its CPU's 32 threads.
 impl Default for Fitted {
     fn default() -> Self {
         Self {
             shared_memory_per_block: 101_376,
+            projection_threads: NonZeroUsize::MIN.saturating_add(7),
         }
     }
 }
 
-/// A stage's seconds, or all three.
+/// Each stage's seconds, and the projection's apart from the upload's it
+/// comes before.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Stages {
     /// Reading the blobs' sizes and downloading them.
     pub download: f64,
     /// Building the graph.
     pub build: f64,
+    /// Projecting layer-1 links into the graph, in the upload stage before
+    /// the write: 0 for a job that does not ask.
+    pub projection: f64,
     /// Writing and uploading the index.
     pub upload: f64,
 }
@@ -210,10 +235,43 @@ impl Fitted {
         Stages {
             download: 0.006_905_632_182_188_668 + 2.321_054_281_931_872_5e-9 * n * d * x.blob_s,
             build,
+            projection: self.projection_seconds(job),
             upload: 2.081_239_079_181_345e-9 * n * d * x.file_s
                 + 6.751_823_325_351_644e-9 * n * g
                 + 4.825_297_812_211_012e-8 * n,
         }
+    }
+
+    /// The seconds `job`'s projection takes on [`Fitted::projection_threads`]
+    /// when the gate lets it through: the gate's search, layer 1 and its
+    /// links. 0 for a job that does not ask.
+    #[must_use]
+    pub fn projection_seconds(&self, job: &Job) -> f64 {
+        let Some(settings) = job.projection(self.projection_threads) else {
+            return 0.0;
+        };
+        let x = Shape::of(job);
+        let (n, d, g) = (x.n, x.d, x.g);
+        let gate = 1.179e-7 * n + 1.13e-9 * n * g;
+        // An m below 2 promotes none: the gate alone.
+        if settings.m < 2 {
+            return gate;
+        }
+        let effective_m = f64::from(settings.m);
+        let promoted = n / effective_m;
+        // No search visits more nodes than layer 1 has.
+        #[expect(
+            clippy::cast_precision_loss,
+            reason = "efConstruction, up to usize::MAX, then held to the promoted count, so its last digits change nothing"
+        )]
+        let ef = (settings.ef_construction as f64).min(promoted).max(1.0);
+        #[expect(clippy::cast_precision_loss, reason = "a thread count, far below 2^53")]
+        let threads = self.projection_threads.get().min(8) as f64;
+        let speedup = 1.0 / (0.05 + 0.95 / threads);
+        let layer1 =
+            7.289e-6 * promoted * (ef / 100.0) * d.sqrt() * (effective_m / 16.0).cbrt() / speedup;
+        let links = 1.613e-7 * n + 5.085e-10 * n * g;
+        gate + layer1 + links
     }
 
     /// Whether cuVS runs the IVF-PQ search that seeds the graph in its slow

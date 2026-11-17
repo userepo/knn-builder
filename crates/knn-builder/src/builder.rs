@@ -153,8 +153,9 @@ impl Builder for knn_gpu::Gpu {
 }
 
 /// A stand-in for the GPU build, for tests of everything around it: it
-/// takes a fixed time, then returns [`FakeBuilder::graph`], or fails as
-/// it was made to. It counts its builds; clones share the count.
+/// takes a fixed time, then returns [`FakeBuilder::graph`] or
+/// [`FakeBuilder::clustered_graph`], or fails as it was made to. It counts
+/// its builds; clones share the count.
 #[derive(Debug, Clone)]
 pub struct FakeBuilder {
     delay: Duration,
@@ -166,6 +167,7 @@ pub struct FakeBuilder {
 #[derive(Debug, Clone)]
 enum Fake {
     Graph,
+    Clustered(usize),
     Fails(String),
     NamesMissingVectors,
 }
@@ -179,6 +181,15 @@ impl FakeBuilder {
             outcome: Fake::Graph,
             builds: Arc::default(),
             free_device_memory: None,
+        }
+    }
+
+    /// Builds [`FakeBuilder::clustered_graph`] of `clusters` in `delay`.
+    #[must_use]
+    pub fn clustered(delay: Duration, clusters: usize) -> Self {
+        Self {
+            outcome: Fake::Clustered(clusters),
+            ..Self::new(delay)
         }
     }
 
@@ -230,6 +241,23 @@ impl FakeBuilder {
             .map(|id| u32::try_from(id).unwrap_or(u32::MAX))
             .collect()
     }
+
+    /// The fake's graph of `rows` vectors in `clusters` runs of consecutive
+    /// ones, as many as `rows` divided by `clusters` rounded up but the
+    /// last: each vector linked to the next `degree` of its own run,
+    /// wrapping around within it, so no search leaves a run.
+    #[must_use]
+    pub fn clustered_graph(rows: usize, degree: usize, clusters: usize) -> Vec<u32> {
+        let size = rows.div_ceil(clusters.max(1)).max(1);
+        (0..rows)
+            .flat_map(|row| {
+                let first = row / size * size;
+                let run = size.min(rows - first);
+                (1..=degree).map(move |k| first + (row - first + k) % run)
+            })
+            .map(|id| u32::try_from(id).unwrap_or(u32::MAX))
+            .collect()
+    }
 }
 
 impl Builder for FakeBuilder {
@@ -249,6 +277,9 @@ impl Builder for FakeBuilder {
         let degree = params.degree_for(u32::try_from(rows).unwrap_or(u32::MAX)) as usize;
         match &self.outcome {
             Fake::Graph => Ok((Self::graph(rows, degree), degree)),
+            Fake::Clustered(clusters) => {
+                Ok((Self::clustered_graph(rows, degree, *clusters), degree))
+            }
             Fake::Fails(message) => Err(message.clone().into()),
             Fake::NamesMissingVectors => {
                 let mut graph = Self::graph(rows, degree);
@@ -269,5 +300,18 @@ mod tests {
     fn links_each_vector_to_the_next() {
         assert_eq!(FakeBuilder::graph(4, 2), [1, 2, 2, 3, 3, 0, 0, 1]);
         assert!(FakeBuilder::graph(10, 9).iter().all(|&id| id < 10));
+    }
+
+    #[test]
+    fn links_each_vector_within_its_cluster() {
+        // Runs of 3, 3 and 1.
+        assert_eq!(
+            FakeBuilder::clustered_graph(7, 2, 3),
+            [1, 2, 2, 0, 0, 1, 4, 5, 5, 3, 3, 4, 6, 6]
+        );
+        assert_eq!(
+            FakeBuilder::clustered_graph(4, 2, 1),
+            FakeBuilder::graph(4, 2)
+        );
     }
 }
