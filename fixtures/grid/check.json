@@ -2,17 +2,17 @@
  {
   "input": "l2-100000x768",
   "m": 16,
-  "sampled_peak_bytes": 738197504,
-  "tight_peak_bytes": 738197504,
+  "sampled_peak_bytes": 631242752,
+  "tight_peak_bytes": 631242752,
   "tight_over_sampled": 0.0,
   "held": {
    "margin": {
-    "left_free_bytes": 769654784,
+    "left_free_bytes": 660602880,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    },
    "short": {
-    "left_free_bytes": 662700032,
+    "left_free_bytes": 566231040,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    }
@@ -22,17 +22,17 @@
  {
   "input": "l2-500000x384-fp16",
   "m": 16,
-  "sampled_peak_bytes": 652214272,
-  "tight_peak_bytes": 652214272,
+  "sampled_peak_bytes": 310378496,
+  "tight_peak_bytes": 310378496,
   "tight_over_sampled": 0.0,
   "held": {
    "margin": {
-    "left_free_bytes": 681574400,
+    "left_free_bytes": 331350016,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    },
    "short": {
-    "left_free_bytes": 585105408,
+    "left_free_bytes": 278921216,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    }
@@ -42,17 +42,17 @@
  {
   "input": "l2-1000000x128",
   "m": 32,
-  "sampled_peak_bytes": 1300234240,
-  "tight_peak_bytes": 1300234240,
+  "sampled_peak_bytes": 786432000,
+  "tight_peak_bytes": 786432000,
   "tight_over_sampled": 0.0,
   "held": {
    "margin": {
-    "left_free_bytes": 1342177280,
+    "left_free_bytes": 817889280,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    },
    "short": {
-    "left_free_bytes": 1170210816,
+    "left_free_bytes": 706740224,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    }
@@ -62,17 +62,17 @@
  {
   "input": "l2-1000000x768",
   "m": 16,
-  "sampled_peak_bytes": 3695181824,
-  "tight_peak_bytes": 3695181824,
+  "sampled_peak_bytes": 824180736,
+  "tight_peak_bytes": 824180736,
   "tight_over_sampled": 0.0,
   "held": {
    "margin": {
-    "left_free_bytes": 3785359360,
+    "left_free_bytes": 855638016,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    },
    "short": {
-    "left_free_bytes": 3323985920,
+    "left_free_bytes": 740294656,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    }
@@ -82,17 +82,17 @@
  {
   "input": "l2-2000000x128",
   "m": 32,
-  "sampled_peak_bytes": 2327838720,
-  "tight_peak_bytes": 2327838720,
+  "sampled_peak_bytes": 1302331392,
+  "tight_peak_bytes": 1302331392,
   "tight_over_sampled": 0.0,
   "held": {
    "margin": {
-    "left_free_bytes": 2390753280,
+    "left_free_bytes": 1344274432,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    },
    "short": {
-    "left_free_bytes": 2095054848,
+    "left_free_bytes": 1170210816,
     "task_status": "COMPLETED_INDEX_BUILD",
     "error_message": null
    }

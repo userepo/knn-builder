@@ -27,7 +27,7 @@ enum { KNN_CAGRA_L2 = 0, KNN_CAGRA_INNER_PRODUCT = 1 };
 enum {
   KNN_CAGRA_OK        = 0,
   KNN_CAGRA_RESOURCES = 1, /* creating the raft resources */
-  KNN_CAGRA_DATASET   = 2, /* copying the vectors to the device */
+  KNN_CAGRA_DATASET   = 2, /* copying binary vectors to the device */
   KNN_CAGRA_BUILD     = 3, /* the CAGRA build */
   KNN_CAGRA_GRAPH     = 4, /* a graph of another shape than asked for */
   KNN_CAGRA_COPY      = 5, /* copying the graph to the host */
@@ -78,9 +78,10 @@ void knn_cagra_gpu_destroy(knn_cagra_gpu* gpu);
 
 /*
  * Builds the CAGRA graph of `rows` x `dimension` host vectors, row-major,
- * of type `dtype`, and copies it into `graph`, `graph_len` ids: rows x
- * params->graph_degree, row-major. Frees everything it allocated on the
- * device before returning, on failure too.
+ * of type `dtype`, reading them from host memory a batch at a time, so the
+ * device never holds them all, and copies it into `graph`, `graph_len` ids:
+ * rows x params->graph_degree, row-major. Frees everything it allocated on
+ * the device before returning, on failure too.
  */
 int knn_cagra_build(knn_cagra_gpu* gpu,
                     const void* vectors,

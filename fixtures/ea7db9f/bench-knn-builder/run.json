@@ -1,0 +1,121 @@
+{
+ "service": "knn-builder",
+ "image": "knn-builder:dev",
+ "image_id": "sha256:20342864ee7849b8f807ee5067f3e6b8c6190b9dd3bc1f6f48fdb851ebe1e94f",
+ "max_workers": 2,
+ "gpu": {
+  "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "driver": "617.42",
+  "memory_mib": 8188
+ },
+ "started": "2026-11-15T22:02:45.165613-06:00",
+ "settings": {
+  "runs": 3,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50
+ },
+ "inputs": {
+  "cohere-l2-1000000x768": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-l2-1000000x768",
+   "index": 0,
+   "job_id": "b6163a7040e72b84e29126411169cb9110adf5a2687d88a813a902890695bc5a",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 31.21,
+   "start": "2026-11-15T22:03:13.183362-06:00",
+   "end": "2026-11-15T22:03:44.392839-06:00",
+   "host_peak_bytes": 4280590336,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 6.895956302,
+    "build": 17.861581453,
+    "upload": 6.234271494
+   },
+   "device_samples": 500,
+   "device_peak_bytes": 866123776,
+   "device_held_bytes": 133169152
+  }
+ ],
+ "single": [
+  {
+   "input": "cohere-l2-1000000x768",
+   "index": 1,
+   "job_id": "6f9dd8a8462a74bdd599630e54fd34b8ca2dab9dec89350a40272bc2b9e19d15",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 33.884,
+   "start": "2026-11-15T22:03:45.362693-06:00",
+   "end": "2026-11-15T22:04:19.245889-06:00",
+   "host_peak_bytes": 4272676864,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 3352129561,
+   "seconds": {
+    "download": 8.306151247,
+    "build": 17.2596393,
+    "upload": 8.26368575
+   },
+   "device_samples": 542,
+   "device_peak_bytes": 824180736,
+   "device_held_bytes": 177209344
+  },
+  {
+   "input": "cohere-l2-1000000x768",
+   "index": 2,
+   "job_id": "9961487fa7ea73cdca2d4380b802710787cc4e8d3c0fd7bb689af0492c81db2b",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 31.72,
+   "start": "2026-11-15T22:04:38.423121-06:00",
+   "end": "2026-11-15T22:05:10.142081-06:00",
+   "host_peak_bytes": 4235812864,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "seconds": {
+    "download": 7.540077169,
+    "build": 16.792884106,
+    "upload": 7.170622737
+   },
+   "device_samples": 508,
+   "device_peak_bytes": 824180736,
+   "device_held_bytes": 177209344
+  },
+  {
+   "input": "cohere-l2-1000000x768",
+   "index": 3,
+   "job_id": "54bddfe23930634655b94506630ed6a64236b9d3d1e5d96966eb8a15d23427a9",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 31.683,
+   "start": "2026-11-15T22:05:10.990968-06:00",
+   "end": "2026-11-15T22:05:42.673744-06:00",
+   "host_peak_bytes": 4228009984,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "seconds": {
+    "download": 7.711073965,
+    "build": 16.555015762,
+    "upload": 7.257152169
+   },
+   "device_samples": 507,
+   "device_peak_bytes": 824180736,
+   "device_held_bytes": 177209344
+  }
+ ],
+ "ended": "2026-11-15T22:05:45.854379-06:00"
+}

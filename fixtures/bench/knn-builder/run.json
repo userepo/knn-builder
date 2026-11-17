@@ -162,7 +162,8 @@
     "upload": 0.705496602
    },
    "device_samples": 452,
-   "device_peak_bytes": 625999872
+   "device_peak_bytes": 492830720,
+   "device_held_bytes": 133169152
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -181,7 +182,8 @@
     "upload": 6.54788551
    },
    "device_samples": 510,
-   "device_peak_bytes": 3737124864
+   "device_peak_bytes": 3737124864,
+   "device_held_bytes": 135266304
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -200,7 +202,8 @@
     "upload": 2.0222418
    },
    "device_samples": 322,
-   "device_peak_bytes": 1191182336
+   "device_peak_bytes": 1191182336,
+   "device_held_bytes": 177209344
   },
   {
    "input": "cohere-hamming-1000000x768-binary",
@@ -219,7 +222,8 @@
     "upload": 0.744247627
    },
    "device_samples": 427,
-   "device_peak_bytes": 497025024
+   "device_peak_bytes": 497025024,
+   "device_held_bytes": 133169152
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -238,7 +242,8 @@
     "upload": 14.715949761
    },
    "device_samples": 590,
-   "device_peak_bytes": 3872391168
+   "device_peak_bytes": 3739222016,
+   "device_held_bytes": 133169152
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -257,7 +262,8 @@
     "upload": 5.363504316
    },
    "device_samples": 342,
-   "device_peak_bytes": 1436549120
+   "device_peak_bytes": 1436549120,
+   "device_held_bytes": 133169152
   }
  ],
  "single": [
@@ -279,7 +285,8 @@
     "upload": 0.671967174
    },
    "device_samples": 428,
-   "device_peak_bytes": 492830720
+   "device_peak_bytes": 492830720,
+   "device_held_bytes": 177209344
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -299,7 +306,8 @@
     "upload": 6.825558846
    },
    "device_samples": 485,
-   "device_peak_bytes": 3872391168
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 177209344
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -319,7 +327,8 @@
     "upload": 2.082707578
    },
    "device_samples": 357,
-   "device_peak_bytes": 1569718272
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 177209344
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -339,7 +348,8 @@
     "upload": 6.367875106
    },
    "device_samples": 536,
-   "device_peak_bytes": 3805282304
+   "device_peak_bytes": 3628072960,
+   "device_held_bytes": 177209344
   },
   {
    "input": "cohere-l2-1000000x768-byte",
@@ -359,7 +369,8 @@
     "upload": 2.671921018
    },
    "device_samples": 376,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-ip-1000000x960",
@@ -379,7 +390,8 @@
     "upload": 20.480312774
    },
    "device_samples": 849,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-l2-1000000x960",
@@ -399,7 +411,8 @@
     "upload": 21.769176479
    },
    "device_samples": 897,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-hamming-1000000x384-binary",
@@ -419,7 +432,8 @@
     "upload": 0.618770594
    },
    "device_samples": 301,
-   "device_peak_bytes": 623902720
+   "device_peak_bytes": 444596224,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384",
@@ -439,7 +453,8 @@
     "upload": 5.052718225
    },
    "device_samples": 304,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384-byte",
@@ -459,7 +474,8 @@
     "upload": 1.295246054
    },
    "device_samples": 215,
-   "device_peak_bytes": 961544192
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384",
@@ -479,7 +495,8 @@
     "upload": 4.744759208
    },
    "device_samples": 312,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384-byte",
@@ -499,7 +516,8 @@
     "upload": 1.486610886
    },
    "device_samples": 203,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-hamming-1000000x128-binary",
@@ -519,7 +537,8 @@
     "upload": 0.542289281
    },
    "device_samples": 203,
-   "device_peak_bytes": 413138944
+   "device_peak_bytes": 413138944,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128",
@@ -539,7 +558,8 @@
     "upload": 3.361383483
    },
    "device_samples": 149,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128-byte",
@@ -559,7 +579,8 @@
     "upload": 0.725139189
    },
    "device_samples": 92,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128",
@@ -579,7 +600,8 @@
     "upload": 2.043983631
    },
    "device_samples": 129,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128-byte",
@@ -599,7 +621,8 @@
     "upload": 0.874724351
    },
    "device_samples": 93,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-hamming-1000000x768-binary",
@@ -618,7 +641,8 @@
     "upload": 0.640434153
    },
    "device_samples": 431,
-   "device_peak_bytes": 492830720
+   "device_peak_bytes": 492830720,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -637,7 +661,8 @@
     "upload": 10.576282577
    },
    "device_samples": 987,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -656,7 +681,8 @@
     "upload": 2.972077332
    },
    "device_samples": 349,
-   "device_peak_bytes": 1370488832
+   "device_peak_bytes": 1191182336,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -675,7 +701,8 @@
     "upload": 7.6536586159999995
    },
    "device_samples": 530,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768-byte",
@@ -694,7 +721,8 @@
     "upload": 2.553491833
    },
    "device_samples": 339,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-ip-1000000x960",
@@ -713,7 +741,8 @@
     "upload": 14.251315631
    },
    "device_samples": 1054,
-   "device_peak_bytes": 4795138048
+   "device_peak_bytes": 4615831552,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-l2-1000000x960",
@@ -732,7 +761,8 @@
     "upload": 15.835898491
    },
    "device_samples": 800,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-hamming-1000000x384-binary",
@@ -751,7 +781,8 @@
     "upload": 0.594835596
    },
    "device_samples": 295,
-   "device_peak_bytes": 619708416
+   "device_peak_bytes": 440401920,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384",
@@ -770,7 +801,8 @@
     "upload": 6.800574574
    },
    "device_samples": 303,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384-byte",
@@ -789,7 +821,8 @@
     "upload": 1.287497323
    },
    "device_samples": 200,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384",
@@ -808,7 +841,8 @@
     "upload": 3.176117971
    },
    "device_samples": 278,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384-byte",
@@ -827,7 +861,8 @@
     "upload": 1.253430462
    },
    "device_samples": 203,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-hamming-1000000x128-binary",
@@ -846,7 +881,8 @@
     "upload": 0.51699041
    },
    "device_samples": 202,
-   "device_peak_bytes": 413138944
+   "device_peak_bytes": 413138944,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128",
@@ -865,7 +901,8 @@
     "upload": 1.748837703
    },
    "device_samples": 122,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128-byte",
@@ -884,7 +921,8 @@
     "upload": 0.73688101
    },
    "device_samples": 94,
-   "device_peak_bytes": 522190848
+   "device_peak_bytes": 522190848,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128",
@@ -903,7 +941,8 @@
     "upload": 1.640947876
    },
    "device_samples": 127,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128-byte",
@@ -922,7 +961,8 @@
     "upload": 0.698815819
    },
    "device_samples": 95,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-hamming-1000000x768-binary",
@@ -941,7 +981,8 @@
     "upload": 0.702861485
    },
    "device_samples": 423,
-   "device_peak_bytes": 492830720
+   "device_peak_bytes": 492830720,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -960,7 +1001,8 @@
     "upload": 12.756470226
    },
    "device_samples": 899,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -979,7 +1021,8 @@
     "upload": 3.214367951
    },
    "device_samples": 355,
-   "device_peak_bytes": 1370488832
+   "device_peak_bytes": 1191182336,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -998,7 +1041,8 @@
     "upload": 10.022842103
    },
    "device_samples": 558,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768-byte",
@@ -1017,7 +1061,8 @@
     "upload": 4.366455688
    },
    "device_samples": 370,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-ip-1000000x960",
@@ -1036,7 +1081,8 @@
     "upload": 21.118607799
    },
    "device_samples": 799,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-l2-1000000x960",
@@ -1055,7 +1101,8 @@
     "upload": 28.140826809
    },
    "device_samples": 932,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-hamming-1000000x384-binary",
@@ -1074,7 +1121,8 @@
     "upload": 0.64440846
    },
    "device_samples": 294,
-   "device_peak_bytes": 619708416
+   "device_peak_bytes": 440401920,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384",
@@ -1093,7 +1141,8 @@
     "upload": 5.7596931510000005
    },
    "device_samples": 312,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384-byte",
@@ -1112,7 +1161,8 @@
     "upload": 1.355101466
    },
    "device_samples": 202,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384",
@@ -1131,7 +1181,8 @@
     "upload": 3.36015901
    },
    "device_samples": 286,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384-byte",
@@ -1150,7 +1201,8 @@
     "upload": 1.289468139
    },
    "device_samples": 205,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-hamming-1000000x128-binary",
@@ -1169,7 +1221,8 @@
     "upload": 0.504954954
    },
    "device_samples": 202,
-   "device_peak_bytes": 413138944
+   "device_peak_bytes": 413138944,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128",
@@ -1188,7 +1241,8 @@
     "upload": 2.511588693
    },
    "device_samples": 125,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128-byte",
@@ -1207,7 +1261,8 @@
     "upload": 0.79566692
    },
    "device_samples": 97,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128",
@@ -1226,7 +1281,8 @@
     "upload": 1.690205784
    },
    "device_samples": 124,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128-byte",
@@ -1245,7 +1301,8 @@
     "upload": 0.768230563
    },
    "device_samples": 94,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-hamming-1000000x768-binary",
@@ -1264,7 +1321,8 @@
     "upload": 0.630242179
    },
    "device_samples": 430,
-   "device_peak_bytes": 492830720
+   "device_peak_bytes": 492830720,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -1283,7 +1341,8 @@
     "upload": 10.881711434
    },
    "device_samples": 986,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -1302,7 +1361,8 @@
     "upload": 2.094973789
    },
    "device_samples": 350,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -1321,7 +1381,8 @@
     "upload": 13.644599835
    },
    "device_samples": 884,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768-byte",
@@ -1340,7 +1401,8 @@
     "upload": 2.106831911
    },
    "device_samples": 351,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-ip-1000000x960",
@@ -1359,7 +1421,8 @@
     "upload": 17.754024154
    },
    "device_samples": 761,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-l2-1000000x960",
@@ -1378,7 +1441,8 @@
     "upload": 30.815727787
    },
    "device_samples": 943,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-hamming-1000000x384-binary",
@@ -1397,7 +1461,8 @@
     "upload": 0.633115824
    },
    "device_samples": 297,
-   "device_peak_bytes": 623902720
+   "device_peak_bytes": 444596224,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384",
@@ -1416,7 +1481,8 @@
     "upload": 4.837184766
    },
    "device_samples": 302,
-   "device_peak_bytes": 1929379840
+   "device_peak_bytes": 1929379840,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384-byte",
@@ -1435,7 +1501,8 @@
     "upload": 1.219865319
    },
    "device_samples": 197,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384",
@@ -1454,7 +1521,8 @@
     "upload": 3.36373359
    },
    "device_samples": 279,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384-byte",
@@ -1473,7 +1541,8 @@
     "upload": 1.255326319
    },
    "device_samples": 202,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-hamming-1000000x128-binary",
@@ -1492,7 +1561,8 @@
     "upload": 0.541047371
    },
    "device_samples": 202,
-   "device_peak_bytes": 408944640
+   "device_peak_bytes": 408944640,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128",
@@ -1511,7 +1581,8 @@
     "upload": 1.830381963
    },
    "device_samples": 126,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128-byte",
@@ -1530,7 +1601,8 @@
     "upload": 0.730212667
    },
    "device_samples": 89,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128",
@@ -1549,7 +1621,8 @@
     "upload": 1.663166498
    },
    "device_samples": 119,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128-byte",
@@ -1568,7 +1641,8 @@
     "upload": 0.705769748
    },
    "device_samples": 88,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-hamming-1000000x768-binary",
@@ -1587,7 +1661,8 @@
     "upload": 0.670468933
    },
    "device_samples": 426,
-   "device_peak_bytes": 488636416
+   "device_peak_bytes": 488636416,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768",
@@ -1606,7 +1681,8 @@
     "upload": 9.786086934
    },
    "device_samples": 897,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-ip-1000000x768-byte",
@@ -1625,7 +1701,8 @@
     "upload": 2.676572018
    },
    "device_samples": 350,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -1644,7 +1721,8 @@
     "upload": 6.971293031
    },
    "device_samples": 963,
-   "device_peak_bytes": 3874488320
+   "device_peak_bytes": 3695181824,
+   "device_held_bytes": 179306496
   },
   {
    "input": "cohere-l2-1000000x768-byte",
@@ -1663,7 +1741,8 @@
     "upload": 1.859804201
    },
    "device_samples": 346,
-   "device_peak_bytes": 1571815424
+   "device_peak_bytes": 1392508928,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-ip-1000000x960",
@@ -1682,7 +1761,8 @@
     "upload": 22.602674408
    },
    "device_samples": 773,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "gist-l2-1000000x960",
@@ -1701,7 +1781,8 @@
     "upload": 39.509986348
    },
    "device_samples": 1105,
-   "device_peak_bytes": 4793040896
+   "device_peak_bytes": 4613734400,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-hamming-1000000x384-binary",
@@ -1720,7 +1801,8 @@
     "upload": 0.618965288
    },
    "device_samples": 294,
-   "device_peak_bytes": 623902720
+   "device_peak_bytes": 444596224,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384",
@@ -1739,7 +1821,8 @@
     "upload": 3.346665659
    },
    "device_samples": 285,
-   "device_peak_bytes": 1933574144
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-ip-1000000x384-byte",
@@ -1758,7 +1841,8 @@
     "upload": 1.282877352
    },
    "device_samples": 201,
-   "device_peak_bytes": 782237696
+   "device_peak_bytes": 782237696,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384",
@@ -1777,7 +1861,8 @@
     "upload": 11.091826302
    },
    "device_samples": 386,
-   "device_peak_bytes": 2112880640
+   "device_peak_bytes": 1933574144,
+   "device_held_bytes": 179306496
   },
   {
    "input": "ms-marco-l2-1000000x384-byte",
@@ -1796,7 +1881,8 @@
     "upload": 1.276325699
    },
    "device_samples": 202,
-   "device_peak_bytes": 957349888
+   "device_peak_bytes": 778043392,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-hamming-1000000x128-binary",
@@ -1815,7 +1901,8 @@
     "upload": 0.520442545
    },
    "device_samples": 200,
-   "device_peak_bytes": 408944640
+   "device_peak_bytes": 408944640,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128",
@@ -1834,7 +1921,8 @@
     "upload": 2.123642161
    },
    "device_samples": 130,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-ip-1000000x128-byte",
@@ -1853,7 +1941,8 @@
     "upload": 0.788804274
    },
    "device_samples": 96,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128",
@@ -1872,7 +1961,8 @@
     "upload": 2.437970129
    },
    "device_samples": 133,
-   "device_peak_bytes": 910163968
+   "device_peak_bytes": 910163968,
+   "device_held_bytes": 179306496
   },
   {
    "input": "sift-l2-1000000x128-byte",
@@ -1891,7 +1981,8 @@
     "upload": 0.783752088
    },
    "device_samples": 96,
-   "device_peak_bytes": 526385152
+   "device_peak_bytes": 526385152,
+   "device_held_bytes": 179306496
   }
  ],
  "concurrent": {

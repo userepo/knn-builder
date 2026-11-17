@@ -53,7 +53,8 @@ pub enum JobError {
         "building the graph: it needs about {needed_mib} MiB of device memory, {free_mib} MiB are free"
     )]
     DeviceMemory {
-        /// The build's modeled peak, with a margin, in MiB.
+        /// The build's modeled peak, with a margin and what a process's
+        /// first build takes besides, in MiB.
         needed_mib: u64,
         /// The device's free memory before the build, in MiB.
         free_mib: u64,

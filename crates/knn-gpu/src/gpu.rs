@@ -420,10 +420,10 @@ impl Gpu {
     }
 
     /// Builds the CAGRA graph of `vectors`, rows of `dimension`, as the
-    /// upstream service does through Faiss: the vectors are copied to a
-    /// padded device dataset, the graph is seeded by an IVF-PQ build and
-    /// search with `params`, pruned to `params.graph_degree`, and copied
-    /// back to the host.
+    /// upstream service does through Faiss: the graph is seeded by an
+    /// IVF-PQ build and search with `params`, which read the vectors from
+    /// host memory a batch at a time, so the device never holds them all,
+    /// then pruned to `params.graph_degree` and copied back to the host.
     ///
     /// # Errors
     ///

@@ -144,10 +144,10 @@ class Peaks:
                 fit.binary_phase_peak(self.binary_models, w, shape, self.binary_cap)
                 for w in (0, 1)
             )
+        # The phases alone: the build reads the vectors from host memory, a
+        # batch at a time, which the IVF-PQ phase counts.
         shape = (n, d, 4 if data_type == "float" else 1, g)
-        return n * d * shape[2] + max(
-            fit.phase_peak(self.models, w, shape, self.cap) for w in (0, 1)
-        )
+        return max(fit.phase_peak(self.models, w, shape, self.cap) for w in (0, 1))
 
 
 def upstream_estimate(n, d, data_type):

@@ -50,9 +50,9 @@ const ROWS: usize = 20_000;
 const DIM: usize = 64;
 const MIB: usize = 1 << 20;
 
-/// Parameters cuVS refuses only after the dataset is on the device: more
-/// IVF-PQ lists than vectors. The test checks the refusal comes from the
-/// build step, so the failure path it measures frees an uploaded dataset.
+/// Parameters cuVS refuses inside its build: more IVF-PQ lists than
+/// vectors. The test checks the refusal comes from the build step, so the
+/// failure path it measures is one that frees what the build allocated.
 fn failing(params: &BuildParams) -> BuildParams {
     BuildParams {
         n_lists: u32::try_from(ROWS).unwrap() + 1,
@@ -109,7 +109,7 @@ fn builds_return_their_device_memory() {
         baseline / MIB,
         after / MIB
     );
-    // The dataset alone is 5 MiB, so a leak per build would lose
+    // The graph alone is 5 MiB, so a leak per build would lose
     // hundreds of MiB over 100 builds; the margin absorbs other
     // processes sharing the GPU (a laptop's display among them).
     assert!(

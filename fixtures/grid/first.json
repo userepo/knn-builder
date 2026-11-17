@@ -1,0 +1,38 @@
+[
+ {
+  "input": "l2-1000x64",
+  "m": 16,
+  "first_peak_bytes": 58720256,
+  "peak_bytes": 16777216
+ },
+ {
+  "input": "l2-1000x64-fp16",
+  "m": 16,
+  "first_peak_bytes": 58720256,
+  "peak_bytes": 16777216
+ },
+ {
+  "input": "l2-10000x128",
+  "m": 16,
+  "first_peak_bytes": 85983232,
+  "peak_bytes": 41943040
+ },
+ {
+  "input": "l2-20000x128",
+  "m": 16,
+  "first_peak_bytes": 85983232,
+  "peak_bytes": 41943040
+ },
+ {
+  "input": "l2-100000x768",
+  "m": 16,
+  "first_peak_bytes": 673185792,
+  "peak_bytes": 631242752
+ },
+ {
+  "input": "l2-1000000x768",
+  "m": 16,
+  "first_peak_bytes": 866123776,
+  "peak_bytes": 824180736
+ }
+]

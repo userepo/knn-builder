@@ -318,7 +318,7 @@ async fn post(router: &api::App, body: &Value) -> Answer {
 }
 
 /// A request for 1M x 768 fp32 vectors: about half a minute to build,
-/// and about 3.5 GiB of device memory at its peak.
+/// and about 790 MiB of device memory at its peak.
 fn large_body() -> Value {
     json!({
         "container_name": "bucket",
@@ -336,7 +336,7 @@ async fn refuses_a_job_it_cannot_build_in_time_or_memory() {
     let small_gpu = Settings {
         client_timeout: Duration::from_secs(10),
         device: Some(Device {
-            free_memory: 1 << 30,
+            free_memory: 512 << 20,
             shared_memory_per_block: 101_376,
         }),
         ..Settings::default()

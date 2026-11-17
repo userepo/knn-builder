@@ -11,16 +11,15 @@
 //! The terms: n vectors of dimension d, s bytes a value on the device (2
 //! for `half_float`, whose vectors are converted on download, 1 for
 //! `byte`), graph degree g. The IVF-PQ build's k-means and its search
-//! cost about n^1.5 d, the graph's optimization n g^2, the dataset's copy
-//! n d s.
+//! cost about n^1.5 d, the graph's optimization n g^2, moving the vectors
+//! to the device, a batch at a time, n d s.
 //!
 //! The models were not fitted to byte builds, only checked against them
-//! (`fixtures/grid/byte-runs.json`): their device peaks are off by the
-//! same bytes as the float builds of the same shape, and their stage times
-//! and file sizes as close as those of the builds fitted, but a byte build
-//! takes as long as a float one, 0.99 to 1.25 times on that grid, so the
-//! build's time counts a byte value as 4 bytes. A data node's own byte
-//! build takes as long as a float one too (`byte-cpu.json`).
+//! (`fixtures/grid/byte-runs.json`): their device peaks, stage times and
+//! file sizes come as close as those of the builds fitted, but a byte build
+//! takes about as long as a float one, so the build's time counts a byte
+//! value as 4 bytes. A data node's own byte build takes as long as a float
+//! one too (`byte-cpu.json`).
 //!
 //! A binary build, NN-descent in Hamming distance with d counting bits, has
 //! models of its own, fitted to 30 builds by `tools/grid/fit.py binary`
@@ -156,6 +155,20 @@ impl Shape {
 /// that also selects them (`kMaxCapacity`).
 const FUSED_TOP_K: u32 = 128;
 
+/// The most vectors the IVF-PQ build holds on the device at once, in their
+/// own type, as it reads them from host memory. Where a float build and an
+/// fp16 one of the same shape both peak in that phase, they peak exactly
+/// this many rows of d values times the 2 bytes between them apart
+/// (`fixtures/grid/runs.json`); builds of fewer vectors hold them all, and
+/// 1,000 float and fp16 vectors peak alike (`fixtures/grid/first.json`).
+const BATCH_ROWS: f64 = 65_536.0;
+
+/// What a process's first build takes of the device besides a later one:
+/// cuVS loads its kernels and creates its library handles then, and keeps
+/// them: 40 to 42 MiB more at the peak, at every size measured
+/// (`fixtures/grid/first.json`).
+const FIRST_BUILD_BYTES: f64 = 44_040_192.0;
+
 /// The candidates the IVF-PQ search that seeds a graph of `degree` over
 /// `doc_count` vectors asks for at `refinement_rate`, as cuVS's CAGRA build
 /// counts them: the degree times the rate, truncated, at least one more
@@ -183,23 +196,23 @@ impl Fitted {
             0.0
         };
         let build = if x.binary {
-            4.484_168_419_630_195_4e-8 * n * d
-                + 1.781_806_605_547_999_5e-8 * n * g
-                + 3.253_617_429_798_503_6e-11 * n * g * g
-                + 9.243_215_069_359_727e-14 * n * g * g * d
+            4.492_611_318_137_086e-8 * n * d
+                + 1.561_331_592_921_353_3e-8 * n * g
+                + 2.484_567_308_376_237e-11 * n * g * g
+                + 1.498_931_781_089_467_2e-13 * n * g * g * d
         } else {
-            0.462_016_340_462_556_74
-                + 2.646_071_502_409_124e-9 * n * d * x.build_s
-                + 8.893_904_400_583_446e-12 * n.powf(1.5) * d
-                + 1.473_025_728_723_046_4e-10 * n * g * g
-                + 8.832_281_977_621_297e-11 * slow
+            0.535_603_221_132_059_7
+                + 2.915_792_487_684_948e-9 * n * d * x.build_s
+                + 9.566_176_532_461_707e-12 * n.powf(1.5) * d
+                + 1.191_717_379_819_209_6e-10 * n * g * g
+                + 8.814_974_178_064_082e-11 * slow
         };
         Stages {
-            download: 0.004_586_874_751_921_019 + 2.440_557_794_472_648_3e-9 * n * d * x.blob_s,
+            download: 0.006_905_632_182_188_668 + 2.321_054_281_931_872_5e-9 * n * d * x.blob_s,
             build,
-            upload: 2.384_391_263_270_578_8e-9 * n * d * x.file_s
-                + 6.416_459_498_281_393_6e-9 * n * g
-                + 1.330_050_367_178_579_5e-7 * n,
+            upload: 2.081_239_079_181_345e-9 * n * d * x.file_s
+                + 6.751_823_325_351_644e-9 * n * g
+                + 4.825_297_812_211_012e-8 * n,
         }
     }
 
@@ -237,15 +250,17 @@ impl Fitted {
             + 24.214_104_760_075_195 * x.n
     }
 
-    /// The device memory the build takes at its peak, in bytes: the
-    /// dataset, and the larger of the IVF-PQ phase (the PQ codes, `pq_dim`
-    /// bytes a vector, and a batch of about 127k rows of d floats) and the
-    /// graph's optimization (the graph, 4 g bytes a vector, and a buffer of
-    /// g ids over at most 500,000 rows). The codes and the graph are floors
-    /// the fitted terms only add to. For a binary build, the dataset and the
-    /// larger of NN-descent's phase (a copy of the dataset and its graph)
-    /// and the graph's optimization (the graph and a buffer of g ids over at
-    /// most 520,000 rows), again on floors.
+    /// The device memory the build takes at its peak, in bytes: the larger
+    /// of the IVF-PQ phase (the PQ codes, `pq_dim` bytes a vector, a batch
+    /// of at most 65,536 vectors in their own type, which the build reads
+    /// from host memory a batch at a time, and buffers of about 530 KB a
+    /// dimension) and the graph's optimization (the graph, 4 g bytes a
+    /// vector, and a buffer of g ids over at most 500,000 rows). The
+    /// dataset is never on the device whole. The codes, the batch and the
+    /// graph are floors the fitted terms only add to. For a binary build,
+    /// the dataset and the larger of NN-descent's phase (a copy of the
+    /// dataset and its graph) and the graph's optimization (the graph and a
+    /// buffer of g ids over at most 520,000 rows), again on floors.
     #[must_use]
     pub fn device_peak_bytes(job: &Job) -> f64 {
         let x = Shape::of(job);
@@ -259,20 +274,23 @@ impl Fitted {
                 + 4.139_523_539_509_295 * n.min(520_000.0) * g;
             return dataset + nn_descent.max(graph);
         }
-        let ivf_pq =
-            n * f64::from(x.pq_dim) + 509_470.100_899_898_9 * d + 0.067_215_460_416_540_28 * n * d;
+        let ivf_pq = n * f64::from(x.pq_dim)
+            + n.min(BATCH_ROWS) * d * x.s
+            + 530_468.456_779_138_1 * d
+            + 0.035_995_253_966_641_88 * n * d;
         let graph = 4.0 * n * g
-            + 318_821.859_684_872_73
-            + 0.043_274_792_718_468_46 * n * g
-            + 4.261_985_417_489_097 * n.min(500_000.0) * g;
-        n * d * x.s + ivf_pq.max(graph)
+            + 0.060_478_834_177_069_97 * n * g
+            + 4.198_149_930_919_303 * n.min(500_000.0) * g;
+        ivf_pq.max(graph)
     }
 
     /// The device memory to have free for `job`'s build, in bytes: its
-    /// peak and a margin of [`DEVICE_MARGIN`].
+    /// peak, a margin of [`DEVICE_MARGIN`], and what the build takes
+    /// besides if it is the process's first, which the forecast does not
+    /// know.
     #[must_use]
     pub fn device_bytes_needed(job: &Job) -> u64 {
-        let needed = Self::device_peak_bytes(job) * (1.0 + DEVICE_MARGIN);
+        let needed = Self::device_peak_bytes(job) * (1.0 + DEVICE_MARGIN) + FIRST_BUILD_BYTES;
         #[expect(
             clippy::cast_possible_truncation,
             clippy::cast_sign_loss,
@@ -310,11 +328,12 @@ impl Fitted {
     }
 }
 
-/// The share of a build's modeled device peak kept free besides: twice
-/// the model's worst under-estimate on the grid it was fitted to (2.7%),
-/// and a little for what cuVS rounds its allocations up to. A byte build
-/// is off by the same bytes as a float one of its shape, which is up to
-/// 3.0% of its smaller peak; the binary model is under by at most 1.2%.
+/// The share of a build's modeled device peak kept free besides. The
+/// models are under by at most 0.8% on their grids (float, fp16 and byte)
+/// and 1.2% (binary); the margin stays the 6% it was when the float model
+/// was under by up to 2.7%, for GPUs and sizes no grid has measured, and
+/// for allocations a measurement can miss, as the 5 ms samples missed the
+/// briefest builds' peaks (`fixtures/grid/tight.json`).
 pub const DEVICE_MARGIN: f64 = 0.06;
 
 #[cfg(test)]

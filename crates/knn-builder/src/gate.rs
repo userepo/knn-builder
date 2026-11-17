@@ -230,12 +230,12 @@ mod tests {
     fn refuses_a_build_the_devices_memory_cannot_hold() {
         let gate = Gate::new(&Settings {
             device: Some(Device {
-                free_memory: 1 << 30,
+                free_memory: 512 << 20,
                 shared_memory_per_block: 101_376,
             }),
             ..Settings::default()
         });
-        // About 3.5 GiB at its peak; about 120 MiB.
+        // About 790 MiB at its peak; about 100 MiB.
         assert!(matches!(
             admit(&gate, &job("bucket", 1_000_000, 768), &[]),
             Err(Refusal::TooLarge { .. })

@@ -18,10 +18,10 @@ The terms, from docs/params.md: n vectors of dimension d, s bytes a value
 (4, 2 for fp16, 1 for byte), graph degree g = 4m. The IVF-PQ build's
 k-means runs on n/10 vectors over sqrt(n) lists, and its search probes 5
 lists of about sqrt(n) vectors for each of n queries, so both cost about
-n^1.5 d; the graph's optimization costs about n g^2; the dataset copy
-n d s. A byte build takes as long as a float one, so the build's time
-counts a byte value as 4 bytes (build_size), as knn-builder's cost model
-does.
+n^1.5 d; the graph's optimization costs about n g^2; moving the vectors
+to the device n d s. A byte build takes about as long as a float one, so
+the build's time counts a byte value as 4 bytes (build_size), as
+knn-builder's cost model does.
 
 That search keeps its fast kernel only while the lookup table (pq_dim x
 256 fp16 values, pq_dim = d/4) and the fused top-k of g candidates fit in
@@ -30,13 +30,18 @@ a block's shared memory (cuVS's compute_similarity_select). On the RTX
 search then costs about four times as much: the `n^1.5 d, slow search`
 term, gated on that measured case.
 
-The device peak is the dataset plus the larger of two phases: the IVF-PQ
-build and search (a buffer of a fixed number of rows of d floats, and the
-PQ codes, n d / 4 bytes) and the graph's optimization (the graph, n g 4
-bytes, and a buffer of g ids for at most a fixed number of rows). What
-must be on the device is a floor the fit adds to: the codes in the first
+The device peak is the larger of two phases: the IVF-PQ build and search
+(the PQ codes, n d / 4 bytes, a batch of at most BATCH_ROWS of the vectors
+in their own type, which the build reads from host memory a batch at a
+time, and buffers that grow with d, fitted) and the graph's optimization
+(the graph, n g 4 bytes, and a buffer of g ids for at most a fixed number
+of rows). The dataset is never on the device whole. What must be on the
+device is a floor the fit adds to: the codes and the batch in the first
 phase, the finished graph in the second, so no job is forecast to take
-less than its dataset, codes and graph, however far past the grid it is.
+less than those, however far past the grid it is. A build's peak is the
+larger of its 5 ms sample and, where RUNS_DIR/tight.json has one
+(tight_peaks.py), its reading as often as the free memory can be read,
+which the briefest builds need.
 The phase that a build peaks in is found by fitting each phase to the
 builds it bounds, in turn, until no build changes phase; the row cap of
 the optimization buffer is the candidate that fits best, and fits.json
@@ -98,13 +103,21 @@ OBSERVED = {
 }
 
 
+# The most rows of vectors the IVF-PQ build holds on the device at once, in
+# their own type: where a float build and an fp16 one of the same shape both
+# peak in that phase, they peak exactly this many rows of d values times the
+# 2 bytes between them apart (48 MiB at d 384, 96 MiB at d 768). A build of
+# fewer vectors holds them all (first_builds.py).
+BATCH_ROWS = 65_536
+
+
 def ivf_phase(n, d, s, g, cap):
     return {"1": 1.0, "d": float(d), "n d": n * d}
 
 
 def ivf_floor(n, d, s, g):
-    # The PQ codes: pq_dim = d / 4 bytes a vector at 8 bits.
-    return n * d / 4
+    # The PQ codes, pq_dim = d / 4 bytes a vector at 8 bits, and the batch.
+    return n * d / 4 + min(n, BATCH_ROWS) * d * s
 
 
 def graph_phase(n, d, s, g, cap):
@@ -190,7 +203,7 @@ def phase_peak(models, which, shape, cap):
 def device_fit(train, cap):
     """The two-phase device model for one row cap: the phases' models and
     their squared relative error on `train`."""
-    over = [r["device"]["peak_bytes"] - dataset(r) for r in train]
+    over = [r["device"]["peak_bytes"] for r in train]
     # Start from the phases' rough sizes (the IVF-PQ buffer about 128k
     # rows of d floats, the graph's buffer as large as the graph), then
     # alternate.
@@ -223,14 +236,9 @@ def device_fit(train, cap):
     return error, models
 
 
-def dataset(record):
-    n, d, s, _ = shape_of(record)
-    return n * d * s
-
-
 def device_peak(models, record, cap):
     shape = shape_of(record)
-    return dataset(record) + max(phase_peak(models, w, shape, cap) for w in (0, 1))
+    return max(phase_peak(models, w, shape, cap) for w in (0, 1))
 
 
 def device(train, held):
@@ -240,7 +248,7 @@ def device(train, held):
     near = [c for e, _, c in fitted if e <= error * 1.01]
     ys = lambda rs: [r["device"]["peak_bytes"] for r in rs]  # noqa: E731
     return {
-        "model": "n d s + max(n d / 4 + IVF-PQ phase, 4 n g + graph phase)",
+        "model": f"max(n d / 4 + min(n, {BATCH_ROWS}) d s + IVF-PQ phase, 4 n g + graph phase)",
         "ivf_pq_phase": models[0],
         "graph_phase": models[1],
         "rows": cap,
@@ -444,12 +452,26 @@ def cpu_fits(cpu):
     return fits
 
 
+def with_tight_peaks(runs, runs_dir):
+    """`runs` with each build's device peak the larger of its sample and
+    its reading in runs_dir/tight.json, where there is one."""
+    path = runs_dir / "tight.json"
+    if not path.exists():
+        return runs
+    tight = {(t["input"], t["m"]): t["peak_bytes"] for t in json.loads(path.read_text())}
+    for r in runs:
+        reading = tight.get((r["input"], r["shape"]["m"]))
+        if reading is not None and r.get("device"):
+            r["device"]["peak_bytes"] = max(r["device"]["peak_bytes"], reading)
+    return runs
+
+
 def main():
     if sys.argv[1] == "binary":
         binary_main(pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3]))
         return
     runs_dir, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
-    runs = json.loads((runs_dir / "runs.json").read_text())
+    runs = with_tight_peaks(json.loads((runs_dir / "runs.json").read_text()), runs_dir)
     builds = [
         r
         for r in runs

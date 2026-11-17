@@ -5,14 +5,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 40820925,
-    "wall_seconds": 0.846,
+    "wall_seconds": 0.673,
     "seconds": {
-      "download": 0.035,
-      "build": 0.714,
-      "upload": 0.097
+      "download": 0.032,
+      "build": 0.569,
+      "upload": 0.072
     },
-    "peak_rss_bytes": 741957632,
-    "peak_rss_after_gpu_init_bytes": 360984576,
+    "peak_rss_bytes": 742174720,
+    "peak_rss_after_gpu_init_bytes": 361664512,
     "shape": {
       "doc_count": 100000,
       "dimension": 128,
@@ -23,8 +23,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7283408896,
-      "peak_bytes": 69206016,
+      "least_free_bytes": 7298088960,
+      "peak_bytes": 54525952,
       "read_every_us": 5000
     }
   },
@@ -34,14 +34,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 66408625,
-    "wall_seconds": 0.961,
+    "wall_seconds": 0.842,
     "seconds": {
-      "download": 0.032,
-      "build": 0.794,
-      "upload": 0.134
+      "download": 0.033,
+      "build": 0.69,
+      "upload": 0.118
     },
-    "peak_rss_bytes": 793829376,
-    "peak_rss_after_gpu_init_bytes": 361005056,
+    "peak_rss_bytes": 793870336,
+    "peak_rss_after_gpu_init_bytes": 361373696,
     "shape": {
       "doc_count": 100000,
       "dimension": 128,
@@ -52,8 +52,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7233077248,
-      "peak_bytes": 119537664,
+      "least_free_bytes": 7247757312,
+      "peak_bytes": 104857600,
       "read_every_us": 5000
     }
   },
@@ -63,14 +63,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 66420925,
-    "wall_seconds": 1.42,
+    "wall_seconds": 1.304,
     "seconds": {
-      "download": 0.093,
-      "build": 1.203,
-      "upload": 0.124
+      "download": 0.095,
+      "build": 1.098,
+      "upload": 0.111
     },
-    "peak_rss_bytes": 794034176,
-    "peak_rss_after_gpu_init_bytes": 360955904,
+    "peak_rss_bytes": 801726464,
+    "peak_rss_after_gpu_init_bytes": 361312256,
     "shape": {
       "doc_count": 100000,
       "dimension": 384,
@@ -81,8 +81,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7098859520,
-      "peak_bytes": 253755392,
+      "least_free_bytes": 7113539584,
+      "peak_bytes": 239075328,
       "read_every_us": 5000
     }
   },
@@ -92,14 +92,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 92008625,
-    "wall_seconds": 1.539,
+    "wall_seconds": 1.369,
     "seconds": {
-      "download": 0.091,
-      "build": 1.291,
-      "upload": 0.157
+      "download": 0.098,
+      "build": 1.108,
+      "upload": 0.162
     },
-    "peak_rss_bytes": 844550144,
-    "peak_rss_after_gpu_init_bytes": 361181184,
+    "peak_rss_bytes": 831873024,
+    "peak_rss_after_gpu_init_bytes": 361426944,
     "shape": {
       "doc_count": 100000,
       "dimension": 384,
@@ -110,8 +110,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7098859520,
-      "peak_bytes": 253755392,
+      "least_free_bytes": 7113539584,
+      "peak_bytes": 239075328,
       "read_every_us": 5000
     }
   },
@@ -121,14 +121,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 104820925,
-    "wall_seconds": 2.34,
+    "wall_seconds": 2.31,
     "seconds": {
-      "download": 0.184,
-      "build": 1.962,
-      "upload": 0.193
+      "download": 0.177,
+      "build": 1.95,
+      "upload": 0.183
     },
-    "peak_rss_bytes": 869031936,
-    "peak_rss_after_gpu_init_bytes": 361164800,
+    "peak_rss_bytes": 858071040,
+    "peak_rss_after_gpu_init_bytes": 361394176,
     "shape": {
       "doc_count": 100000,
       "dimension": 768,
@@ -139,8 +139,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6845104128,
-      "peak_bytes": 507510784,
+      "least_free_bytes": 6872367104,
+      "peak_bytes": 480247808,
       "read_every_us": 5000
     }
   },
@@ -150,14 +150,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 130408625,
-    "wall_seconds": 4.54,
+    "wall_seconds": 4.431,
     "seconds": {
-      "download": 0.177,
-      "build": 4.13,
-      "upload": 0.233
+      "download": 0.18,
+      "build": 4.008,
+      "upload": 0.243
     },
-    "peak_rss_bytes": 908857344,
-    "peak_rss_after_gpu_init_bytes": 360947712,
+    "peak_rss_bytes": 899407872,
+    "peak_rss_after_gpu_init_bytes": 361619456,
     "shape": {
       "doc_count": 100000,
       "dimension": 768,
@@ -168,8 +168,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6845104128,
-      "peak_bytes": 507510784,
+      "least_free_bytes": 6872367104,
+      "peak_bytes": 480247808,
       "read_every_us": 5000
     }
   },
@@ -179,14 +179,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 102042237,
-    "wall_seconds": 1.463,
+    "wall_seconds": 1.466,
     "seconds": {
-      "download": 0.079,
-      "build": 1.193,
-      "upload": 0.191
+      "download": 0.082,
+      "build": 1.178,
+      "upload": 0.205
     },
-    "peak_rss_bytes": 846241792,
-    "peak_rss_after_gpu_init_bytes": 361046016,
+    "peak_rss_bytes": 845238272,
+    "peak_rss_after_gpu_init_bytes": 361291776,
     "shape": {
       "doc_count": 250000,
       "dimension": 128,
@@ -197,8 +197,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7189037056,
-      "peak_bytes": 163577856,
+      "least_free_bytes": 7220494336,
+      "peak_bytes": 132120576,
       "read_every_us": 5000
     }
   },
@@ -208,14 +208,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 166008433,
-    "wall_seconds": 1.948,
+    "wall_seconds": 2.066,
     "seconds": {
-      "download": 0.08,
-      "build": 1.538,
-      "upload": 0.33
+      "download": 0.082,
+      "build": 1.608,
+      "upload": 0.375
     },
-    "peak_rss_bytes": 962445312,
-    "peak_rss_after_gpu_init_bytes": 360931328,
+    "peak_rss_bytes": 961839104,
+    "peak_rss_after_gpu_init_bytes": 361689088,
     "shape": {
       "doc_count": 250000,
       "dimension": 128,
@@ -226,8 +226,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7056916480,
-      "peak_bytes": 295698432,
+      "least_free_bytes": 7088373760,
+      "peak_bytes": 264241152,
       "read_every_us": 5000
     }
   },
@@ -237,14 +237,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 166042237,
-    "wall_seconds": 2.848,
+    "wall_seconds": 2.76,
     "seconds": {
-      "download": 0.223,
-      "build": 2.314,
-      "upload": 0.311
+      "download": 0.24,
+      "build": 2.217,
+      "upload": 0.302
     },
-    "peak_rss_bytes": 952606720,
-    "peak_rss_after_gpu_init_bytes": 360685568,
+    "peak_rss_bytes": 953049088,
+    "peak_rss_after_gpu_init_bytes": 361324544,
     "shape": {
       "doc_count": 250000,
       "dimension": 384,
@@ -255,8 +255,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7025459200,
-      "peak_bytes": 327155712,
+      "least_free_bytes": 7096762368,
+      "peak_bytes": 255852544,
       "read_every_us": 5000
     }
   },
@@ -266,14 +266,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 230008433,
-    "wall_seconds": 3.165,
+    "wall_seconds": 2.889,
     "seconds": {
-      "download": 0.218,
-      "build": 2.517,
-      "upload": 0.43
+      "download": 0.225,
+      "build": 2.224,
+      "upload": 0.44
     },
-    "peak_rss_bytes": 1050783744,
-    "peak_rss_after_gpu_init_bytes": 360726528,
+    "peak_rss_bytes": 1053925376,
+    "peak_rss_after_gpu_init_bytes": 361541632,
     "shape": {
       "doc_count": 250000,
       "dimension": 384,
@@ -284,8 +284,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6994001920,
-      "peak_bytes": 358612992,
+      "least_free_bytes": 7088373760,
+      "peak_bytes": 264241152,
       "read_every_us": 5000
     }
   },
@@ -295,14 +295,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 262042237,
-    "wall_seconds": 4.741,
+    "wall_seconds": 4.551,
     "seconds": {
-      "download": 0.446,
-      "build": 3.789,
-      "upload": 0.506
+      "download": 0.447,
+      "build": 3.642,
+      "upload": 0.461
     },
-    "peak_rss_bytes": 1083703296,
-    "peak_rss_after_gpu_init_bytes": 360869888,
+    "peak_rss_bytes": 1099104256,
+    "peak_rss_after_gpu_init_bytes": 361562112,
     "shape": {
       "doc_count": 250000,
       "dimension": 768,
@@ -313,8 +313,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6696206336,
-      "peak_bytes": 656408576,
+      "least_free_bytes": 6838812672,
+      "peak_bytes": 513802240,
       "read_every_us": 5000
     }
   },
@@ -324,14 +324,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 326008433,
-    "wall_seconds": 12.806,
+    "wall_seconds": 12.843,
     "seconds": {
-      "download": 0.451,
-      "build": 11.74,
-      "upload": 0.614
+      "download": 0.466,
+      "build": 11.767,
+      "upload": 0.609
     },
-    "peak_rss_bytes": 1159884800,
-    "peak_rss_after_gpu_init_bytes": 361119744,
+    "peak_rss_bytes": 1161854976,
+    "peak_rss_after_gpu_init_bytes": 361910272,
     "shape": {
       "doc_count": 250000,
       "dimension": 768,
@@ -342,8 +342,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6696206336,
-      "peak_bytes": 656408576,
+      "least_free_bytes": 6838812672,
+      "peak_bytes": 513802240,
       "read_every_us": 5000
     }
   },
@@ -353,14 +353,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 204066109,
-    "wall_seconds": 3.127,
+    "wall_seconds": 2.698,
     "seconds": {
-      "download": 0.158,
-      "build": 2.59,
-      "upload": 0.379
+      "download": 0.151,
+      "build": 2.188,
+      "upload": 0.359
     },
-    "peak_rss_bytes": 1009659904,
-    "peak_rss_after_gpu_init_bytes": 360792064,
+    "peak_rss_bytes": 1009643520,
+    "peak_rss_after_gpu_init_bytes": 361631744,
     "shape": {
       "doc_count": 500000,
       "dimension": 128,
@@ -371,8 +371,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 7021264896,
-      "peak_bytes": 331350016,
+      "least_free_bytes": 7086276608,
+      "peak_bytes": 266338304,
       "read_every_us": 5000
     }
   },
@@ -382,14 +382,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 332030897,
-    "wall_seconds": 3.997,
+    "wall_seconds": 3.603,
     "seconds": {
-      "download": 0.152,
-      "build": 3.182,
-      "upload": 0.664
+      "download": 0.153,
+      "build": 2.869,
+      "upload": 0.58
     },
-    "peak_rss_bytes": 1249701888,
-    "peak_rss_after_gpu_init_bytes": 360972288,
+    "peak_rss_bytes": 1250107392,
+    "peak_rss_after_gpu_init_bytes": 361402368,
     "shape": {
       "doc_count": 500000,
       "dimension": 128,
@@ -400,8 +400,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6759120896,
-      "peak_bytes": 593494016,
+      "least_free_bytes": 6824132608,
+      "peak_bytes": 528482304,
       "read_every_us": 5000
     }
   },
@@ -411,14 +411,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 332066109,
-    "wall_seconds": 5.368,
+    "wall_seconds": 5.344,
     "seconds": {
-      "download": 0.472,
-      "build": 4.221,
-      "upload": 0.674
+      "download": 0.44,
+      "build": 4.345,
+      "upload": 0.558
     },
-    "peak_rss_bytes": 1161342976,
-    "peak_rss_after_gpu_init_bytes": 360751104,
+    "peak_rss_bytes": 1163747328,
+    "peak_rss_after_gpu_init_bytes": 361472000,
     "shape": {
       "doc_count": 500000,
       "dimension": 384,
@@ -429,8 +429,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6893338624,
-      "peak_bytes": 459276288,
+      "least_free_bytes": 7067402240,
+      "peak_bytes": 285212672,
       "read_every_us": 5000
     }
   },
@@ -440,14 +440,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 460030897,
-    "wall_seconds": 5.621,
+    "wall_seconds": 5.456,
     "seconds": {
-      "download": 0.442,
-      "build": 4.324,
-      "upload": 0.854
+      "download": 0.432,
+      "build": 4.19,
+      "upload": 0.833
     },
-    "peak_rss_bytes": 1385140224,
-    "peak_rss_after_gpu_init_bytes": 361324544,
+    "peak_rss_bytes": 1388843008,
+    "peak_rss_after_gpu_init_bytes": 361512960,
     "shape": {
       "doc_count": 500000,
       "dimension": 384,
@@ -458,8 +458,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6631194624,
-      "peak_bytes": 721420288,
+      "least_free_bytes": 6824132608,
+      "peak_bytes": 528482304,
       "read_every_us": 5000
     }
   },
@@ -469,14 +469,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 524066109,
-    "wall_seconds": 10.705,
+    "wall_seconds": 10.593,
     "seconds": {
-      "download": 0.943,
-      "build": 8.667,
-      "upload": 1.096
+      "download": 0.877,
+      "build": 8.524,
+      "upload": 1.192
     },
-    "peak_rss_bytes": 1355632640,
-    "peak_rss_after_gpu_init_bytes": 361222144,
+    "peak_rss_bytes": 1354436608,
+    "peak_rss_after_gpu_init_bytes": 361648128,
     "shape": {
       "doc_count": 500000,
       "dimension": 768,
@@ -487,8 +487,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6446645248,
-      "peak_bytes": 905969664,
+      "least_free_bytes": 6782189568,
+      "peak_bytes": 570425344,
       "read_every_us": 5000
     }
   },
@@ -498,14 +498,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 652030897,
-    "wall_seconds": 34.057,
+    "wall_seconds": 33.132,
     "seconds": {
-      "download": 0.96,
-      "build": 31.516,
-      "upload": 1.581
+      "download": 0.861,
+      "build": 31.145,
+      "upload": 1.126
     },
-    "peak_rss_bytes": 1579655168,
-    "peak_rss_after_gpu_init_bytes": 360960000,
+    "peak_rss_bytes": 1577947136,
+    "peak_rss_after_gpu_init_bytes": 361410560,
     "shape": {
       "doc_count": 500000,
       "dimension": 768,
@@ -516,8 +516,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6438256640,
-      "peak_bytes": 914358272,
+      "least_free_bytes": 6782189568,
+      "peak_bytes": 570425344,
       "read_every_us": 5000
     }
   },
@@ -527,14 +527,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 408129597,
-    "wall_seconds": 5.167,
+    "wall_seconds": 4.718,
     "seconds": {
-      "download": 0.301,
-      "build": 3.95,
-      "upload": 0.915
+      "download": 0.3,
+      "build": 3.74,
+      "upload": 0.678
     },
-    "peak_rss_bytes": 1318780928,
-    "peak_rss_after_gpu_init_bytes": 361308160,
+    "peak_rss_bytes": 1319149568,
+    "peak_rss_after_gpu_init_bytes": 361811968,
     "shape": {
       "doc_count": 1000000,
       "dimension": 128,
@@ -545,8 +545,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6826229760,
-      "peak_bytes": 526385152,
+      "least_free_bytes": 6956253184,
+      "peak_bytes": 396361728,
       "read_every_us": 5000
     }
   },
@@ -556,14 +556,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 664062513,
-    "wall_seconds": 7.064,
+    "wall_seconds": 6.9,
     "seconds": {
-      "download": 0.309,
-      "build": 5.358,
-      "upload": 1.397
+      "download": 0.324,
+      "build": 5.194,
+      "upload": 1.382
     },
-    "peak_rss_bytes": 1834287104,
-    "peak_rss_after_gpu_init_bytes": 361009152,
+    "peak_rss_bytes": 1833746432,
+    "peak_rss_after_gpu_init_bytes": 361361408,
     "shape": {
       "doc_count": 1000000,
       "dimension": 128,
@@ -574,8 +574,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6436159488,
-      "peak_bytes": 916455424,
+      "least_free_bytes": 6566182912,
+      "peak_bytes": 786432000,
       "read_every_us": 5000
     }
   },
@@ -585,14 +585,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 664129597,
-    "wall_seconds": 10.218,
+    "wall_seconds": 9.916,
     "seconds": {
-      "download": 0.918,
-      "build": 7.648,
-      "upload": 1.651
+      "download": 0.895,
+      "build": 7.624,
+      "upload": 1.397
     },
-    "peak_rss_bytes": 1579167744,
-    "peak_rss_after_gpu_init_bytes": 361111552,
+    "peak_rss_bytes": 1578885120,
+    "peak_rss_after_gpu_init_bytes": 361619456,
     "shape": {
       "doc_count": 1000000,
       "dimension": 384,
@@ -603,8 +603,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6570377216,
-      "peak_bytes": 782237696,
+      "least_free_bytes": 6956253184,
+      "peak_bytes": 396361728,
       "read_every_us": 5000
     }
   },
@@ -614,14 +614,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 920062513,
-    "wall_seconds": 11.397,
+    "wall_seconds": 10.902,
     "seconds": {
-      "download": 1.061,
-      "build": 8.28,
-      "upload": 2.056
+      "download": 0.882,
+      "build": 8.1,
+      "upload": 1.919
     },
-    "peak_rss_bytes": 2090840064,
-    "peak_rss_after_gpu_init_bytes": 360865792,
+    "peak_rss_bytes": 2093187072,
+    "peak_rss_after_gpu_init_bytes": 361349120,
     "shape": {
       "doc_count": 1000000,
       "dimension": 384,
@@ -632,8 +632,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 6180306944,
-      "peak_bytes": 1172307968,
+      "least_free_bytes": 6566182912,
+      "peak_bytes": 786432000,
       "read_every_us": 5000
     }
   },
@@ -643,14 +643,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 4077949,
-    "wall_seconds": 0.585,
+    "wall_seconds": 0.434,
     "seconds": {
-      "download": 0.009,
-      "build": 0.558,
-      "upload": 0.018
+      "download": 0.01,
+      "build": 0.409,
+      "upload": 0.015
     },
-    "peak_rss_bytes": 665862144,
-    "peak_rss_after_gpu_init_bytes": 360828928,
+    "peak_rss_bytes": 666509312,
+    "peak_rss_after_gpu_init_bytes": 361865216,
     "shape": {
       "doc_count": 10000,
       "dimension": 128,
@@ -672,14 +672,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 1048129597,
-    "wall_seconds": 20.011,
+    "wall_seconds": 17.959,
     "seconds": {
-      "download": 1.767,
-      "build": 14.403,
-      "upload": 3.841
+      "download": 1.716,
+      "build": 14.024,
+      "upload": 2.219
     },
-    "peak_rss_bytes": 1964597248,
-    "peak_rss_after_gpu_init_bytes": 360828928,
+    "peak_rss_bytes": 1964797952,
+    "peak_rss_after_gpu_init_bytes": 361865216,
     "shape": {
       "doc_count": 1000000,
       "dimension": 768,
@@ -690,8 +690,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 5960105984,
-      "peak_bytes": 1392508928,
+      "least_free_bytes": 6679429120,
+      "peak_bytes": 673185792,
       "read_every_us": 5000
     }
   },
@@ -701,14 +701,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 6637937,
-    "wall_seconds": 0.621,
+    "wall_seconds": 0.423,
     "seconds": {
       "download": 0.009,
-      "build": 0.59,
+      "build": 0.392,
       "upload": 0.022
     },
-    "peak_rss_bytes": 673284096,
-    "peak_rss_after_gpu_init_bytes": 360800256,
+    "peak_rss_bytes": 673570816,
+    "peak_rss_after_gpu_init_bytes": 361578496,
     "shape": {
       "doc_count": 10000,
       "dimension": 128,
@@ -730,14 +730,14 @@
     "task_status": "COMPLETED_INDEX_BUILD",
     "file_name": "vectors.faiss",
     "file_size": 1304062513,
-    "wall_seconds": 84.228,
+    "wall_seconds": 83.034,
     "seconds": {
-      "download": 1.907,
-      "build": 78.883,
-      "upload": 3.437
+      "download": 1.697,
+      "build": 78.566,
+      "upload": 2.772
     },
-    "peak_rss_bytes": 2477948928,
-    "peak_rss_after_gpu_init_bytes": 360800256,
+    "peak_rss_bytes": 2478620672,
+    "peak_rss_after_gpu_init_bytes": 361578496,
     "shape": {
       "doc_count": 1000000,
       "dimension": 768,
@@ -748,8 +748,8 @@
     "device": {
       "total_bytes": 8585216000,
       "free_before_bytes": 7352614912,
-      "least_free_bytes": 5796528128,
-      "peak_bytes": 1556086784,
+      "least_free_bytes": 6566182912,
+      "peak_bytes": 786432000,
       "read_every_us": 5000
     }
   }

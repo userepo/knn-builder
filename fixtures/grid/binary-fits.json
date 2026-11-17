@@ -2,22 +2,22 @@
  "failed_builds": [],
  "build_seconds": {
   "terms": {
-   "n d": 4.4841684196301954e-08,
-   "n g": 1.7818066055479995e-08,
-   "n g^2": 3.2536174297985036e-11,
-   "n g^2 d": 9.243215069359727e-14
+   "n d": 4.492611318137086e-08,
+   "n g": 1.5613315929213533e-08,
+   "n g^2": 2.484567308376237e-11,
+   "n g^2 d": 1.4989317810894672e-13
   },
   "train": {
    "points": 22,
-   "median_abs": 0.1014,
-   "max_abs": 0.2067,
-   "most_under": -0.1637
+   "median_abs": 0.0878,
+   "max_abs": 0.1876,
+   "most_under": -0.162
   },
   "held_out": {
    "points": 8,
-   "median_abs": 0.0432,
-   "max_abs": 0.0992,
-   "most_under": -0.0992
+   "median_abs": 0.0481,
+   "max_abs": 0.1276,
+   "most_under": -0.1276
   }
  },
  "file_bytes": {
@@ -71,17 +71,17 @@
  "download_seconds": {
   "float_model": {
    "points": 30,
-   "median_abs": 0.0574,
-   "max_abs": 0.3471,
-   "most_under": -0.2125
+   "median_abs": 0.0882,
+   "max_abs": 0.4507,
+   "most_under": -0.266
   }
  },
  "upload_seconds": {
   "float_model": {
    "points": 30,
-   "median_abs": 0.0583,
-   "max_abs": 0.384,
-   "most_under": -0.384
+   "median_abs": 0.0921,
+   "max_abs": 0.3362,
+   "most_under": -0.3362
   }
  },
  "cpu_seconds_1_threads": {

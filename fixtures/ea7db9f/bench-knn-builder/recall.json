@@ -1,0 +1,10 @@
+{
+ "recall": {
+  "seed": 1,
+  "k": 10
+ },
+ "inputs": {
+  "cohere-l2-1000000x768": 0.964
+ },
+ "knn_inspect": "knn-inspect 0.17.0"
+}

@@ -1,8 +1,10 @@
 // The CAGRA build through cuVS's C++ API, the API Faiss builds through, so
 // every IVF-PQ graph build and search setting reaches cuVS as the upstream
 // service passes it; cuVS's C API fixes two of the search settings
-// (docs/params.md). Binary vectors build through NN-descent in Hamming
-// distance, as Faiss's BinaryCuvsCagra builds them.
+// (docs/params.md). Those builds read the vectors from host memory, as the
+// service's patched Faiss reads them. Binary vectors build through
+// NN-descent in Hamming distance, as Faiss's BinaryCuvsCagra builds them,
+// from a copy on the device.
 //
 // Device memory is owned by C++ objects that free it on every return, and
 // every exception is caught and returned as a status with its message.
@@ -156,41 +158,21 @@ cuvs::neighbors::cagra::index_params faiss_binary_index_params(const knn_cagra_b
   return params;
 }
 
-// Copies the host vectors to a padded device dataset, builds on it, and
-// copies the graph back, as Faiss's CuvsCagra::train does for host data
-// it is told to store (faiss/gpu/impl/CuvsCagra.cu:218-227) and, with
-// rvib's patch 0003, BinaryCuvsCagra::train. The service stores none, so
-// its float, fp16 and byte builds take the patch's host-memory path
-// instead (CuvsCagra.cu:228-249). The graph may be narrower than `max_degree`
-// where cuVS lowers the degree; `degree` receives the one it built.
-template <typename T>
-int build_graph(raft::resources& res,
-                const T* vectors,
-                std::int64_t rows,
-                std::int64_t dimension,
-                const cuvs::neighbors::cagra::index_params& params,
-                std::uint32_t max_degree,
-                std::uint32_t* graph,
-                std::size_t graph_len,
-                std::uint32_t* degree,
-                char* message,
-                std::size_t len)
+// Checks the graph cuVS built, `view` on the device, against the rows and
+// the most neighbors asked for, and copies it into `graph`. It may be
+// narrower than `max_degree` where cuVS lowers the degree; `degree`
+// receives the one it built.
+template <typename View>
+int copy_graph(raft::resources& res,
+               View const& view,
+               std::int64_t rows,
+               std::uint32_t max_degree,
+               std::uint32_t* graph,
+               std::size_t graph_len,
+               std::uint32_t* degree,
+               char* message,
+               std::size_t len)
 {
-  // Declared before the index, which views it, so it is freed after.
-  std::unique_ptr<cuvs::neighbors::device_padded_dataset<T, std::int64_t>> dataset;
-  int status = run(KNN_CAGRA_DATASET, message, len, [&] {
-    auto host = raft::make_host_matrix_view<const T, std::int64_t>(vectors, rows, dimension);
-    dataset   = cuvs::neighbors::make_device_padded_dataset(res, host);
-  });
-  if (status != KNN_CAGRA_OK) { return status; }
-
-  std::optional<cuvs::neighbors::cagra::device_padded_index<T, std::uint32_t>> index;
-  status = run(KNN_CAGRA_BUILD, message, len, [&] {
-    index.emplace(cuvs::neighbors::cagra::build(res, params, dataset->as_dataset_view()));
-  });
-  if (status != KNN_CAGRA_OK) { return status; }
-
-  auto const view = index->graph();
   if (view.extent(0) != rows || view.extent(1) < 1 ||
       view.extent(1) > static_cast<std::int64_t>(max_degree) ||
       static_cast<std::size_t>(view.size()) > graph_len) {
@@ -215,6 +197,73 @@ int build_graph(raft::resources& res,
   });
 }
 
+// Builds the graph from the host vectors themselves, through a host dataset
+// view, and copies it back, as the service's Faiss builds float, fp16 and
+// byte vectors: rvib's patch 0003 has CuvsCagra::train do so when it is told
+// to store no dataset, as the service tells it
+// (faiss/gpu/impl/CuvsCagra.cu:228-249). cuVS reads a host view a batch at
+// a time, so the dataset is never on the device whole; with
+// `attach_dataset_on_build` false, as Faiss sets it, the index holds only
+// its graph and not that view.
+template <typename T>
+int build_graph_from_host(raft::resources& res,
+                          const T* vectors,
+                          std::int64_t rows,
+                          std::int64_t dimension,
+                          cuvs::neighbors::cagra::index_params params,
+                          std::uint32_t max_degree,
+                          std::uint32_t* graph,
+                          std::size_t graph_len,
+                          std::uint32_t* degree,
+                          char* message,
+                          std::size_t len)
+{
+  params.attach_dataset_on_build = false;
+  std::optional<cuvs::neighbors::cagra::host_standard_index<T, std::uint32_t>> index;
+  int const status = run(KNN_CAGRA_BUILD, message, len, [&] {
+    auto host = raft::make_host_matrix_view<const T, std::int64_t>(vectors, rows, dimension);
+    index.emplace(cuvs::neighbors::cagra::build(
+      res, params, cuvs::neighbors::make_host_standard_dataset_view(host)));
+  });
+  if (status != KNN_CAGRA_OK) { return status; }
+  return copy_graph(
+    res, index->graph(), rows, max_degree, graph, graph_len, degree, message, len);
+}
+
+// Copies the host vectors to a padded device dataset, builds on it, and
+// copies the graph back, as Faiss's BinaryCuvsCagra::train does with rvib's
+// patch 0003 (faiss/gpu/impl/BinaryCuvsCagra.cu:180-188), which builds
+// binary vectors from the device still.
+template <typename T>
+int build_graph_on_device(raft::resources& res,
+                          const T* vectors,
+                          std::int64_t rows,
+                          std::int64_t dimension,
+                          const cuvs::neighbors::cagra::index_params& params,
+                          std::uint32_t max_degree,
+                          std::uint32_t* graph,
+                          std::size_t graph_len,
+                          std::uint32_t* degree,
+                          char* message,
+                          std::size_t len)
+{
+  // Declared before the index, which views it, so it is freed after.
+  std::unique_ptr<cuvs::neighbors::device_padded_dataset<T, std::int64_t>> dataset;
+  int status = run(KNN_CAGRA_DATASET, message, len, [&] {
+    auto host = raft::make_host_matrix_view<const T, std::int64_t>(vectors, rows, dimension);
+    dataset   = cuvs::neighbors::make_device_padded_dataset(res, host);
+  });
+  if (status != KNN_CAGRA_OK) { return status; }
+
+  std::optional<cuvs::neighbors::cagra::device_padded_index<T, std::uint32_t>> index;
+  status = run(KNN_CAGRA_BUILD, message, len, [&] {
+    index.emplace(cuvs::neighbors::cagra::build(res, params, dataset->as_dataset_view()));
+  });
+  if (status != KNN_CAGRA_OK) { return status; }
+  return copy_graph(
+    res, index->graph(), rows, max_degree, graph, graph_len, degree, message, len);
+}
+
 // An IVF-PQ build, whose degree the service's effective m keeps within
 // what cuVS builds: a graph of any other degree is refused.
 template <typename T>
@@ -229,17 +278,17 @@ int build_ivf_pq_graph(raft::resources& res,
                        std::size_t len)
 {
   std::uint32_t degree = 0;
-  int const status     = build_graph(res,
-                                 vectors,
-                                 rows,
-                                 dimension,
-                                 faiss_index_params(p),
-                                 p.graph_degree,
-                                 graph,
-                                 graph_len,
-                                 &degree,
-                                 message,
-                                 len);
+  int const status     = build_graph_from_host(res,
+                                               vectors,
+                                               rows,
+                                               dimension,
+                                               faiss_index_params(p),
+                                               p.graph_degree,
+                                               graph,
+                                               graph_len,
+                                               &degree,
+                                               message,
+                                               len);
   if (status == KNN_CAGRA_OK && degree != p.graph_degree) {
     if (message != nullptr && len > 0) {
       std::snprintf(message, len, "degree %u where %u was asked for", degree, p.graph_degree);
@@ -344,15 +393,15 @@ extern "C" int knn_cagra_build_binary(knn_cagra_gpu* gpu,
       message, message_len, "null pointer, empty shape, bits not whole bytes or graph degree 0");
     return KNN_CAGRA_ARGUMENTS;
   }
-  return build_graph(gpu->res,
-                     bits,
-                     rows,
-                     dimension / 8,
-                     faiss_binary_index_params(*params),
-                     params->graph_degree,
-                     graph,
-                     graph_len,
-                     degree,
-                     message,
-                     message_len);
+  return build_graph_on_device(gpu->res,
+                               bits,
+                               rows,
+                               dimension / 8,
+                               faiss_binary_index_params(*params),
+                               params->graph_degree,
+                               graph,
+                               graph_len,
+                               degree,
+                               message,
+                               message_len);
 }

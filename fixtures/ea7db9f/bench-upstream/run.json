@@ -52,7 +52,8 @@
     "upload": 7.32
    },
    "device_samples": 539,
-   "device_peak_bytes": 1007681536
+   "device_peak_bytes": 1007681536,
+   "device_held_bytes": 0
   }
  ],
  "single": [
@@ -76,7 +77,8 @@
     "upload": 23.47
    },
    "device_samples": 1158,
-   "device_peak_bytes": 872415232
+   "device_peak_bytes": 872415232,
+   "device_held_bytes": 137363456
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -97,7 +99,8 @@
     "upload": 7.61
    },
    "device_samples": 542,
-   "device_peak_bytes": 872415232
+   "device_peak_bytes": 872415232,
+   "device_held_bytes": 137363456
   },
   {
    "input": "cohere-l2-1000000x768",
@@ -118,7 +121,8 @@
     "upload": 15.67
    },
    "device_samples": 670,
-   "device_peak_bytes": 872415232
+   "device_peak_bytes": 872415232,
+   "device_held_bytes": 148897792
   }
  ],
  "ended": "2026-11-15T20:21:17.295569-06:00"

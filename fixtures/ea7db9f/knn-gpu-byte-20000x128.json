@@ -1,0 +1,548 @@
+{
+  "knn_inspect": "knn-inspect 0.17.0",
+  "recall": {
+    "seed": 1,
+    "k": 10,
+    "queries": "the input's queries.f32, or queries.u8 for binary"
+  },
+  "inputs": {
+    "ip-20000x128-byte": {
+      "input": {
+        "doc_count": 20000,
+        "dimension": 128,
+        "space_type": "innerproduct",
+        "data_type": "byte",
+        "blob_dtype": "<i1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 3004,
+        "distribution": "uniform integers -128..127",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.561,
+            "write": 0.145
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.779
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.312,
+            "write": 0.101
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.769
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.258,
+            "write": 0.06
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.778
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.233,
+            "write": 0.077
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.769
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.242,
+            "write": 0.065
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.778
+        },
+        {
+          "run": 6,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.287,
+            "write": 0.081
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.769
+        },
+        {
+          "run": 7,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.313,
+            "write": 0.038
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.779
+        },
+        {
+          "run": 8,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.297,
+            "write": 0.069
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.768
+        },
+        {
+          "run": 9,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.287,
+            "write": 0.047
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.779
+        },
+        {
+          "run": 10,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.244,
+            "write": 0.066
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.769
+        },
+        {
+          "run": 11,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.236,
+            "write": 0.075
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.778
+        },
+        {
+          "run": 12,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.277,
+            "write": 0.04
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.768
+        },
+        {
+          "run": 13,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.247,
+            "write": 0.087
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.78
+        },
+        {
+          "run": 14,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.235,
+            "write": 0.111
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.769
+        },
+        {
+          "run": 15,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.3,
+            "write": 0.053
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.78
+        },
+        {
+          "run": 16,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.239,
+            "write": 0.073
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.77
+        },
+        {
+          "run": 17,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.259,
+            "write": 0.102
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.778
+        },
+        {
+          "run": 18,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.241,
+            "write": 0.069
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.77
+        },
+        {
+          "run": 19,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.255,
+            "write": 0.074
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.778
+        },
+        {
+          "run": 20,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.258,
+            "write": 0.062
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.771
+        }
+      ],
+      "recall_at_10": {
+        "min": 0.768,
+        "max": 0.78,
+        "mean": 0.77395
+      },
+      "build_seconds": {
+        "min": 0.233,
+        "max": 0.561,
+        "mean": 0.27905
+      }
+    },
+    "l2-20000x128-byte": {
+      "input": {
+        "doc_count": 20000,
+        "dimension": 128,
+        "space_type": "l2",
+        "data_type": "byte",
+        "blob_dtype": "<i1",
+        "skip_stored_vectors": false,
+        "m": 16,
+        "ef_construction": 100,
+        "ef_search": 100,
+        "queries": 100,
+        "seed": 3005,
+        "distribution": "uniform integers -128..127",
+        "doc_ids": "permutation of 0..doc_count, times 3 plus 7"
+      },
+      "runs": [
+        {
+          "run": 1,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.424,
+            "write": 0.056
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.773
+        },
+        {
+          "run": 2,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.272,
+            "write": 0.073
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.775
+        },
+        {
+          "run": 3,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.291,
+            "write": 0.052
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 4,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.247,
+            "write": 0.046
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 5,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.257,
+            "write": 0.074
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.772
+        },
+        {
+          "run": 6,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.25,
+            "write": 0.066
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.773
+        },
+        {
+          "run": 7,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.262,
+            "write": 0.053
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.777
+        },
+        {
+          "run": 8,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.247,
+            "write": 0.078
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.775
+        },
+        {
+          "run": 9,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.234,
+            "write": 0.073
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 10,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.229,
+            "write": 0.061
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 11,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.411,
+            "write": 0.032
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.773
+        },
+        {
+          "run": 12,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.24,
+            "write": 0.091
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.775
+        },
+        {
+          "run": 13,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.237,
+            "write": 0.071
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 14,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.36,
+            "write": 0.05
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 15,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.253,
+            "write": 0.072
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        },
+        {
+          "run": 16,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.249,
+            "write": 0.044
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.775
+        },
+        {
+          "run": 17,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.273,
+            "write": 0.068
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.772
+        },
+        {
+          "run": 18,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.257,
+            "write": 0.063
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.773
+        },
+        {
+          "run": 19,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.244,
+            "write": 0.061
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.777
+        },
+        {
+          "run": 20,
+          "task_status": "COMPLETED_INDEX_BUILD",
+          "size": 8162621,
+          "seconds": {
+            "build": 0.236,
+            "write": 0.056
+          },
+          "out_of_range": 0,
+          "verify": "clean",
+          "recall_at_10": 0.774
+        }
+      ],
+      "recall_at_10": {
+        "min": 0.772,
+        "max": 0.777,
+        "mean": 0.7741
+      },
+      "build_seconds": {
+        "min": 0.229,
+        "max": 0.424,
+        "mean": 0.27365
+      }
+    }
+  }
+}

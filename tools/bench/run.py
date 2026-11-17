@@ -11,11 +11,12 @@ memory. The phases, in order:
               its request to the status that shows it completed, asked
               every 0.2 s), the service process's peak resident memory
               (VmHWM, reset before each job), the GPU's memory at its peak
-              during the job less the least seen (nvidia-smi sampled every
-              50 ms, the measure of tools/baseline/device_peaks.py over the
-              request's window, from the POST to the status that shows the
-              job ended), and its per-step times from the service's DEBUG
-              log; the first run's file is fetched to
+              during the job less what the service process held before it
+              (nvidia-smi sampled every 50 ms, the measure of
+              tools/baseline/device_peaks.py over the request's window,
+              from the POST to the status that shows the job ended), and
+              its per-step times from the service's DEBUG log; the first
+              run's file is fetched to
               OUT_DIR/<input>/run-1.faiss for the recall
   concurrent  per data type, ROUNDS rounds of CONCURRENT jobs sent at once
               as k-NN's data nodes send them (tools/burst/burst.py's model,
@@ -82,8 +83,10 @@ import urllib.request
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 sys.path.insert(0, str(ROOT / "tools" / "burst"))
+sys.path.insert(0, str(ROOT / "tools" / "baseline"))
 sys.dont_write_bytecode = True  # no __pycache__ in the checkout
 import burst  # noqa: E402
+import device_peaks  # noqa: E402
 
 UPSTREAM = "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc"
 # name: (image, MAX_WORKERS)
@@ -161,6 +164,9 @@ class Service:
         self.log = out / "service.log"
         self.log.write_bytes(b"")
         self.settings = None
+        # When each of the service's processes started, for what each held
+        # on the device before a job: an earlier one's is not counted.
+        self.starts = []
 
     def start(self, timeout, poll):
         """Starts the service with these client settings; a change restarts
@@ -183,6 +189,9 @@ class Service:
         # No timeout: the first `up` pulls the images, 14 GB for the
         # upstream one.
         run(*COMPOSE, "up", "-d", "localstack", "service", env=env, timeout=None)
+        # Before the wait: what the process holds from its start shows
+        # only until the GPU idles, which a slow wait for S3 can outlast.
+        self.starts.append(now())
         self.settings = (timeout, poll)
         self.wait()
 
@@ -191,6 +200,7 @@ class Service:
         job store, its log kept (the container's log survives a restart,
         so it is collected whole at the end)."""
         run(*COMPOSE, "restart", "service", env=self.env)
+        self.starts.append(now())
         self.wait()
 
     def wait(self):
@@ -305,6 +315,25 @@ def image_id(image):
         capture_output=True, text=True, check=True,
     )
     return out.stdout.strip()
+
+
+def attach_device_peaks(records, samples, starts):
+    """Each build's device peak, by device_peaks.py's measure over its
+    request's window, and what the service's process held before it, of
+    the processes up at `starts` the last up before the build."""
+    for record in records:
+        if "start" not in record:
+            continue
+        start = datetime.datetime.fromisoformat(record["start"])
+        peak, count, held = device_peaks.peak(
+            samples,
+            start,
+            datetime.datetime.fromisoformat(record["end"]),
+            max((s for s in starts if s <= start), default=None),
+        )
+        record["device_samples"] = count
+        record["device_held_bytes"] = held << 20
+        record["device_peak_bytes"] = None if peak is None else peak << 20
 
 
 def steps_from_log(log):
@@ -603,14 +632,9 @@ class Bench:
                         record["seconds"] = steps.get(record["job_id"])
 
     def attach_device_peaks(self, samples):
-        for record in self.record["warm_up"] + self.record.get("single", []):
-            if "start" not in record:
-                continue
-            start = datetime.datetime.fromisoformat(record["start"])
-            end = datetime.datetime.fromisoformat(record["end"])
-            used = [u for t, u in samples if start <= t <= end]
-            record["device_samples"] = len(used)
-            record["device_peak_bytes"] = (max(used) - min(used)) << 20 if used else None
+        starts = self.service.starts
+        self.record["service_starts"] = [s.isoformat() for s in starts]
+        attach_device_peaks(self.record["warm_up"] + self.record.get("single", []), samples, starts)
 
     def save(self):
         self.record["ended"] = now().isoformat()
