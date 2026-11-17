@@ -20,7 +20,7 @@ From Git Bash on Windows, Docker needs a Windows path and no path rewriting: `ex
 
 ## Inputs
 
-`make_inputs.py` writes build inputs in the format k-NN uploads (float32, float16 or int8 vectors, int32 doc ids) with 100 held-out queries each:
+`make_inputs.py` writes build inputs in the format k-NN uploads (float32, float16 or int8 vectors, int32 doc ids) with 100 held-out queries each (1,000 for the `clustered` set):
 
 ```sh
 $RUN $API tools/make_inputs.py small fixtures/inputs       # committed
@@ -30,6 +30,15 @@ $RUN $API tools/make_inputs.py byte-large target/inputs-byte-large
 $RUN $API tools/make_inputs.py binary fixtures/binary/inputs   # committed
 $RUN $API tools/make_inputs.py binary-large target/inputs-binary-large
 $RUN $API tools/make_inputs.py binary-sizes target/inputs-binary-sizes
+$RUN $API tools/make_inputs.py clustered target/inputs-clustered
+```
+
+The `clustered` set is for the upper-level projection (`project_link_to_base_layer`): Gaussian mixtures of 300,000 unit vectors of dimension 256 under inner product, each vector and query a random standard normal center plus sigma times standard normal noise, scaled to unit length. Built once each without the projection, at k-NN's default m of 16, knn-builder's CAGRA graphs of 200 clusters at sigma 0.3 or 1.0, or 1,000 at sigma 0.3, fell apart into a component a cluster, while 200 clusters at sigma 2.0 overlap enough to stay one graph. The set also holds the first of them as a half_float field (`-fp16`) and as a byte field (`-byte`: the same unit vectors times 127 over their largest absolute value, rounded, the queries scaled alike), whose graphs fell apart the same way; `make_inputs.py` refuses to run if a copy's seed is not its source's.
+
+`bench/components.py` counts the strongly and weakly connected components of a built file's level 0, in the oracle's image, whose Faiss reads the service's files:
+
+```sh
+$RUN $BASE tools/bench/components.py target/e2e/clustered-off/*/run-1.faiss
 ```
 
 A byte input's vectors are int8 values drawn uniformly over -128 to 127, and its queries the same values as float32, as k-NN takes a byte field's queries. A binary input's vectors are packed bits, as k-NN uploads a binary field's, uniform or, for a name ending in `-clustered`, drawn around a center for every 50 vectors with each bit flipped with probability 0.1; its queries are packed bits too, in `queries.u8`.

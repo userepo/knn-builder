@@ -44,12 +44,24 @@ Usage: python make_inputs.py SET OUT_DIR [NAME...], SET one of
                 1,024 bits, and 512 at 100k, 500k and 1M, for fitting the
                 NN-descent build's models (not committed), and a small one
                 to warm up with
+  clustered  Gaussian mixtures of 300k x 256 unit vectors under inner
+             product, whose clusters a CAGRA graph leaves apart, for
+             checking the upper-level projection (not committed): 200
+             clusters at sigma 0.3 and 1.0, 1,000 at sigma 0.3, and 200 at
+             sigma 2.0, which overlap and stay one graph; fp16 and byte
+             copies of the first, the same draw
 With NAMEs, only those inputs of the set.
 
 A binary input's bits are uniform, or, for a name ending in -clustered,
 drawn around centers: one center of uniform bits for every 50 vectors,
 each vector and query a center's bits with each bit flipped with
 probability 0.1, so a graph has neighbors to find.
+
+A mixture input (the clustered set) draws its centers standard normal,
+and each vector and query a random center plus sigma times standard
+normal noise, scaled to unit length; it has 1,000 queries, for recall at
+100. Its byte copy is the same unit vectors times 127 over the largest
+absolute value among them, rounded, its queries scaled the same way.
 
 Runs in the remote-vector-index-builder image, for its numpy.
 """
@@ -189,7 +201,33 @@ SETS = {
         "hamming-2000000x256-binary-clustered": (4114, 2_000_000, 256, "hamming", "binary", "<u1", False),
         "hamming-2000000x1024-binary-clustered": (4115, 2_000_000, 1024, "hamming", "binary", "<u1", False),
     },
+    "clustered": {
+        "ip-300000x256-c200-s0.3": (5000, 300_000, 256, "innerproduct", "float", "<f4", False),
+        "ip-300000x256-c200-s1.0": (5001, 300_000, 256, "innerproduct", "float", "<f4", False),
+        "ip-300000x256-c1000-s0.3": (5002, 300_000, 256, "innerproduct", "float", "<f4", False),
+        "ip-300000x256-c200-s2.0": (5003, 300_000, 256, "innerproduct", "float", "<f4", False),
+        # The first input's draw, by its seed, as a half_float and a byte
+        # field (COPIES).
+        "ip-300000x256-c200-s0.3-fp16": (5000, 300_000, 256, "innerproduct", "half_float", "<f2", False),
+        "ip-300000x256-c200-s0.3-byte": (5000, 300_000, 256, "innerproduct", "byte", "<i1", False),
+    },
 }
+
+# A mixture input's clusters and the spread of its vectors around their
+# centers, by name.
+MIXTURES = {
+    "ip-300000x256-c200-s0.3": (200, 0.3),
+    "ip-300000x256-c200-s1.0": (200, 1.0),
+    "ip-300000x256-c1000-s0.3": (1000, 0.3),
+    "ip-300000x256-c200-s2.0": (200, 2.0),
+}
+# A copy of a mixture input in another field type: the input it copies,
+# whose seed it must share to draw the same vectors.
+COPIES = {
+    "ip-300000x256-c200-s0.3-fp16": "ip-300000x256-c200-s0.3",
+    "ip-300000x256-c200-s0.3-byte": "ip-300000x256-c200-s0.3",
+}
+MIXTURE_QUERIES = 1000
 
 # A clustered binary input: vectors for each center, and the chance of each
 # bit flipping away from its center's.
@@ -238,7 +276,48 @@ def draw_clustered_bits(rng, rows, dim, centers):
     return out
 
 
-def distribution(byte, binary, clustered, unit, doc_count, dim):
+def draw_mixture(rng, rows, centers, sigma):
+    """Unit rows, each a random center plus sigma times standard normal
+    noise, drawn in float32, CHUNK_ROWS at a time."""
+    out = np.empty((rows, centers.shape[1]), dtype=np.float32)
+    for start in range(0, rows, CHUNK_ROWS):
+        end = min(start + CHUNK_ROWS, rows)
+        which = rng.integers(len(centers), size=end - start)
+        x = centers[which] + sigma * rng.standard_normal(
+            (end - start, centers.shape[1]), dtype=np.float32
+        )
+        x /= np.linalg.norm(x, axis=1, keepdims=True)
+        out[start:end] = x
+    return out
+
+
+def mixture(name):
+    """The clusters and sigma of a mixture input or a copy of one, or None."""
+    return MIXTURES.get(COPIES.get(name, name))
+
+
+def check_mixtures():
+    """Every input of the clustered set a mixture, and every copy in the
+    same set as its source with its seed, so it draws the same vectors."""
+    inputs = SETS["clustered"]
+    for name in inputs:
+        if mixture(name) is None:
+            sys.exit(f"clustered input {name} is no mixture and copies none")
+    for copy, source in COPIES.items():
+        if copy not in inputs or source not in inputs:
+            sys.exit(f"copy {copy} and its source {source} must both be in the clustered set")
+        if inputs[copy][0] != inputs[source][0]:
+            sys.exit(f"copy {copy} has seed {inputs[copy][0]}, its source {source} {inputs[source][0]}")
+
+
+def distribution(byte, binary, clustered, unit, doc_count, dim, mixed=None, scale=None):
+    if mixed:
+        clusters, sigma = mixed
+        return (
+            f"{clusters} standard normal centers, each vector a random center plus"
+            f" {sigma} times standard normal noise, unit length"
+            + (f", times {scale:.6g} and rounded to int8" if byte else "")
+        )
     if clustered:
         centers = max(doc_count // VECTORS_PER_CENTER, 1)
         return f"{centers} centers of uniform bits, each bit flipped with probability {FLIP}"
@@ -260,9 +339,22 @@ def write_input(out, name, spec):
     clustered = binary and name.endswith("-clustered")
     # Byte vectors cannot be scaled to unit length; inner product takes them as drawn.
     unit = space == "innerproduct" and not byte
+    mixed = mixture(name)
+    scale = None
+    queries_count = MIXTURE_QUERIES if mixed else QUERIES
     d = out / name
     d.mkdir(parents=True, exist_ok=True)
-    if clustered:
+    if mixed:
+        clusters, sigma = mixed
+        centers = rng.standard_normal((clusters, dim), dtype=np.float32)
+        vectors = draw_mixture(rng, doc_count, centers, sigma)
+        queries = draw_mixture(rng, queries_count, centers, sigma)
+        if byte:
+            scale = 127 / float(np.abs(vectors).max())
+            vectors = np.rint(vectors * scale)
+            queries = np.clip(np.rint(queries * scale), -128, 127)
+        (d / "vectors.knnvec").write_bytes(vectors.astype(blob_dtype).tobytes())
+    elif clustered:
         centers = draw_bits(rng, max(doc_count // VECTORS_PER_CENTER, 1), dim)
         vectors = draw_clustered_bits(rng, doc_count, dim, centers)
         queries = draw_clustered_bits(rng, QUERIES, dim, centers)
@@ -300,9 +392,9 @@ def write_input(out, name, spec):
         "blob_dtype": blob_dtype,
         "skip_stored_vectors": skip,
         **ALGORITHM_PARAMETERS,
-        "queries": QUERIES,
+        "queries": queries_count,
         "seed": seed,
-        "distribution": distribution(byte, binary, clustered, unit, doc_count, dim),
+        "distribution": distribution(byte, binary, clustered, unit, doc_count, dim, mixed, scale),
         "doc_ids": "permutation of 0..doc_count, times 3 plus 7",
     }
     (d / "input.json").write_bytes((json.dumps(meta, indent=2) + "\n").encode())
@@ -310,6 +402,7 @@ def write_input(out, name, spec):
 
 def main():
     which, out, names = sys.argv[1], pathlib.Path(sys.argv[2]), sys.argv[3:]
+    check_mixtures()
     for name in names:
         if name not in SETS[which]:
             sys.exit(f"no input {name} in {which}")
