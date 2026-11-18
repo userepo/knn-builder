@@ -9,7 +9,10 @@ outcomes, and the sustained queue's jobs per hour).
 The steps are aligned across the services: the upstream service logs
 download, build, conversion, write and upload; knn-builder download, build
 and upload with the write streamed inside the upload; so the table's build
-is the upstream build, conversion and write together.
+is the upstream build, conversion and write together. A build asked for
+the upper-level projection (run.py --project) runs it inside the upstream
+conversion and as a step of its own in knn-builder, which the table's
+build takes in as well.
 
 Recall is knn-inspect's seeded search (seed 1, k 10) over each input's
 held-out queries, as tools/baseline/score.py runs it; each run directory
@@ -100,8 +103,9 @@ def percentile(values, p):
 
 
 def build_seconds(seconds):
-    """The build step across the services: build, conversion and write."""
-    return sum(seconds.get(k, 0.0) for k in ("build", "conversion", "write"))
+    """The build step across the services: build, conversion and write,
+    with knn-builder's projection, which the upstream conversion includes."""
+    return sum(seconds.get(k, 0.0) for k in ("build", "conversion", "write", "projection"))
 
 
 def fmt(value, digits=1):

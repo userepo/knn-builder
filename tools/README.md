@@ -297,4 +297,17 @@ python tools/bench/run.py target/bench/dry/upstream upstream $DRY
 python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/dry/knn-builder target/bench/dry/upstream
 ```
 
+### The projection
+
+`--project` sends every build with `project_link_to_base_layer` true, and `--fetch-runs N` keeps the files of the first N single runs rather than the first alone. Each record of the single phase then carries the projection from the service's DEBUG log: whether it ran (or skipped a connected graph, or promoted too few), the share of the nodes reachable before it, the nodes it promoted, the links it added, and its milliseconds. `bench/projection.py` scores each kept file, its level-0 components (`components.py` in the oracle's image) and knn-inspect recall as the mean over five seeds of random entry points, recall@10 at the file's own search settings and recall@100 at ef_search 600 from 32 entry points, into `projection.json` beside `run.json`, and prints a table by input of the mean and range over the builds of each run; `--delete-files` removes each file once scored, `--summary` writes the table's figures as JSON. On the `clustered` set, with and without the projection on each service:
+
+```sh
+P="--inputs target/inputs-clustered --phases single --runs 5 --fetch-runs 5"
+python tools/bench/run.py target/bench/projection/knn-builder-off knn-builder $P
+python tools/bench/run.py target/bench/projection/knn-builder-on knn-builder $P --project
+python tools/bench/run.py target/bench/projection/upstream-off upstream $P
+python tools/bench/run.py target/bench/projection/upstream-on upstream $P --project
+python tools/bench/projection.py ../knn-inspect/target/release/knn-inspect target/bench/projection/*/ --delete-files --summary target/bench/projection/summary.json
+```
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

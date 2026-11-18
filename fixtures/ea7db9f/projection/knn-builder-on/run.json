@@ -1,0 +1,1108 @@
+{
+ "service": "knn-builder",
+ "image": "knn-builder:dev",
+ "image_id": "sha256:676cb184795ae4e4fd3af35c7716c426ccf47bf7826817ca929a88532b98892a",
+ "max_workers": 2,
+ "gpu": {
+  "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "driver": "621.24",
+  "memory_mib": 8188
+ },
+ "started": "2026-11-17T20:30:15.359721-06:00",
+ "settings": {
+  "runs": 5,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": true,
+  "fetch_runs": 5
+ },
+ "inputs": {
+  "ip-300000x256-c1000-s0.3": {
+   "dir": "target/inputs-clustered/ip-300000x256-c1000-s0.3",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 300000,
+   "dimension": 256
+  },
+  "ip-300000x256-c200-s0.3": {
+   "dir": "target/inputs-clustered/ip-300000x256-c200-s0.3",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 300000,
+   "dimension": 256
+  },
+  "ip-300000x256-c200-s0.3-byte": {
+   "dir": "target/inputs-clustered/ip-300000x256-c200-s0.3-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 300000,
+   "dimension": 256
+  },
+  "ip-300000x256-c200-s0.3-fp16": {
+   "dir": "target/inputs-clustered/ip-300000x256-c200-s0.3-fp16",
+   "data_type": "half_float",
+   "space_type": "innerproduct",
+   "doc_count": 300000,
+   "dimension": 256
+  },
+  "ip-300000x256-c200-s1.0": {
+   "dir": "target/inputs-clustered/ip-300000x256-c200-s1.0",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 300000,
+   "dimension": 256
+  },
+  "ip-300000x256-c200-s2.0": {
+   "dir": "target/inputs-clustered/ip-300000x256-c200-s2.0",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 300000,
+   "dimension": 256
+  }
+ },
+ "warm_up": [
+  {
+   "input": "ip-300000x256-c1000-s0.3",
+   "index": 0,
+   "job_id": "fb3105b9384dcf94016d3f657f22f0aa5947c6254238c4e803aecb3111564137",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.717,
+   "start": "2026-11-17T20:30:32.082039-06:00",
+   "end": "2026-11-17T20:30:37.799648-06:00",
+   "host_peak_bytes": 1231732736,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.681624791,
+    "build": 3.778838535,
+    "upload": 0.765988059,
+    "projection": 0.382110784
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.00104,
+    "promoted": 18831.0,
+    "links_added": 293550.0,
+    "gate_ms": 0.233592,
+    "layer1_build_ms": 316.894475,
+    "projection_ms": 64.930174
+   },
+   "device_samples": 92,
+   "device_held_bytes": 133169152,
+   "device_peak_bytes": 257949696
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-byte",
+   "index": 1,
+   "job_id": "3cc5884402adc0b56967354d23d60171be2656bfd7bc2068d09c7827e1e1088c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 3.641,
+   "start": "2026-11-17T20:30:38.563893-06:00",
+   "end": "2026-11-17T20:30:42.204878-06:00",
+   "host_peak_bytes": 1106292736,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.189174211,
+    "build": 2.649169593,
+    "upload": 0.322113419,
+    "projection": 0.319293665
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218377.0,
+    "gate_ms": 0.894568,
+    "layer1_build_ms": 262.41472999999996,
+    "projection_ms": 55.946748
+   },
+   "device_samples": 58,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-fp16",
+   "index": 2,
+   "job_id": "4e729b1d03119de10b9301302061fae6da28ca05badfad6e291b703d1ff9a83b",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.051,
+   "start": "2026-11-17T20:30:42.958824-06:00",
+   "end": "2026-11-17T20:30:47.009868-06:00",
+   "host_peak_bytes": 1252859904,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.380016389,
+    "build": 2.8526257250000002,
+    "upload": 0.449727246,
+    "projection": 0.309608842
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217967.0,
+    "gate_ms": 0.786599,
+    "layer1_build_ms": 252.66570700000003,
+    "projection_ms": 56.115106999999995
+   },
+   "device_samples": 65,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  }
+ ],
+ "single": [
+  {
+   "input": "ip-300000x256-c1000-s0.3",
+   "index": 6,
+   "job_id": "7dde57475e7ab3a7e542bc641ae2c765211d0172c1b08d4de1d15fb51c1d8357",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.934,
+   "start": "2026-11-17T20:30:47.792051-06:00",
+   "end": "2026-11-17T20:30:52.726269-06:00",
+   "host_peak_bytes": 1384001536,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.730441491,
+    "build": 2.974651527,
+    "upload": 0.793991039,
+    "projection": 0.39690262
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.00104,
+    "promoted": 18831.0,
+    "links_added": 293608.0,
+    "gate_ms": 0.18818200000000002,
+    "layer1_build_ms": 332.101337,
+    "projection_ms": 64.580712
+   },
+   "device_samples": 79,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3",
+   "index": 7,
+   "job_id": "ee747a2dcd9867695c34994225263a421f815225bb12393e50c233377fe978f8",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.912,
+   "start": "2026-11-17T20:30:55.800082-06:00",
+   "end": "2026-11-17T20:31:00.712186-06:00",
+   "host_peak_bytes": 1389514752,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.770614464,
+    "build": 2.966480363,
+    "upload": 0.766488248,
+    "projection": 0.295714733
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217525.0,
+    "gate_ms": 0.765087,
+    "layer1_build_ms": 240.288663,
+    "projection_ms": 54.628254
+   },
+   "device_samples": 79,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-byte",
+   "index": 8,
+   "job_id": "31b4beb25fe1a1720a20daf5bf8cd7a412a22666d0f0185d4631993b8a78ccb9",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 3.842,
+   "start": "2026-11-17T20:31:03.656069-06:00",
+   "end": "2026-11-17T20:31:07.497696-06:00",
+   "host_peak_bytes": 1158647808,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 160843197,
+   "seconds": {
+    "download": 0.199014214,
+    "build": 2.809929726,
+    "upload": 0.327989484,
+    "projection": 0.303992638
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217802.0,
+    "gate_ms": 0.780698,
+    "layer1_build_ms": 247.91694,
+    "projection_ms": 55.255565
+   },
+   "device_samples": 62,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-fp16",
+   "index": 9,
+   "job_id": "85172b5a720d29bab2373a40db9e2cfa566ad8207efbfff65dd1d5d2f8102a4c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.005,
+   "start": "2026-11-17T20:31:09.123850-06:00",
+   "end": "2026-11-17T20:31:13.128961-06:00",
+   "host_peak_bytes": 1236017152,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 237643197,
+   "seconds": {
+    "download": 0.375726389,
+    "build": 2.760595563,
+    "upload": 0.488393108,
+    "projection": 0.313067057
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217898.0,
+    "gate_ms": 0.820065,
+    "layer1_build_ms": 258.182613,
+    "projection_ms": 54.030336
+   },
+   "device_samples": 64,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s1.0",
+   "index": 10,
+   "job_id": "5c9f9086e38d1b491d890e84311c7d1e9ee956c3c3f2fed849507982b72c7797",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.872,
+   "start": "2026-11-17T20:31:15.231462-06:00",
+   "end": "2026-11-17T20:31:20.103164-06:00",
+   "host_peak_bytes": 1391476736,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.708299564,
+    "build": 2.900151807,
+    "upload": 0.784926796,
+    "projection": 0.379772416
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.005206666666666667,
+    "promoted": 18831.0,
+    "links_added": 277765.0,
+    "gate_ms": 0.899057,
+    "layer1_build_ms": 318.519629,
+    "projection_ms": 60.317004
+   },
+   "device_samples": 79,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s2.0",
+   "index": 11,
+   "job_id": "25b844da19efd90565fe97afb7e58814eb67425ebef0d5e4938de8dd4fadd4b9",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.439,
+   "start": "2026-11-17T20:31:23.195357-06:00",
+   "end": "2026-11-17T20:31:27.634581-06:00",
+   "host_peak_bytes": 1393119232,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.681415362,
+    "build": 2.8036990790000003,
+    "upload": 0.768282836
+   },
+   "projection": {
+    "outcome": "skipped",
+    "nodes": 300000.0,
+    "reachable": 1.0,
+    "gate_ms": 46.308695
+   },
+   "device_samples": 71,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c1000-s0.3",
+   "index": 12,
+   "job_id": "b1a44c1733161b9bf53492f8891076a23e513af40d60bd8cb81c8c3c1fc5aa03",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.099,
+   "start": "2026-11-17T20:31:30.493961-06:00",
+   "end": "2026-11-17T20:31:35.593549-06:00",
+   "host_peak_bytes": 1393938432,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.753808197,
+    "build": 3.050108099,
+    "upload": 0.714460846,
+    "projection": 0.383719998
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.00104,
+    "promoted": 18831.0,
+    "links_added": 293703.0,
+    "gate_ms": 0.26441000000000003,
+    "layer1_build_ms": 319.742158,
+    "projection_ms": 63.6755
+   },
+   "device_samples": 82,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3",
+   "index": 13,
+   "job_id": "8d227b63e669335317665b11767496ffa2ee6cb56f1374ddf519ab742093d752",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.926,
+   "start": "2026-11-17T20:31:38.529916-06:00",
+   "end": "2026-11-17T20:31:43.455900-06:00",
+   "host_peak_bytes": 1399312384,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.776383179,
+    "build": 3.017137677,
+    "upload": 0.754230376,
+    "projection": 0.29482515
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218321.0,
+    "gate_ms": 0.7324700000000001,
+    "layer1_build_ms": 239.584557,
+    "projection_ms": 54.47898
+   },
+   "device_samples": 79,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-byte",
+   "index": 14,
+   "job_id": "4e062bd4b75eba05b930cc107bf670c0b5c72d99f06727efe6494459d5c148f0",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 3.823,
+   "start": "2026-11-17T20:31:46.573962-06:00",
+   "end": "2026-11-17T20:31:50.396912-06:00",
+   "host_peak_bytes": 1172385792,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "size": 160843197,
+   "seconds": {
+    "download": 0.18427073,
+    "build": 2.926728046,
+    "upload": 0.315392388,
+    "projection": 0.298393687
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218231.0,
+    "gate_ms": 0.884962,
+    "layer1_build_ms": 244.100138,
+    "projection_ms": 53.37542
+   },
+   "device_samples": 62,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-fp16",
+   "index": 15,
+   "job_id": "53df5ec534965bca9108499347fbdaf78d31eb324cdde87381719b4c4a8809c7",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.25,
+   "start": "2026-11-17T20:31:51.962120-06:00",
+   "end": "2026-11-17T20:31:56.211963-06:00",
+   "host_peak_bytes": 1249640448,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "size": 237643197,
+   "seconds": {
+    "download": 0.338832976,
+    "build": 2.958310869,
+    "upload": 0.477592316,
+    "projection": 0.295125408
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218452.0,
+    "gate_ms": 0.874125,
+    "layer1_build_ms": 240.218309,
+    "projection_ms": 54.001659000000004
+   },
+   "device_samples": 68,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s1.0",
+   "index": 16,
+   "job_id": "5ab9b0ab0577a81232d157be80c688abe7e64632f52957e9235e65018138d5ae",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.919,
+   "start": "2026-11-17T20:31:58.527540-06:00",
+   "end": "2026-11-17T20:32:03.447137-06:00",
+   "host_peak_bytes": 1403678720,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.706675474,
+    "build": 2.919652608,
+    "upload": 0.727632324,
+    "projection": 0.366140927
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.005206666666666667,
+    "promoted": 18831.0,
+    "links_added": 277962.0,
+    "gate_ms": 1.070782,
+    "layer1_build_ms": 304.368406,
+    "projection_ms": 60.665931
+   },
+   "device_samples": 79,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c200-s2.0",
+   "index": 17,
+   "job_id": "2cd394a0ff081986e76b975cab770c83dc75a2359b91f14fb50a0325f8c37e5b",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.463,
+   "start": "2026-11-17T20:32:06.110855-06:00",
+   "end": "2026-11-17T20:32:10.574057-06:00",
+   "host_peak_bytes": 1402949632,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.749195328,
+    "build": 2.869526181,
+    "upload": 0.738843164
+   },
+   "projection": {
+    "outcome": "skipped",
+    "nodes": 300000.0,
+    "reachable": 1.0,
+    "gate_ms": 47.136269
+   },
+   "device_samples": 72,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c1000-s0.3",
+   "index": 18,
+   "job_id": "e4cd26ba66e7ac44d0e4924ca9ffd97e81dd7a79d6052144512e0aba12cebd50",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.869,
+   "start": "2026-11-17T20:32:13.643840-06:00",
+   "end": "2026-11-17T20:32:18.513258-06:00",
+   "host_peak_bytes": 1404067840,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.681742259,
+    "build": 2.941354955,
+    "upload": 0.764827201,
+    "projection": 0.368089548
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.00104,
+    "promoted": 18831.0,
+    "links_added": 293340.0,
+    "gate_ms": 0.20503200000000002,
+    "layer1_build_ms": 306.42264600000004,
+    "projection_ms": 61.42696
+   },
+   "device_samples": 78,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3",
+   "index": 19,
+   "job_id": "871b97f4eca474b545771a733bd1dc5bb3ed3d92dfba08ba2c1a7df74552c8eb",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.866,
+   "start": "2026-11-17T20:32:21.394561-06:00",
+   "end": "2026-11-17T20:32:26.260877-06:00",
+   "host_peak_bytes": 1407184896,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.742886797,
+    "build": 2.884772999,
+    "upload": 0.741518633,
+    "projection": 0.294888769
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218112.0,
+    "gate_ms": 0.799786,
+    "layer1_build_ms": 239.84035500000002,
+    "projection_ms": 54.213033
+   },
+   "device_samples": 78,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-byte",
+   "index": 20,
+   "job_id": "3391308c04b64626cdd7f08c7de35cc556117d2c6cbab8c389889f0b82efe921",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.045,
+   "start": "2026-11-17T20:32:29.263939-06:00",
+   "end": "2026-11-17T20:32:33.309387-06:00",
+   "host_peak_bytes": 1177018368,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "size": 160843197,
+   "seconds": {
+    "download": 0.178487037,
+    "build": 3.10308904,
+    "upload": 0.313653614,
+    "projection": 0.30331558
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217225.0,
+    "gate_ms": 0.812275,
+    "layer1_build_ms": 247.153928,
+    "projection_ms": 55.315587
+   },
+   "device_samples": 65,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-fp16",
+   "index": 21,
+   "job_id": "f812e4ac8e71f991968117f8e7c2dc3dba2c805a541f9c39f0646a62e3aaaee8",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.234,
+   "start": "2026-11-17T20:32:34.765607-06:00",
+   "end": "2026-11-17T20:32:38.999461-06:00",
+   "host_peak_bytes": 1257259008,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "size": 237643197,
+   "seconds": {
+    "download": 0.391463684,
+    "build": 2.937370885,
+    "upload": 0.44923613,
+    "projection": 0.297945422
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218027.0,
+    "gate_ms": 0.8082560000000001,
+    "layer1_build_ms": 243.43847599999998,
+    "projection_ms": 53.667108
+   },
+   "device_samples": 68,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s1.0",
+   "index": 22,
+   "job_id": "586dca5ffdd303737519545b36a28621d1b29f48353d774cd00482783610568d",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.921,
+   "start": "2026-11-17T20:32:41.089965-06:00",
+   "end": "2026-11-17T20:32:46.010960-06:00",
+   "host_peak_bytes": 1410654208,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.69006901,
+    "build": 3.072820252,
+    "upload": 0.677796516,
+    "projection": 0.376049587
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.005206666666666667,
+    "promoted": 18831.0,
+    "links_added": 278114.0,
+    "gate_ms": 0.812015,
+    "layer1_build_ms": 313.82678400000003,
+    "projection_ms": 61.375491999999994
+   },
+   "device_samples": 79,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s2.0",
+   "index": 23,
+   "job_id": "ad1e1b0d67cfb0a6125aaf1717fe5eed488c2d67cff03bc7e1b22b38e0aab84a",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.48,
+   "start": "2026-11-17T20:32:48.789256-06:00",
+   "end": "2026-11-17T20:32:53.269270-06:00",
+   "host_peak_bytes": 1411063808,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.694923356,
+    "build": 2.924371716,
+    "upload": 0.737530513
+   },
+   "projection": {
+    "outcome": "skipped",
+    "nodes": 300000.0,
+    "reachable": 1.0,
+    "gate_ms": 48.893992
+   },
+   "device_samples": 72,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c1000-s0.3",
+   "index": 24,
+   "job_id": "e7e67d0ef16317aee4ec61c4abbc489f4474efb4b485c4fb8ccde26ba7b4d713",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.845,
+   "start": "2026-11-17T20:32:55.955671-06:00",
+   "end": "2026-11-17T20:33:00.800860-06:00",
+   "host_peak_bytes": 1410994176,
+   "file_name": "vectors.faiss",
+   "run": 4,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.675486005,
+    "build": 2.92775395,
+    "upload": 0.754652197,
+    "projection": 0.373089945
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.00104,
+    "promoted": 18831.0,
+    "links_added": 293644.0,
+    "gate_ms": 0.253585,
+    "layer1_build_ms": 311.926845,
+    "projection_ms": 60.877622
+   },
+   "device_samples": 77,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3",
+   "index": 25,
+   "job_id": "47867703394e1754c19613f3ace24e0f8e1da3c6e17998c3e31027651ba972ee",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.136,
+   "start": "2026-11-17T20:33:04.029951-06:00",
+   "end": "2026-11-17T20:33:09.166113-06:00",
+   "host_peak_bytes": 1411080192,
+   "file_name": "vectors.faiss",
+   "run": 4,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.750890305,
+    "build": 3.14215431,
+    "upload": 0.749222283,
+    "projection": 0.297635985
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218412.0,
+    "gate_ms": 0.7984749999999999,
+    "layer1_build_ms": 244.13958699999998,
+    "projection_ms": 52.662901
+   },
+   "device_samples": 82,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-byte",
+   "index": 26,
+   "job_id": "415c8f8f93cc4c5d8f7a0b40f7e55c57891129552acd46d8ca4de9e5cf67ab0e",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 3.845,
+   "start": "2026-11-17T20:33:11.812574-06:00",
+   "end": "2026-11-17T20:33:15.657987-06:00",
+   "host_peak_bytes": 1181102080,
+   "file_name": "vectors.faiss",
+   "run": 4,
+   "size": 160843197,
+   "seconds": {
+    "download": 0.18627485,
+    "build": 2.791759519,
+    "upload": 0.327020748,
+    "projection": 0.311351697
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218228.0,
+    "gate_ms": 0.9061330000000001,
+    "layer1_build_ms": 252.826599,
+    "projection_ms": 57.585843
+   },
+   "device_samples": 62,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-fp16",
+   "index": 27,
+   "job_id": "8005a2049e16261736ba9471c6925495160ee04320289031dfd757c071d6c077",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.472,
+   "start": "2026-11-17T20:33:17.387316-06:00",
+   "end": "2026-11-17T20:33:21.859813-06:00",
+   "host_peak_bytes": 1257263104,
+   "file_name": "vectors.faiss",
+   "run": 4,
+   "size": 237643197,
+   "seconds": {
+    "download": 0.358932721,
+    "build": 3.253313845,
+    "upload": 0.490205423,
+    "projection": 0.303554842
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217801.0,
+    "gate_ms": 0.7990090000000001,
+    "layer1_build_ms": 249.219721,
+    "projection_ms": 53.49754
+   },
+   "device_samples": 72,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s1.0",
+   "index": 28,
+   "job_id": "15bc8392061719b07fed9db4b87df41a0dfe876055d40f5e6b2b9b2b1dbe24ee",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.876,
+   "start": "2026-11-17T20:33:24.004294-06:00",
+   "end": "2026-11-17T20:33:28.880675-06:00",
+   "host_peak_bytes": 1411596288,
+   "file_name": "vectors.faiss",
+   "run": 4,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.67718883,
+    "build": 2.9228356140000002,
+    "upload": 0.752166187,
+    "projection": 0.370184493
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.005206666666666667,
+    "promoted": 18831.0,
+    "links_added": 277836.0,
+    "gate_ms": 0.8511989999999999,
+    "layer1_build_ms": 307.799537,
+    "projection_ms": 61.491578999999994
+   },
+   "device_samples": 78,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s2.0",
+   "index": 29,
+   "job_id": "f3d448dd23d9ae4ba1e2bce37323d0758d7fb9c7c3d46bcb42559d222ffe9714",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.061,
+   "start": "2026-11-17T20:33:31.997067-06:00",
+   "end": "2026-11-17T20:33:37.058056-06:00",
+   "host_peak_bytes": 1414057984,
+   "file_name": "vectors.faiss",
+   "run": 4,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.69315403,
+    "build": 3.367777628,
+    "upload": 0.807724178
+   },
+   "projection": {
+    "outcome": "skipped",
+    "nodes": 300000.0,
+    "reachable": 1.0,
+    "gate_ms": 47.755002
+   },
+   "device_samples": 81,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c1000-s0.3",
+   "index": 30,
+   "job_id": "a51d563399fa4f164e5991a8b08930e8312a012f05addc7cca029188da2b5ca3",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.271,
+   "start": "2026-11-17T20:33:39.702036-06:00",
+   "end": "2026-11-17T20:33:44.973392-06:00",
+   "host_peak_bytes": 1414160384,
+   "file_name": "vectors.faiss",
+   "run": 5,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.65746072,
+    "build": 3.248620027,
+    "upload": 0.743229158,
+    "projection": 0.371636543
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.00104,
+    "promoted": 18831.0,
+    "links_added": 293663.0,
+    "gate_ms": 0.212803,
+    "layer1_build_ms": 310.601183,
+    "projection_ms": 60.786466
+   },
+   "device_samples": 85,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3",
+   "index": 31,
+   "job_id": "ea2d8170cd952e343defd52a746ea8be03284482de28e6a3edc6e78284c5acfd",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.151,
+   "start": "2026-11-17T20:33:47.938815-06:00",
+   "end": "2026-11-17T20:33:53.089849-06:00",
+   "host_peak_bytes": 1413677056,
+   "file_name": "vectors.faiss",
+   "run": 5,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.669071002,
+    "build": 3.222274293,
+    "upload": 0.759050835,
+    "projection": 0.295383498
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 218009.0,
+    "gate_ms": 0.7173630000000001,
+    "layer1_build_ms": 239.53532099999998,
+    "projection_ms": 55.094083000000005
+   },
+   "device_samples": 83,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-byte",
+   "index": 32,
+   "job_id": "d4e891f5254ec23b9d304d173b433a202366f2e79ada3436b06f0e5c146a808c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 3.849,
+   "start": "2026-11-17T20:33:55.928696-06:00",
+   "end": "2026-11-17T20:33:59.777436-06:00",
+   "host_peak_bytes": 1186631680,
+   "file_name": "vectors.faiss",
+   "run": 5,
+   "size": 160843197,
+   "seconds": {
+    "download": 0.178434857,
+    "build": 2.947264842,
+    "upload": 0.338691266,
+    "projection": 0.298800823
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217817.0,
+    "gate_ms": 0.8037030000000001,
+    "layer1_build_ms": 245.140955,
+    "projection_ms": 52.823533
+   },
+   "device_samples": 62,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s0.3-fp16",
+   "index": 33,
+   "job_id": "7534e810a617a39c3e8c1a13151537fe25a865eb9d4806842738e01187325b4b",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.227,
+   "start": "2026-11-17T20:34:01.432473-06:00",
+   "end": "2026-11-17T20:34:05.659404-06:00",
+   "host_peak_bytes": 1263267840,
+   "file_name": "vectors.faiss",
+   "run": 5,
+   "size": 237643197,
+   "seconds": {
+    "download": 0.350805941,
+    "build": 2.981331796,
+    "upload": 0.421886268,
+    "projection": 0.294874901
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.0049,
+    "promoted": 18831.0,
+    "links_added": 217288.0,
+    "gate_ms": 0.7984519999999999,
+    "layer1_build_ms": 239.975246,
+    "projection_ms": 54.066836
+   },
+   "device_samples": 68,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 211812352
+  },
+  {
+   "input": "ip-300000x256-c200-s1.0",
+   "index": 34,
+   "job_id": "c62885468490b57257eb5c15830ca2f311f74a8a7988d899cdbc6e0fbbfb3ae9",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 5.249,
+   "start": "2026-11-17T20:34:07.560390-06:00",
+   "end": "2026-11-17T20:34:12.809884-06:00",
+   "host_peak_bytes": 1417617408,
+   "file_name": "vectors.faiss",
+   "run": 5,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.706781203,
+    "build": 3.215343767,
+    "upload": 0.706864581,
+    "projection": 0.377147706
+   },
+   "projection": {
+    "outcome": "projected",
+    "nodes": 300000.0,
+    "reachable": 0.005206666666666667,
+    "promoted": 18831.0,
+    "links_added": 277954.0,
+    "gate_ms": 0.828176,
+    "layer1_build_ms": 313.589831,
+    "projection_ms": 62.692792999999995
+   },
+   "device_samples": 84,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  },
+  {
+   "input": "ip-300000x256-c200-s2.0",
+   "index": 35,
+   "job_id": "fe93eccc1b81217f52ae33ee2d505141ddd43567ebc5d1e1c17d0e76b2c9b5d6",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.513,
+   "start": "2026-11-17T20:34:15.821042-06:00",
+   "end": "2026-11-17T20:34:20.333794-06:00",
+   "host_peak_bytes": 1417330688,
+   "file_name": "vectors.faiss",
+   "run": 5,
+   "size": 391243161,
+   "seconds": {
+    "download": 0.680800342,
+    "build": 3.006894461,
+    "upload": 0.764254456
+   },
+   "projection": {
+    "outcome": "skipped",
+    "nodes": 300000.0,
+    "reachable": 1.0,
+    "gate_ms": 47.361658
+   },
+   "device_samples": 72,
+   "device_held_bytes": 179306496,
+   "device_peak_bytes": 224395264
+  }
+ ],
+ "service_starts": [
+  "2026-11-17T20:30:17.174911-06:00"
+ ],
+ "ended": "2026-11-17T20:34:26.996186-06:00"
+}

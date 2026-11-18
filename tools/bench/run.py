@@ -15,9 +15,10 @@ memory. The phases, in order:
               (nvidia-smi sampled every 50 ms, the measure of
               tools/baseline/device_peaks.py over the request's window,
               from the POST to the status that shows the job ended), and
-              its per-step times from the service's DEBUG log; the first
-              run's file is fetched to
-              OUT_DIR/<input>/run-1.faiss for the recall
+              its per-step times and any upper-level projection it ran
+              from the service's DEBUG log; the files of the first
+              --fetch-runs runs (1 by default) are fetched to
+              OUT_DIR/<input>/run-N.faiss for the recall
   concurrent  per data type, ROUNDS rounds of CONCURRENT jobs sent at once
               as k-NN's data nodes send them (tools/burst/burst.py's model,
               k-NN's default timeout and poll interval), over the data
@@ -55,7 +56,11 @@ and compacted; see that the host has the room.
 Usage: python tools/bench/run.py OUT_DIR SERVICE [--inputs DIR ...]
            [--runs N] [--concurrent N] [--rounds N] [--queue N]
            [--sustain-seconds S] [--burst-jobs N] [--burst-timeout S]
-           [--burst-poll S] [--phases LIST] [--seed N] [NAME...]
+           [--burst-poll S] [--phases LIST] [--seed N] [--project]
+           [--fetch-runs N] [NAME...]
+
+--project asks every build for the upper-level projection
+(project_link_to_base_layer), for tools/bench/projection.py.
 
 SERVICE is knn-builder (the knn-builder:dev image) or upstream (the pinned
 api-snapshot image on one worker, since two builds at once crash it under
@@ -121,9 +126,24 @@ UPSTREAM_STEPS = {
     "write": re.compile(r"Index write time for vector path \S+: ([\d.]+) seconds"),
     "upload": re.compile(r"Total upload time for path \S+: ([\d.]+) seconds"),
 }
+# A job that projected links has its projection's time between the build's
+# and the upload's.
 KNN_BUILDER_STEPS = re.compile(
-    r"job stage times job_id=(\w+) download_s=([\d.eE+-]+) build_s=([\d.eE+-]+) upload_s=([\d.eE+-]+)"
+    r"job stage times job_id=(\w+) download_s=([\d.eE+-]+) build_s=([\d.eE+-]+)"
+    r"(?: projection_s=([\d.eE+-]+))? upload_s=([\d.eE+-]+)"
 )
+# The upper-level projection's lines in each service's log: whether it
+# ran, the share of the nodes reachable before it, its counts and times.
+UPSTREAM_PROJECTION = re.compile(
+    r"Upper-level projection(?: (skipped))?: ([\d.]+)% of \d+ nodes reachable(.*)"
+)
+UPSTREAM_NOTHING = re.compile(r"Upper-level projection: (\d+) promoted, nothing to do")
+UPSTREAM_FAILED = re.compile(r"Upper-level projection failed")
+KNN_BUILDER_PROJECTION = re.compile(
+    r"upper-level projection( skipped| stopped|: nothing to do| failed)?(?:[^\"]*?) vector_path=\"([^\"]+)\"(.*)"
+)
+KNN_BUILDER_COMPLETED = re.compile(r"job completed job_id=(\w+) vector_path=\"([^\"]+)\"")
+FIELD = re.compile(r"(\w+)=([\d.eE+-]+)(?=[\s),]|$)")
 
 
 def now():
@@ -340,7 +360,9 @@ def steps_from_log(log):
     """Each job's step seconds by job id, from either service's log."""
     steps = {}
     for m in KNN_BUILDER_STEPS.finditer(log):
-        steps[m[1]] = {"download": float(m[2]), "build": float(m[3]), "upload": float(m[4])}
+        steps[m[1]] = {"download": float(m[2]), "build": float(m[3]), "upload": float(m[5])}
+        if m[4] is not None:
+            steps[m[1]]["projection"] = float(m[4])
     block = None
     for line in log.splitlines():
         if UPSTREAM_START.search(line):
@@ -353,6 +375,53 @@ def steps_from_log(log):
                 if m := pattern.search(line):
                     block[step] = float(m[1])
     return steps
+
+
+def fields(text):
+    return {k: float(v) for k, v in FIELD.findall(text)}
+
+
+def projections_from_log(log):
+    """Each job's upper-level projection by job id, from either service's
+    log: its outcome (projected; skipped, the graph connected; nothing, too
+    few promoted; stopped; failed), the share of the nodes reachable before
+    it, and its counts and milliseconds. knn-builder logs a projection by
+    vector path ahead of the job's completion line, which names both: one
+    build at a time, as the single phase runs them, pairs them up."""
+    out = {}
+    pending = {}
+    block = None
+    for line in log.splitlines():
+        if m := KNN_BUILDER_PROJECTION.search(line):
+            outcome = {" skipped": "skipped", " stopped": "stopped", " failed": "failed",
+                       ": nothing to do": "nothing"}.get(m[1], "projected")
+            pending[m[2]] = {"outcome": outcome, **fields(m[3])}
+        elif m := KNN_BUILDER_COMPLETED.search(line):
+            if m[2] in pending:
+                out[m[1]] = pending.pop(m[2])
+        elif UPSTREAM_START.search(line):
+            block = None
+        elif m := UPSTREAM_PROJECTION.search(line):
+            block = {"outcome": "skipped" if m[1] else "projected",
+                     "reachable": float(m[2]) / 100, **fields(m[3])}
+        elif m := UPSTREAM_NOTHING.search(line):
+            block = {"outcome": "nothing", "promoted": float(m[1])}
+        elif UPSTREAM_FAILED.search(line):
+            block = {"outcome": "failed"}
+        elif (m := UPSTREAM_END.search(line)) and block is not None:
+            out[m[1]] = block
+            block = None
+    return out
+
+
+class ProjectingNode(burst.DataNode):
+    """A data node whose requests ask for the upper-level projection, as
+    k-NN sends a field's project_link_to_base_layer."""
+
+    def body(self, index, name):
+        body = super().body(index, name)
+        body["index_parameters"]["algorithm_parameters"] = {"project_link_to_base_layer": True}
+        return body
 
 
 class Bench:
@@ -374,9 +443,10 @@ class Bench:
                 sys.exit(f"{self.out} holds the input {name}: give a run directory")
         self.out.mkdir(parents=True, exist_ok=True)
         self.service = Service(image, max_workers, self.out, inputs)
-        # What a run before left here: its files, and the recall report.py
-        # cached of them.
-        (self.out / "recall.json").unlink(missing_ok=True)
+        # What a run before left here: its files, and what report.py and
+        # projection.py cached of them.
+        for cache in ("recall.json", "projection.json"):
+            (self.out / cache).unlink(missing_ok=True)
         for name in inputs:
             shutil.rmtree(self.out / name, ignore_errors=True)
         self.stop = threading.Event()
@@ -400,6 +470,8 @@ class Bench:
                 "knn_poll_seconds": KNN_POLL,
                 "seed": args.seed,
                 "gpu_sample_ms": GPU_SAMPLE_MS,
+                "project_link_to_base_layer": args.project,
+                "fetch_runs": args.fetch_runs,
             },
             "inputs": {
                 name: {
@@ -432,7 +504,8 @@ class Bench:
         return types
 
     def node(self, label, timeout=KNN_TIMEOUT, poll=KNN_POLL):
-        return burst.DataNode(
+        node_type = ProjectingNode if self.args.project else burst.DataNode
+        return node_type(
             self.service.url, self.inputs, BUCKET, f"{self.label}-{label}", timeout, poll,
             self.args.seed,
         )
@@ -512,8 +585,8 @@ class Bench:
             for i, name in enumerate(sorted(self.inputs)):
                 record = self.one_build(node, run_number * len(self.inputs) + i, name)
                 record["run"] = run_number
-                if run_number == 1 and record["task_status"] == "COMPLETED_INDEX_BUILD":
-                    path = self.out / name / "run-1.faiss"
+                if run_number <= self.args.fetch_runs and record["task_status"] == "COMPLETED_INDEX_BUILD":
+                    path = self.out / name / f"run-{run_number}.faiss"
                     record["size"] = self.service.fetch(f"{name}/{record['file_name']}", path)
                 self.discard(record)
                 records.append(record)
@@ -621,10 +694,14 @@ class Bench:
             print(f"burst {data_type}: {phase[data_type]['outcomes']}", flush=True)
 
     def attach_steps(self):
-        steps = steps_from_log(self.service.log.read_text(encoding="utf-8", errors="replace"))
+        log = self.service.log.read_text(encoding="utf-8", errors="replace")
+        steps = steps_from_log(log)
+        projections = projections_from_log(log)
         for record in self.record["warm_up"] + self.record.get("single", []):
             if "job_id" in record:
                 record["seconds"] = steps.get(record["job_id"])
+                if record["job_id"] in projections:
+                    record["projection"] = projections[record["job_id"]]
         for phase in ("concurrent", "sustained", "burst"):
             for group in self.record.get(phase, {}).values():
                 for record in group["records"]:
@@ -692,6 +769,8 @@ def main():
     parser.add_argument("--burst-poll", type=int, default=5)
     parser.add_argument("--phases", default=",".join(PHASES))
     parser.add_argument("--seed", type=int, default=1)
+    parser.add_argument("--project", action="store_true")
+    parser.add_argument("--fetch-runs", type=int, default=1)
     parser.add_argument("names", nargs="*")
     args = parser.parse_args()
     args.phases = [p for p in args.phases.split(",") if p]
@@ -702,7 +781,7 @@ def main():
                         (args.rounds, "--rounds"), (args.queue, "--queue"),
                         (args.sustain_seconds, "--sustain-seconds"),
                         (args.burst_jobs, "--burst-jobs"), (args.burst_timeout, "--burst-timeout"),
-                        (args.burst_poll, "--burst-poll")):
+                        (args.burst_poll, "--burst-poll"), (args.fetch_runs, "--fetch-runs")):
         if value <= 0:
             sys.exit(f"{what} takes a number above 0")
 

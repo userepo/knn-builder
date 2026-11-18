@@ -1,0 +1,1541 @@
+{
+ "seeds": 5,
+ "recalls": {
+  "recall@10": [
+   10,
+   null,
+   null
+  ],
+  "recall@100": [
+   100,
+   600,
+   32
+  ]
+ },
+ "runs": {
+  "knn-builder-off": {
+   "service": "knn-builder",
+   "image_id": "sha256:676cb184795ae4e4fd3af35c7716c426ccf47bf7826817ca929a88532b98892a",
+   "project_link_to_base_layer": false,
+   "label": "knn-builder without the projection",
+   "inputs": {
+    "ip-300000x256-c1000-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 998,
+      "min": 995,
+      "max": 1000,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.0030873333333333334,
+      "min": 0.0011833333333333333,
+      "max": 0.0059433333333333335,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.0332,
+      "min": 0.0332,
+      "max": 0.0332,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.0332,
+      "min": 0.0332,
+      "max": 0.0332,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 4.6392,
+      "min": 4.454,
+      "max": 4.79,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1311974195.2,
+      "min": 1298530304,
+      "max": 1353912320,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 214328934.4,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.14666400000000002,
+      "min": 0.14644000000000001,
+      "max": 0.14702,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.14959920000000002,
+      "min": 0.149596,
+      "max": 0.1496,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 4.5456,
+      "min": 4.426,
+      "max": 4.623,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1300932198.4,
+      "min": 1296400384,
+      "max": 1303724032,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 214328934.4,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-byte": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.146808,
+      "min": 0.14642,
+      "max": 0.14698,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.14959920000000002,
+      "min": 0.149596,
+      "max": 0.1496,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 3.5682,
+      "min": 3.395,
+      "max": 3.671,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1070808268.8,
+      "min": 1066520576,
+      "max": 1073876992,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 211812352,
+      "min": 211812352,
+      "max": 211812352,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-fp16": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.146296,
+      "min": 0.14606,
+      "max": 0.14684,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.1496,
+      "min": 0.1496,
+      "max": 0.1496,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 3.9234,
+      "min": 3.771,
+      "max": 4.202,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1147472281.6,
+      "min": 1143341056,
+      "max": 1150177280,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 211812352,
+      "min": 211812352,
+      "max": 211812352,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s1.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.144168,
+      "min": 0.14414,
+      "max": 0.1442,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.1442,
+      "min": 0.1442,
+      "max": 0.1442,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 4.5484,
+      "min": 4.419,
+      "max": 4.795,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1301417164.8,
+      "min": 1297797120,
+      "max": 1303724032,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 216845516.8,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s2.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.672996,
+      "min": 0.6671,
+      "max": 0.68282,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9700552,
+      "min": 0.968002,
+      "max": 0.972174,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 4.5498,
+      "min": 4.338,
+      "max": 4.686,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1301927526.4,
+      "min": 1298821120,
+      "max": 1303805952,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 211812352,
+      "min": 211812352,
+      "max": 211812352,
+      "n": 5
+     }
+    }
+   }
+  },
+  "knn-builder-on": {
+   "service": "knn-builder",
+   "image_id": "sha256:676cb184795ae4e4fd3af35c7716c426ccf47bf7826817ca929a88532b98892a",
+   "project_link_to_base_layer": true,
+   "label": "knn-builder with the projection",
+   "inputs": {
+    "ip-300000x256-c1000-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.93614,
+      "min": 0.9359,
+      "max": 0.9362,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.00104,
+      "min": 0.00104,
+      "max": 0.00104,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 293591.6,
+      "min": 293340.0,
+      "max": 293703.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.3786530882,
+      "min": 0.36805463800000005,
+      "max": 0.39687023099999996,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 5.0036,
+      "min": 4.845,
+      "max": 5.271,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1401432473.6,
+      "min": 1384001536,
+      "max": 1414160384,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 219362099.2,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.949164,
+      "min": 0.9474400000000001,
+      "max": 0.95074,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.998796,
+      "min": 0.9987900000000001,
+      "max": 0.9988,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0049,
+      "min": 0.0049,
+      "max": 0.0049,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 218075.8,
+      "min": 217525.0,
+      "max": 218412.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.295655783,
+      "min": 0.29479600699999997,
+      "max": 0.297600963,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 4.9982,
+      "min": 4.866,
+      "max": 5.151,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1404153856,
+      "min": 1389514752,
+      "max": 1413677056,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 214328934.4,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-byte": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.9508,
+      "min": 0.9474400000000001,
+      "max": 0.95334,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.998996,
+      "min": 0.99899,
+      "max": 0.999,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0049,
+      "min": 0.0049,
+      "max": 0.0049,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 217860.6,
+      "min": 217225.0,
+      "max": 218231.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.3031364558,
+      "min": 0.29836052,
+      "max": 0.311318575,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 3.8808000000000002,
+      "min": 3.823,
+      "max": 4.045,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1175157145.6,
+      "min": 1158647808,
+      "max": 1186631680,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 211812352,
+      "min": 211812352,
+      "max": 211812352,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-fp16": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.949572,
+      "min": 0.94728,
+      "max": 0.95152,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9987980000000001,
+      "min": 0.9987900000000001,
+      "max": 0.9988,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0049,
+      "min": 0.0049,
+      "max": 0.0049,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 217893.2,
+      "min": 217288.0,
+      "max": 218452.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.3008795502,
+      "min": 0.294840534,
+      "max": 0.313033014,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 4.2376000000000005,
+      "min": 4.005,
+      "max": 4.472,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1252689510.4,
+      "min": 1236017152,
+      "max": 1263267840,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 211812352,
+      "min": 211812352,
+      "max": 211812352,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s1.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.93806,
+      "min": 0.9372199999999999,
+      "max": 0.93894,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.005206666666666667,
+      "min": 0.005206666666666667,
+      "max": 0.005206666666666667,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 277926.2,
+      "min": 277765.0,
+      "max": 278114.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.373821643,
+      "min": 0.366105119,
+      "max": 0.37973569,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 4.9674,
+      "min": 4.872,
+      "max": 5.249,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1407004672,
+      "min": 1391476736,
+      "max": 1417617408,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 216845516.8,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s2.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "skipped": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.674428,
+      "min": 0.66126,
+      "max": 0.68184,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9696284,
+      "min": 0.96753,
+      "max": 0.971124,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": {
+      "mean": 0.0474911232,
+      "min": 0.046308695,
+      "max": 0.048893992,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 4.5912,
+      "min": 4.439,
+      "max": 5.061,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1407704268.8,
+      "min": 1393119232,
+      "max": 1417330688,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 219362099.2,
+      "min": 211812352,
+      "max": 224395264,
+      "n": 5
+     }
+    }
+   }
+  },
+  "upstream-off": {
+   "service": "upstream",
+   "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "project_link_to_base_layer": false,
+   "label": "upstream without the projection",
+   "inputs": {
+    "ip-300000x256-c1000-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 998,
+      "min": 995,
+      "max": 1000,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.0030873333333333334,
+      "min": 0.0011833333333333333,
+      "max": 0.0059433333333333335,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.0332,
+      "min": 0.0332,
+      "max": 0.0332,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.0332,
+      "min": 0.0332,
+      "max": 0.0332,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 5.1244,
+      "min": 5.056,
+      "max": 5.193,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2069147648,
+      "min": 2030239744,
+      "max": 2101940224,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 267177164.8,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.14671599999999999,
+      "min": 0.14644,
+      "max": 0.14712,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.1495996,
+      "min": 0.149598,
+      "max": 0.1496,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 5.2034,
+      "min": 5.072,
+      "max": 5.433,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2069846425.6,
+      "min": 2032316416,
+      "max": 2102460416,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 267177164.8,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-byte": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.146488,
+      "min": 0.14594000000000001,
+      "max": 0.1471,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.1496,
+      "min": 0.1496,
+      "max": 0.1496,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 3.6638,
+      "min": 3.477,
+      "max": 3.898,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1627285913.6,
+      "min": 1594281984,
+      "max": 1663909888,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 262144000,
+      "min": 262144000,
+      "max": 262144000,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-fp16": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.14652800000000002,
+      "min": 0.14624,
+      "max": 0.14672000000000002,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.14959920000000002,
+      "min": 0.149596,
+      "max": 0.1496,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 4.067,
+      "min": 3.839,
+      "max": 4.296,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1780853964.8,
+      "min": 1747931136,
+      "max": 1817337856,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 262144000,
+      "min": 262144000,
+      "max": 262144000,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s1.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 200,
+      "min": 200,
+      "max": 200,
+      "n": 5
+     },
+     "largest": {
+      "mean": 0.005366666666666666,
+      "min": 0.005366666666666666,
+      "max": 0.005366666666666666,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.144176,
+      "min": 0.14414,
+      "max": 0.1442,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.1442,
+      "min": 0.1442,
+      "max": 0.1442,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 5.0542,
+      "min": 4.876,
+      "max": 5.265,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2087999078.4,
+      "min": 2055208960,
+      "max": 2124517376,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 267177164.8,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s2.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "none": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.67734,
+      "min": 0.67122,
+      "max": 0.68288,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9693844,
+      "min": 0.967748,
+      "max": 0.971542,
+      "n": 5
+     },
+     "reachable_before": null,
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": null,
+     "wall_seconds": {
+      "mean": 5.0338,
+      "min": 4.945,
+      "max": 5.149,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2088116224,
+      "min": 2055467008,
+      "max": 2124599296,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 267177164.8,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    }
+   }
+  },
+  "upstream-on": {
+   "service": "upstream",
+   "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "project_link_to_base_layer": true,
+   "label": "upstream with the projection",
+   "inputs": {
+    "ip-300000x256-c1000-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.93494,
+      "min": 0.9328,
+      "max": 0.9382,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9998,
+      "min": 0.9994,
+      "max": 1.0,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.001,
+      "min": 0.001,
+      "max": 0.001,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 292610.4,
+      "min": 292463.0,
+      "max": 292803.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.2577,
+      "min": 0.23839999999999997,
+      "max": 0.2809,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 5.4562,
+      "min": 5.245,
+      "max": 5.596,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2106783334.4,
+      "min": 2040119296,
+      "max": 2140512256,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 264660582.4,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.948592,
+      "min": 0.94572,
+      "max": 0.9511000000000001,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.99896,
+      "min": 0.9988,
+      "max": 0.9992,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0049,
+      "min": 0.0049,
+      "max": 0.0049,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 216780.8,
+      "min": 215820.0,
+      "max": 217267.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.2142,
+      "min": 0.2036,
+      "max": 0.22229999999999997,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 5.4274000000000004,
+      "min": 5.259,
+      "max": 5.561,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2124059443.2,
+      "min": 2081251328,
+      "max": 2180743168,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 264660582.4,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-byte": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.95104,
+      "min": 0.94784,
+      "max": 0.95292,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9991599999999999,
+      "min": 0.999,
+      "max": 0.9994,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0049,
+      "min": 0.0049,
+      "max": 0.0049,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 216628.8,
+      "min": 216016.0,
+      "max": 217224.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.21544,
+      "min": 0.2024,
+      "max": 0.2312,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 4.0488,
+      "min": 3.886,
+      "max": 4.316,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1681440768,
+      "min": 1606402048,
+      "max": 1720004608,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 262144000,
+      "min": 262144000,
+      "max": 262144000,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s0.3-fp16": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.948832,
+      "min": 0.94598,
+      "max": 0.95056,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.998996,
+      "min": 0.9988,
+      "max": 0.99919,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0049,
+      "min": 0.0049,
+      "max": 0.0049,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 216732.8,
+      "min": 216482.0,
+      "max": 217034.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.20722000000000002,
+      "min": 0.2029,
+      "max": 0.21130000000000002,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 4.3712,
+      "min": 4.095,
+      "max": 4.692,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 1844676198.4,
+      "min": 1802907648,
+      "max": 1873854464,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 262144000,
+      "min": 262144000,
+      "max": 262144000,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s1.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "projected": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.933508,
+      "min": 0.93062,
+      "max": 0.93674,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 0.0052,
+      "min": 0.0052,
+      "max": 0.0052,
+      "n": 5
+     },
+     "promoted": {
+      "mean": 18831.0,
+      "min": 18831.0,
+      "max": 18831.0,
+      "n": 5
+     },
+     "links_added": {
+      "mean": 277426.8,
+      "min": 277009.0,
+      "max": 277822.0,
+      "n": 5
+     },
+     "projection_seconds": {
+      "mean": 0.24942,
+      "min": 0.22929999999999998,
+      "max": 0.2731,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 5.379,
+      "min": 5.161,
+      "max": 5.533,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2136005836.8,
+      "min": 2067001344,
+      "max": 2183168000,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 262144000,
+      "min": 262144000,
+      "max": 262144000,
+      "n": 5
+     }
+    },
+    "ip-300000x256-c200-s2.0": {
+     "builds": 5,
+     "completed": 5,
+     "outcomes": {
+      "skipped": 5
+     },
+     "strong": {
+      "mean": 1,
+      "min": 1,
+      "max": 1,
+      "n": 5
+     },
+     "largest": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "recall@10": {
+      "mean": 0.670984,
+      "min": 0.65728,
+      "max": 0.682,
+      "n": 5
+     },
+     "recall@100": {
+      "mean": 0.9693428,
+      "min": 0.968706,
+      "max": 0.970478,
+      "n": 5
+     },
+     "reachable_before": {
+      "mean": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "n": 5
+     },
+     "promoted": null,
+     "links_added": null,
+     "projection_seconds": {
+      "mean": 0.26012,
+      "min": 0.2253,
+      "max": 0.276,
+      "n": 5
+     },
+     "wall_seconds": {
+      "mean": 5.3292,
+      "min": 5.154,
+      "max": 5.575,
+      "n": 5
+     },
+     "host_peak_bytes": {
+      "mean": 2127381299.2,
+      "min": 2067439616,
+      "max": 2185355264,
+      "n": 5
+     },
+     "device_peak_bytes": {
+      "mean": 264660582.4,
+      "min": 262144000,
+      "max": 274726912,
+      "n": 5
+     }
+    }
+   }
+  }
+ }
+}
