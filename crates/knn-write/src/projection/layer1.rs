@@ -18,8 +18,13 @@
     reason = "node ids below the node count, rows within the neighbor table"
 )]
 
+use std::any::Any;
 use std::num::NonZeroUsize;
+use std::ops::Range;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::mpsc::{Receiver, Sender, channel};
+use std::sync::{Arc, RwLock};
+use std::thread::{Scope, ScopedJoinHandle};
 
 use super::{ProjectionError, Stop, kernels};
 use crate::Metric;
@@ -44,13 +49,17 @@ const BATCH_SHARE: usize = 16;
 /// large layer.
 const MAX_BATCH: usize = 128;
 
-/// The fewest searches a thread is started for; for fewer, starting it
-/// costs about what it saves.
+/// The fewest searches a thread is woken for; for fewer, waking it costs
+/// about what it saves.
 const SEARCHES_A_THREAD: usize = 4;
 
-/// The fewest rows taking links back a thread is started for: most take
+/// The fewest rows taking links back a thread is woken for: most take
 /// their link into a free slot, at next to no cost.
 const ROWS_A_THREAD: usize = 256;
+
+/// What a thread says when it finds the level's lock poisoned: a panic
+/// left the level half written, so the build cannot go on.
+const POISONED: &str = "the level's lock is poisoned: a thread panicked while changing it";
 
 /// How the level's nodes go in.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -66,10 +75,12 @@ pub enum Insertion {
     /// nodes of a batch do not see each other, as Faiss's own threads see
     /// only part of each other's work.
     Batched {
-        /// The most threads to search and link on. A batch searches on a
-        /// thread for every 4 of its nodes, so on 32 at most, and links
-        /// back on a thread for every 256 rows the links go into. Each
-        /// searching thread holds a byte for every node.
+        /// The most threads to search and link on, the calling one among
+        /// them; the others are started once and kept for every batch. A
+        /// batch searches on a thread for every 4 of its nodes, so on 32
+        /// at most, and links back on a thread for every 256 rows the
+        /// links go into, on no more than search. Each thread holds a
+        /// byte for every node.
         threads: NonZeroUsize,
     },
 }
@@ -374,7 +385,10 @@ impl Storage<'_> {
 
     /// Four scores at once (`distances_batch_4`).
     fn scores_4(&self, query: &[f32], ids: [u32; 4]) -> [f32; 4] {
-        let rows = ids.map(|id| self.row(id));
+        // Written out, as the kernels' four sums are: `map` is not always
+        // inlined here.
+        let [id0, id1, id2, id3] = ids;
+        let rows = [self.row(id0), self.row(id1), self.row(id2), self.row(id3)];
         match self.metric {
             Metric::InnerProduct => kernels::inner_product_batch_4(query, rows),
             Metric::L2 | Metric::Hamming => kernels::l2_batch_4(query, rows),
@@ -472,8 +486,9 @@ impl Build<'_> {
     /// node's own or a target's, never both (no row links to a batch node
     /// before its batch links), so the target rows can change in parallel
     /// too, each taking its links in batch order: the result is the same
-    /// whatever the thread count. `None` once `stop`, asked before each
-    /// batch, says to give up.
+    /// whatever the thread count. The threads are started once and kept
+    /// for every batch, which wakes those it has work for. `None` once
+    /// `stop`, asked before each batch, says to give up.
     fn batched<O: Order>(
         &self,
         neighbors: &mut [u32],
@@ -483,62 +498,67 @@ impl Build<'_> {
         threads: NonZeroUsize,
         stop: Stop<'_>,
     ) -> Option<()> {
-        // Each thread that searches has a table of its own; the links back
-        // need none.
-        let searchers = searchers(Insertion::Batched { threads });
-        let mut visited: Vec<Visited> = (0..searchers).map(|_| Visited::new(n)).collect();
-        let mut linkers = vec![(); threads.get()];
-        let mut inserted = 1;
-        let mut start = 0;
-        while start < rest.len() {
-            if stop() {
-                return None;
-            }
-            let size = batch_size(inserted).min(rest.len() - start);
-            let batch = &rest[start..start + size];
-            let graph: &[u32] = neighbors;
-            let targets = parallel(batch, &mut visited, SEARCHES_A_THREAD, |visited, &pt| {
-                self.targets::<O>(graph, visited, pt, entry)
-            });
-            // Each batch node's own row, empty until now.
-            for (&pt, targets) in batch.iter().zip(&targets) {
-                for &other in targets {
-                    self.add_link::<O>(&mut neighbors[self.row(pt)], pt, other);
+        // No batch is larger than the size the whole count gives, so none
+        // searches on more threads than that one would. Its links back
+        // could use more only at an m past 64 with hardly a link pruned,
+        // so they get the same threads and none of their own.
+        let most = batch_size(rest.len())
+            .div_ceil(SEARCHES_A_THREAD)
+            .min(searchers(Insertion::Batched { threads }));
+        let batches = Batches {
+            build: self,
+            neighbors: RwLock::new(neighbors),
+            rest,
+            entry,
+        };
+        let work = |step: &Step, visited: &mut Visited, next: &AtomicUsize| {
+            batches.share::<O>(step, visited, next)
+        };
+        std::thread::scope(|scope| {
+            // Each thread has a table of the nodes its search has seen, the
+            // calling one too.
+            let mut visited = Visited::new(n);
+            let mut crew = Crew::hire(scope, &work, (1..most).map(|_| Visited::new(n)));
+            let mut inserted = 1;
+            let mut start = 0;
+            while start < rest.len() {
+                if stop() {
+                    return None;
                 }
-            }
-            // The links back, by the row they go into, each row's in batch
-            // order, which the stable sort keeps.
-            let mut back: Vec<(u32, u32)> = batch
-                .iter()
-                .zip(&targets)
-                .flat_map(|(&pt, targets)| targets.iter().map(move |&other| (other, pt)))
-                .collect();
-            back.sort_by_key(|&(other, _)| other);
-            // chunk_by yields no empty group.
-            let groups: Vec<(u32, &[(u32, u32)])> = back
-                .chunk_by(|a, b| a.0 == b.0)
-                .map(|group| (group[0].0, group))
-                .collect();
-            let graph: &[u32] = neighbors;
-            let rows = parallel(
-                &groups,
-                &mut linkers,
-                ROWS_A_THREAD,
-                |(), &(other, group)| {
-                    let mut row = graph[self.row(other)].to_vec();
-                    for &(_, pt) in group {
-                        self.add_link::<O>(&mut row, other, pt);
+                let size = batch_size(inserted).min(rest.len() - start);
+                let places = start..start + size;
+                let batch = &rest[places.clone()];
+                let targets = crew.run(
+                    &Step::Search(places),
+                    size.div_ceil(SEARCHES_A_THREAD),
+                    &mut visited,
+                );
+                {
+                    // Each batch node's own row, empty until now.
+                    let mut neighbors = batches.neighbors.write().expect(POISONED);
+                    for (&pt, targets) in batch.iter().zip(&targets) {
+                        for &other in targets {
+                            self.add_link::<O>(&mut neighbors[self.row(pt)], pt, other);
+                        }
                     }
-                    (other, row)
-                },
-            );
-            for (other, row) in rows {
-                neighbors[self.row(other)].copy_from_slice(&row);
+                }
+                let back = Arc::new(Back::new(batch, &targets));
+                let rows = crew.run(
+                    &Step::Link(Arc::clone(&back)),
+                    back.rows.len().div_ceil(ROWS_A_THREAD),
+                    &mut visited,
+                );
+                {
+                    let mut neighbors = batches.neighbors.write().expect(POISONED);
+                    for ((other, _), row) in back.rows.iter().zip(&rows) {
+                        neighbors[self.row(*other)].copy_from_slice(row);
+                    }
+                }
+                inserted += size;
+                start += size;
             }
-            inserted += size;
-            start += size;
-        }
-        Some(())
+            Some(())
+        })
     }
 
     /// `search_neighbors_to_add`, its optimized form: neighbors' scores
@@ -689,61 +709,198 @@ fn batch_size(inserted: usize) -> usize {
     (inserted / BATCH_SHARE).clamp(1, MAX_BATCH)
 }
 
-/// `f` over `items`, on a thread for every `per_thread` of them, at most
-/// one for each of `workers`, which that thread keeps; on the calling
-/// thread when that comes to one. Each thread takes the next item none has
-/// taken, so a slow item holds up only its own thread. The results come
-/// back in `items`' order, whichever thread ran each.
-///
-/// # Panics
-///
-/// When `workers` is empty: no thread would have one to run with.
-fn parallel<T: Sync, R: Send, W: Send>(
-    items: &[T],
-    workers: &mut [W],
-    per_thread: usize,
-    f: impl Fn(&mut W, &T) -> R + Sync,
-) -> Vec<R> {
-    let threads = workers.len().min(items.len().div_ceil(per_thread.max(1)));
-    if threads <= 1 {
-        let worker = workers
-            .first_mut()
-            .expect("a batched build makes one worker at least");
-        return items.iter().map(|item| f(worker, item)).collect();
+/// What a batch asks of the threads it wakes.
+#[derive(Clone)]
+enum Step {
+    /// The targets of the nodes at these places of the insertion order
+    /// after the entry point.
+    Search(Range<usize>),
+    /// The rows a batch's links go back into, each with its links added.
+    Link(Arc<Back>),
+}
+
+/// A batch's links back, by the row they go into.
+struct Back {
+    /// Each link as the row it goes into and the batch node it adds,
+    /// sorted by row, a row's in batch order.
+    links: Vec<(u32, u32)>,
+    /// Each row that takes links, and where they lie in `links`.
+    rows: Vec<(u32, Range<usize>)>,
+}
+
+impl Back {
+    /// The links back of `batch`, each node of it linked to its `targets`.
+    fn new(batch: &[u32], targets: &[Vec<u32>]) -> Self {
+        let mut links: Vec<(u32, u32)> = batch
+            .iter()
+            .zip(targets)
+            .flat_map(|(&pt, targets)| targets.iter().map(move |&other| (other, pt)))
+            .collect();
+        // The stable sort keeps each row's links in batch order.
+        links.sort_by_key(|&(other, _)| other);
+        let mut rows = Vec::new();
+        let mut start = 0;
+        for group in links.chunk_by(|a, b| a.0 == b.0) {
+            // chunk_by yields no empty group.
+            if let Some(&(other, _)) = group.first() {
+                rows.push((other, start..start + group.len()));
+            }
+            start += group.len();
+        }
+        Self { links, rows }
     }
-    let next = AtomicUsize::new(0);
-    let mut done: Vec<(usize, R)> = std::thread::scope(|scope| {
-        let handles: Vec<_> = workers
-            .iter_mut()
-            .take(threads)
-            .map(|worker| {
-                let (f, next) = (&f, &next);
-                scope.spawn(move || {
-                    let mut done = Vec::new();
-                    loop {
-                        let i = next.fetch_add(1, Ordering::Relaxed);
-                        let Some(item) = items.get(i) else {
-                            return done;
-                        };
-                        done.push((i, f(worker, item)));
+}
+
+/// What the threads of a batched build share: the level as the batches so
+/// far left it, which a step's threads read and the calling thread changes
+/// between steps.
+struct Batches<'a> {
+    build: &'a Build<'a>,
+    neighbors: RwLock<&'a mut [u32]>,
+    /// The insertion order after the entry point.
+    rest: &'a [u32],
+    entry: u32,
+}
+
+impl Batches<'_> {
+    /// One thread's share of `step`: each item it took from `next`, with
+    /// the targets it found for the node or the row as its links leave it.
+    fn share<O: Order>(
+        &self,
+        step: &Step,
+        visited: &mut Visited,
+        next: &AtomicUsize,
+    ) -> Share<Vec<u32>> {
+        let neighbors = self.neighbors.read().expect(POISONED);
+        let neighbors: &[u32] = &neighbors;
+        let mut share = Share::new();
+        match step {
+            Step::Search(places) => {
+                let batch = &self.rest[places.clone()];
+                while let Some((i, &pt)) = take(batch, next) {
+                    let targets = self.build.targets::<O>(neighbors, visited, pt, self.entry);
+                    share.push((i, targets));
+                }
+            }
+            Step::Link(back) => {
+                while let Some((i, (other, links))) = take(&back.rows, next) {
+                    let mut row = neighbors[self.build.row(*other)].to_vec();
+                    for &(_, pt) in &back.links[links.clone()] {
+                        self.build.add_link::<O>(&mut row, *other, pt);
                     }
-                })
+                    share.push((i, row));
+                }
+            }
+        }
+        share
+    }
+}
+
+/// The next of `items` no thread has taken from `next`, with its place:
+/// each thread takes one at a time, so a slow item holds up only its own
+/// thread.
+fn take<'a, T>(items: &'a [T], next: &AtomicUsize) -> Option<(usize, &'a T)> {
+    let i = next.fetch_add(1, Ordering::Relaxed);
+    items.get(i).map(|item| (i, item))
+}
+
+/// One thread's part of a step: what it made of each item it took, with
+/// the item's place among the step's.
+type Share<R> = Vec<(usize, R)>;
+
+/// The threads kept for a build's steps besides the calling one, so that a
+/// step wakes the threads it would otherwise have to start. Each has a
+/// worker of its own (in a build, its table of the nodes seen) and takes
+/// its share of every step sent to it, as the calling thread takes its
+/// own, until the crew is dropped.
+struct Crew<'scope, S, R, F> {
+    /// A thread's share of a step, taken from the step's counter.
+    work: &'scope F,
+    hands: Vec<Hand<'scope, S, R>>,
+}
+
+/// One of a crew's threads: the steps go to it and its shares come back.
+struct Hand<'scope, S, R> {
+    steps: Sender<(S, Arc<AtomicUsize>)>,
+    shares: Receiver<Share<R>>,
+    thread: ScopedJoinHandle<'scope, ()>,
+}
+
+impl<'scope, S: Clone + Send + 'scope, R: Send + 'scope, F> Crew<'scope, S, R, F> {
+    /// Starts a thread for each of `workers`, which it keeps; `work` is a
+    /// thread's share of a step, taken from the step's counter.
+    fn hire<'env, W>(
+        scope: &'scope Scope<'scope, 'env>,
+        work: &'env F,
+        workers: impl IntoIterator<Item = W>,
+    ) -> Self
+    where
+        W: Send + 'scope,
+        F: Fn(&S, &mut W, &AtomicUsize) -> Share<R> + Sync,
+    {
+        let hands = workers
+            .into_iter()
+            .map(|mut worker| {
+                let (steps, asked) = channel::<(S, Arc<AtomicUsize>)>();
+                let (answers, shares) = channel();
+                let thread = scope.spawn(move || {
+                    for (step, next) in asked {
+                        // The calling thread waits for each share it asked
+                        // for, until it gives the build up.
+                        if answers.send(work(&step, &mut worker, &next)).is_err() {
+                            return;
+                        }
+                    }
+                });
+                Hand {
+                    steps,
+                    shares,
+                    thread,
+                }
             })
             .collect();
-        handles
-            .into_iter()
-            .flat_map(|handle| {
-                // A worker only computes; its panic is a bug, carried to
-                // the caller's thread as it would be without threads.
-                handle
-                    .join()
-                    .unwrap_or_else(|payload| std::panic::resume_unwind(payload))
-            })
-            .collect()
-    });
-    // Each index was taken once.
-    done.sort_unstable_by_key(|&(i, _)| i);
-    done.into_iter().map(|(_, result)| result).collect()
+        Self { work, hands }
+    }
+
+    /// `step` on up to `threads` threads, the calling one with `own` among
+    /// them and the rest the crew's first: every item's result, in the
+    /// items' order, whichever thread took it.
+    fn run<W>(&mut self, step: &S, threads: usize, own: &mut W) -> Vec<R>
+    where
+        F: Fn(&S, &mut W, &AtomicUsize) -> Share<R>,
+    {
+        let next = Arc::new(AtomicUsize::new(0));
+        let asked = threads.saturating_sub(1).min(self.hands.len());
+        for hand in self.hands.iter().take(asked) {
+            // A thread that is gone has panicked: seen below, where its
+            // share is missing.
+            let _gone = hand.steps.send((step.clone(), Arc::clone(&next)));
+        }
+        let mut done = (self.work)(step, own, &next);
+        for i in 0..asked {
+            let Some(hand) = self.hands.get(i) else {
+                break;
+            };
+            match hand.shares.recv() {
+                Ok(share) => done.extend(share),
+                Err(_) => carry_panic(self.hands.swap_remove(i).thread),
+            }
+        }
+        // Each item was taken once.
+        done.sort_unstable_by_key(|&(i, _)| i);
+        done.into_iter().map(|(_, result)| result).collect()
+    }
+}
+
+/// Ends the build as the panic of a crew's thread, which left without its
+/// share, would have ended it without threads: a thread only computes, so
+/// its panic is a bug, carried to the caller's thread.
+fn carry_panic(thread: ScopedJoinHandle<'_, ()>) -> ! {
+    let payload: Box<dyn Any + Send> = match thread.join() {
+        Err(payload) => payload,
+        Ok(()) => Box::new("a thread of the level's build left without its share"),
+    };
+    std::panic::resume_unwind(payload)
 }
 
 /// `max_size -= max_size * prune_headroom`: the row's size less the
@@ -762,12 +919,15 @@ fn pruned_size(row: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+    use std::num::NonZeroUsize;
     use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::{Arc, Mutex, RwLock};
     use std::time::{Duration, Instant};
 
     use super::{
-        Distance, Heap, Insertion, Node, Storage, Visited, build_layer1, closer, parallel,
-        pruned_size,
+        Back, Batches, Build, Crew, Distance, EMPTY, Heap, Insertion, Node, Share, Step, Storage,
+        Visited, build_layer1, closer, pruned_size, take,
     };
     use crate::Metric;
     use crate::projection::ProjectionError;
@@ -868,44 +1028,177 @@ mod tests {
         assert_eq!(storage.symmetric(0, 1), 3.0);
     }
 
-    #[test]
-    fn returns_what_the_threads_ran_in_order() {
-        let items: Vec<u32> = (0..1000).collect();
-        let squares: Vec<u32> = items.iter().map(|x| x * x).collect();
-        let mut runs = vec![0_usize; 7];
-        // Each worker's first item waits until all seven have one, so the
-        // seven threads take turns; after ten seconds it goes on, so too
-        // few threads fail below instead of hanging.
-        let started = AtomicUsize::new(0);
-        let got = parallel(&items, &mut runs, 3, |runs, &x| {
-            if *runs == 0 {
-                started.fetch_add(1, Ordering::SeqCst);
-                let deadline = Instant::now() + Duration::from_secs(10);
-                while started.load(Ordering::SeqCst) < 7 && Instant::now() < deadline {
-                    std::thread::yield_now();
-                }
+    /// A step for the crew's tests: the squares of `items`, each thread's
+    /// first of them waiting until `together` threads have one.
+    #[derive(Clone)]
+    struct Squares {
+        items: Arc<Vec<u32>>,
+        started: Arc<AtomicUsize>,
+        together: usize,
+    }
+
+    impl Squares {
+        fn of(items: &[u32], together: usize) -> Self {
+            Self {
+                items: Arc::new(items.to_vec()),
+                started: Arc::new(AtomicUsize::new(0)),
+                together,
             }
-            *runs += 1;
-            x * x
-        });
-        assert_eq!(got, squares);
-        assert_eq!(runs.iter().sum::<usize>(), 1000);
-        assert!(runs.iter().all(|&r| r > 0), "{runs:?}");
-        // Too few for a second thread: all on the first worker.
-        let mut runs = vec![0_usize; 7];
-        let got = parallel(&items[..4], &mut runs, 4, |runs, &x| {
-            *runs += 1;
-            x
-        });
-        assert_eq!(got, [0, 1, 2, 3]);
-        assert_eq!(runs, [4, 0, 0, 0, 0, 0, 0]);
+        }
     }
 
     #[test]
-    #[should_panic(expected = "one worker at least")]
-    fn refuses_to_run_without_a_worker() {
-        let mut none: [(); 0] = [];
-        parallel(&[1_u32], &mut none, 1, |(), &x| x);
+    fn shares_each_step_among_the_threads_it_keeps() {
+        let items: Vec<u32> = (0..1000).collect();
+        let squares: Vec<u32> = items.iter().map(|x| x * x).collect();
+        // What each worker took, the calling thread's first, and the
+        // threads that worked.
+        let runs: Vec<AtomicUsize> = (0..7).map(|_| AtomicUsize::new(0)).collect();
+        let threads = Mutex::new(HashSet::new());
+        let taken = || -> Vec<usize> { runs.iter().map(|r| r.load(Ordering::SeqCst)).collect() };
+        // A thread's first item waits until the step's threads all have
+        // one, so they take turns; after ten seconds it goes on, so too few
+        // threads fail below instead of hanging.
+        let work = |step: &Squares, worker: &mut usize, next: &AtomicUsize| {
+            threads.lock().unwrap().insert(std::thread::current().id());
+            let mut share = Share::new();
+            while let Some((i, &x)) = take(&step.items, next) {
+                if share.is_empty() {
+                    step.started.fetch_add(1, Ordering::SeqCst);
+                    let deadline = Instant::now() + Duration::from_secs(10);
+                    while step.started.load(Ordering::SeqCst) < step.together
+                        && Instant::now() < deadline
+                    {
+                        std::thread::yield_now();
+                    }
+                }
+                runs[*worker].fetch_add(1, Ordering::SeqCst);
+                share.push((i, x * x));
+            }
+            share
+        };
+        std::thread::scope(|scope| {
+            let mut crew = Crew::hire(scope, &work, 1..7_usize);
+            let mut own = 0;
+            // Two steps on all seven: the same seven threads both times,
+            // asked for exactly or for more than there are.
+            for asked in [7, 100] {
+                let got = crew.run(&Squares::of(&items, 7), asked, &mut own);
+                assert_eq!(got, squares);
+            }
+            assert_eq!(taken().iter().sum::<usize>(), 2000);
+            assert!(taken().iter().all(|&r| r > 1), "{:?}", taken());
+            assert_eq!(threads.lock().unwrap().len(), 7);
+            // On three: the calling thread and the crew's first two.
+            let before = taken();
+            let got = crew.run(&Squares::of(&items, 3), 3, &mut own);
+            assert_eq!(got, squares);
+            let took: Vec<usize> = taken().iter().zip(&before).map(|(a, b)| a - b).collect();
+            assert!(took[..3].iter().all(|&r| r > 0), "{took:?}");
+            assert_eq!(took[3..], [0; 4]);
+            // On one, or on none: the calling thread alone.
+            for asked in [1, 0] {
+                let before = taken();
+                let got = crew.run(&Squares::of(&items[..4], 1), asked, &mut own);
+                assert_eq!(got, [0, 1, 4, 9]);
+                let took: Vec<usize> = taken().iter().zip(&before).map(|(a, b)| a - b).collect();
+                assert_eq!(took, [4, 0, 0, 0, 0, 0, 0]);
+            }
+        });
+        // A crew of none leaves every step to the calling thread.
+        std::thread::scope(|scope| {
+            let mut crew = Crew::hire(scope, &work, std::iter::empty());
+            let got = crew.run(&Squares::of(&items, 1), 7, &mut 0);
+            assert_eq!(got, squares);
+        });
+        assert_eq!(threads.lock().unwrap().len(), 7);
+    }
+
+    #[test]
+    #[should_panic(expected = "the kept thread's own words")]
+    fn carries_a_kept_thread_s_panic_to_the_caller() {
+        let work = |(): &(), worker: &mut usize, _: &AtomicUsize| -> Share<u32> {
+            assert_eq!(*worker, 0, "the kept thread's own words");
+            Share::new()
+        };
+        std::thread::scope(|scope| {
+            let mut crew = Crew::hire(scope, &work, [1_usize]);
+            crew.run(&(), 2, &mut 0);
+        });
+    }
+
+    #[test]
+    fn takes_its_share_of_a_search_and_of_the_links_back() {
+        // Four nodes on a line, none linked yet: each of the last three
+        // finds the entry point alone.
+        let vectors = [0.0_f32, 1.0, 2.0, 3.0];
+        let build = Build {
+            storage: Storage {
+                vectors: &vectors,
+                dimension: 1,
+                metric: Metric::L2,
+            },
+            m: 2,
+            ef: 4,
+        };
+        let mut neighbors = [EMPTY; 8];
+        let batches = Batches {
+            build: &build,
+            neighbors: RwLock::new(&mut neighbors),
+            rest: &[1, 2, 3],
+            entry: 0,
+        };
+        let step = Step::Search(0..3);
+        let next = AtomicUsize::new(0);
+        let mut visited = Visited::new(4);
+        let targets = batches.share::<Distance>(&step, &mut visited, &next);
+        assert_eq!(targets, [(0, vec![0]), (1, vec![0]), (2, vec![0])]);
+        // Nothing is left of the step for a thread that comes after.
+        assert_eq!(batches.share::<Distance>(&step, &mut visited, &next), []);
+        // The three links back all go into the entry point's row, which
+        // holds two: it keeps the nearest.
+        let targets: Vec<Vec<u32>> = targets.into_iter().map(|(_, found)| found).collect();
+        let step = Step::Link(Arc::new(Back::new(batches.rest, &targets)));
+        let linked = batches.share::<Distance>(&step, &mut visited, &AtomicUsize::new(0));
+        assert_eq!(linked, [(0, vec![1, EMPTY])]);
+    }
+
+    /// `count` vectors of `dimension` values from 0 to 1, from a 64-bit LCG
+    /// (Knuth's MMIX constants).
+    fn uniform(count: usize, dimension: usize, seed: u64) -> Vec<f32> {
+        let mut state = seed;
+        (0..count * dimension)
+            .map(|_| {
+                state = state
+                    .wrapping_mul(6_364_136_223_846_793_005)
+                    .wrapping_add(1_442_695_040_888_963_407);
+                #[expect(clippy::cast_precision_loss, reason = "24 bits")]
+                let value = (state >> 40) as f32 / 16_777_216.0;
+                value
+            })
+            .collect()
+    }
+
+    #[test]
+    fn builds_one_level_on_more_threads_than_it_keeps() {
+        // A batch of 128 searches on 32 threads at most: given more, the
+        // build keeps 31 beside its own, and the level is the one a single
+        // thread builds. At m 6 a third of these rows end full, so many a
+        // link back prunes its row.
+        let (count, dimension, m) = (2_400, 4, 6);
+        let vectors = uniform(count, dimension, 7);
+        let on = |threads: usize| {
+            let insertion = Insertion::Batched {
+                threads: NonZeroUsize::new(threads).unwrap(),
+            };
+            build_layer1(&vectors, dimension, Metric::L2, m, 80, insertion).unwrap()
+        };
+        let one = on(1);
+        let full = one.chunks(m).filter(|row| !row.contains(&EMPTY)).count();
+        assert!(full > count / 4, "{full} full rows");
+        for threads in [33, 40, 64] {
+            assert_eq!(on(threads), one, "{threads} threads");
+        }
     }
 
     #[test]

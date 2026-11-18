@@ -49,13 +49,16 @@
 //! far apart and overlapping (`fixtures/grid/projection.json`, by
 //! `knn-write`'s `projection_cost` test): the gate's search over the graph,
 //! about n g; layer 1, about p ef sqrt(d) m^(1/3) for its p = n / m nodes;
-//! and its links, about n g again. The whole is within 0.53 to 2.9 times
-//! of each projection timed, overlapping clusters the slower and m 2 the
-//! one past 2.4. Layer 1 runs 5.5 to 5.7 times as fast on 8 threads as on
-//! one, about as a share of 5% done on one thread would; past 8 this
-//! CPU's slower cores gain little, and the model counts no more. It is
-//! counted in full whenever a job asks, though the gate leaves a graph
-//! that is already connected as built after its search alone.
+//! and its links, about n g again. The whole is within 0.57 to 2.4 times
+//! of each projection timed at m 4 or more, overlapping clusters the
+//! slower, and 5.2 times the one at m 2, where a level's rows hold a link
+//! or two and a search visits few nodes. Layer 1 runs 6.3 to 6.5 times as
+//! fast on 8 threads as on one, a little more than the share of 5% done
+//! on one thread that the model counts would give; on 16 and 32 threads,
+//! this CPU's slower cores among them, it runs 8.4 to 10.2 times as fast,
+//! which the model does not count. It is counted in full whenever a job
+//! asks, though the gate leaves a graph that is already connected as
+//! built after its search alone.
 
 use std::num::NonZeroUsize;
 

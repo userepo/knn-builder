@@ -2,7 +2,7 @@
 
 A remote vector index build service for [OpenSearch k-NN](https://github.com/opensearch-project/k-NN), written in Rust. It is meant as a drop-in replacement for [remote-vector-index-builder](https://github.com/opensearch-project/remote-vector-index-builder): the same HTTP API, the same index files, and the same cuVS CAGRA build on the GPU, with less host memory per build and a GPU that stays busy while vectors download and indexes upload.
 
-**Status:** released. `knn-gpu` builds the CAGRA graph on the GPU with the upstream service's parameters, and `knn-write` writes the index file the service writes, identical to it on every test file; `knn-store` downloads the vectors from S3 and streams the index file back up, with no temporary file; and the library half of `knn-builder` runs the three as a pipeline, the next job downloading while one builds and the last one uploading, within a budget of host memory. The `knn-builder` binary serves the HTTP API on port 1025, answering as the upstream service does, and runs from a container image as the upstream one does; an OpenSearch 3.9.0 node with k-NN's remote index build turned on builds its float, half_float, byte and binary segments through it. `project_link_to_base_layer: true`, an option of the upstream service's next, unreleased version that k-NN does not send yet, is taken as that version takes it: a float, half_float or byte graph whose clusters a search could not leave is linked through an HNSW layer over a sample of its vectors before it is written (`docs/params.md`).
+**Status:** released. `knn-gpu` builds the CAGRA graph on the GPU with the upstream service's parameters, and `knn-write` writes the index file the service writes, identical to it on every test file; `knn-store` downloads the vectors from S3 and streams the index file back up, with no temporary file; and the library half of `knn-builder` runs the three as a pipeline, the next job downloading while one builds and the last one uploading, within a budget of host memory. The `knn-builder` binary serves the HTTP API on port 1025, answering as the upstream service does, and runs from a container image as the upstream one does; an OpenSearch 3.9.0 node with k-NN's remote index build turned on builds its float, half_float, byte and binary segments through it. `project_link_to_base_layer: true`, an option of the upstream service's next, unreleased version that k-NN does not send yet, is taken as that version takes it: a float, half_float or byte graph whose clusters a search could not leave is linked through an HNSW layer over a sample of its vectors before it is written (`docs/params.md`), which on clustered inputs restores the recall as the upstream service's does (the projection, under Benchmarks).
 
 ## Building
 
@@ -145,6 +145,35 @@ python tools/bench/run.py target/bench/knn-builder knn-builder
 python tools/bench/run.py target/bench/upstream upstream
 python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/knn-builder target/bench/upstream
 ```
+
+### The projection
+
+`project_link_to_base_layer` is for vectors in clusters so far apart that the CAGRA build links none of them to another, so a search never leaves the clusters its entry points fall in ([issue 158](https://github.com/opensearch-project/remote-vector-index-builder/issues/158) of the upstream service). Both services built six such inputs without it and with it, five builds each: Gaussian mixtures of 300,000 unit vectors of dimension 256 under inner product, in 200 clusters at sigma 0.3 (as a float, a half_float and a byte field) and at sigma 1.0, in 1,000 clusters at sigma 0.3, and, as a control whose graph builds connected, in 200 overlapping clusters at sigma 2.0. They ran as the builds above on the same machine (driver 621.24), knn-builder at the commit after 32cb7b5, which keeps layer 1's threads from one batch to the next, and the upstream service as its `api-snapshot` image at digest `e8fecaef…` (commit ea7db9f). A cell holds the mean of the five builds without the projection, then with it:
+
+- **Components** counts the strongly connected components of the file's level 0: 1 where a search can get from any node to any other.
+- **Recall@10** and **Recall@100** are knn-inspect's over 1,000 held-out queries, each the mean over five seeds of its random entry points: at 10 with the file's own settings (`ef_search` 100, 32 entry points), as k-NN searches it by default, and at 100 with `ef_search` 600 from 32 entry points.
+- **Projection s** is the projection's time in the service's `DEBUG` log, in the builds that asked for it; **Latency** and **Host peak** are as above.
+
+| Input | Service | Components | Recall@10 | Recall@100 | Projection s | Latency s | Host peak GB |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `ip-300000x256-c200-s0.3` | knn-builder | 200 to 1 | 0.147 to 0.949 | 0.150 to 0.999 | 0.26 | 4.57 to 4.80 | 1.30 to 1.32 |
+| `ip-300000x256-c200-s0.3` | upstream | 200 to 1 | 0.147 to 0.949 | 0.150 to 0.999 | 0.21 | 5.20 to 5.43 | 2.07 to 2.12 |
+| `ip-300000x256-c200-s0.3-fp16` | knn-builder | 200 to 1 | 0.146 to 0.950 | 0.150 to 0.999 | 0.26 | 3.86 to 3.97 | 1.15 to 1.17 |
+| `ip-300000x256-c200-s0.3-fp16` | upstream | 200 to 1 | 0.147 to 0.949 | 0.150 to 0.999 | 0.21 | 4.07 to 4.37 | 1.78 to 1.84 |
+| `ip-300000x256-c200-s0.3-byte` | knn-builder | 200 to 1 | 0.147 to 0.949 | 0.150 to 0.999 | 0.27 | 3.62 to 3.76 | 1.07 to 1.05 |
+| `ip-300000x256-c200-s0.3-byte` | upstream | 200 to 1 | 0.146 to 0.951 | 0.150 to 0.999 | 0.22 | 3.66 to 4.05 | 1.63 to 1.68 |
+| `ip-300000x256-c200-s1.0` | knn-builder | 200 to 1 | 0.144 to 0.938 | 0.144 to 1.000 | 0.34 | 4.56 to 4.74 | 1.30 to 1.32 |
+| `ip-300000x256-c200-s1.0` | upstream | 200 to 1 | 0.144 to 0.934 | 0.144 to 1.000 | 0.25 | 5.05 to 5.38 | 2.09 to 2.14 |
+| `ip-300000x256-c1000-s0.3` | knn-builder | 998 to 1 | 0.033 to 0.936 | 0.033 to 1.000 | 0.34 | 4.62 to 4.90 | 1.30 to 1.31 |
+| `ip-300000x256-c1000-s0.3` | upstream | 998 to 1 | 0.033 to 0.935 | 0.033 to 1.000 | 0.26 | 5.12 to 5.46 | 2.07 to 2.11 |
+| `ip-300000x256-c200-s2.0` | knn-builder | 1 to 1 | 0.671 to 0.670 | 0.970 to 0.970 | 0.05 | 4.54 to 4.60 | 1.30 to 1.33 |
+| `ip-300000x256-c200-s2.0` | upstream | 1 to 1 | 0.677 to 0.671 | 0.969 to 0.969 | 0.26 | 5.03 to 5.33 | 2.09 to 2.13 |
+
+Without the projection both services' graphs fall apart into a component a cluster, and a search finds only the neighbors in the clusters it entered: a recall of 0.14 to 0.15 for 200 clusters and 0.03 for 1,000, at 10 and at 100 alike. With it every such graph is one component on both services, recalling 0.9985 or more at 100 and 0.93 to 0.95 at 10. Both leave the control as built, its graph being connected already: the option goes by what a search can reach, not by what it finds, and the control's recall stays where it was, 0.97 at 100 and 0.67 at 10, below the projected graphs'.
+
+knn-builder's projection is the upstream service's but for the order layer 1's nodes go in (`docs/params.md`). The two promote the same 18,831 nodes, and knn-builder adds 0.2 to 0.6% more links. Its mean recall@10 is within the range of the upstream service's five builds on four of the five split inputs and above it on the fifth, 200 clusters at sigma 1.0, where its builds recall 0.937 to 0.939 and the upstream's 0.931 to 0.937; at 100 the two are within 0.0003 on every split input, and 0.0008 apart on the control, which neither changes. Its projection takes 0.26 to 0.34 s against 0.21 to 0.26 s, layer 1 being 0.21 to 0.28 s of it against 0.13 to 0.18 s; on the control, where each only measures what a search reaches, it takes 0.05 s against 0.26 s. With the projection knn-builder's builds still end sooner (3.76 to 4.90 s against 4.05 to 5.46 s) and in less host memory (1.05 to 1.33 GB against 1.68 to 2.14 GB, within 0.03 GB of its builds without), and neither service's device peak changes (0.21 to 0.22 GB and 0.26 to 0.27 GB).
+
+The records are in `fixtures/ea7db9f/projection/`, with every build's figures and their ranges in its `summary.md`. `tools/README.md` gives the commands: `make_inputs.py clustered` writes the inputs, `run.py --project` asks for the projection, and `projection.py` scores the files.
 
 ## License
 

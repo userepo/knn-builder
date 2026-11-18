@@ -1,15 +1,7 @@
 {
  "seeds": 5,
  "files": {
-  "ip-300000x256-c200-s0.3/run-1.faiss": {
-   "nodes": 300000,
-   "strong": 200,
-   "largest": 0.005366666666666666,
-   "weak": 200,
-   "recall@10": 0.1466,
-   "recall@100": 0.1496
-  },
-  "ip-300000x256-c1000-s0.3/run-3.faiss": {
+  "ip-300000x256-c1000-s0.3/run-5.faiss": {
    "nodes": 300000,
    "strong": 995,
    "largest": 0.0059433333333333335,
@@ -17,15 +9,7 @@
    "recall@10": 0.0332,
    "recall@100": 0.0332
   },
-  "ip-300000x256-c1000-s0.3/run-1.faiss": {
-   "nodes": 300000,
-   "strong": 1000,
-   "largest": 0.0011833333333333333,
-   "weak": 1000,
-   "recall@10": 0.0332,
-   "recall@100": 0.0332
-  },
-  "ip-300000x256-c1000-s0.3/run-5.faiss": {
+  "ip-300000x256-c1000-s0.3/run-3.faiss": {
    "nodes": 300000,
    "strong": 995,
    "largest": 0.0059433333333333335,
@@ -41,15 +25,23 @@
    "recall@10": 0.0332,
    "recall@100": 0.0332
   },
-  "ip-300000x256-c200-s0.3/run-3.faiss": {
+  "ip-300000x256-c200-s0.3/run-1.faiss": {
    "nodes": 300000,
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14702,
+   "recall@10": 0.14644000000000001,
    "recall@100": 0.1496
   },
   "ip-300000x256-c1000-s0.3/run-4.faiss": {
+   "nodes": 300000,
+   "strong": 1000,
+   "largest": 0.0011833333333333333,
+   "weak": 1000,
+   "recall@10": 0.0332,
+   "recall@100": 0.0332
+  },
+  "ip-300000x256-c1000-s0.3/run-1.faiss": {
    "nodes": 300000,
    "strong": 1000,
    "largest": 0.0011833333333333333,
@@ -62,7 +54,15 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14644000000000001,
+   "recall@10": 0.147,
+   "recall@100": 0.1496
+  },
+  "ip-300000x256-c200-s0.3/run-3.faiss": {
+   "nodes": 300000,
+   "strong": 200,
+   "largest": 0.005366666666666666,
+   "weak": 200,
+   "recall@10": 0.14622,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s0.3/run-4.faiss": {
@@ -70,7 +70,7 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14656,
+   "recall@10": 0.14684,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s0.3/run-5.faiss": {
@@ -78,39 +78,15 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.1467,
-   "recall@100": 0.149596
-  },
-  "ip-300000x256-c200-s0.3-byte/run-1.faiss": {
-   "nodes": 300000,
-   "strong": 200,
-   "largest": 0.005366666666666666,
-   "weak": 200,
-   "recall@10": 0.14698,
-   "recall@100": 0.149596
+   "recall@10": 0.14654,
+   "recall@100": 0.1496
   },
   "ip-300000x256-c200-s0.3-byte/run-2.faiss": {
    "nodes": 300000,
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14698,
-   "recall@100": 0.1496
-  },
-  "ip-300000x256-c200-s0.3-byte/run-5.faiss": {
-   "nodes": 300000,
-   "strong": 200,
-   "largest": 0.005366666666666666,
-   "weak": 200,
-   "recall@10": 0.14642,
-   "recall@100": 0.1496
-  },
-  "ip-300000x256-c200-s0.3-byte/run-3.faiss": {
-   "nodes": 300000,
-   "strong": 200,
-   "largest": 0.005366666666666666,
-   "weak": 200,
-   "recall@10": 0.1467,
+   "recall@10": 0.14656,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s0.3-byte/run-4.faiss": {
@@ -118,7 +94,31 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14696,
+   "recall@10": 0.14646,
+   "recall@100": 0.1496
+  },
+  "ip-300000x256-c200-s0.3-byte/run-1.faiss": {
+   "nodes": 300000,
+   "strong": 200,
+   "largest": 0.005366666666666666,
+   "weak": 200,
+   "recall@10": 0.1466,
+   "recall@100": 0.1496
+  },
+  "ip-300000x256-c200-s0.3-byte/run-3.faiss": {
+   "nodes": 300000,
+   "strong": 200,
+   "largest": 0.005366666666666666,
+   "weak": 200,
+   "recall@10": 0.14652,
+   "recall@100": 0.1496
+  },
+  "ip-300000x256-c200-s0.3-byte/run-5.faiss": {
+   "nodes": 300000,
+   "strong": 200,
+   "largest": 0.005366666666666666,
+   "weak": 200,
+   "recall@10": 0.1469,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s0.3-fp16/run-1.faiss": {
@@ -126,7 +126,7 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.1464,
+   "recall@10": 0.1467,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s1.0/run-1.faiss": {
@@ -137,20 +137,12 @@
    "recall@10": 0.14414,
    "recall@100": 0.1442
   },
-  "ip-300000x256-c200-s0.3-fp16/run-3.faiss": {
-   "nodes": 300000,
-   "strong": 200,
-   "largest": 0.005366666666666666,
-   "weak": 200,
-   "recall@10": 0.14606,
-   "recall@100": 0.1496
-  },
   "ip-300000x256-c200-s0.3-fp16/run-2.faiss": {
    "nodes": 300000,
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14612,
+   "recall@10": 0.14648,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s1.0/run-3.faiss": {
@@ -158,10 +150,26 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14414,
+   "recall@10": 0.1442,
    "recall@100": 0.1442
   },
   "ip-300000x256-c200-s1.0/run-2.faiss": {
+   "nodes": 300000,
+   "strong": 200,
+   "largest": 0.005366666666666666,
+   "weak": 200,
+   "recall@10": 0.14418,
+   "recall@100": 0.1442
+  },
+  "ip-300000x256-c200-s0.3-fp16/run-3.faiss": {
+   "nodes": 300000,
+   "strong": 200,
+   "largest": 0.005366666666666666,
+   "weak": 200,
+   "recall@10": 0.14634,
+   "recall@100": 0.1496
+  },
+  "ip-300000x256-c200-s1.0/run-4.faiss": {
    "nodes": 300000,
    "strong": 200,
    "largest": 0.005366666666666666,
@@ -174,7 +182,7 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14606,
+   "recall@10": 0.14612,
    "recall@100": 0.1496
   },
   "ip-300000x256-c200-s0.3-fp16/run-5.faiss": {
@@ -182,64 +190,56 @@
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.14684,
+   "recall@10": 0.14668,
    "recall@100": 0.1496
-  },
-  "ip-300000x256-c200-s1.0/run-4.faiss": {
-   "nodes": 300000,
-   "strong": 200,
-   "largest": 0.005366666666666666,
-   "weak": 200,
-   "recall@10": 0.14418,
-   "recall@100": 0.1442
   },
   "ip-300000x256-c200-s1.0/run-5.faiss": {
    "nodes": 300000,
    "strong": 200,
    "largest": 0.005366666666666666,
    "weak": 200,
-   "recall@10": 0.1442,
+   "recall@10": 0.14412,
    "recall@100": 0.1442
-  },
-  "ip-300000x256-c200-s2.0/run-2.faiss": {
-   "nodes": 300000,
-   "strong": 1,
-   "largest": 1.0,
-   "weak": 1,
-   "recall@10": 0.6755800000000001,
-   "recall@100": 0.972174
   },
   "ip-300000x256-c200-s2.0/run-1.faiss": {
    "nodes": 300000,
    "strong": 1,
    "largest": 1.0,
    "weak": 1,
-   "recall@10": 0.6716,
-   "recall@100": 0.969956
+   "recall@10": 0.6668,
+   "recall@100": 0.967038
+  },
+  "ip-300000x256-c200-s2.0/run-2.faiss": {
+   "nodes": 300000,
+   "strong": 1,
+   "largest": 1.0,
+   "weak": 1,
+   "recall@10": 0.66324,
+   "recall@100": 0.970426
   },
   "ip-300000x256-c200-s2.0/run-3.faiss": {
    "nodes": 300000,
    "strong": 1,
    "largest": 1.0,
    "weak": 1,
-   "recall@10": 0.6671,
-   "recall@100": 0.97087
+   "recall@10": 0.674,
+   "recall@100": 0.968882
   },
   "ip-300000x256-c200-s2.0/run-4.faiss": {
    "nodes": 300000,
    "strong": 1,
    "largest": 1.0,
    "weak": 1,
-   "recall@10": 0.68282,
-   "recall@100": 0.968002
+   "recall@10": 0.67304,
+   "recall@100": 0.970808
   },
   "ip-300000x256-c200-s2.0/run-5.faiss": {
    "nodes": 300000,
    "strong": 1,
    "largest": 1.0,
    "weak": 1,
-   "recall@10": 0.66788,
-   "recall@100": 0.969274
+   "recall@10": 0.6769,
+   "recall@100": 0.970654
   }
  }
 }

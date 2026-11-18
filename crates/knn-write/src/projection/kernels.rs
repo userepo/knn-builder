@@ -84,12 +84,26 @@ pub(crate) fn inner_product(x: &[f32], y: &[f32]) -> f32 {
 
 /// Four squared L2 distances from `x` (`fvec_L2sqr_batch_4`).
 pub(crate) fn l2_batch_4(x: &[f32], ys: [&[f32]; 4]) -> [f32; 4] {
-    ys.map(|y| sum(x, y, Epilogue::Three, l2_term))
+    batch_4(x, ys, l2_term)
 }
 
 /// Four inner products with `x` (`fvec_inner_product_batch_4`).
 pub(crate) fn inner_product_batch_4(x: &[f32], ys: [&[f32]; 4]) -> [f32; 4] {
-    ys.map(|y| sum(x, y, Epilogue::Three, ip_term))
+    batch_4(x, ys, ip_term)
+}
+
+/// The four-at-a-time forms' sums, each written out: the level's searches
+/// spend most of their time here, and an array's `map` is not always
+/// inlined into them.
+#[inline]
+fn batch_4(x: &[f32], ys: [&[f32]; 4], term: impl Fn(f32, f32) -> f32 + Copy) -> [f32; 4] {
+    let [y0, y1, y2, y3] = ys;
+    [
+        sum(x, y0, Epilogue::Three, term),
+        sum(x, y1, Epilogue::Three, term),
+        sum(x, y2, Epilogue::Three, term),
+        sum(x, y3, Epilogue::Three, term),
+    ]
 }
 
 #[cfg(test)]
