@@ -3,8 +3,8 @@ the GPU, over the inputs tools/bench/datasets.py wrote (or make_inputs.py's),
 and records every measurement in OUT_DIR/run.json for report.py.
 
 The service runs from docker-compose.yml beside this file, with LocalStack
-for S3, and is driven from the host, where nvidia-smi samples the GPU's
-memory. The phases, in order:
+for S3 or, given --s3-bucket, a bucket on real S3, and is driven from the
+host, where nvidia-smi samples the GPU's memory. The phases, in order:
 
   single      a warm-up build of one input of each data type, then RUNS
               builds of every input one at a time: each job's latency (from
@@ -45,30 +45,49 @@ are replaced. A run that fails or is interrupted still takes the services
 down and writes run.json with the phases that finished and the error; a
 service that stops answering its heart beat ends the run the same way.
 
-LocalStack keeps the inputs and the files of the jobs in flight in
-Docker's disk. Each job's file is deleted once its job is seen completed
-(a run's 1,500 jobs would else leave hundreds of GB), so the bucket holds
-about 30 GB at most: the inputs and one concurrent round's files. Under
-Docker Desktop the disk image on the host still grows with every block
-first written, by hundreds of GB over a run, until the image is trimmed
-and compacted; see that the host has the room.
+Each job's file is deleted once its job is seen completed (a run's
+1,500 jobs would else leave hundreds of GB), so the bucket holds about
+30 GB at most: the inputs and one concurrent round's files. LocalStack
+keeps them in Docker's disk, which under Docker Desktop still grows on the
+host with every block first written, by hundreds of GB over a run, until
+the image is trimmed and compacted; see that the host has the room.
+
+With --s3-bucket BUCKET the inputs and the jobs' files are on real S3, in
+that bucket, which must exist and is best given to the benchmark alone:
+the inputs go in at <input>/vectors.knnvec and <input>/doc_ids.knndid,
+are left there for the next run (an input already there is not sent
+again, unless its blobs have changed since, by their SHA-256), and the
+jobs' files are deleted as above. Every container takes
+AWS_DEFAULT_REGION, which must be set, and AWS_ACCESS_KEY_ID,
+AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN from this environment, or,
+those unset, finds credentials by the SDKs' default chain (an instance
+role, if the instance metadata service answers containers);
+S3_ENDPOINT_URL, set, names an S3-compatible endpoint instead of AWS's.
+The host reads and deletes the jobs' files through the s3 service of
+docker-compose.yml, which signs with boto3, so it still needs no AWS
+library.
 
 Usage: python tools/bench/run.py OUT_DIR SERVICE [--inputs DIR ...]
            [--runs N] [--concurrent N] [--rounds N] [--queue N]
            [--sustain-seconds S] [--burst-jobs N] [--burst-timeout S]
            [--burst-poll S] [--phases LIST] [--seed N] [--project]
-           [--fetch-runs N] [NAME...]
+           [--fetch-runs N] [--s3-bucket BUCKET] [--max-workers N]
+           [NAME...]
 
 --project asks every build for the upper-level projection
 (project_link_to_base_layer), for tools/bench/projection.py.
 
 SERVICE is knn-builder (the knn-builder:dev image) or upstream (the pinned
 api-snapshot image on one worker, since two builds at once crash it under
-WSL2); SERVICE_IMAGE in the environment names another image. --inputs
+WSL2; --max-workers sets another count, such as its default 2 on native
+Linux); SERVICE_IMAGE in the environment names another image. --inputs
 (default target/bench/inputs) may repeat; NAMEs pick inputs under them.
+GPU_MEMORY_LIMIT (8) is the GPU's memory in GB as the services are told
+it, printed at the start beside the GPU's own; --s3-bucket needs it set.
 SERVICE_PORT (1026) and S3_PORT (4568) are the host ports the services
-answer on. Needs Docker with GPU access, nvidia-smi and Python 3 on the
-host, nothing else. Writes OUT_DIR/run.json, service.log and gpu.csv.
+answer on, on the loopback only. Needs Docker with GPU access, nvidia-smi
+and Python 3 on the host, nothing else. Writes OUT_DIR/run.json,
+service.log and gpu.csv.
 """
 
 import argparse
@@ -83,6 +102,8 @@ import sys
 import tempfile
 import threading
 import time
+import urllib.error
+import urllib.parse
 import urllib.request
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -96,7 +117,8 @@ import device_peaks  # noqa: E402
 UPSTREAM = "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc"
 # name: (image, MAX_WORKERS)
 SERVICES = {"knn-builder": ("knn-builder:dev", "2"), "upstream": (UPSTREAM, "1")}
-BUCKET = "bench"
+# LocalStack's bucket; a run on real S3 names its own.
+LOCAL_BUCKET = "bench"
 PHASES = ("single", "concurrent", "sustained", "burst")
 # k-NN's defaults: knn.remote_index_build.client.timeout and poll_interval.
 KNN_TIMEOUT = 3600
@@ -115,16 +137,27 @@ COMPOSE = ["docker", "compose", "-f", str(HERE / "docker-compose.yml")]
 DOCKER_TIMEOUT = 1800
 
 # The upstream service's log: a job's block runs from its start line to
-# its end line (one worker, so blocks never interleave), the step lines
-# between them its.
+# its end line, the step lines between them for its vector path its. On
+# more than one worker the blocks of different paths interleave; jobs of
+# one path in flight at once cannot be told apart, and none of them gets
+# step times, nor any job of the path that starts before the last of
+# them has ended.
 UPSTREAM_START = re.compile(r"Starting task execution for vector path: (\S+)")
 UPSTREAM_END = re.compile(r"Job (\w+) with vector path (\S+) completed with status")
+# A job whose record expired while it ran ends with this line instead.
+UPSTREAM_EXPIRED = re.compile(r"Job \w+ with vector path (\S+) was deleted during execution")
+# A build that raised, before its start line or after it: the line does
+# not say which, so how many jobs of its path are in flight is no longer
+# known, and the path gets no step times for the rest of the process.
+UPSTREAM_RAISED = re.compile(r"Build process failed for job \w+ with vector path (\S+?): ")
+# The process starting: whatever was in flight in the one before is gone.
+UPSTREAM_BOOT = re.compile(r"Started server process")
 UPSTREAM_STEPS = {
-    "download": re.compile(r"Vector download time for vector path \S+: ([\d.]+) seconds"),
-    "build": re.compile(r"Index build time for vector path \S+: ([\d.]+) seconds"),
-    "conversion": re.compile(r"Index conversion time for vector path \S+: ([\d.]+) seconds"),
-    "write": re.compile(r"Index write time for vector path \S+: ([\d.]+) seconds"),
-    "upload": re.compile(r"Total upload time for path \S+: ([\d.]+) seconds"),
+    "download": re.compile(r"Vector download time for vector path (\S+): ([\d.]+) seconds"),
+    "build": re.compile(r"Index build time for vector path (\S+): ([\d.]+) seconds"),
+    "conversion": re.compile(r"Index conversion time for vector path (\S+): ([\d.]+) seconds"),
+    "write": re.compile(r"Index write time for vector path (\S+): ([\d.]+) seconds"),
+    "upload": re.compile(r"Total upload time for path (\S+): ([\d.]+) seconds"),
 }
 # A job that projected links has its projection's time between the build's
 # and the upload's.
@@ -153,8 +186,9 @@ def now():
 def run(*args, env=None, capture=False, timeout=DOCKER_TIMEOUT):
     """A docker command: its output, when wanted, through a file rather
     than a pipe, so that the timeout's kill of the client ends the call
-    even while the compose plugin it spawned keeps the pipe open."""
-    merged = {**os.environ, **(env or {})}
+    even while the compose plugin it spawned keeps the pipe open. A None
+    in `env` unsets that variable."""
+    merged = {k: v for k, v in {**os.environ, **(env or {})}.items() if v is not None}
     args = list(map(str, args))
     if not capture:
         subprocess.run(args, env=merged, check=True, timeout=timeout)
@@ -167,18 +201,43 @@ def run(*args, env=None, capture=False, timeout=DOCKER_TIMEOUT):
 
 class Service:
     """The compose services: up with one set of client settings at a time,
-    their logs collected before each change, down at the end."""
+    their logs collected before each change, down at the end. `bucket` is
+    a bucket on real S3, or None for LocalStack's."""
 
-    def __init__(self, image, max_workers, out, inputs):
+    def __init__(self, image, max_workers, out, inputs, bucket):
+        self.bucket = bucket or LOCAL_BUCKET
         self.env = {
             "SERVICE_IMAGE": image,
             "MAX_WORKERS": max_workers,
+            "GPU_MEMORY_LIMIT": gpu_memory_limit(),
             "SERVICE_PORT": os.environ.get("SERVICE_PORT", "1026"),
             "S3_PORT": os.environ.get("S3_PORT", "4568"),
+            "BENCH_BUCKET": self.bucket,
             "INPUT_DIRS": ",".join(
                 str(d.resolve().relative_to(ROOT)).replace("\\", "/") for d in inputs.values()
             ),
         }
+        if bucket is None:
+            # LocalStack's endpoint inside the compose network and its test
+            # credentials, whatever this environment holds for real S3.
+            self.s3_service = "localstack"
+            self.env.update(
+                COMPOSE_PROFILES="localstack",
+                S3_ENDPOINT_URL="http://localstack:4566",
+                AWS_ACCESS_KEY_ID="test",
+                AWS_SECRET_ACCESS_KEY="test",
+                AWS_SESSION_TOKEN=None,
+                AWS_DEFAULT_REGION="us-east-1",
+                BENCH_CREATE_BUCKET="1",
+            )
+        else:
+            # The credentials, region and any endpoint are this
+            # environment's, passed through as they are.
+            self.s3_service = "s3"
+            self.env.update(COMPOSE_PROFILES="s3", BENCH_CREATE_BUCKET=None)
+        # `down` with both profiles, so a run takes down what a run before
+        # left, whichever S3 it had.
+        self.down_env = {**self.env, "COMPOSE_PROFILES": "localstack,s3"}
         self.url = f"http://localhost:{self.env['SERVICE_PORT']}"
         self.s3 = f"http://localhost:{self.env['S3_PORT']}"
         self.log = out / "service.log"
@@ -200,7 +259,7 @@ class Service:
             self.settings = None
             self.collect_log()
         else:
-            run(*COMPOSE, "down", "-v", env=self.env)
+            run(*COMPOSE, "down", "-v", env=self.down_env)
         env = {
             **self.env,
             "CLIENT_TIMEOUT_SECONDS": str(timeout),
@@ -208,7 +267,7 @@ class Service:
         }
         # No timeout: the first `up` pulls the images, 14 GB for the
         # upstream one.
-        run(*COMPOSE, "up", "-d", "localstack", "service", env=env, timeout=None)
+        run(*COMPOSE, "up", "-d", self.s3_service, "service", env=env, timeout=None)
         # Before the wait: what the process holds from its start shows
         # only until the GPU idles, which a slow wait for S3 can outlast.
         self.starts.append(now())
@@ -225,10 +284,13 @@ class Service:
 
     def wait(self):
         timeout, poll = self.settings
-        burst.DataNode(self.url, {}, BUCKET, "", timeout, poll).wait_for_heart_beat()
-        self.wait_for_s3()
+        burst.DataNode(self.url, {}, self.bucket, "", timeout, poll).wait_for_heart_beat()
+        if self.s3_service == "localstack":
+            self.wait_for_localstack()
+        else:
+            self.wait_for_bucket()
 
-    def wait_for_s3(self):
+    def wait_for_localstack(self):
         for _ in range(120):
             try:
                 with urllib.request.urlopen(f"{self.s3}/_localstack/health", timeout=5) as resp:
@@ -238,6 +300,26 @@ class Service:
                 pass
             time.sleep(1)
         raise SystemExit("LocalStack never reported S3 up")
+
+    def wait_for_bucket(self):
+        """Waits up to two minutes for the s3 service to reach the bucket;
+        ends the run at once where it will not (s3_proxy.py's 502: no
+        credentials, access denied, no such bucket)."""
+        reason = "the s3 service never answered"
+        deadline = time.monotonic() + 120
+        while time.monotonic() < deadline:
+            try:
+                # s3_proxy.py answers within its own shorter timeouts.
+                with urllib.request.urlopen(f"{self.s3}/_health", timeout=30):
+                    return
+            except urllib.error.HTTPError as e:
+                reason = e.read().decode(errors="replace").strip() or f"HTTP {e.code}"
+                if e.code == 502:
+                    break
+            except OSError as e:
+                reason = str(e)
+            time.sleep(1)
+        raise SystemExit(f"S3 bucket {self.bucket} not reachable: {reason}")
 
     def upload(self):
         run(*COMPOSE, "run", "--rm", "uploader", env=self.env)
@@ -262,12 +344,19 @@ class Service:
 
     def fetch(self, key, path):
         path.parent.mkdir(parents=True, exist_ok=True)
-        with urllib.request.urlopen(f"{self.s3}/{BUCKET}/{key}") as resp, path.open("wb") as f:
+        url = f"{self.s3}/{self.bucket}/{urllib.parse.quote(key)}"
+        with urllib.request.urlopen(url) as resp, path.open("wb") as f:
             shutil.copyfileobj(resp, f, length=8 << 20)
-        return path.stat().st_size
+            expected = resp.headers.get("Content-Length")
+        size = path.stat().st_size
+        # A transfer cut short ends without an error from urllib.
+        if expected is not None and size != int(expected):
+            raise OSError(f"fetched {size} of {expected} bytes of {key}")
+        return size
 
     def delete(self, key):
-        request = urllib.request.Request(f"{self.s3}/{BUCKET}/{key}", method="DELETE")
+        url = f"{self.s3}/{self.bucket}/{urllib.parse.quote(key)}"
+        request = urllib.request.Request(url, method="DELETE")
         with urllib.request.urlopen(request, timeout=60):
             pass
 
@@ -276,7 +365,7 @@ class Service:
             if self.settings is not None:
                 self.collect_log()
         finally:
-            run(*COMPOSE, "down", "-v", env=self.env)
+            run(*COMPOSE, "down", "-v", env=self.down_env)
 
 
 class Sampler:
@@ -316,6 +405,12 @@ class Sampler:
                 at = local.replace(fold=1).astimezone()
             out.append((at, used))
         return out
+
+
+def gpu_memory_limit():
+    """GPU_MEMORY_LIMIT as docker-compose.yml passes it: this
+    environment's, or 8."""
+    return os.environ.get("GPU_MEMORY_LIMIT") or "8"
 
 
 def gpu_info():
@@ -363,17 +458,40 @@ def steps_from_log(log):
         steps[m[1]] = {"download": float(m[2]), "build": float(m[3]), "upload": float(m[5])}
         if m[4] is not None:
             steps[m[1]]["projection"] = float(m[4])
-    block = None
+    # By vector path: the open block and the jobs of the path in flight.
+    # The block is None from the second job's start until every one has
+    # ended, so a job that starts as another of its path is still
+    # building never takes that one's lines.
+    blocks = {}
+
+    def close(path):
+        """One job of `path` ended: its block, when it ran alone."""
+        block, in_flight = blocks.pop(path, (None, 0))
+        if in_flight > 1:
+            blocks[path] = (None, in_flight - 1)
+            return None
+        return block
+
     for line in log.splitlines():
-        if UPSTREAM_START.search(line):
-            block = {}
-        elif (m := UPSTREAM_END.search(line)) and block is not None:
-            steps[m[1]] = block
-            block = None
-        elif block is not None:
+        if UPSTREAM_BOOT.search(line):
+            blocks.clear()
+        elif m := UPSTREAM_START.search(line):
+            block, in_flight = blocks.get(m[1], ({}, 0))
+            blocks[m[1]] = (block if in_flight == 0 else None, in_flight + 1)
+        elif m := UPSTREAM_END.search(line):
+            if (block := close(m[2])) is not None:
+                steps[m[1]] = block
+        elif m := UPSTREAM_EXPIRED.search(line):
+            close(m[1])
+        elif m := UPSTREAM_RAISED.search(line):
+            # An endless count: no start or end opens a block again.
+            blocks[m[1]] = (None, float("inf"))
+        else:
             for step, pattern in UPSTREAM_STEPS.items():
                 if m := pattern.search(line):
-                    block[step] = float(m[1])
+                    block = blocks.get(m[1], (None, 0))[0]
+                    if block is not None:
+                        block[step] = float(m[2])
     return steps
 
 
@@ -386,8 +504,9 @@ def projections_from_log(log):
     log: its outcome (projected; skipped, the graph connected; nothing, too
     few promoted; stopped; failed), the share of the nodes reachable before
     it, and its counts and milliseconds. knn-builder logs a projection by
-    vector path ahead of the job's completion line, which names both: one
-    build at a time, as the single phase runs them, pairs them up."""
+    vector path ahead of the job's completion line, which names both, and
+    the upstream service's projection lines name no path: one build at a
+    time, as the single phase runs them, pairs them up."""
     out = {}
     pending = {}
     block = None
@@ -432,17 +551,21 @@ class Bench:
         self.out = args.out_dir
         self.label = args.service
         image, max_workers = SERVICES.get(args.service, (None, "1"))
+        if args.max_workers is not None:
+            max_workers = str(args.max_workers)
         image = os.environ.get("SERVICE_IMAGE", image)
         if image is None:
             sys.exit(f"SERVICE is {', '.join(SERVICES)}, or set SERVICE_IMAGE; not {args.service}")
         gpu = gpu_info()
+        print(f"GPU_MEMORY_LIMIT {gpu_memory_limit()} GB for {gpu['name']}, "
+              f"which has {gpu['memory_mib'] * 2**20 / 1e9:.1f} GB", flush=True)
         # A run's directory never holds an input: OUT_DIR given as an
         # inputs directory would otherwise lose them below.
         for name in inputs:
             if (self.out / name / "input.json").exists():
                 sys.exit(f"{self.out} holds the input {name}: give a run directory")
         self.out.mkdir(parents=True, exist_ok=True)
-        self.service = Service(image, max_workers, self.out, inputs)
+        self.service = Service(image, max_workers, self.out, inputs, args.s3_bucket)
         # What a run before left here: its files, and what report.py and
         # projection.py cached of them.
         for cache in ("recall.json", "projection.json"):
@@ -472,6 +595,9 @@ class Bench:
                 "gpu_sample_ms": GPU_SAMPLE_MS,
                 "project_link_to_base_layer": args.project,
                 "fetch_runs": args.fetch_runs,
+                "gpu_memory_limit_gb": float(gpu_memory_limit()),
+                # Where the bucket was, not its name.
+                "s3": s3_setting(args.s3_bucket),
             },
             "inputs": {
                 name: {
@@ -506,8 +632,8 @@ class Bench:
     def node(self, label, timeout=KNN_TIMEOUT, poll=KNN_POLL):
         node_type = ProjectingNode if self.args.project else burst.DataNode
         return node_type(
-            self.service.url, self.inputs, BUCKET, f"{self.label}-{label}", timeout, poll,
-            self.args.seed,
+            self.service.url, self.inputs, self.service.bucket, f"{self.label}-{label}", timeout,
+            poll, self.args.seed,
         )
 
     def one_build(self, node, index, name):
@@ -754,6 +880,18 @@ class Bench:
         print(f"wrote {self.out / 'run.json'}", flush=True)
 
 
+def s3_setting(bucket):
+    """Where a run's bucket was, for run.json: LocalStack, or real S3 in
+    a region, at AWS's endpoint or another."""
+    if bucket is None:
+        return {"store": "localstack"}
+    return {
+        "store": "s3",
+        "region": os.environ["AWS_DEFAULT_REGION"],
+        "endpoint": "custom" if os.environ.get("S3_ENDPOINT_URL") else "aws",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("out_dir", type=pathlib.Path)
@@ -771,8 +909,26 @@ def main():
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--project", action="store_true")
     parser.add_argument("--fetch-runs", type=int, default=1)
+    parser.add_argument("--s3-bucket")
+    parser.add_argument("--max-workers", type=int)
     parser.add_argument("names", nargs="*")
     args = parser.parse_args()
+    if args.s3_bucket is not None:
+        if not args.s3_bucket:
+            sys.exit("--s3-bucket takes a bucket's name")
+        if not os.environ.get("AWS_DEFAULT_REGION"):
+            sys.exit("--s3-bucket needs AWS_DEFAULT_REGION, the bucket's region")
+        # Unset it means 8, which on a larger GPU would run the whole
+        # benchmark with the services told the wrong size.
+        if not os.environ.get("GPU_MEMORY_LIMIT"):
+            sys.exit("--s3-bucket needs GPU_MEMORY_LIMIT, the GPU's memory in GB")
+    if args.max_workers is not None and args.max_workers <= 0:
+        sys.exit("--max-workers takes a number above 0")
+    try:
+        if float(gpu_memory_limit()) <= 0:
+            raise ValueError
+    except ValueError:
+        sys.exit(f"GPU_MEMORY_LIMIT takes a number of GB above 0, not {gpu_memory_limit()}")
     args.phases = [p for p in args.phases.split(",") if p]
     for phase in args.phases:
         if phase not in PHASES:

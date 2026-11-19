@@ -32,6 +32,7 @@ tools/bench/run.py to drive the same way; they need the standard library
 only.
 """
 
+import hashlib
 import json
 import os
 import pathlib
@@ -52,25 +53,45 @@ JITTER = (0.8, 1.2)
 REQUEST_TIMEOUT = 60.0
 
 
-def put_inputs(endpoint, bucket, inputs):
-    """Uploads each input's two blobs to `bucket` unless they are there;
-    `inputs` maps each name to its directory."""
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        while chunk := f.read(8 << 20):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def put_inputs(endpoint, bucket, inputs, create=True):
+    """Uploads each input's two blobs to `bucket` unless the same blobs
+    are there; `inputs` maps each name to its directory. Each blob goes up
+    with its SHA-256 as metadata, and one there under the name with
+    another, or none, is replaced: a bucket that outlives a run would
+    otherwise serve an input's old vectors after the input changed. The
+    bucket is created first when `create` says so, as LocalStack's must
+    be; a bucket on real S3 is the user's and must exist."""
     import boto3  # noqa: PLC0415  (the upstream image's; the driver only)
     import botocore.exceptions  # noqa: PLC0415
 
     s3 = boto3.client("s3", endpoint_url=endpoint)
-    try:
-        s3.create_bucket(Bucket=bucket)
-    except botocore.exceptions.ClientError as e:
-        if e.response["Error"]["Code"] not in ("BucketAlreadyOwnedByYou", "BucketAlreadyExists"):
-            raise
+    if create:
+        try:
+            s3.create_bucket(Bucket=bucket)
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] not in ("BucketAlreadyOwnedByYou", "BucketAlreadyExists"):
+                raise
     for name, directory in inputs.items():
         for blob in ("vectors.knnvec", "doc_ids.knndid"):
             key = f"{name}/{blob}"
+            digest = sha256(directory / blob)
             try:
-                s3.head_object(Bucket=bucket, Key=key)
+                there = s3.head_object(Bucket=bucket, Key=key)["Metadata"].get("sha256")
             except botocore.exceptions.ClientError:
-                s3.upload_file(str(directory / blob), bucket, key)
+                there = None
+            if there != digest:
+                s3.upload_file(
+                    str(directory / blob), bucket, key,
+                    ExtraArgs={"Metadata": {"sha256": digest}},
+                )
                 print(f"put {key}", flush=True)
 
 

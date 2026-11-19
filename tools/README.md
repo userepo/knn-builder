@@ -299,6 +299,17 @@ python tools/bench/run.py target/bench/dry/upstream upstream $DRY
 python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/dry/knn-builder target/bench/dry/upstream
 ```
 
+### On real S3
+
+`--s3-bucket BUCKET` runs against a bucket on real S3 instead of LocalStack, as on a cloud GPU host with the upstream service on its default two workers (`--max-workers 2`). The bucket must exist, in the region `AWS_DEFAULT_REGION` names, and is best kept for the benchmark: the inputs go in at `<input>/vectors.knnvec` and `<input>/doc_ids.knndid` and stay for the next run (an input that has changed since, by its blobs' SHA-256, is sent again), and each job's file is deleted once the job is seen completed. Every container takes `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN` from the host's environment, or, with them unset, the SDKs' default chain, which on EC2 means the instance role if the instance metadata service answers containers (IMDSv2 needs a hop limit of 2 for that); `S3_ENDPOINT_URL`, set, names an S3-compatible endpoint. The host fetches and deletes the jobs' files through the `s3` service of `bench/docker-compose.yml` (`bench/s3_proxy.py`, boto3 in the upstream image), so it still needs only Python, and every port the services publish is on the host's loopback. `run.json` records the store and region (not the bucket's name), `GPU_MEMORY_LIMIT` and the worker count; `--s3-bucket` needs `GPU_MEMORY_LIMIT` set, to the GPU's memory in GB, since unset it is 8. On a host with a 24 GB GPU, for instance:
+
+```sh
+export AWS_DEFAULT_REGION=us-east-1 GPU_MEMORY_LIMIT=24
+python tools/bench/run.py target/bench/cloud/knn-builder knn-builder --s3-bucket my-bench-bucket
+python tools/bench/run.py target/bench/cloud/upstream upstream --s3-bucket my-bench-bucket --max-workers 2
+python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/cloud/knn-builder target/bench/cloud/upstream
+```
+
 ### The projection
 
 `--project` sends every build with `project_link_to_base_layer` true, and `--fetch-runs N` keeps the files of the first N single runs rather than the first alone. Each record of the single phase then carries the projection from the service's DEBUG log: whether it ran (or skipped a connected graph, or promoted too few), the share of the nodes reachable before it, the nodes it promoted, the links it added, and its milliseconds. `bench/projection.py` scores each kept file, its level-0 components (`components.py` in the oracle's image) and knn-inspect recall as the mean over five seeds of random entry points, recall@10 at the file's own search settings and recall@100 at ef_search 600 from 32 entry points, into `projection.json` beside `run.json`, and prints a table by input of the mean and range over the builds of each run; `--delete-files` removes each file once scored, `--summary` writes the table's figures as JSON. On the `clustered` set, with and without the projection on each service:

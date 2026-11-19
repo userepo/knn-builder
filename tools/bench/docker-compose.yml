@@ -1,30 +1,51 @@
 # One remote index build service on the GPU for the benchmark: knn-builder's
 # image, or the upstream service at the pinned commit (ea7db9f, as the
-# api-snapshot image of that digest), with LocalStack for S3 and an
-# uploader for the inputs. tools/bench/run.py drives it from the host,
-# where nvidia-smi samples the GPU; it starts the services with the
-# settings each phase needs and takes them down.
+# api-snapshot image of that digest), with S3 and an uploader for the
+# inputs. S3 is LocalStack (the localstack profile) or a bucket on real S3,
+# which the s3 service serves to the host as LocalStack would (the s3
+# profile). tools/bench/run.py drives it from the host, where nvidia-smi
+# samples the GPU; it starts the services with the settings each phase
+# needs and takes them down. Every port is published on the host's
+# loopback only: on a cloud host the s3 service would otherwise let anyone
+# read and delete the bucket's objects.
 name: knn-builder-bench
 
 x-aws: &aws
-  AWS_ACCESS_KEY_ID: test
-  AWS_SECRET_ACCESS_KEY: test
-  AWS_DEFAULT_REGION: us-east-1
+  # Set by run.py for LocalStack (its endpoint and test credentials), or
+  # taken from the host's environment for real S3. One unset there is
+  # unset here, so the AWS SDKs fall back to their default chain, such as
+  # an instance role.
+  S3_ENDPOINT_URL:
+  AWS_ACCESS_KEY_ID:
+  AWS_SECRET_ACCESS_KEY:
+  AWS_SESSION_TOKEN:
+  AWS_DEFAULT_REGION:
 
 services:
   localstack:
+    profiles: ["localstack"]
     # 4.14, the version upstream's e2e test uses.
     image: localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a
     environment:
       SERVICES: s3
+    ports:
+      - "127.0.0.1:${S3_PORT:-4568}:4566"
+
+  s3:
+    profiles: ["s3"]
+    image: opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
+    entrypoint: ["python", "/work/tools/bench/s3_proxy.py"]
+    environment:
+      BENCH_BUCKET: ${BENCH_BUCKET:-bench}
       <<: *aws
     ports:
-      - "${S3_PORT:-4568}:4566"
+      - "127.0.0.1:${S3_PORT:-4568}:4566"
+    volumes:
+      - ../..:/work:ro
 
   service:
     image: ${SERVICE_IMAGE:?set SERVICE_IMAGE}
     environment:
-      S3_ENDPOINT_URL: http://localstack:4566
       # The GPU's memory, not the default 24: what the upstream service
       # bounds its estimate by.
       GPU_MEMORY_LIMIT: ${GPU_MEMORY_LIMIT:-8}
@@ -37,7 +58,7 @@ services:
       LOG_LEVEL: DEBUG
       <<: *aws
     ports:
-      - "${SERVICE_PORT:-1026}:1025"
+      - "127.0.0.1:${SERVICE_PORT:-1026}:1025"
     deploy:
       resources:
         reservations:
@@ -46,16 +67,23 @@ services:
               count: all
               capabilities: [gpu]
     depends_on:
-      - localstack
+      localstack:
+        condition: service_started
+        required: false
 
   uploader:
     image: opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
     entrypoint: ["python", "/work/tools/bench/upload.py"]
     environment:
-      S3_ENDPOINT_URL: http://localstack:4566
       INPUT_DIRS: ${INPUT_DIRS:-}
+      BENCH_BUCKET: ${BENCH_BUCKET:-bench}
+      # 1 for LocalStack, which starts without the bucket; real S3's must
+      # exist already.
+      BENCH_CREATE_BUCKET: ${BENCH_CREATE_BUCKET:-}
       <<: *aws
     volumes:
-      - ../..:/work
+      - ../..:/work:ro
     depends_on:
-      - localstack
+      localstack:
+        condition: service_started
+        required: false
