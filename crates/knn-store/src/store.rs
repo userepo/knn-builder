@@ -343,7 +343,7 @@ pub(crate) fn loader() -> ConfigLoader {
     let https = aws_smithy_http_client::Builder::new()
         .tls_provider(tls::Provider::Rustls(CryptoMode::Ring))
         .build_https();
-    aws_config::defaults(BehaviorVersion::v2026_11_10())
+    aws_config::defaults(BehaviorVersion::v2026_11_17())
         .http_client(https)
         .retry_config(RetryConfig::standard().with_max_attempts(4))
         .timeout_config(

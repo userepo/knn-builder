@@ -30,7 +30,7 @@ Under WSL, the first build's CMake step can take minutes while CMake searches th
 Each release's image is on Docker Hub as `userepo/knn-builder:<version>`, the newest also as `latest`. It runs as the upstream user guide starts the upstream image, on a host with the NVIDIA container toolkit and a driver for CUDA 12.9:
 
 ```sh
-docker run --gpus all -p 80:1025 userepo/knn-builder:1.0.0
+docker run --gpus all -p 80:1025 userepo/knn-builder:1.1.0
 ```
 
 The `Dockerfile` builds the service with the `gpu` feature against the conda environment of `environment.yml`, then copies the binary and the CUDA and cuVS libraries it loads onto `nvidia/cuda:12.9.2-base-ubuntu24.04`, the latest patch release of the base the upstream image uses (12.9.0); it runs as its own user, on port 1025. The release workflow builds it from the tag; to build it yourself, with BuildKit, Docker's default builder:
