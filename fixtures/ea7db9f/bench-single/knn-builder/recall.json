@@ -1,0 +1,23 @@
+{
+ "recall": {
+  "seed": 1,
+  "k": 10
+ },
+ "inputs": {
+  "cohere-ip-1000000x768": 0.955,
+  "cohere-ip-1000000x768-byte": 0.95,
+  "cohere-l2-1000000x768": 0.964,
+  "cohere-l2-1000000x768-byte": 0.961,
+  "gist-ip-1000000x960": 0.961,
+  "gist-l2-1000000x960": 0.951,
+  "ms-marco-ip-1000000x384": 0.98,
+  "ms-marco-ip-1000000x384-byte": 0.981,
+  "ms-marco-l2-1000000x384": 0.964,
+  "ms-marco-l2-1000000x384-byte": 0.985,
+  "sift-ip-1000000x128": 0.991,
+  "sift-ip-1000000x128-byte": 0.672,
+  "sift-l2-1000000x128": 0.997,
+  "sift-l2-1000000x128-byte": 0.998
+ },
+ "knn_inspect": "knn-inspect 0.17.0"
+}

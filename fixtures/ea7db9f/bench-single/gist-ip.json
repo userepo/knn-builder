@@ -1,0 +1,245 @@
+{
+ "input": "gist-ip-1000000x960",
+ "builds": "tools/bench/run.py --phases single --fetch-runs 5, five builds by each service with every file kept",
+ "recall": {
+  "tool": "knn-inspect 0.17.0",
+  "queries": 100,
+  "k": 10,
+  "seed": 1,
+  "entry_points": 32,
+  "ef_search": "100, the file's; 400 for recall@10_ef_search_400",
+  "matches_histogram": "queries by how many of their 10 exact neighbors the search found, 0 to 10"
+ },
+ "services": {
+  "knn-builder": {
+   "image": "knn-builder:dev",
+   "image_id": "sha256:7cc91bafc9bf8f8904c09a367862e217dea435ae1d231f4b0b7cc2b2a857c2bb",
+   "commit": "3a4eb45",
+   "driver": "621.24",
+   "started": "2026-11-18T17:47:24.007878-06:00",
+   "ended": "2026-11-18T17:57:08.725554-06:00",
+   "files": [
+    {
+     "run": 1,
+     "recall@10": 0.99,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      8,
+      91
+     ],
+     "recall@10_ef_search_400": 0.997
+    },
+    {
+     "run": 2,
+     "recall@10": 0.984,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      4,
+      8,
+      88
+     ],
+     "recall@10_ef_search_400": 1.0
+    },
+    {
+     "run": 3,
+     "recall@10": 0.999,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      99
+     ],
+     "recall@10_ef_search_400": 1.0
+    },
+    {
+     "run": 4,
+     "recall@10": 0.973,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      25,
+      74
+     ],
+     "recall@10_ef_search_400": 0.998
+    },
+    {
+     "run": 5,
+     "recall@10": 0.991,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      9,
+      91
+     ],
+     "recall@10_ef_search_400": 1.0
+    }
+   ]
+  },
+  "upstream": {
+   "image": "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "commit": "ea7db9f",
+   "driver": "621.24",
+   "started": "2026-11-18T17:57:09.567606-06:00",
+   "ended": "2026-11-18T18:13:35.873620-06:00",
+   "files": [
+    {
+     "run": 1,
+     "recall@10": 0.997,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      3,
+      97
+     ],
+     "recall@10_ef_search_400": 1.0
+    },
+    {
+     "run": 2,
+     "recall@10": 0.991,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      4,
+      94
+     ],
+     "recall@10_ef_search_400": 1.0
+    },
+    {
+     "run": 3,
+     "recall@10": 0.995,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      3,
+      96
+     ],
+     "recall@10_ef_search_400": 0.999
+    },
+    {
+     "run": 4,
+     "recall@10": 0.961,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      37,
+      62
+     ],
+     "recall@10_ef_search_400": 0.989
+    },
+    {
+     "run": 5,
+     "recall@10": 0.96,
+     "matches_histogram": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5,
+      30,
+      65
+     ],
+     "recall@10_ef_search_400": 0.998
+    }
+   ]
+  }
+ },
+ "exact_neighbors": {
+  "method": "the 10 largest inner products of each query over the input's vectors, by brute force",
+  "slots": 1000,
+  "distinct_vectors": 54,
+  "queries_holding_each_of_the_10_most_common": [
+   96,
+   94,
+   93,
+   84,
+   64,
+   62,
+   58,
+   47,
+   38,
+   37
+  ],
+  "norms_of_those": [
+   7.21,
+   7.73,
+   7.03,
+   6.89,
+   7.8,
+   6.73,
+   6.72,
+   6.8,
+   6.96,
+   6.8
+  ],
+  "median_norm_of_every_1000th_vector": 2.53
+ }
+}

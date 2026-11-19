@@ -1,0 +1,75 @@
+{
+ "host": {
+  "cpu": "Intel Core i9-14900HX",
+  "memory_gb": 32,
+  "os": "Windows 11 Home 10.0.26300",
+  "gpu": "NVIDIA GeForce RTX 4070 Laptop GPU, 8188 MiB",
+  "driver": "621.24"
+ },
+ "docker": {
+  "engine": "Docker Desktop, engine 29.9.3, on WSL2 2.7.14.0, kernel 6.18.33.2-2",
+  "vm": "32 processors, 15 GB of memory",
+  "gpu": "NVIDIA container toolkit, --gpus all"
+ },
+ "services": {
+  "knn-builder": {
+   "image": "knn-builder:dev",
+   "image_id": "sha256:7cc91bafc9bf8f8904c09a367862e217dea435ae1d231f4b0b7cc2b2a857c2bb",
+   "commit": "3a4eb45",
+   "libcuvs": "26.08.01",
+   "cuda": "12.9",
+   "max_workers": "2, read and ignored: one build at a time on the GPU, the next job downloading and the last uploading meanwhile"
+  },
+  "upstream": {
+   "image": "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "commit": "ea7db9f",
+   "libcuvs": "26.08.01",
+   "faiss": "1.14.3",
+   "cuda": "12.9",
+   "python": "3.11.15",
+   "max_workers": 1,
+   "note": "one worker: two builds at once crash the service under WSL2"
+  },
+  "localstack": "localstack/localstack@sha256:3ebc37595918b8accb852f8048fef2aff047d465167edd655528065b07bc364a"
+ },
+ "settings": {
+  "gpu_memory_limit_gb": 8,
+  "phases": [
+   "single"
+  ],
+  "runs": 5
+ },
+ "inputs": [
+  "cohere-ip-1000000x768",
+  "cohere-ip-1000000x768-byte",
+  "cohere-l2-1000000x768",
+  "cohere-l2-1000000x768-byte",
+  "gist-ip-1000000x960",
+  "gist-l2-1000000x960",
+  "ms-marco-ip-1000000x384",
+  "ms-marco-ip-1000000x384-byte",
+  "ms-marco-l2-1000000x384",
+  "ms-marco-l2-1000000x384-byte",
+  "sift-ip-1000000x128",
+  "sift-ip-1000000x128-byte",
+  "sift-l2-1000000x128",
+  "sift-l2-1000000x128-byte"
+ ],
+ "runs": {
+  "knn-builder": {
+   "started": "2026-11-18T15:19:46.545870-06:00",
+   "ended": "2026-11-18T15:52:46.877508-06:00"
+  },
+  "upstream": {
+   "started": "2026-11-18T15:52:48.132717-06:00",
+   "ended": "2026-11-18T16:42:38.873626-06:00"
+  }
+ },
+ "recall": {
+  "tool": "knn-inspect 0.17.0",
+  "queries": 100,
+  "k": 10,
+  "seed": 1
+ }
+}
