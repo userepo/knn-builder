@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="knn-builder">
+  <title>knn-builder</title>
+  <!-- A chip from above, its pins on four sides, with a small nearest-neighbor graph on it. -->
+  <g fill="#8b98a9">
+    <rect x="160" y="40" width="32" height="64" rx="10"/>
+    <rect x="240" y="40" width="32" height="64" rx="10"/>
+    <rect x="320" y="40" width="32" height="64" rx="10"/>
+    <rect x="160" y="408" width="32" height="64" rx="10"/>
+    <rect x="240" y="408" width="32" height="64" rx="10"/>
+    <rect x="320" y="408" width="32" height="64" rx="10"/>
+    <rect x="40" y="160" width="64" height="32" rx="10"/>
+    <rect x="40" y="240" width="64" height="32" rx="10"/>
+    <rect x="40" y="320" width="64" height="32" rx="10"/>
+    <rect x="408" y="160" width="64" height="32" rx="10"/>
+    <rect x="408" y="240" width="64" height="32" rx="10"/>
+    <rect x="408" y="320" width="64" height="32" rx="10"/>
+  </g>
+  <rect x="88" y="88" width="336" height="336" rx="56" fill="#101826" stroke="#f5a524" stroke-width="16"/>
+  <g stroke="#e6edf3" stroke-width="12" stroke-linecap="round">
+    <line x1="252" y1="262" x2="176" y2="196"/>
+    <line x1="252" y1="262" x2="304" y2="170"/>
+    <line x1="252" y1="262" x2="346" y2="278"/>
+    <line x1="252" y1="262" x2="262" y2="350"/>
+    <line x1="252" y1="262" x2="170" y2="318"/>
+    <line x1="176" y1="196" x2="304" y2="170"/>
+    <line x1="346" y1="278" x2="262" y2="350"/>
+  </g>
+  <g fill="#f5a524">
+    <circle cx="176" cy="196" r="24"/>
+    <circle cx="304" cy="170" r="24"/>
+    <circle cx="346" cy="278" r="24"/>
+    <circle cx="262" cy="350" r="24"/>
+    <circle cx="170" cy="318" r="24"/>
+  </g>
+  <circle cx="252" cy="262" r="30" fill="#e6edf3"/>
+</svg>
