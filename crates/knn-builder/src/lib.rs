@@ -4,7 +4,8 @@
 //! clusters linked when it asks (`project_link_to_base_layer`), and its
 //! index file written straight into an upload, with no temporary file; a
 //! [`Pipeline`] overlaps those three stages across jobs, the projection
-//! running in the upload stage. [`request`]
+//! running in the upload stage, and the [`recall`] check beside the write
+//! when the service sets one. [`request`]
 //! reads a build request as the upstream service does, [`service`]
 //! holds the jobs and feeds them to a pipeline, and [`api`] answers HTTP
 //! requests with them, set up by [`config`].
@@ -20,6 +21,7 @@ mod job;
 mod load;
 mod pipeline;
 mod project;
+pub mod recall;
 pub mod request;
 pub mod service;
 mod write;
@@ -28,3 +30,4 @@ pub use builder::{BuildError, Builder, FakeBuilder, Vectors};
 pub use error::JobError;
 pub use job::{DataType, GraphParams, Job, SpaceType};
 pub use pipeline::{Built, Canceler, Flights, InFlight, JobHandle, Pipeline, Span, Stage, Timings};
+pub use recall::{Checked, RecallCheck};

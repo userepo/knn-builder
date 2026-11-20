@@ -23,8 +23,8 @@ use common::{S3, ids, le_ids};
 use knn_builder::cost::{Fitted, Stages};
 use knn_builder::forecast::Forecaster;
 use knn_builder::{
-    Builder, Built, DataType, FakeBuilder, GraphParams, Job, JobError, Pipeline, SpaceType, Span,
-    Stage,
+    Builder, Built, DataType, FakeBuilder, GraphParams, Job, JobError, JobHandle, Pipeline,
+    RecallCheck, SpaceType, Span, Stage,
 };
 use knn_gpu::fp16;
 use knn_write::projection::{
@@ -87,6 +87,7 @@ fn job(bucket: &str, name: &str, doc_count: u32, dimension: u32) -> Job {
         ef_search: 100,
         skip_stored_vectors: false,
         project_link_to_base_layer: false,
+        recall_check: RecallCheck::default(),
     }
 }
 
@@ -538,6 +539,7 @@ async fn ends_the_jobs_when_the_forecast_says() {
             build: seconds(t.build),
             projection: t.projection.map_or(0.0, seconds),
             upload: seconds(t.upload),
+            check: 0.0,
         }
     };
     let forecaster = Forecaster::new(took, BUDGET);
@@ -622,6 +624,107 @@ async fn holds_three_jobs_at_most() {
             k + 3
         );
     }
+    s3.remove().await;
+}
+
+/// With a recall check, a job reports the recall of its graph, and below
+/// the least set fails with nothing stored. A job that leaves its vectors
+/// out of the file keeps them for the check, and a job without one
+/// reports none.
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn checks_the_recall_before_storing() {
+    let s3 = S3::new("recall").await;
+    let check = RecallCheck {
+        queries: 50,
+        ..RecallCheck::default()
+    };
+    let checked = |name: &str| Job {
+        recall_check: check,
+        ..job(&s3.bucket, name, 600, 16)
+    };
+    let reported = checked("reported");
+    let skipped = Job {
+        skip_stored_vectors: true,
+        ..checked("skipped")
+    };
+    let binary = Job {
+        data_type: DataType::Binary,
+        space_type: SpaceType::Hamming,
+        dimension: 64,
+        ..checked("binary")
+    };
+    let failed = Job {
+        recall_check: RecallCheck {
+            min_recall: Some(1.0),
+            ..check
+        },
+        ..checked("failed")
+    };
+    let unchecked = job(&s3.bucket, "unchecked", 600, 16);
+    let cases = [
+        (&reported, Blob::F32),
+        (&skipped, Blob::F32),
+        (&binary, Blob::Bits),
+        (&failed, Blob::F32),
+        (&unchecked, Blob::F32),
+    ];
+    for &(job, blob) in &cases {
+        s3.put_inputs(job, &values(job), blob, None).await;
+    }
+    // Runs of 10 vectors no search leaves, where a vector's 10 nearest
+    // neighbors lie in two runs at the edges: a recall below 1.
+    let pipeline = s3.pipeline(FakeBuilder::clustered(Duration::ZERO, 60));
+    let handles: Vec<_> = cases
+        .iter()
+        .map(|&(job, _)| pipeline.submit(job.clone()))
+        .collect();
+    let mut outcomes = handles.into_iter().map(JobHandle::outcome);
+    let mut next = async || outcomes.next().unwrap().await;
+
+    let found = |built: &Built| built.recall.unwrap();
+    let reported = next().await.unwrap();
+    let recall = found(&reported);
+    assert!((0.0..1.0).contains(&recall.recall), "{recall:?}");
+    // The check ran within the upload, and so did the upload's wait for
+    // it.
+    let (ran, upload) = (reported.timings.check.unwrap(), reported.timings.upload);
+    assert!(upload.start <= ran.start && ran.end <= upload.end);
+    assert!(reported.timings.check_wait <= upload.duration());
+    assert_eq!((recall.queries, recall.k), (50, 10));
+    // The same vectors and graph, though the file leaves them out.
+    assert_eq!(found(&next().await.unwrap()).recall, recall.recall);
+    let bits = found(&next().await.unwrap());
+    assert!((0.0..=1.0).contains(&bits.recall), "{bits:?}");
+    let error = next().await.unwrap_err();
+    assert_eq!(
+        error,
+        JobError::LowRecall {
+            recall: recall.recall,
+            min: 1.0,
+            queries: 50,
+            k: 10,
+        }
+    );
+    let unchecked = next().await.unwrap();
+    assert_eq!(unchecked.recall, None);
+    assert_eq!(
+        (unchecked.timings.check, unchecked.timings.check_wait),
+        (None, Duration::ZERO)
+    );
+    pipeline.close().await;
+
+    for &(job, blob) in &cases {
+        let stored = s3.get(&job.index_key()).await;
+        if job.vector_path == failed.vector_path {
+            assert!(stored.is_none(), "a failed check stores nothing");
+        } else {
+            let graph = FakeBuilder::clustered_graph(600, degree(job), 60);
+            let expected = expected_with(job, &values(job), blob, &graph);
+            assert!(stored.unwrap() == expected, "{} differs", job.vector_path);
+        }
+    }
+    assert_eq!(s3.pending_uploads().await, 0);
     s3.remove().await;
 }
 

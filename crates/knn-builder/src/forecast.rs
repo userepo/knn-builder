@@ -9,7 +9,9 @@
 //! How long each stage takes comes from a [`StageModel`], corrected by what
 //! completed jobs took: a ratio of observed to modeled time per stage, and
 //! one per build configuration besides, since the kernels cuVS picks for a
-//! configuration can make it much slower than its size alone says.
+//! configuration can make it much slower than its size alone says. The
+//! projection and the recall check, in the upload stage, have ratios of
+//! their own: they run on the processors, where the upload waits on S3.
 
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
@@ -64,6 +66,7 @@ pub struct Forecaster<M> {
     build: Ratio,
     projection: Ratio,
     upload: Ratio,
+    check: Ratio,
     /// Build ratios by configuration, where one is known.
     builds: HashMap<Configuration, Ratio>,
 }
@@ -140,6 +143,7 @@ impl<M: StageModel> Forecaster<M> {
             build: Ratio::default(),
             projection: Ratio::default(),
             upload: Ratio::default(),
+            check: Ratio::default(),
             builds: HashMap::new(),
         }
     }
@@ -151,8 +155,13 @@ impl<M: StageModel> Forecaster<M> {
         let seconds = |span: crate::Span| span.duration().as_secs_f64();
         self.download
             .learn(0.0, seconds(timings.download), modeled.download);
-        self.upload
-            .learn(0.0, seconds(timings.upload), modeled.upload);
+        // The upload's own time: what a written index waited for its
+        // recall check is the check's, learned apart.
+        let upload = seconds(timings.upload) - timings.check_wait.as_secs_f64();
+        self.upload.learn(0.0, upload, modeled.upload);
+        if let Some(check) = timings.check {
+            self.check.learn(0.0, seconds(check), modeled.check);
+        }
         // Only a projection that built layer 1: one the gate stopped took
         // its search alone.
         if let Some(projection) = timings.projection {
@@ -184,6 +193,7 @@ impl<M: StageModel> Forecaster<M> {
             build: modeled.build * build.factor(),
             projection: modeled.projection * self.projection.factor(),
             upload: modeled.upload * self.upload.factor(),
+            check: modeled.check * self.check.factor(),
         }
     }
 
@@ -220,6 +230,17 @@ fn remaining(modeled: f64, elapsed: f64) -> f64 {
     } else {
         elapsed * OVERRUN
     }
+}
+
+/// The time left in a canceled upload stage `elapsed` into it: none while
+/// its projection runs, which stops at once and so starts no check, nor
+/// for a job without a check; a recall check under way runs to its end,
+/// since nothing stops it partway.
+fn canceled_upload(stages: &Stages, elapsed: f64) -> f64 {
+    if stages.check <= 0.0 || elapsed < stages.projection {
+        return 0.0;
+    }
+    remaining(stages.projection + stages.check, elapsed)
 }
 
 /// When each stage, its slot and the budget are next free, in seconds from
@@ -289,11 +310,12 @@ impl Lanes {
             Stage::Graphed | Stage::Uploading => 0.0,
         };
         self.build = self.build.max(built);
-        // Uploaded by, after the projection when it asks: a canceled upload
-        // stops at once, and so does its projection.
-        let upload = stages.projection + stages.upload;
+        // Uploaded by, after the projection when it asks and with the
+        // recall check when it has one: a canceled upload stops at once,
+        // and so does its projection, but a check under way runs on.
+        let upload = stages.upload_stage();
         let uploaded = match stage {
-            Stage::Uploading if canceled => 0.0,
+            Stage::Uploading if canceled => canceled_upload(&stages, elapsed),
             Stage::Uploading => remaining(upload, elapsed),
             _ => {
                 let start = built.max(self.upload);
@@ -338,10 +360,11 @@ mod tests {
     use super::{Forecaster, StageModel, Stages};
     use crate::job::tests::job;
     use crate::pipeline::Budget;
-    use crate::{InFlight, Job, Span, Stage, Timings};
+    use crate::{InFlight, Job, RecallCheck, Span, Stage, Timings};
 
     /// One second to download, two to build, one to upload, whatever the
-    /// job.
+    /// job; half a second to project, and three for a recall check, when
+    /// it has them.
     fn fixed(job: &Job) -> Stages {
         Stages {
             download: 1.0,
@@ -352,6 +375,7 @@ mod tests {
                 0.0
             },
             upload: 1.0,
+            check: if job.recall_check.is_on() { 3.0 } else { 0.0 },
         }
     }
 
@@ -466,7 +490,9 @@ mod tests {
             download: span(0.0, download),
             build: span(download, download + build),
             projection: None,
+            check: None,
             upload: span(download + build, download + build + upload),
+            check_wait: Duration::ZERO,
         }
     }
 
@@ -496,6 +522,98 @@ mod tests {
         let partway = [at(now, asks, Stage::Uploading, 1.0, false)];
         let forecast = Forecaster::new(fixed, u64::MAX).forecast(now, &partway, None);
         assert_eq!(seconds(&forecast.ends), [0.5]);
+    }
+
+    /// A job with a recall check.
+    fn checked() -> Job {
+        Job {
+            recall_check: RecallCheck {
+                queries: 100,
+                ..RecallCheck::default()
+            },
+            ..job("bucket", 1_000, 64)
+        }
+    }
+
+    #[test]
+    fn uploads_once_the_recall_check_ends() {
+        let now = Instant::now();
+        let jobs = [
+            at(now, checked(), Stage::Queued, 0.0, false),
+            at(now, job("bucket", 1_000, 64), Stage::Queued, 0.0, false),
+        ];
+        let forecast = Forecaster::new(fixed, u64::MAX).forecast(now, &jobs, None);
+        // Its upload stage takes the check's three seconds, not the write's
+        // one; the next job's upload waits for it.
+        assert_eq!(seconds(&forecast.ends), [6.0, 7.0]);
+        // A check no longer than the write adds nothing.
+        let quick = |job: &Job| Stages {
+            check: 0.5,
+            ..fixed(job)
+        };
+        let jobs = [at(now, checked(), Stage::Queued, 0.0, false)];
+        let forecast = Forecaster::new(quick, u64::MAX).forecast(now, &jobs, None);
+        assert_eq!(seconds(&forecast.ends), [4.0]);
+    }
+
+    #[test]
+    fn waits_for_a_canceled_jobs_check_under_way() {
+        let now = Instant::now();
+        let mut asks = checked();
+        asks.project_link_to_base_layer = true;
+        let jobs = [
+            // A second into its three-second check: two left.
+            at(now, checked(), Stage::Uploading, 1.0, true),
+            // Its projection stops at once, and no check starts.
+            at(now, asks.clone(), Stage::Uploading, 0.25, true),
+            // Into the check, the projection's half second behind it.
+            at(now, asks, Stage::Uploading, 1.5, true),
+            // No check: the upload stops at once.
+            at(now, job("bucket", 1_000, 64), Stage::Uploading, 1.0, true),
+        ];
+        let forecast = Forecaster::new(fixed, u64::MAX).forecast(now, &jobs, None);
+        assert_eq!(seconds(&forecast.ends), [2.0, 0.0, 2.0, 0.0]);
+    }
+
+    #[test]
+    fn learns_the_recall_check_apart_from_the_upload() {
+        let mut forecaster = Forecaster::new(fixed, u64::MAX);
+        let check = |took: &Timings, seconds: u64| {
+            Some(Span {
+                start: took.upload.start,
+                end: took.upload.start + Duration::from_secs(seconds),
+            })
+        };
+        // A check of six seconds, twice its model, which the written index
+        // waited five of: the upload's own second is as modeled.
+        let mut took = timings(1.0, 2.0, 6.0);
+        took.check = check(&took, 6);
+        took.check_wait = Duration::from_secs(5);
+        forecaster.learn(&checked(), &took);
+        let stages = forecaster.stages(&checked());
+        assert!(
+            (stages.check - 3.0 * 2f64.sqrt()).abs() < 1e-9,
+            "{stages:?}"
+        );
+        assert!((stages.upload - 1.0).abs() < 1e-9, "{stages:?}");
+        // An upload of four seconds, four times its model, beside a check
+        // that ended first, in the three modeled: each moves by its own.
+        let mut took = timings(1.0, 2.0, 4.0);
+        took.check = check(&took, 3);
+        forecaster.learn(&checked(), &took);
+        let stages = forecaster.stages(&checked());
+        assert!(
+            (stages.check - 3.0 * 2f64.powf(1.0 / 3.0)).abs() < 1e-9,
+            "{stages:?}"
+        );
+        assert!(
+            (stages.upload - 4f64.powf(1.0 / 3.0)).abs() < 1e-9,
+            "{stages:?}"
+        );
+        // A job without a check teaches the check nothing.
+        forecaster.learn(&job("bucket", 1_000, 64), &timings(1.0, 2.0, 1.0));
+        let unmoved = forecaster.stages(&checked()).check;
+        assert!((unmoved - stages.check).abs() < 1e-9, "{unmoved}");
     }
 
     #[test]

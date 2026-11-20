@@ -61,6 +61,17 @@ impl Vectors {
         }
     }
 
+    /// Takes the values, leaving none of the same type, as
+    /// [`Vectors::release_values`] does.
+    pub(crate) fn take_values(&mut self) -> Self {
+        match self {
+            Self::F32(v) => Self::F32(std::mem::take(v)),
+            Self::F16(v) => Self::F16(std::mem::take(v)),
+            Self::I8(v) => Self::I8(std::mem::take(v)),
+            Self::Bits(v) => Self::Bits(std::mem::take(v)),
+        }
+    }
+
     /// The vectors as `knn-write` takes them.
     #[must_use]
     pub fn as_write(&self) -> knn_write::Vectors<'_> {

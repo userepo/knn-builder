@@ -90,6 +90,8 @@ async fn main() -> ExitCode {
         version = env!("CARGO_PKG_VERSION"),
         port = PORT,
         basic_auth = config.auth.is_some(),
+        recall_check_queries = config.service.recall_check.queries,
+        recall_check_min = config.service.recall_check.min_recall,
         "listening"
     );
     let app = api::app(Arc::clone(&service), config.auth);

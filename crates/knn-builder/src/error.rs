@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 /// Why a job failed: the message the status response carries.
-#[derive(Debug, Error, Clone, PartialEq, Eq)]
+#[derive(Debug, Error, Clone, PartialEq)]
 #[non_exhaustive]
 pub enum JobError {
     /// A blob could not be read, or holds another size than the request
@@ -68,6 +68,22 @@ pub enum JobError {
     /// Storing the index failed. Nothing was stored.
     #[error("uploading the index: {0}")]
     Upload(knn_store::Error),
+    /// The recall check found the graph's recall below the least the
+    /// service takes (`RECALL_CHECK_MIN`). Nothing was stored: the data
+    /// node builds the segment itself.
+    #[error(
+        "the recall check failed: recall@{k} over {queries} sampled vectors is {recall:.4}, below the least of {min}"
+    )]
+    LowRecall {
+        /// The recall found.
+        recall: f64,
+        /// The least taken.
+        min: f64,
+        /// Queries sampled.
+        queries: usize,
+        /// Neighbors each asked for.
+        k: usize,
+    },
     /// The job was canceled. Nothing was stored.
     #[error("the job was canceled")]
     Canceled,
@@ -97,7 +113,8 @@ pub enum JobError {
     /// pipeline carries on with the next.
     #[error("the {stage} stage panicked")]
     Panicked {
-        /// `download`, `build` or `upload`.
+        /// `download`, `build` or `upload`, the recall check's work
+        /// counting as the upload's.
         stage: &'static str,
     },
 }

@@ -59,6 +59,16 @@
 //! which the model does not count. It is counted in full whenever a job
 //! asks, though the gate leaves a graph that is already connected as
 //! built after its search alone.
+//!
+//! And the recall check, on the CPU beside the write, timed with
+//! knn-inspect's search on the same machine's 32 threads over 1M vectors
+//! of knn-builder's files (cohere-768 and gist-960 as float, cohere-768 as
+//! byte and as binary): its exact neighbors, a pass over every vector for
+//! each query, about q n d for q queries, at 4.6e-11 to 4.7e-11 s a float
+//! value, 3.3e-11 s a byte one and 3.3e-12 s a bit; and its searches,
+//! about 1.3 ms a query at efSearch 100. A `half_float` value, decoded by
+//! table, is counted as a float one, unmeasured. On 4 threads the exact
+//! neighbors take 2.5 to 3.9 times as long, which the model does not count.
 
 use std::num::NonZeroUsize;
 
@@ -99,8 +109,8 @@ impl Default for Fitted {
     }
 }
 
-/// Each stage's seconds, and the projection's apart from the upload's it
-/// comes before.
+/// Each stage's seconds, and the projection's and the recall check's apart
+/// from the upload's they come before and beside.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Stages {
     /// Reading the blobs' sizes and downloading them.
@@ -112,6 +122,18 @@ pub struct Stages {
     pub projection: f64,
     /// Writing and uploading the index.
     pub upload: f64,
+    /// The recall check, beside the write, in the upload stage: 0 for a
+    /// job without one. The stage takes the longer of the two.
+    pub check: f64,
+}
+
+impl Stages {
+    /// The upload stage's seconds: the projection, then the longer of the
+    /// write and the recall check.
+    #[must_use]
+    pub fn upload_stage(&self) -> f64 {
+        self.projection + self.upload.max(self.check)
+    }
 }
 
 /// A job's sizes, as the models take them.
@@ -242,7 +264,28 @@ impl Fitted {
             upload: 2.081_239_079_181_345e-9 * n * d * x.file_s
                 + 6.751_823_325_351_644e-9 * n * g
                 + 4.825_297_812_211_012e-8 * n,
+            check: Self::check_seconds(job),
         }
+    }
+
+    /// The seconds `job`'s recall check takes on the 32 threads it was
+    /// timed on: its exact neighbors and its searches. 0 for a job without
+    /// one.
+    #[must_use]
+    pub fn check_seconds(job: &Job) -> f64 {
+        let check = job.recall_check;
+        if !check.is_on() {
+            return 0.0;
+        }
+        let x = Shape::of(job);
+        let q = f64::from(check.queries_for(job.doc_count));
+        // A value's time, a binary dimension counting bits.
+        let value = match job.data_type {
+            DataType::Float | DataType::HalfFloat => 4.7e-11,
+            DataType::Byte => 3.3e-11,
+            DataType::Binary => 3.3e-12,
+        };
+        value * q * x.n * x.d + 1.3e-3 * q
     }
 
     /// The seconds `job`'s projection takes on [`Fitted::projection_threads`]
@@ -399,7 +442,42 @@ pub const DEVICE_MARGIN: f64 = 0.06;
 
 #[cfg(test)]
 mod tests {
-    use super::{FUSED_TOP_K, candidates};
+    use super::{FUSED_TOP_K, Fitted, candidates};
+    use crate::job::tests::job;
+    use crate::{DataType, RecallCheck};
+
+    #[test]
+    fn times_the_recall_check_as_measured() {
+        let mut cohere = job("bucket", 1_000_000, 768);
+        assert!(Fitted::check_seconds(&cohere).abs() < f64::EPSILON, "off");
+        cohere.recall_check = RecallCheck {
+            queries: 100,
+            ..RecallCheck::default()
+        };
+        // Measured: 3.6 s for the exact neighbors of 100 queries, 0.13 s
+        // for their searches; 2.5 s and 0.25 s as byte and binary vectors.
+        let within = |job: &crate::Job, measured: f64| {
+            let modeled = Fitted::check_seconds(job);
+            assert!(
+                (modeled / measured - 1.0).abs() < 0.05,
+                "{:?}: {modeled} for {measured}",
+                job.data_type
+            );
+        };
+        within(&cohere, 3.6 + 0.13);
+        let stages = Fitted::default().stages(&cohere);
+        assert!((stages.check - Fitted::check_seconds(&cohere)).abs() < f64::EPSILON);
+        cohere.data_type = DataType::Byte;
+        within(&cohere, 2.5 + 0.13);
+        cohere.data_type = DataType::Binary;
+        within(&cohere, 0.25 + 0.13);
+        // No more queries than vectors.
+        cohere.doc_count = 50;
+        cohere.data_type = DataType::Float;
+        let fifty = Fitted::check_seconds(&cohere);
+        cohere.recall_check.queries = 50;
+        assert!((Fitted::check_seconds(&cohere) - fifty).abs() < f64::EPSILON);
+    }
 
     #[test]
     fn counts_the_search_candidates_as_cuvs_does() {

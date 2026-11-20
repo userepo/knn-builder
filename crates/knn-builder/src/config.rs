@@ -1,8 +1,9 @@
 //! The service's settings, from the environment variables the upstream
 //! service reads, under its names and with its defaults, so a deployment's
-//! settings carry over; two of knn-builder's own, for Basic Auth; and three
+//! settings carry over; two of knn-builder's own, for Basic Auth; three
 //! for what it knows of the data node: k-NN's client timeout and poll
-//! interval, with k-NN's defaults, and the threads it builds on itself.
+//! interval, with k-NN's defaults, and the threads it builds on itself;
+//! and three for the recall check, off by default.
 //!
 //! A value the upstream service cannot read stops it at start; so does
 //! one here, with the variable named. Numbers are read as Rust reads
@@ -24,19 +25,25 @@ use std::time::Duration;
 
 use thiserror::Error;
 
+use crate::RecallCheck;
 use crate::cost::CpuThreads;
 use crate::service;
+
+/// The most neighbors a recall check's query asks for: k-NN's own limit
+/// on a query's k.
+const MAX_K: u32 = 10_000;
 
 /// What the service reads from its environment. The defaults are the
 /// upstream service's.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Config {
-    /// The job store's size and TTL, the memory limits, and the data
-    /// node's settings: `REQUEST_STORE_MAX_SIZE`,
+    /// The job store's size and TTL, the memory limits, the data node's
+    /// settings and the recall check: `REQUEST_STORE_MAX_SIZE`,
     /// `REQUEST_STORE_TTL_SECONDS`, `GPU_MEMORY_LIMIT`,
     /// `CPU_MEMORY_LIMIT`, `CLIENT_TIMEOUT_SECONDS`,
-    /// `CLIENT_POLL_INTERVAL_SECONDS` and `CPU_BUILD_THREADS`; their
-    /// defaults by default. The GPU is the binary's to read.
+    /// `CLIENT_POLL_INTERVAL_SECONDS`, `CPU_BUILD_THREADS`,
+    /// `RECALL_CHECK_QUERIES`, `RECALL_CHECK_K` and `RECALL_CHECK_MIN`;
+    /// their defaults by default. The GPU is the binary's to read.
     pub service: service::Settings,
     /// `LOG_LEVEL`: `INFO` by default. `DEBUG` adds each job's stage
     /// timings.
@@ -158,6 +165,7 @@ impl Config {
                 }
             });
         }
+        settings.recall_check = recall_check(&var)?;
         // The service's thread pool refuses 0.
         if let Some(value) = var("MAX_WORKERS")
             && !value
@@ -203,7 +211,7 @@ impl Config {
 
 /// Every variable the service reads: its own, and S3's, which
 /// `knn_store::Settings::from_env` reads.
-const VARIABLES: [&str; 15] = [
+const VARIABLES: [&str; 18] = [
     "REQUEST_STORE_TYPE",
     "REQUEST_STORE_MAX_SIZE",
     "REQUEST_STORE_TTL_SECONDS",
@@ -212,6 +220,9 @@ const VARIABLES: [&str; 15] = [
     "CLIENT_TIMEOUT_SECONDS",
     "CLIENT_POLL_INTERVAL_SECONDS",
     "CPU_BUILD_THREADS",
+    "RECALL_CHECK_QUERIES",
+    "RECALL_CHECK_K",
+    "RECALL_CHECK_MIN",
     "MAX_WORKERS",
     "INDEX_SERIALIZATION_MODE",
     "LOG_LEVEL",
@@ -220,6 +231,35 @@ const VARIABLES: [&str; 15] = [
     "S3_ENDPOINT_URL",
     "AWS_DEFAULT_REGION",
 ];
+
+/// The recall check's variables.
+fn recall_check(var: impl Fn(&str) -> Option<String>) -> Result<RecallCheck, ConfigError> {
+    let mut check = RecallCheck::default();
+    if let Some(value) = var("RECALL_CHECK_QUERIES") {
+        check.queries = whole("RECALL_CHECK_QUERIES", &value)?;
+    }
+    if let Some(value) = var("RECALL_CHECK_K") {
+        check.k = whole("RECALL_CHECK_K", &value)?;
+        if !(1..=MAX_K).contains(&check.k) {
+            return Err(error(
+                "RECALL_CHECK_K",
+                &format!("{value:?} is not 1 to {MAX_K}, the k a k-NN query takes"),
+            ));
+        }
+    }
+    if let Some(value) = var("RECALL_CHECK_MIN") {
+        check.min_recall = Some(match value.trim().parse::<f64>() {
+            Ok(min) if (0.0..=1.0).contains(&min) => min,
+            _ => {
+                return Err(error(
+                    "RECALL_CHECK_MIN",
+                    &format!("{value:?} is not a recall, 0 to 1"),
+                ));
+            }
+        });
+    }
+    Ok(check)
+}
 
 fn error(variable: &'static str, problem: &str) -> ConfigError {
     ConfigError {
@@ -274,6 +314,7 @@ mod tests {
     use std::time::Duration;
 
     use super::{Config, ConfigError, Credentials, VARIABLES};
+    use crate::RecallCheck;
     use crate::cost::CpuThreads;
 
     fn read(vars: &[(&str, &str)]) -> Result<Config, ConfigError> {
@@ -300,6 +341,9 @@ mod tests {
             ("CLIENT_TIMEOUT_SECONDS", "600"),
             ("CLIENT_POLL_INTERVAL_SECONDS", "0"),
             ("CPU_BUILD_THREADS", " 4 "),
+            ("RECALL_CHECK_QUERIES", "100"),
+            ("RECALL_CHECK_K", " 100 "),
+            ("RECALL_CHECK_MIN", "0.9"),
             ("MAX_WORKERS", "4"),
             ("INDEX_SERIALIZATION_MODE", "MEMORY"),
             ("LOG_LEVEL", "debug"),
@@ -314,6 +358,14 @@ mod tests {
         assert_eq!(config.service.client_timeout, Duration::from_secs(600));
         assert_eq!(config.service.poll_interval, Duration::ZERO);
         assert_eq!(config.service.cpu_build, Some(CpuThreads::Four));
+        assert_eq!(
+            config.service.recall_check,
+            RecallCheck {
+                queries: 100,
+                k: 100,
+                min_recall: Some(0.9),
+            }
+        );
         assert_eq!(config.log_level, tracing::Level::DEBUG);
         assert_eq!(
             config.auth,
@@ -349,6 +401,12 @@ mod tests {
                 "CLIENT_POLL_INTERVAL_SECONDS",
             ),
             (&[("CPU_BUILD_THREADS", "8")], "CPU_BUILD_THREADS"),
+            (&[("RECALL_CHECK_QUERIES", "-1")], "RECALL_CHECK_QUERIES"),
+            (&[("RECALL_CHECK_K", "0")], "RECALL_CHECK_K"),
+            (&[("RECALL_CHECK_K", "10001")], "RECALL_CHECK_K"),
+            (&[("RECALL_CHECK_MIN", "1.5")], "RECALL_CHECK_MIN"),
+            (&[("RECALL_CHECK_MIN", "-0.1")], "RECALL_CHECK_MIN"),
+            (&[("RECALL_CHECK_MIN", "nan")], "RECALL_CHECK_MIN"),
             (&[("MAX_WORKERS", "0")], "MAX_WORKERS"),
             (&[("LOG_LEVEL", "LOUD")], "LOG_LEVEL"),
             (&[("BASIC_AUTH_USERNAME", "admin")], "BASIC_AUTH_PASSWORD"),
@@ -373,6 +431,20 @@ mod tests {
             ),
         ] {
             assert_eq!(read(vars).unwrap_err().variable, variable, "{vars:?}");
+        }
+    }
+
+    #[test]
+    fn takes_a_check_with_no_least_recall() {
+        let config = read(&[("RECALL_CHECK_QUERIES", "100")]).unwrap();
+        let check = config.service.recall_check;
+        assert!(check.is_on());
+        assert_eq!((check.k, check.min_recall), (10, None));
+        assert!(!Config::default().service.recall_check.is_on());
+        // Both ends of a recall are one.
+        for (value, min) in [("0", 0.0), ("1", 1.0)] {
+            let config = read(&[("RECALL_CHECK_MIN", value)]).unwrap();
+            assert_eq!(config.service.recall_check.min_recall, Some(min));
         }
     }
 

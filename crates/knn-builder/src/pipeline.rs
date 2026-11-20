@@ -1,6 +1,7 @@
 //! Jobs flow through three stages, one job at a time in each: the
 //! download, the build on the builder's own thread, then the write and
-//! upload, after the projection for a job that asks for it. So the next
+//! upload, after the projection for a job that asks for it and beside the
+//! recall check for a job that has one. So the next
 //! job downloads while one builds, and the last one projects and uploads
 //! meanwhile. A stage takes the next stage's one slot before it
 //! takes up a job, so a finished job waits where it is until the next
@@ -9,8 +10,9 @@
 //! while the stage ahead finishes.
 //!
 //! Those jobs share a budget of host memory too: a job takes its
-//! buffers' share (vectors, doc ids, graph, and the projection's buffers
-//! when it asks for one; not the transfers' own buffers) before it
+//! buffers' share (vectors, doc ids, graph, and the projection's and the
+//! recall check's buffers when it has them; not the transfers' own
+//! buffers) before it
 //! downloads and gives it back when it ends, so a large job waits until
 //! the ones ahead of it have made room. A job larger than the whole budget
 //! takes all of it, and runs alone.
@@ -32,8 +34,9 @@ use tokio::task::JoinHandle;
 use crate::cost::Fitted;
 use crate::load::{Dataset, load};
 use crate::project::project;
+use crate::recall::{self, Checked};
 use crate::write::write_index;
-use crate::{Builder, Job, JobError};
+use crate::{Builder, Job, JobError, Vectors};
 
 /// The stages, running.
 #[derive(Debug)]
@@ -224,8 +227,9 @@ impl Canceler {
     /// Cancels the job: one still queued ends at once and never starts, a
     /// download or upload stops at once (a projection before the upload
     /// between two batches of its layer 1, or once its pass over the graph
-    /// under way ends), an upload aborts so nothing is stored, and a build,
-    /// which cannot be stopped, is thrown away when it ends. The job then
+    /// under way ends; a recall check beside the upload once it ends), an
+    /// upload aborts so nothing is stored, and a build, which cannot be
+    /// stopped, is thrown away when it ends. The job then
     /// ends with [`JobError::Canceled`], unless its upload had already sent
     /// its last request.
     pub fn cancel(&self) {
@@ -278,12 +282,15 @@ impl Claim {
 }
 
 /// A job that ended with its index stored.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Built {
     /// The index file's name: the status response's `file_name`.
     pub file_name: String,
     /// When each stage worked on it.
     pub timings: Timings,
+    /// What its recall check found: none when it had none, or the check
+    /// could not run.
+    pub recall: Option<Checked>,
 }
 
 /// When each stage worked on a job.
@@ -298,8 +305,15 @@ pub struct Timings {
     /// the job did not ask, the gate found the graph connected or it
     /// failed.
     pub projection: Option<Span>,
-    /// Writing and uploading the index.
+    /// The recall check, beside the write: only when the job has one and
+    /// it ran.
+    pub check: Option<Span>,
+    /// Writing and uploading the index, which waits for the recall check
+    /// before it completes when the job has one.
     pub upload: Span,
+    /// How long, of `upload`, the written index waited for the recall
+    /// check before its upload completed: none when the check ended first.
+    pub check_wait: Duration,
 }
 
 /// A stage's time with a job.
@@ -342,7 +356,7 @@ pub enum Stage {
     /// Built, in the upload slot until the upload stage takes it.
     Graphed,
     /// Projecting layer-1 links into its graph when it asks, then writing
-    /// and uploading its index.
+    /// and uploading its index, beside its recall check when it has one.
     Uploading,
 }
 
@@ -620,8 +634,11 @@ fn builds<B: Builder>(
         match built {
             Ok((graph, degree)) => {
                 // Not in the file, so not needed past the build, nor past
-                // the projection when the job asks for one.
-                if job.queued.job.skip_stored_vectors && !job.queued.job.project_link_to_base_layer
+                // the projection or the recall check when the job has them.
+                let request = &job.queued.job;
+                if request.skip_stored_vectors
+                    && !request.project_link_to_base_layer
+                    && !request.recall_check.is_on()
                 {
                     job.dataset.vectors.release_values();
                 }
@@ -681,23 +698,56 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
             let (mut dataset, mut graph) = (dataset, graph);
             // A cancel stops the projection, then the write at once.
             let projection = project(&request, &dataset.vectors, &mut graph, degree, &cancel);
-            if request.skip_stored_vectors {
-                dataset.vectors.release_values();
-            }
+            // Vectors the file leaves out: freed before the write, or by
+            // the recall check once it is done with them.
+            let check_only = request
+                .skip_stored_vectors
+                .then(|| dataset.vectors.take_values());
             let start = Instant::now();
-            write_index(&store, &request, &dataset, &graph, degree, &cancel)
-                .map(|()| (projection, Span::since(start)))
+            let (written, found, waited) = thread::scope(|scope| {
+                let (job, graph, cancel) = (&request, graph.as_slice(), &cancel);
+                let stored = &dataset.vectors;
+                let mut checker = request.recall_check.is_on().then(move || {
+                    scope.spawn(move || {
+                        let vectors = check_only.as_ref().unwrap_or(stored);
+                        run_check(job, vectors, graph, degree, cancel)
+                    })
+                });
+                let (mut found, mut waited) = (None, Duration::ZERO);
+                let written = write_index(&store, job, &dataset, graph, degree, cancel, || {
+                    let Some(checker) = checker.take() else {
+                        return Ok(());
+                    };
+                    let waiting = Instant::now();
+                    let joined = checker.join();
+                    waited = waiting.elapsed();
+                    found = joined.map_err(|_| JobError::Panicked { stage: "upload" })?;
+                    found.as_ref().map_or(Ok(()), |(checked, _)| {
+                        recall::verdict(&job.recall_check, checked)
+                    })
+                });
+                // A write that failed before the verdict leaves the check
+                // to end here, judging nothing.
+                if let Some(checker) = checker {
+                    _ = checker.join();
+                }
+                (written, found, waited)
+            });
+            written.map(|()| (projection, Span::since(start), found, waited))
         })
         .await;
         let outcome = match written {
-            Ok(Ok((projection, upload))) => Ok(Built {
+            Ok(Ok((projection, upload, found, check_wait))) => Ok(Built {
                 file_name: queued.job.file_name(),
                 timings: Timings {
                     download,
                     build,
                     projection,
+                    check: found.map(|(_, span)| span),
                     upload,
+                    check_wait,
                 },
+                recall: found.map(|(checked, _)| checked),
             }),
             Ok(Err(error)) => Err(error),
             Err(join) if join.is_panic() => Err(JobError::Panicked { stage: "upload" }),
@@ -711,6 +761,34 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
         let Queued { report, track, .. } = queued;
         drop(track);
         _ = report.send(outcome);
+    }
+}
+
+/// `job`'s recall check over `vectors` and `graph`, and when it ran: none
+/// when the job was canceled first, or the check could not run, which it
+/// warns of.
+fn run_check(
+    job: &Job,
+    vectors: &Vectors,
+    graph: &[u32],
+    degree: usize,
+    cancel: &Cancel,
+) -> Option<(Checked, Span)> {
+    if cancel.is_canceled() {
+        return None;
+    }
+    let start = Instant::now();
+    match recall::check(job, vectors, graph, degree) {
+        Ok(checked) => Some((checked, Span::since(start))),
+        Err(error) => {
+            // The write may yet refuse the same inputs, and store nothing.
+            tracing::warn!(
+                vector_path = job.vector_path,
+                %error,
+                "recall check could not run; the job goes unchecked"
+            );
+            None
+        }
     }
 }
 

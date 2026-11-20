@@ -27,5 +27,6 @@ yanked = "deny"
 [sources]
 unknown-registry = "deny"
 unknown-git = "deny"
-# knn-write's tests read its output back with knn-inspect's crates.
+# The recall check searches with knn-inspect's crates, and knn-write's
+# tests read its output back with them.
 allow-git = ["https://github.com/userepo/knn-inspect"]

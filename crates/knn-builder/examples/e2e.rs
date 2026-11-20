@@ -47,7 +47,9 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use knn_builder::{BuildError, Builder, DataType, GraphParams, Job, Pipeline, SpaceType, Vectors};
+use knn_builder::{
+    BuildError, Builder, DataType, GraphParams, Job, Pipeline, RecallCheck, SpaceType, Vectors,
+};
 use knn_gpu::{Gpu, Reservation, device_memory};
 use knn_store::{Cancel, Settings, Store, Transfers};
 use serde_json::{Value, json};
@@ -132,6 +134,7 @@ fn job(bucket: &str, name: &str, meta: &Value, m: Option<u32>) -> Job {
         skip_stored_vectors: meta["skip_stored_vectors"].as_bool().unwrap(),
         // The baseline's requests leave it off.
         project_link_to_base_layer: false,
+        recall_check: RecallCheck::default(),
     }
 }
 

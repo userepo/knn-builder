@@ -35,6 +35,10 @@
 //!   the data node would build it sooner itself (`crate::gate`). The
 //!   service takes such a job, and the data node waits for it until its
 //!   timeout or its failure.
+//! - When set, a recall check samples each job's vectors as queries,
+//!   searches its graph for them as k-NN will search the file, and logs the
+//!   recall with the job's end; below a least recall set, the job fails
+//!   with nothing stored ([`crate::recall`]).
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -47,7 +51,7 @@ use tokio::task::JoinSet;
 use crate::cost::CpuThreads;
 use crate::gate::Gate;
 use crate::request::{BuildRequest, JobId};
-use crate::{Builder, Built, Canceler, DataType, Flights, JobError, Pipeline};
+use crate::{Builder, Built, Canceler, DataType, Flights, Job, JobError, Pipeline, RecallCheck};
 
 const POISONED: &str = "a thread panicked holding the job store";
 
@@ -83,6 +87,9 @@ pub struct Settings {
     /// The GPU, as read at start; without one, no job is refused for its
     /// device memory.
     pub device: Option<Device>,
+    /// The recall check each job gets (`RECALL_CHECK_QUERIES`,
+    /// `RECALL_CHECK_K`, `RECALL_CHECK_MIN`); off by default.
+    pub recall_check: RecallCheck,
 }
 
 impl Default for Settings {
@@ -97,6 +104,7 @@ impl Default for Settings {
             poll_interval: Duration::from_secs(5),
             cpu_build: None,
             device: None,
+            recall_check: RecallCheck::default(),
         }
     }
 }
@@ -291,13 +299,17 @@ impl Service {
         while inner.recorders.try_join_next().is_some() {}
         let vector_path = request.vector_path.clone();
         let timeout = inner.jobs.settings.client_timeout;
+        let recall_check = inner.jobs.settings.recall_check;
         let mut started = false;
         let taken = inner
             .jobs
             .take(request, Instant::now(), |job_id, request, now| {
                 started = true;
                 let job = match request.job() {
-                    Ok(job) => job,
+                    Ok(job) => Job {
+                        recall_check,
+                        ..job
+                    },
                     Err(error) => {
                         tracing::info!(%job_id, vector_path, %error, "job failed at once");
                         return Ok(State::ended(Err(error), now));
@@ -487,13 +499,23 @@ impl Inner {
 fn log_end(job_id: &JobId, vector_path: &str, outcome: &Result<Built, JobError>) {
     match outcome {
         Ok(built) => {
-            tracing::info!(%job_id, vector_path, file_name = built.file_name, "job completed");
+            let checked = built.recall.as_ref();
+            tracing::info!(
+                %job_id,
+                vector_path,
+                file_name = built.file_name,
+                recall = checked.map(|c| c.recall),
+                recall_queries = checked.map(|c| c.queries),
+                recall_k = checked.map(|c| c.k),
+                "job completed"
+            );
             let seconds = |span: crate::Span| span.duration().as_secs_f64();
             tracing::debug!(
                 %job_id,
                 download_s = seconds(built.timings.download),
                 build_s = seconds(built.timings.build),
                 projection_s = built.timings.projection.map(seconds),
+                recall_check_s = built.timings.check.map(seconds),
                 upload_s = seconds(built.timings.upload),
                 total_s = built
                     .timings
@@ -747,7 +769,7 @@ mod tests {
 
     use super::{Admission, Jobs, Refusal, Settings, State, Status, estimate};
     use crate::request::{BuildRequest, JobId};
-    use crate::{Built, Canceler, DataType, JobError, SpaceType, Span, Timings};
+    use crate::{Built, Canceler, DataType, JobError, RecallCheck, SpaceType, Span, Timings};
 
     /// `tools/oracle/capacity.py`'s record of the service's estimates.
     const CAPACITY: &str = include_str!("../tests/data/capacity.json");
@@ -801,8 +823,11 @@ mod tests {
                 download: span,
                 build: span,
                 projection: None,
+                check: None,
                 upload: span,
+                check_wait: Duration::ZERO,
             },
+            recall: None,
         }
     }
 
@@ -902,6 +927,7 @@ mod tests {
                 poll_interval: Duration::from_secs(5),
                 cpu_build: None,
                 device: None,
+                recall_check: RecallCheck::default(),
             }
         );
     }

@@ -11,8 +11,10 @@ use crate::{Job, JobError};
 
 /// Writes the index of `job` from its inputs and `graph` (`degree` ids per
 /// vector) into an upload to the job's index key, encrypted as its
-/// inputs are. The writer's checks run before the upload starts; any
-/// failure after aborts the upload, so nothing is stored.
+/// inputs are. The writer's checks run before the upload starts. Once the
+/// file is written, `verdict` says whether to store it, and the upload
+/// completes only then: a verdict against it, or any failure after the
+/// upload starts, aborts the upload, so nothing is stored.
 pub(crate) fn write_index(
     store: &Store,
     job: &Job,
@@ -20,6 +22,7 @@ pub(crate) fn write_index(
     graph: &[u32],
     degree: usize,
     cancel: &Cancel,
+    verdict: impl FnOnce() -> Result<(), JobError>,
 ) -> Result<(), JobError> {
     if cancel.is_canceled() {
         return Err(JobError::Canceled);
@@ -44,7 +47,13 @@ pub(crate) fn write_index(
         cancel,
     );
     match file.write_to(&mut upload) {
-        Ok(()) => upload.finish().map_err(JobError::upload),
+        Ok(()) => match verdict() {
+            Ok(()) => upload.finish().map_err(JobError::upload),
+            Err(error) => {
+                upload.abort().map_err(JobError::upload)?;
+                Err(error)
+            }
+        },
         Err(error) => {
             // The upload's own failure, when that is what stopped the
             // writer; otherwise the writer's, once the upload is given up.

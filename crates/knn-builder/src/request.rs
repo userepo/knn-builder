@@ -20,7 +20,7 @@ use std::fmt::{self, Write as _};
 use serde_json::{Map, Value, json};
 use sha2::{Digest, Sha256};
 
-use crate::{DataType, Job, JobError, SpaceType};
+use crate::{DataType, Job, JobError, RecallCheck, SpaceType};
 
 /// A build request that passed the service's checks.
 #[derive(Debug, Clone, PartialEq)]
@@ -235,6 +235,7 @@ impl BuildRequest {
             skip_stored_vectors: self.skip_stored_vectors,
             project_link_to_base_layer: self.project_link_to_base_layer
                 && self.data_type != DataType::Binary,
+            recall_check: RecallCheck::default(),
         })
     }
 }

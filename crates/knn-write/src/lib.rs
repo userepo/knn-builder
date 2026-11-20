@@ -47,4 +47,4 @@ mod write;
 
 pub use error::Error;
 pub use levels::{LevelTable, Levels, NodeLevel};
-pub use write::{IndexFile, IndexSpec, Metric, Vectors};
+pub use write::{BASE_LEVEL_ENTRY_POINTS, IndexFile, IndexSpec, Metric, Vectors};

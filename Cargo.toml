@@ -29,10 +29,13 @@ thiserror = "2.0.21"
 # knn-write's tests: fp32 to fp16, rounding to nearest even as numpy does.
 half = "2.7.1"
 
-# knn-write's tests: knn-inspect's reader and checks, at a pinned commit,
-# read back what the writer writes; fixtures and generated cases.
-knn-format = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
-knn-check = { git = "https://github.com/userepo/knn-inspect", rev = "155da57dbb411bfbd5042094934ca35b3191325b" }
+# knn-inspect's crates, at one release: knn-builder's recall check
+# searches each graph with knn-recall as k-NN searches its file, and
+# knn-write's tests read back what the writer writes with knn-format's
+# reader and knn-check's checks; fixtures and generated cases.
+knn-recall = { git = "https://github.com/userepo/knn-inspect", tag = "v0.18.0" }
+knn-format = { git = "https://github.com/userepo/knn-inspect", tag = "v0.18.0" }
+knn-check = { git = "https://github.com/userepo/knn-inspect", tag = "v0.18.0" }
 proptest = "1.12.0"
 serde_json = "1.0.154"
 # knn-builder: the job id, a SHA-256 of the request's paths, as the

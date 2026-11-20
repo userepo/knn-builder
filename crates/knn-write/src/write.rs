@@ -18,8 +18,10 @@ const HEADER_LEN: u64 = 4 + 8 + 8 + 8 + 1 + 4;
 /// A binary index's header after its fourcc (`write_index_binary_header`):
 /// `d`, `code_size`, `ntotal`, `is_trained`, `metric_type`.
 const BINARY_HEADER_LEN: u64 = 4 + 4 + 8 + 1 + 4;
-/// `IndexHNSWCagra::num_base_level_search_entrypoints`, at its default.
-const BASE_LEVEL_ENTRY_POINTS: i32 = 32;
+/// The random entry points a search of the file's graph draws
+/// (`IndexHNSWCagra::num_base_level_search_entrypoints`), at Faiss's
+/// default, which the service's files store.
+pub const BASE_LEVEL_ENTRY_POINTS: u16 = 32;
 /// `ScalarQuantizer::QT_fp16`.
 const QT_FP16: i32 = 4;
 /// `ScalarQuantizer::QT_8bit_direct_signed`.
@@ -309,14 +311,14 @@ impl<'a> IndexFile<'a> {
             w.binary_header(*b"IBMp", d, code_size, n, false, metric)?;
             w.binary_header(*b"IBHc", d, code_size, n, true, metric)?;
             w.bytes(&[0, 1])?; // keep_max_size_level0, base_level_only
-            w.i32(BASE_LEVEL_ENTRY_POINTS)?;
+            w.i32(i32::from(BASE_LEVEL_ENTRY_POINTS))?;
         } else {
             // IndexIDMap: it wrapped the GPU index before training.
             w.header(*b"IxMp", d, n, false, metric)?;
             // IndexHNSWCagra and its four CAGRA fields.
             w.header(*b"IHc2", d, n, true, metric)?;
             w.bytes(&[1, 1])?; // keep_max_size_level0, base_level_only
-            w.i32(BASE_LEVEL_ENTRY_POINTS)?;
+            w.i32(i32::from(BASE_LEVEL_ENTRY_POINTS))?;
             w.i32(spec.vectors.numeric_type())?;
         }
 

@@ -4,6 +4,8 @@ use std::num::NonZeroUsize;
 
 use knn_write::projection;
 
+use crate::RecallCheck;
+
 /// How k-NN encoded the vectors: the request's `data_type`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum DataType {
@@ -68,8 +70,9 @@ impl GraphParams {
 }
 
 /// One index to build: where its inputs are and what to build from them.
-/// The service's request, validated: [`BuildRequest::job`](crate::request::BuildRequest::job).
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// The service's request, validated: [`BuildRequest::job`](crate::request::BuildRequest::job),
+/// with the recall check the service runs on it.
+#[derive(Debug, Clone, PartialEq)]
 pub struct Job {
     /// `container_name`: the bucket the blobs are in, and the index goes.
     pub bucket: String,
@@ -97,6 +100,10 @@ pub struct Job {
     /// (`project_link_to_base_layer`). Never for binary vectors, whose
     /// requests the service builds without it.
     pub project_link_to_base_layer: bool,
+    /// The recall check run on its graph before its index is stored: the
+    /// service's ([`Settings::recall_check`](crate::service::Settings::recall_check)),
+    /// off for a job from [`BuildRequest::job`](crate::request::BuildRequest::job).
+    pub recall_check: RecallCheck,
 }
 
 impl Job {
@@ -198,9 +205,10 @@ impl Job {
     }
 
     /// The host memory the job's buffers take, in bytes: the vectors as
-    /// downloaded, the doc ids, and the graph, and for a job that asks for
-    /// the projection the most its buffers take at once, counted for as
-    /// many threads as search at most. Saturating, past any memory.
+    /// downloaded, the doc ids, and the graph; for a job that asks for the
+    /// projection the most its buffers take at once, counted for as many
+    /// threads as search at most; and the recall check's, when it has one.
+    /// Saturating, past any memory.
     pub(crate) fn host_bytes(&self) -> u64 {
         let doc_count = u64::from(self.doc_count);
         // No graph when the parameters fail; the job fails before one.
@@ -215,6 +223,7 @@ impl Job {
             .saturating_add(ids)
             .saturating_add(graph)
             .saturating_add(projection)
+            .saturating_add(self.recall_check.host_bytes(self))
     }
 }
 
@@ -225,6 +234,7 @@ pub(crate) mod tests {
     use knn_write::projection;
 
     use super::{DataType, GraphParams, Job, SpaceType};
+    use crate::RecallCheck;
 
     /// A job on `bucket` for `doc_count` x `dimension` fp32 vectors.
     pub(crate) fn job(bucket: &str, doc_count: u32, dimension: u32) -> Job {
@@ -241,6 +251,7 @@ pub(crate) mod tests {
             ef_search: 100,
             skip_stored_vectors: false,
             project_link_to_base_layer: false,
+            recall_check: RecallCheck::default(),
         }
     }
 

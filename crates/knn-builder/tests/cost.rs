@@ -23,7 +23,7 @@ use std::num::NonZeroUsize;
 use std::path::Path;
 
 use knn_builder::cost::{CpuThreads, Fitted, Stages};
-use knn_builder::{DataType, Job, SpaceType};
+use knn_builder::{DataType, Job, RecallCheck, SpaceType};
 use serde_json::Value;
 
 /// The RTX 4070 Laptop GPU's shared memory a block, which the grid ran on.
@@ -91,6 +91,7 @@ fn job(record: &Value) -> Job {
         ef_search: 100,
         skip_stored_vectors: false,
         project_link_to_base_layer: false,
+        recall_check: RecallCheck::default(),
     }
 }
 

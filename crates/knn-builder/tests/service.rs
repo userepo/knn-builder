@@ -18,9 +18,9 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use common::{S3, ids, le_ids};
-use knn_builder::FakeBuilder;
 use knn_builder::request::{self, BuildRequest, JobId};
 use knn_builder::service::{Service, Settings, Status};
+use knn_builder::{FakeBuilder, RecallCheck};
 use serde_json::{Value, json};
 
 const DOC_COUNT: u32 = 600;
@@ -116,6 +116,44 @@ async fn holds_a_failure_and_stores_nothing() {
         panic!("not failed");
     };
     assert!(error_message.contains("no GPU here"), "{error_message}");
+    let mut keys = s3.keys().await;
+    keys.sort();
+    assert_eq!(
+        keys,
+        [request.doc_id_path.clone(), request.vector_path.clone()]
+    );
+    assert_eq!(s3.pending_uploads().await, 0);
+    service.close().await;
+    s3.remove().await;
+}
+
+/// The service's recall check is each job's: below its least recall, the
+/// job fails with the check's message and nothing stored.
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn fails_a_job_below_the_least_recall() {
+    let s3 = S3::new("service-recall").await;
+    let request = request(&s3, "recall", &json!({}));
+    put_inputs(&s3, &request).await;
+    // Runs of 10 vectors no search leaves: a recall below 1.
+    let builder = FakeBuilder::clustered(Duration::ZERO, 60);
+    let settings = Settings {
+        recall_check: RecallCheck {
+            queries: 50,
+            min_recall: Some(1.0),
+            ..RecallCheck::default()
+        },
+        ..Settings::default()
+    };
+    let service = Service::start(s3.store.clone(), builder, settings);
+    let job_id = service.submit(request.clone()).unwrap();
+    let Status::Failed { error_message } = ended(&service, &job_id).await else {
+        panic!("not failed");
+    };
+    assert!(
+        error_message.starts_with("the recall check failed: recall@10 over 50 sampled vectors is "),
+        "{error_message}"
+    );
     let mut keys = s3.keys().await;
     keys.sort();
     assert_eq!(

@@ -18,6 +18,9 @@ gpu = ["knn-gpu/gpu"]
 axum.workspace = true
 base64.workspace = true
 knn-gpu.workspace = true
+# The recall check: knn-inspect's search, over the job's vectors and graph
+# in memory.
+knn-recall.workspace = true
 knn-store.workspace = true
 knn-write.workspace = true
 # The build request: read as a JSON value, then checked field by field as
@@ -36,6 +39,9 @@ tracing-subscriber.workspace = true
 [dev-dependencies]
 # The LocalStack tests set up and inspect their bucket with the SDK.
 aws-sdk-s3.workspace = true
+# The recall check's tests read the file written from the same inputs,
+# for the recall knn-inspect gives on it.
+knn-format.workspace = true
 
 [[example]]
 name = "e2e"
