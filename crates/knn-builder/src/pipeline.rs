@@ -43,6 +43,8 @@ use crate::{Builder, Job, JobError, Vectors};
 pub struct Pipeline {
     queue: mpsc::UnboundedSender<Queued>,
     board: Arc<Board>,
+    /// The download stage's budget, read for how much of it is taken.
+    budget: Budget,
     /// The number the next job submitted gets.
     next: AtomicU64,
     downloads: JoinHandle<()>,
@@ -70,7 +72,7 @@ impl Pipeline {
         let (to_build, loaded) = mpsc::channel(1);
         let (to_upload, graphed) = mpsc::channel(1);
         let budget = Budget::new(host_memory);
-        let downloads = runtime.spawn(downloads(store.clone(), queued, to_build, budget));
+        let downloads = runtime.spawn(downloads(store.clone(), queued, to_build, budget.clone()));
         let builds = {
             let runtime = runtime.clone();
             thread::spawn(move || builds(builder, loaded, &to_upload, &runtime))
@@ -79,6 +81,7 @@ impl Pipeline {
         Self {
             queue,
             board: Arc::default(),
+            budget,
             next: AtomicU64::new(0),
             downloads,
             builds,
@@ -135,7 +138,10 @@ impl Pipeline {
     /// that does not hold the pipeline.
     #[must_use]
     pub fn flights(&self) -> Flights {
-        Flights(Arc::clone(&self.board))
+        Flights {
+            board: Arc::clone(&self.board),
+            budget: self.budget.clone(),
+        }
     }
 
     /// Takes no more jobs, and waits until every job taken has ended.
@@ -143,6 +149,7 @@ impl Pipeline {
         let Self {
             queue,
             board: _,
+            budget: _,
             next: _,
             downloads,
             builds,
@@ -377,9 +384,12 @@ pub struct InFlight {
 }
 
 /// The jobs in flight of a pipeline, as [`Pipeline::flights`] gives
-/// them; clones tell the same.
+/// them, and its budget; clones tell the same.
 #[derive(Debug, Clone)]
-pub struct Flights(Arc<Board>);
+pub struct Flights {
+    board: Arc<Board>,
+    budget: Budget,
+}
 
 impl Flights {
     /// As [`Pipeline::in_flight`].
@@ -389,7 +399,14 @@ impl Flights {
     /// After a thread panicked while it held the list, a bug.
     #[must_use]
     pub fn in_flight(&self) -> Vec<InFlight> {
-        self.0.in_flight()
+        self.board.in_flight()
+    }
+
+    /// The host memory the jobs' buffers may take at once, and how much of
+    /// it the jobs in the pipeline take now, both in bytes, counted in
+    /// whole MiB as the pipeline counts them.
+    pub(crate) fn host_budget(&self) -> (u64, u64) {
+        self.budget.bytes()
     }
 }
 
@@ -487,7 +504,9 @@ impl Queued {
     }
 }
 
-/// The host memory the jobs' buffers may take at once, in MiB.
+/// The host memory the jobs' buffers may take at once, in MiB; clones
+/// share it.
+#[derive(Debug, Clone)]
 pub(crate) struct Budget {
     mib: Arc<Semaphore>,
     total: u32,
@@ -511,6 +530,16 @@ impl Budget {
         u32::try_from(bytes / Self::MIB)
             .unwrap_or(u32::MAX)
             .clamp(1, max)
+    }
+
+    /// The budget, and the part of it taken, in bytes.
+    fn bytes(&self) -> (u64, u64) {
+        let free = u32::try_from(self.mib.available_permits()).unwrap_or(self.total);
+        let taken = self.total.saturating_sub(free);
+        (
+            u64::from(self.total) * Self::MIB,
+            u64::from(taken) * Self::MIB,
+        )
     }
 
     /// `job`'s share of a budget of `total` MiB: its buffers rounded up to
@@ -820,5 +849,9 @@ mod tests {
         assert_eq!(budget.take(&large).await.num_permits(), 4);
         // Given back when dropped.
         assert_eq!(budget.mib.available_permits(), 4);
+        let held = budget.take(&mid).await;
+        assert_eq!(budget.bytes(), (4 << 20, 2 << 20));
+        drop(held);
+        assert_eq!(budget.bytes(), (4 << 20, 0));
     }
 }

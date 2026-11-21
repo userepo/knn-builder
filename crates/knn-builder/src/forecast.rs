@@ -178,6 +178,20 @@ impl<M: StageModel> Forecaster<M> {
         self.build.learn(0.0, seconds(timings.build), modeled.build);
     }
 
+    /// What the jobs that ended have taught: each stage's observed over
+    /// modeled seconds, 1 for a stage none has shown yet; the build's over
+    /// every configuration. Ratios, not seconds.
+    #[must_use]
+    pub fn ratios(&self) -> Stages {
+        Stages {
+            download: self.download.factor(),
+            build: self.build.factor(),
+            projection: self.projection.factor(),
+            upload: self.upload.factor(),
+            check: self.check.factor(),
+        }
+    }
+
     /// `job`'s stages as the forecast takes them: modeled, then corrected
     /// by what completed jobs took.
     #[must_use]

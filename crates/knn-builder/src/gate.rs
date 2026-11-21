@@ -16,7 +16,7 @@
 
 use std::time::{Duration, Instant};
 
-use crate::cost::{CpuThreads, Fitted};
+use crate::cost::{CpuThreads, Fitted, Stages};
 use crate::forecast::Forecaster;
 use crate::request::JobId;
 use crate::service::{Refusal, Settings};
@@ -169,6 +169,18 @@ impl Gate {
                 (self.latest_seen(ends) >= self.timeout).then_some(flight.id)
             })
             .collect()
+    }
+
+    /// Each stage's correction, as the forecast has learned it.
+    pub(crate) fn ratios(&self) -> Stages {
+        self.forecaster.ratios()
+    }
+
+    /// Until the last of the jobs `in_flight` is forecast to end; none
+    /// with none.
+    pub(crate) fn drain(&self, now: Instant, in_flight: &[InFlight]) -> Duration {
+        let forecast = self.forecaster.forecast(now, in_flight, None);
+        forecast.ends.into_iter().max().unwrap_or_default()
     }
 
     /// The data node's timeout, in whole seconds.

@@ -16,7 +16,9 @@
 //! they cannot be read.
 //!
 //! Nothing here reads a clock or a file: the values are the caller's, and
-//! the same snapshot renders the same page.
+//! the same snapshot renders the same page. [`Answers`] counts the
+//! requests answered without a lock, for the API to count each as it
+//! answers it.
 //!
 //! ```
 //! use knn_builder::metrics::{Outcome, Snapshot};
@@ -30,6 +32,7 @@
 use std::fmt::{self, Display, Write as _};
 use std::iter;
 use std::marker::PhantomData;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 use crate::{DataType, Stage};
 
@@ -362,8 +365,8 @@ impl Histogram {
 /// What the service counts as it runs: the counters and the histograms.
 ///
 /// The times, the forecast ratio and the vectors are of jobs that ended
-/// with their index stored; the recall is of every job checked, those
-/// failed for it included.
+/// with their index stored; the recall is of those and of the jobs failed
+/// for their recall.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Counted {
     /// Build requests, by how they were answered.
@@ -398,6 +401,76 @@ impl Default for Counted {
             forecast_ratio: Histogram::new(&RATIOS),
             recall: Histogram::new(&RECALLS),
         }
+    }
+}
+
+/// The status codes [`Answers`] counts, as HTTP has them.
+const CODES: std::ops::RangeInclusive<u16> = 100..=999;
+
+/// The requests answered, by route and status code, each count atomic.
+///
+/// A slot for every route and code, so counting takes no lock and
+/// allocates nothing; [`Answers::answered`] lists the ones counted.
+pub struct Answers {
+    /// By route, then by code from the first of [`CODES`].
+    counts: Vec<AtomicU64>,
+}
+
+impl Default for Answers {
+    fn default() -> Self {
+        let slots = Route::ALL.len() * CODES.len();
+        Self {
+            counts: iter::repeat_with(AtomicU64::default).take(slots).collect(),
+        }
+    }
+}
+
+/// The requests counted, not every slot.
+impl fmt::Debug for Answers {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Answers")
+            .field("answered", &self.answered())
+            .finish()
+    }
+}
+
+impl Answers {
+    /// Counts one request on `route` answered with `code`; a code HTTP
+    /// does not have is not counted.
+    pub fn count(&self, route: Route, code: u16) {
+        if let Some(count) = self.slot(route, code) {
+            count.fetch_add(1, Ordering::Relaxed);
+        }
+    }
+
+    /// Every route and code counted, with its count.
+    #[must_use]
+    pub fn answered(&self) -> Vec<Answered> {
+        let mut answered = Vec::new();
+        for &route in Route::ALL {
+            for code in CODES {
+                let requests = self
+                    .slot(route, code)
+                    .map_or(0, |c| c.load(Ordering::Relaxed));
+                if requests > 0 {
+                    answered.push(Answered {
+                        route,
+                        code,
+                        requests,
+                    });
+                }
+            }
+        }
+        answered
+    }
+
+    fn slot(&self, route: Route, code: u16) -> Option<&AtomicU64> {
+        if !CODES.contains(&code) {
+            return None;
+        }
+        let route = Route::ALL.iter().position(|&known| known == route)?;
+        let code = usize::from(code - CODES.start());
+        self.counts.get(route * CODES.len() + code)
     }
 }
 
@@ -571,7 +644,7 @@ impl Snapshot {
         page.metric(
             "knn_builder_recall",
             Kind::Histogram,
-            "Recall the recall check found, for every job checked.",
+            "Recall the recall check found, for jobs that stored an index or failed for their recall.",
         );
         page.histogram("knn_builder_recall", &[], &counted.recall);
     }
@@ -782,8 +855,8 @@ mod tests {
     use std::collections::{HashMap, HashSet};
 
     use super::{
-        Answered, BuildAnswer, Family, FlightStage, GpuMemory, Histogram, Label, Number, Outcome,
-        RATIOS, RECALLS, Route, SECONDS, Snapshot, TimedStage, VectorType, escape,
+        Answered, Answers, BuildAnswer, Family, FlightStage, GpuMemory, Histogram, Label, Number,
+        Outcome, RATIOS, RECALLS, Route, SECONDS, Snapshot, TimedStage, VectorType, escape,
     };
     use crate::{DataType, Stage};
 
@@ -944,6 +1017,36 @@ mod tests {
         for (data_type, text) in data_types {
             assert_eq!(VectorType::from(data_type).text(), text);
         }
+    }
+
+    #[test]
+    fn counts_the_answers_by_route_and_code() {
+        let answers = Answers::default();
+        assert_eq!(answers.answered(), []);
+        assert_eq!(format!("{answers:?}"), "Answers { answered: [] }");
+        for _ in 0..3 {
+            answers.count(Route::Status, 404);
+        }
+        answers.count(Route::Build, 200);
+        answers.count(Route::Other, 999);
+        answers.count(Route::Metrics, 100);
+        // Not HTTP's: not counted, and nowhere else either.
+        answers.count(Route::Build, 99);
+        answers.count(Route::Build, 1000);
+        let answered: Vec<(Route, u16, u64)> = answers
+            .answered()
+            .into_iter()
+            .map(|a| (a.route, a.code, a.requests))
+            .collect();
+        assert_eq!(
+            answered,
+            [
+                (Route::Build, 200, 1),
+                (Route::Status, 404, 3),
+                (Route::Metrics, 100, 1),
+                (Route::Other, 999, 1),
+            ]
+        );
     }
 
     #[test]

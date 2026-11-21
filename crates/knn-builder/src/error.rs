@@ -1,5 +1,7 @@
 use thiserror::Error;
 
+use crate::metrics::Outcome;
+
 /// Why a job failed: the message the status response carries.
 #[derive(Debug, Error, Clone, PartialEq)]
 #[non_exhaustive]
@@ -120,6 +122,24 @@ pub enum JobError {
 }
 
 impl JobError {
+    /// How a job that failed so ended, as the metrics count it.
+    pub(crate) fn outcome(&self) -> Outcome {
+        match self {
+            Self::Download(_) | Self::HalfFloatSize { .. } => Outcome::DownloadFailed,
+            Self::HostMemory { .. } => Outcome::HostMemory,
+            Self::OutOfRange { .. } | Self::Params(_) => Outcome::BadParameters,
+            Self::DeviceMemory { .. } => Outcome::DeviceMemory,
+            Self::Build(_) => Outcome::BuildFailed,
+            Self::Write(_) => Outcome::WriteFailed,
+            Self::Upload(_) => Outcome::UploadFailed,
+            Self::LowRecall { .. } => Outcome::LowRecall,
+            Self::Canceled | Self::Stopped => Outcome::Canceled,
+            Self::WouldMissDeadline { .. } => Outcome::ForecastLate,
+            Self::PastDeadline { .. } => Outcome::TimedOut,
+            Self::Panicked { .. } => Outcome::Panicked,
+        }
+    }
+
     /// A download error; a canceled download as [`JobError::Canceled`].
     pub(crate) fn download(error: knn_store::Error) -> Self {
         match error {
@@ -134,5 +154,94 @@ impl JobError {
             knn_store::Error::Canceled { .. } => Self::Canceled,
             error => Self::Upload(error),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::JobError;
+    use crate::metrics::Outcome;
+
+    #[test]
+    fn labels_each_failure() {
+        let object = || ("bucket".to_owned(), "a/_0_f.knnvec".to_owned());
+        let s3 = || {
+            let (bucket, key) = object();
+            knn_store::Error::S3 {
+                call: "GetObject",
+                bucket,
+                key,
+                message: "refused".into(),
+            }
+        };
+        let cases = [
+            (JobError::Download(s3()), Outcome::DownloadFailed),
+            (
+                JobError::HalfFloatSize {
+                    size: 3,
+                    fp16: 4,
+                    fp32: 8,
+                    doc_count: 1,
+                    dimension: 2,
+                },
+                Outcome::DownloadFailed,
+            ),
+            (JobError::HostMemory { values: 1 }, Outcome::HostMemory),
+            (
+                JobError::OutOfRange {
+                    name: "m",
+                    value: -1,
+                    min: 0,
+                    max: 1,
+                },
+                Outcome::BadParameters,
+            ),
+            (
+                JobError::Params(knn_gpu::Error::Request {
+                    doc_count: 0,
+                    dimension: 8,
+                    m: 16,
+                }),
+                Outcome::BadParameters,
+            ),
+            (
+                JobError::DeviceMemory {
+                    needed_mib: 2,
+                    free_mib: 1,
+                },
+                Outcome::DeviceMemory,
+            ),
+            (JobError::Build("no GPU".into()), Outcome::BuildFailed),
+            (JobError::Write("refused".into()), Outcome::WriteFailed),
+            (JobError::Upload(s3()), Outcome::UploadFailed),
+            (
+                JobError::LowRecall {
+                    recall: 0.5,
+                    min: 0.9,
+                    queries: 10,
+                    k: 10,
+                },
+                Outcome::LowRecall,
+            ),
+            (JobError::Canceled, Outcome::Canceled),
+            (JobError::Stopped, Outcome::Canceled),
+            (
+                JobError::WouldMissDeadline { seconds: 4 },
+                Outcome::ForecastLate,
+            ),
+            (JobError::PastDeadline { seconds: 4 }, Outcome::TimedOut),
+            (JobError::Panicked { stage: "build" }, Outcome::Panicked),
+        ];
+        for (error, outcome) in cases {
+            assert_eq!(error.outcome(), outcome, "{error}");
+        }
+        // A canceled transfer is a cancel, whichever way it went.
+        let (bucket, key) = object();
+        let canceled = knn_store::Error::Canceled { bucket, key };
+        assert_eq!(
+            JobError::upload(canceled.clone()).outcome(),
+            Outcome::Canceled
+        );
+        assert_eq!(JobError::download(canceled).outcome(), Outcome::Canceled);
     }
 }

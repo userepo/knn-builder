@@ -39,10 +39,15 @@
 //!   searches its graph for them as k-NN will search the file, and logs the
 //!   recall with the job's end; below a least recall set, the job fails
 //!   with nothing stored ([`crate::recall`]).
+//!
+//! It also counts what it does, for [`Service::metrics`]: the build
+//! requests by answer, and the jobs by how they ended, each once, with
+//! the stage times, the forecast's accuracy and the recall of those that
+//! report them.
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, OnceLock};
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use knn_store::Store;
 use thiserror::Error;
@@ -50,8 +55,11 @@ use tokio::task::JoinSet;
 
 use crate::cost::CpuThreads;
 use crate::gate::Gate;
+use crate::metrics::{BuildAnswer, Counted, Family, Outcome, Snapshot, TimedStage};
 use crate::request::{BuildRequest, JobId};
-use crate::{Builder, Built, Canceler, DataType, Flights, Job, JobError, Pipeline, RecallCheck};
+use crate::{
+    Builder, Built, Canceler, DataType, Flights, Job, JobError, Pipeline, RecallCheck, Span,
+};
 
 const POISONED: &str = "a thread panicked holding the job store";
 
@@ -229,6 +237,17 @@ impl Refusal {
             | Self::CpuSooner { .. } => 507,
         }
     }
+
+    /// The answer, as the metrics count it.
+    fn answer(&self) -> BuildAnswer {
+        match self {
+            Self::Conflict { .. } => BuildAnswer::Conflict,
+            Self::Full { .. } => BuildAnswer::StoreFull,
+            Self::TooLarge { .. } => BuildAnswer::TooLarge,
+            Self::Late { .. } => BuildAnswer::Late,
+            Self::CpuSooner { .. } => BuildAnswer::CpuSooner,
+        }
+    }
 }
 
 /// The jobs, and the pipeline that runs them.
@@ -236,6 +255,8 @@ impl Refusal {
 pub struct Service {
     inner: Arc<Mutex<Inner>>,
     pipeline: Pipeline,
+    /// When it started, in seconds of Unix time.
+    started: f64,
 }
 
 #[derive(Debug)]
@@ -249,6 +270,8 @@ struct Inner {
     watches: HashMap<u64, Watch>,
     /// A task per running job, recording its outcome.
     recorders: JoinSet<()>,
+    /// What the metrics count.
+    counted: Counted,
 }
 
 impl Service {
@@ -273,8 +296,12 @@ impl Service {
                 flights: pipeline.flights(),
                 watches: HashMap::new(),
                 recorders: JoinSet::new(),
+                counted: Counted::default(),
             })),
             pipeline,
+            started: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_or(0.0, |since| since.as_secs_f64()),
         }
     }
 
@@ -312,6 +339,7 @@ impl Service {
                     },
                     Err(error) => {
                         tracing::info!(%job_id, vector_path, %error, "job failed at once");
+                        count_failure(&mut inner.counted, &error);
                         return Ok(State::ended(Err(error), now));
                     }
                 };
@@ -328,6 +356,7 @@ impl Service {
                     "job queued"
                 );
                 let learned = job.clone();
+                let (taken, forecast) = (now, admitted.ends_in);
                 let handle = self.pipeline.submit(job);
                 let id = handle.id();
                 let canceler = handle.canceler();
@@ -373,18 +402,22 @@ impl Service {
                     });
                     let ended = Instant::now();
                     log_end(&job_id, &vector_path, &outcome);
+                    let times = Times {
+                        taken,
+                        forecast,
+                        ended,
+                    };
                     let mut inner = shared.lock().expect(POISONED);
-                    if let Ok(built) = &outcome {
-                        inner.gate.learn(&learned, &built.timings);
-                    }
-                    inner.jobs.end(&job_id, outcome, ended);
-                    inner.watches.remove(&id);
-                    // What this one taught, and the room it left, may move
-                    // the others' forecasts.
-                    inner.recheck(ended);
+                    inner.record_end(id, &job_id, &learned, times, outcome);
                 });
                 Ok(State::Running(canceler))
             });
+        let answer = match &taken {
+            Ok(_) if started => BuildAnswer::Accepted,
+            Ok(_) => BuildAnswer::Held,
+            Err(refusal) => refusal.answer(),
+        };
+        inner.counted.build_requests.add(answer, 1);
         match &taken {
             Ok(job_id) if !started => tracing::info!(%job_id, vector_path, "job held already"),
             Ok(_) => {}
@@ -406,6 +439,66 @@ impl Service {
             .expect(POISONED)
             .jobs
             .status(job_id, Instant::now())
+    }
+
+    /// Counts a build request refused before it reached the service: a
+    /// body the API could not read.
+    ///
+    /// # Panics
+    ///
+    /// After a thread panicked holding the job store, a bug.
+    pub fn count_invalid(&self) {
+        let mut inner = self.inner.lock().expect(POISONED);
+        inner.counted.build_requests.add(BuildAnswer::Invalid, 1);
+    }
+
+    /// Every metric's value now, but the requests answered, which are the
+    /// API's to count, and the process's and the GPU's memory.
+    ///
+    /// # Panics
+    ///
+    /// After a thread panicked holding the job store or the pipeline's job
+    /// list, a bug.
+    #[must_use]
+    pub fn metrics(&self) -> Snapshot {
+        let now = Instant::now();
+        let inner = self.inner.lock().expect(POISONED);
+        let in_flight = inner.flights.in_flight();
+        let mut jobs_in_flight = Family::default();
+        // A job the service dropped has ended, though it stays in the
+        // pipeline until its stage lets it go.
+        let running = |id| {
+            let watch: Option<&Watch> = inner.watches.get(&id);
+            watch.is_some_and(|watch| inner.jobs.is_running(&watch.job_id))
+        };
+        for flight in in_flight.iter().filter(|flight| running(flight.id)) {
+            jobs_in_flight.add(flight.stage.into(), 1);
+        }
+        let ratios = inner.gate.ratios();
+        let mut stage_model_ratio = Family::new(1.0);
+        for (stage, ratio) in [
+            (TimedStage::Download, ratios.download),
+            (TimedStage::Build, ratios.build),
+            (TimedStage::Projection, ratios.projection),
+            (TimedStage::RecallCheck, ratios.check),
+            (TimedStage::Upload, ratios.upload),
+        ] {
+            stage_model_ratio.set(stage, ratio);
+        }
+        let (host_budget, host_budget_used) = inner.flights.host_budget();
+        let settings = &inner.jobs.settings;
+        Snapshot {
+            counted: inner.counted.clone(),
+            jobs_in_flight,
+            jobs_held: inner.jobs.held(now),
+            jobs_held_limit: u64::try_from(settings.max_jobs).unwrap_or(u64::MAX),
+            stage_model_ratio,
+            drain_seconds: inner.gate.drain(now, &in_flight).as_secs_f64(),
+            host_budget,
+            host_budget_used,
+            start_time_seconds: self.started,
+            ..Snapshot::default()
+        }
     }
 
     /// Every job held, in the order they were taken: the debug list of
@@ -464,6 +557,34 @@ struct Watch {
 }
 
 impl Inner {
+    /// Records how the job `job_id`, number `id` in the pipeline, ended:
+    /// what the forecast learns from it, its status, and its count, once;
+    /// then forecasts the others again.
+    fn record_end(
+        &mut self,
+        id: u64,
+        job_id: &JobId,
+        job: &Job,
+        times: Times,
+        outcome: Result<Built, JobError>,
+    ) {
+        if let Ok(built) = &outcome {
+            self.gate.learn(job, &built.timings);
+        }
+        // A job the service dropped first is ended, and counted, already.
+        if self.jobs.is_running(job_id) {
+            match &outcome {
+                Ok(built) => count_completion(&mut self.counted, job, built, times),
+                Err(error) => count_failure(&mut self.counted, error),
+            }
+        }
+        self.jobs.end(job_id, outcome, times.ended);
+        self.watches.remove(&id);
+        // What this one taught, and the room it left, may move the others'
+        // forecasts.
+        self.recheck(times.ended);
+    }
+
     /// Forecasts the jobs not yet building again, and cancels those that
     /// would now miss the data node's timeout. Each fails at once: one
     /// waiting in the build slot would otherwise end only when the builder
@@ -489,9 +610,67 @@ impl Inner {
                 watch.canceler.cancel();
                 // The pipeline's report, when it comes, finds it ended.
                 let job_id = watch.job_id.clone();
+                if self.jobs.is_running(&job_id) {
+                    count_failure(&mut self.counted, &reason);
+                }
                 self.jobs.end(&job_id, Err(reason), now);
             }
         }
+    }
+}
+
+/// When a job was taken, the seconds it was forecast to take from then,
+/// and when it ended.
+#[derive(Debug, Clone, Copy)]
+struct Times {
+    taken: Instant,
+    forecast: Duration,
+    ended: Instant,
+}
+
+/// Counts a job that ended with its index stored: its vectors, its times
+/// and its recall.
+fn count_completion(counted: &mut Counted, job: &Job, built: &Built, times: Times) {
+    let seconds = |span: Span| span.duration().as_secs_f64();
+    let timings = &built.timings;
+    counted.jobs_ended.add(Outcome::Completed, 1);
+    counted
+        .vectors_built
+        .add(job.data_type.into(), u64::from(job.doc_count));
+    let took = times.ended.saturating_duration_since(times.taken);
+    counted.job_seconds.observe(took.as_secs_f64());
+    let queued = timings
+        .download
+        .start
+        .saturating_duration_since(times.taken);
+    counted.queue_seconds.observe(queued.as_secs_f64());
+    let stages = [
+        (TimedStage::Download, Some(timings.download)),
+        (TimedStage::Build, Some(timings.build)),
+        (TimedStage::Projection, timings.projection),
+        (TimedStage::RecallCheck, timings.check),
+        (TimedStage::Upload, Some(timings.upload)),
+    ];
+    for (stage, span) in stages {
+        if let Some(span) = span {
+            counted.stage_seconds.observe(stage, seconds(span));
+        }
+    }
+    // A forecast of nothing has no ratio: the histogram leaves out the
+    // infinity.
+    counted
+        .forecast_ratio
+        .observe(took.as_secs_f64() / times.forecast.as_secs_f64());
+    if let Some(checked) = &built.recall {
+        counted.recall.observe(checked.recall);
+    }
+}
+
+/// Counts a job that failed; one failed for its recall, with the recall.
+fn count_failure(counted: &mut Counted, error: &JobError) {
+    counted.jobs_ended.add(error.outcome(), 1);
+    if let JobError::LowRecall { recall, .. } = error {
+        counted.recall.observe(*recall);
     }
 }
 
@@ -658,6 +837,20 @@ impl Jobs {
             },
         );
         Ok(job_id)
+    }
+
+    /// Whether the job `job_id` is held and has not ended.
+    fn is_running(&self, job_id: &JobId) -> bool {
+        self.held
+            .get(job_id)
+            .is_some_and(|held| matches!(held.state, State::Running(_)))
+    }
+
+    /// The jobs held that have not expired.
+    fn held(&self, now: Instant) -> u64 {
+        let held = self.held.values();
+        let live = held.filter(|held| !held.expired(self.settings.ttl, now));
+        u64::try_from(live.count()).unwrap_or(u64::MAX)
     }
 
     /// Records the end of the running job `job_id`.
@@ -1061,6 +1254,8 @@ mod tests {
             jobs.admit(&third, before),
             Err(Refusal::Full { .. })
         ));
+        assert_eq!(jobs.held(before), 2);
+        assert_eq!(jobs.held(now + TTL), 1, "an expired job is not counted");
         assert!(matches!(
             jobs.admit(&third, now + TTL),
             Ok(Admission::New(_))
@@ -1082,11 +1277,14 @@ mod tests {
         let now = Instant::now();
         let mut jobs = jobs(10);
         let job_id = start(&mut jobs, &request("a/_0_f.knnvec", 8), now);
+        assert!(jobs.is_running(&job_id));
+        assert!(!jobs.is_running(&JobId::from("no-such-job")));
         jobs.end(&job_id, Ok(built("_0_f.faiss", now)), now);
         let completed = Some(Status::Completed {
             file_name: "_0_f.faiss".into(),
         });
         assert_eq!(jobs.status(&job_id, now), completed);
+        assert!(!jobs.is_running(&job_id));
         // A second end changes nothing.
         jobs.end(&job_id, Err(JobError::Stopped), now);
         assert_eq!(jobs.status(&job_id, now), completed);

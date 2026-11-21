@@ -1,8 +1,10 @@
 //! The HTTP API against the service's own answers,
 //! `tests/data/routes.json`, recorded by `tools/oracle/routes.py`; its
-//! Basic Auth; and, against LocalStack (ignored by default, as the
-//! pipeline's tests are), a job's life through it. The cases knn-builder
-//! answers differently are listed in `DIVERGENT`, each with why.
+//! Basic Auth; its metrics page, and what it counts of the requests and
+//! of jobs that fail without an S3; and, against LocalStack (ignored by
+//! default, as the pipeline's tests are), a job's life through it. The
+//! cases knn-builder answers differently are listed in `DIVERGENT`, each
+//! with why.
 
 #![allow(
     clippy::unwrap_used,
@@ -22,6 +24,7 @@ use common::{S3, ids, le_ids};
 use knn_builder::FakeBuilder;
 use knn_builder::api;
 use knn_builder::config::Credentials;
+use knn_builder::cost::CpuThreads;
 use knn_builder::service::{Device, Service, Settings};
 use knn_store::{Store, Transfers};
 use serde_json::{Value, json};
@@ -241,6 +244,7 @@ async fn asks_for_basic_auth_when_it_is_set() {
             ("GET", "/_status/abc"),
             ("POST", "/_build"),
             ("GET", "/_jobs"),
+            ("GET", "/metrics"),
         ] {
             assert_eq!(
                 send(&router, method, path, &headers, "").await,
@@ -276,6 +280,241 @@ async fn asks_for_basic_auth_when_it_is_set() {
         (missing.status, missing.body.as_str()),
         (404, r#"{"detail":"Job not found"}"#)
     );
+}
+
+/// Requests refused for their credentials are counted as any other, the
+/// scrape's own among them.
+#[tokio::test(flavor = "multi_thread")]
+async fn counts_the_requests_it_refuses_for_credentials() {
+    let credentials = Credentials {
+        username: "admin".into(),
+        password: "s3cret:x".into(),
+    };
+    let service = service(
+        nowhere().await,
+        FakeBuilder::new(Duration::ZERO),
+        Settings::default(),
+    );
+    let router = api::app(service, Some(credentials));
+    let right = [("authorization", "Basic YWRtaW46czNjcmV0Ong=")];
+    for path in ["/metrics", "/_jobs", "/metrics"] {
+        assert_eq!(send(&router, "GET", path, &[], "").await.status, 401);
+    }
+    assert_eq!(
+        send(&router, "GET", "/_heart_beat", &[], "").await.status,
+        200
+    );
+    let page = send(&router, "GET", "/metrics", &right, "").await;
+    assert_eq!(page.status, 200);
+    for (series, count) in [
+        (
+            r#"knn_builder_http_requests_total{route="metrics",code="401"}"#,
+            Some(2.0),
+        ),
+        (
+            r#"knn_builder_http_requests_total{route="jobs",code="401"}"#,
+            Some(1.0),
+        ),
+        (
+            r#"knn_builder_http_requests_total{route="heart_beat",code="200"}"#,
+            Some(1.0),
+        ),
+        // Counted once answered: not on its own page.
+        (
+            r#"knn_builder_http_requests_total{route="metrics",code="200"}"#,
+            None,
+        ),
+    ] {
+        assert_eq!(value(&page.body, series), count, "{series}");
+    }
+}
+
+/// The value of `series`, its name and labels as the page writes them.
+fn value(page: &str, series: &str) -> Option<f64> {
+    page.lines().find_map(|line| {
+        let (name, value) = line.rsplit_once(' ')?;
+        (name == series).then(|| value.parse().unwrap())
+    })
+}
+
+async fn scrape(router: &api::App) -> String {
+    let page = send(router, "GET", "/metrics", &[], "").await;
+    assert_eq!(page.status, 200, "{}", page.body);
+    page.body
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn serves_its_metrics_on_get_only() {
+    let router = api::app(
+        service(
+            nowhere().await,
+            FakeBuilder::new(Duration::ZERO),
+            Settings::default(),
+        ),
+        None,
+    );
+    let page = send(&router, "GET", "/metrics", &[], "").await;
+    assert_eq!(
+        (page.status, page.headers.as_slice()),
+        (
+            200,
+            &[(
+                "content-type".to_owned(),
+                api::METRICS_CONTENT_TYPE.to_owned()
+            )][..]
+        )
+    );
+    let version = env!("CARGO_PKG_VERSION");
+    let info = format!(r#"knn_builder_build_info{{version="{version}"}}"#);
+    assert_eq!(value(&page.body, &info), Some(1.0));
+    // An idle service: nothing counted, nothing in flight.
+    assert_eq!(value(&page.body, "knn_builder_jobs_held"), Some(0.0));
+    assert_eq!(
+        value(&page.body, "knn_builder_jobs_held_limit"),
+        Some(10_000.0)
+    );
+    assert_eq!(value(&page.body, "knn_builder_drain_seconds"), Some(0.0));
+    assert_eq!(
+        value(&page.body, "knn_builder_host_budget_bytes"),
+        Some(f64::from(30_517_u32 * 1024) * 1024.0)
+    );
+    assert_eq!(
+        value(&page.body, "knn_builder_host_budget_used_bytes"),
+        Some(0.0)
+    );
+    assert!(value(&page.body, "process_start_time_seconds").unwrap() > 1.7e9);
+    assert!(!page.body.contains("process_resident_memory_bytes"));
+    for method in ["POST", "HEAD", "PUT"] {
+        let answer = send(&router, method, "/metrics", &[], "").await;
+        assert_eq!(answer.status, 405, "{method}");
+        assert!(
+            answer
+                .headers
+                .contains(&("allow".to_owned(), "GET".to_owned()))
+        );
+    }
+    let slash = send(&router, "GET", "/metrics/", &[], "").await;
+    assert_eq!(slash.status, 307);
+    assert!(slash.headers.contains(&(
+        "location".to_owned(),
+        "http://testserver/metrics".to_owned()
+    )));
+    let page = scrape(&router).await;
+    for (series, count) in [
+        (
+            r#"knn_builder_http_requests_total{route="metrics",code="200"}"#,
+            1.0,
+        ),
+        (
+            r#"knn_builder_http_requests_total{route="metrics",code="405"}"#,
+            3.0,
+        ),
+        (
+            r#"knn_builder_http_requests_total{route="other",code="307"}"#,
+            1.0,
+        ),
+    ] {
+        assert_eq!(value(&page, series), Some(count), "{series}");
+    }
+}
+
+/// A small request for the segment `name`, in a bucket on no S3.
+fn small_body(name: &str) -> Value {
+    json!({
+        "container_name": "bucket",
+        "vector_path": format!("{name}/_0_vectors.knnvec"),
+        "doc_id_path": format!("{name}/_0_vectors.knndid"),
+        "dimension": 16,
+        "doc_count": 600,
+    })
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn counts_each_answer_and_each_end_once() {
+    let settings = Settings {
+        max_jobs: 3,
+        ..Settings::default()
+    };
+    let router = api::app(
+        service(nowhere().await, FakeBuilder::new(Duration::ZERO), settings),
+        None,
+    );
+    let first = small_body("first");
+    let mut other = first.clone();
+    other["dimension"] = json!(8);
+    let mut invalid = first.clone();
+    invalid["doc_count"] = json!(4);
+    let mut no_build = small_body("no-build");
+    no_build["index_parameters"] = json!({"algorithm_parameters": {"m": -1}});
+    let mut job_ids = Vec::new();
+    for (body, status) in [
+        (&first, 200),
+        // A retry, a conflict and a body refused.
+        (&first, 200),
+        (&other, 409),
+        (&invalid, 422),
+        // Taken, and failed at once.
+        (&no_build, 200),
+        (&small_body("second"), 200),
+        // A fourth job, with three held.
+        (&small_body("third"), 507),
+    ] {
+        let answer = post(&router, body).await;
+        assert_eq!(answer.status, status, "{body}: {}", answer.body);
+        if status == 200 {
+            let id = serde_json::from_str::<Value>(&answer.body).unwrap()["job_id"].clone();
+            job_ids.push(id.as_str().unwrap().to_owned());
+        }
+    }
+    // With no S3, the two that download fail there.
+    for job_id in &job_ids {
+        assert_eq!(
+            ended(&router, job_id).await["task_status"],
+            "FAILED_INDEX_BUILD"
+        );
+    }
+    let page = scrape(&router).await;
+    let answers = [
+        ("accepted", 3.0),
+        ("held", 1.0),
+        ("invalid", 1.0),
+        ("conflict", 1.0),
+        ("store_full", 1.0),
+        ("too_large", 0.0),
+        ("late", 0.0),
+        ("cpu_sooner", 0.0),
+    ];
+    for (result, count) in answers {
+        let series = format!(r#"knn_builder_build_requests_total{{result="{result}"}}"#);
+        assert_eq!(value(&page, &series), Some(count), "{series}");
+    }
+    for (outcome, count) in [
+        ("download_failed", 2.0),
+        ("bad_parameters", 1.0),
+        ("completed", 0.0),
+        ("canceled", 0.0),
+    ] {
+        let series = format!(r#"knn_builder_jobs_ended_total{{outcome="{outcome}"}}"#);
+        assert_eq!(value(&page, &series), Some(count), "{series}");
+    }
+    for (code, count) in [(200, 4.0), (409, 1.0), (422, 1.0), (507, 1.0)] {
+        let series = format!(r#"knn_builder_http_requests_total{{route="build",code="{code}"}}"#);
+        assert_eq!(value(&page, &series), Some(count), "{series}");
+    }
+    // Ended, so held until the TTL, and nothing in flight.
+    assert_eq!(value(&page, "knn_builder_jobs_held"), Some(3.0));
+    assert_eq!(value(&page, "knn_builder_jobs_held_limit"), Some(3.0));
+    let queued = r#"knn_builder_jobs_in_flight{stage="queued"}"#;
+    assert_eq!(value(&page, queued), Some(0.0));
+    assert_eq!(
+        value(&page, "knn_builder_host_budget_used_bytes"),
+        Some(0.0)
+    );
+    assert_eq!(value(&page, "knn_builder_drain_seconds"), Some(0.0));
+    // No job stored an index: no times, and nothing learned.
+    assert_eq!(value(&page, "knn_builder_job_seconds_count"), Some(0.0));
+    let ratio = r#"knn_builder_stage_model_ratio{stage="build"}"#;
+    assert_eq!(value(&page, ratio), Some(1.0));
 }
 
 /// The request k-NN would send for the segment `name`.
@@ -355,6 +594,9 @@ async fn refuses_a_job_it_cannot_build_in_time_or_memory() {
             .starts_with("Insufficient available resources to process job "),
         "{detail}"
     );
+    let page = scrape(&router).await;
+    let too_large = r#"knn_builder_build_requests_total{result="too_large"}"#;
+    assert_eq!(value(&page, too_large), Some(1.0));
     // With the memory, the data node's 10 s timeout refuses it.
     let short = Settings {
         client_timeout: Duration::from_secs(10),
@@ -380,6 +622,26 @@ async fn refuses_a_job_it_cannot_build_in_time_or_memory() {
     assert_eq!(jobs.body, r#""{}""#);
     let status = send(&router, "GET", "/_status/0123abc", &[], "").await;
     assert_eq!(status.status, 404);
+    let page = scrape(&router).await;
+    for (result, count) in [("late", 1.0), ("too_large", 0.0), ("accepted", 0.0)] {
+        let series = format!(r#"knn_builder_build_requests_total{{result="{result}"}}"#);
+        assert_eq!(value(&page, &series), Some(count), "{series}");
+    }
+    // A data node on four threads builds a small segment before its first
+    // poll would see the job ended.
+    let cpu = Settings {
+        cpu_build: Some(CpuThreads::Four),
+        ..Settings::default()
+    };
+    let router = api::app(
+        service(nowhere().await, FakeBuilder::new(Duration::ZERO), cpu),
+        None,
+    );
+    let answer = post(&router, &small_body("small")).await;
+    assert_eq!(answer.status, 507, "{}", answer.body);
+    let page = scrape(&router).await;
+    let cpu_sooner = r#"knn_builder_build_requests_total{result="cpu_sooner"}"#;
+    assert_eq!(value(&page, cpu_sooner), Some(1.0));
 }
 
 /// The status of `job_id` once it is no longer running.

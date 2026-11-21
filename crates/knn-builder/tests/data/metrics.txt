@@ -57,7 +57,7 @@ knn_builder_vectors_built_total{data_type="float"} 18000000
 knn_builder_vectors_built_total{data_type="half_float"} 6500000
 knn_builder_vectors_built_total{data_type="byte"} 9250000
 knn_builder_vectors_built_total{data_type="binary"} 4000000
-# HELP knn_builder_recall Recall the recall check found, for every job checked.
+# HELP knn_builder_recall Recall the recall check found, for jobs that stored an index or failed for their recall.
 # TYPE knn_builder_recall histogram
 knn_builder_recall_bucket{le="0.5"} 1
 knn_builder_recall_bucket{le="0.8"} 12

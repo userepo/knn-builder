@@ -1,6 +1,7 @@
 //! The service core against a real S3 API, with the fake builder:
 //! LocalStack in CI. Ignored by default, as the pipeline's tests are; the
-//! job store's own rules are unit tests in `src/service.rs`.
+//! job store's own rules are unit tests in `src/service.rs`. Each test
+//! also holds the metrics to how its jobs ended.
 //!
 //! Each test makes a bucket of its own and removes it when it passes.
 
@@ -18,6 +19,9 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use common::{S3, ids, le_ids};
+use knn_builder::metrics::{
+    BuildAnswer, Family, FlightStage, Label, Outcome, Snapshot, TimedStage, VectorType,
+};
 use knn_builder::request::{self, BuildRequest, JobId};
 use knn_builder::service::{Service, Settings, Status};
 use knn_builder::{FakeBuilder, RecallCheck};
@@ -49,6 +53,32 @@ async fn put_inputs(s3: &S3, request: &BuildRequest) {
     s3.put(&request.vector_path, values.collect(), None).await;
     s3.put(&request.doc_id_path, le_ids(&ids(DOC_COUNT)), None)
         .await;
+}
+
+/// `family`'s value for `label`.
+fn of<L: Label, T>(family: &Family<L, T>, label: L) -> &T {
+    let mut values = family.iter();
+    values.find(|(known, _)| *known == label).unwrap().1
+}
+
+/// The jobs `snapshot` counts as having ended as `outcome`.
+fn ended_as(snapshot: &Snapshot, outcome: Outcome) -> u64 {
+    *of(&snapshot.counted.jobs_ended, outcome)
+}
+
+/// The jobs `snapshot` has in flight, in every stage.
+fn in_flight(snapshot: &Snapshot) -> u64 {
+    snapshot.jobs_in_flight.iter().map(|(_, &jobs)| jobs).sum()
+}
+
+/// The jobs `snapshot` counts as having ended at all.
+fn ended_in_all(snapshot: &Snapshot) -> u64 {
+    snapshot
+        .counted
+        .jobs_ended
+        .iter()
+        .map(|(_, &count)| count)
+        .sum()
 }
 
 /// The status of `job_id` once it has ended.
@@ -88,6 +118,20 @@ async fn builds_a_job_once_however_often_it_is_requested() {
         assert_eq!(submit.await.unwrap(), Ok(request.job_id()));
     }
     assert_eq!(service.status(&request.job_id()), Some(Status::Running));
+    // Once it builds: in flight, its buffers counted, and some way to go.
+    let building = loop {
+        let snapshot = service.metrics();
+        if *of(&snapshot.jobs_in_flight, FlightStage::Building) == 1 {
+            break snapshot;
+        }
+        assert_eq!(service.status(&request.job_id()), Some(Status::Running));
+        tokio::time::sleep(Duration::from_millis(5)).await;
+    };
+    assert_eq!(in_flight(&building), 1);
+    assert!(building.host_budget_used > 0);
+    assert!(building.host_budget_used < building.host_budget);
+    assert!(building.drain_seconds > 0.0);
+    assert_eq!(ended_in_all(&building), 0);
     let file_name = "_0_vectors.faiss".to_owned();
     assert_eq!(
         ended(&service, &request.job_id()).await,
@@ -99,6 +143,38 @@ async fn builds_a_job_once_however_often_it_is_requested() {
     // A retry after the job ended gets it too.
     assert_eq!(service.submit(request.clone()), Ok(request.job_id()));
     assert_eq!(builder.builds(), 1);
+    let snapshot = service.metrics();
+    let counted = &snapshot.counted;
+    let answers = &counted.build_requests;
+    assert_eq!(*of(answers, BuildAnswer::Accepted), 1);
+    assert_eq!(*of(answers, BuildAnswer::Held), 16);
+    assert_eq!(ended_as(&snapshot, Outcome::Completed), 1);
+    assert_eq!(ended_in_all(&snapshot), 1);
+    let vectors = *of(&counted.vectors_built, VectorType::Float);
+    assert_eq!(vectors, u64::from(DOC_COUNT));
+    // Each stage the job ran timed once, within the job's own time.
+    let stage = |stage| of(&counted.stage_seconds, stage);
+    for (timed, runs) in [
+        (TimedStage::Download, 1),
+        (TimedStage::Build, 1),
+        (TimedStage::Projection, 0),
+        (TimedStage::RecallCheck, 0),
+        (TimedStage::Upload, 1),
+    ] {
+        assert_eq!(stage(timed).count(), runs, "{timed:?}");
+    }
+    let stages: f64 = [TimedStage::Download, TimedStage::Build, TimedStage::Upload]
+        .into_iter()
+        .map(|timed| stage(timed).sum())
+        .sum();
+    assert!(stage(TimedStage::Build).sum() >= 0.3);
+    assert!(stages + counted.queue_seconds.sum() <= counted.job_seconds.sum());
+    assert_eq!(counted.job_seconds.count(), 1);
+    assert_eq!(counted.forecast_ratio.count(), 1);
+    assert_eq!(counted.recall.count(), 0);
+    assert_eq!(snapshot.jobs_held, 1);
+    assert_eq!(in_flight(&snapshot), 0);
+    assert_eq!(snapshot.host_budget_used, 0);
     Arc::into_inner(service).unwrap().close().await;
     s3.remove().await;
 }
@@ -116,6 +192,10 @@ async fn holds_a_failure_and_stores_nothing() {
         panic!("not failed");
     };
     assert!(error_message.contains("no GPU here"), "{error_message}");
+    let snapshot = service.metrics();
+    assert_eq!(ended_as(&snapshot, Outcome::BuildFailed), 1);
+    assert_eq!(ended_in_all(&snapshot), 1);
+    assert_eq!(snapshot.counted.job_seconds.count(), 0);
     let mut keys = s3.keys().await;
     keys.sort();
     assert_eq!(
@@ -154,6 +234,13 @@ async fn fails_a_job_below_the_least_recall() {
         error_message.starts_with("the recall check failed: recall@10 over 50 sampled vectors is "),
         "{error_message}"
     );
+    // Counted, with its recall.
+    let snapshot = service.metrics();
+    assert_eq!(ended_as(&snapshot, Outcome::LowRecall), 1);
+    assert_eq!(ended_in_all(&snapshot), 1);
+    let recall = &snapshot.counted.recall;
+    assert_eq!(recall.count(), 1);
+    assert!(recall.sum() < 1.0, "{}", recall.sum());
     let mut keys = s3.keys().await;
     keys.sort();
     assert_eq!(
@@ -181,6 +268,11 @@ async fn fails_at_once_a_job_no_build_can_take() {
         })
     );
     assert_eq!(builder.builds(), 0);
+    let snapshot = service.metrics();
+    let accepted = *of(&snapshot.counted.build_requests, BuildAnswer::Accepted);
+    assert_eq!(accepted, 1);
+    assert_eq!(ended_as(&snapshot, Outcome::BadParameters), 1);
+    assert_eq!(ended_in_all(&snapshot), 1);
     service.close().await;
     s3.remove().await;
 }
@@ -257,6 +349,14 @@ async fn drops_the_jobs_the_data_node_stopped_waiting_for() {
     let builder = FakeBuilder::new(Duration::from_secs(3));
     let service = Service::start(s3.store.clone(), builder.clone(), settings);
     let ids = [first.clone(), second.clone()].map(|request| service.submit(request).unwrap());
+    // Past the 2 s, with the first's build still under way: both dropped,
+    // and neither ended yet, the second waiting for the builder to let it
+    // go. Each is in flight until it ends.
+    tokio::time::sleep(Duration::from_millis(2_500)).await;
+    let waiting = service.metrics();
+    assert_eq!(ended_in_all(&waiting), 0);
+    assert_eq!(*of(&waiting.jobs_in_flight, FlightStage::Building), 1);
+    assert_eq!(in_flight(&waiting), 2);
     let dropped = Status::Failed {
         error_message: "the data node's timeout of 2 s passed, so the job was dropped".to_owned(),
     };
@@ -267,6 +367,9 @@ async fn drops_the_jobs_the_data_node_stopped_waiting_for() {
         assert!(s3.get(&format!("{name}/_0_vectors.faiss")).await.is_none());
     }
     assert_eq!(builder.builds(), 1);
+    let snapshot = service.metrics();
+    assert_eq!(ended_as(&snapshot, Outcome::TimedOut), 2);
+    assert_eq!(ended_in_all(&snapshot), 2);
     service.close().await;
     s3.remove().await;
 }
@@ -305,6 +408,12 @@ async fn drops_the_jobs_forecast_again_to_miss_once_one_ends() {
         assert_eq!(ended(&service, job_id).await, forecast_late);
         assert!(submitted.elapsed() < Duration::from_secs(4));
     }
+    // Ended, so in flight no more, wherever in the pipeline they still
+    // are: only the second is.
+    let dropped = service.metrics();
+    assert_eq!(ended_as(&dropped, Outcome::ForecastLate), 2);
+    assert_eq!(ended_as(&dropped, Outcome::Completed), 1);
+    assert_eq!(in_flight(&dropped), 1);
     assert!(matches!(
         ended(&service, &ids[0]).await,
         Status::Completed { .. }
@@ -319,6 +428,19 @@ async fn drops_the_jobs_forecast_again_to_miss_once_one_ends() {
         }
     );
     assert_eq!(builder.builds(), 2);
+    // Each counted once: the two dropped ended in the store first, and
+    // again, unseen, when the pipeline reported them.
+    let snapshot = service.metrics();
+    assert_eq!(ended_as(&snapshot, Outcome::Completed), 1);
+    assert_eq!(ended_as(&snapshot, Outcome::ForecastLate), 2);
+    assert_eq!(ended_as(&snapshot, Outcome::TimedOut), 1);
+    assert_eq!(ended_in_all(&snapshot), 4);
+    // The first took 3 s where the model had about half a second.
+    let ratio = &snapshot.counted.forecast_ratio;
+    assert_eq!(ratio.count(), 1);
+    assert!(ratio.sum() > 1.5, "{}", ratio.sum());
+    let build = *of(&snapshot.stage_model_ratio, TimedStage::Build);
+    assert!(build > 1.5, "{build}");
     service.close().await;
     s3.remove().await;
 }

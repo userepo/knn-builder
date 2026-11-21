@@ -10,16 +10,22 @@
 //! `tests/data/routes.json` holds the service's own answers, recorded by
 //! `tools/oracle/routes.py`.
 //!
+//! Beside them, `GET /metrics` answers the service's metrics in the
+//! Prometheus text format ([`crate::metrics`]), with the requests answered
+//! by route and status code; the upstream service has no such route, and
+//! answers it 404, as any path it has no route for. k-NN never asks for it.
+//!
 //! The service also serves FastAPI's documentation (`/docs`, `/redoc`,
 //! `/openapi.json`); here those are paths like any other, 404. A build
 //! request's body may be 2 MB at most,
 //! axum's default; a larger one gets 413, where the service reads any
 //! size. k-NN's are a few hundred bytes.
 //!
-//! With [`Credentials`] set, every route but `/_heart_beat` asks for them
-//! by Basic Auth, and answers 401 without them; the heart beat stays open
-//! for health checks, as it tells nothing. Unset, the `Authorization`
-//! header is ignored, as the service ignores it.
+//! With [`Credentials`] set, every route but `/_heart_beat`, `/metrics`
+//! among them, asks for them by Basic Auth, and answers 401 without them;
+//! the heart beat stays open for health checks, as it tells nothing.
+//! Unset, the `Authorization` header is ignored, as the service ignores
+//! it.
 
 use std::fmt::Write as _;
 use std::sync::Arc;
@@ -39,16 +45,22 @@ use tower::ServiceExt as _;
 use tower::util::MapRequest;
 
 use crate::config::Credentials;
+use crate::metrics::{Answers, Route};
 use crate::request::{self, JobId};
 use crate::service::{Listed, Service, Status};
 
 /// What `GET /_heart_beat` answers: the service's name.
 pub const SERVICE_NAME: &str = "remote-vector-index-builder-api";
 
+/// The type of `GET /metrics`'s body: the Prometheus text format.
+pub const METRICS_CONTENT_TYPE: &str = "text/plain; version=0.0.4; charset=utf-8";
+
 #[derive(Debug, Clone)]
 struct Api {
     service: Arc<Service>,
     auth: Option<Arc<Credentials>>,
+    /// The requests answered, every route counted.
+    answers: Arc<Answers>,
 }
 
 /// The API as a service: the routes, behind the path decoding.
@@ -134,6 +146,7 @@ fn router(service: Arc<Service>, auth: Option<Credentials>) -> Router {
     let api = Api {
         service,
         auth: auth.map(Arc::new),
+        answers: Arc::default(),
     };
     Router::new()
         .route("/_build", post(build).fallback(not_allowed("POST")))
@@ -149,6 +162,12 @@ fn router(service: Arc<Service>, auth: Option<Credentials>) -> Router {
                 .head(not_allowed("GET"))
                 .fallback(not_allowed("GET")),
         )
+        .route(
+            "/metrics",
+            get(metrics)
+                .head(not_allowed("GET"))
+                .fallback(not_allowed("GET")),
+        )
         .route_layer(middleware::from_fn_with_state(api.clone(), authenticate))
         // Added after the auth layer, so outside it.
         .route(
@@ -158,7 +177,7 @@ fn router(service: Arc<Service>, auth: Option<Credentials>) -> Router {
                 .fallback(not_allowed("GET")),
         )
         .fallback(not_found)
-        .layer(middleware::from_fn(log))
+        .layer(middleware::from_fn_with_state(api.clone(), log))
         .with_state(api)
 }
 
@@ -168,6 +187,7 @@ async fn build(State(api): State<Api>, headers: HeaderMap, body: Bytes) -> Respo
         Ok(request) => request,
         Err(rejection) => {
             tracing::info!(errors = ?rejection.errors(), "build request refused");
+            api.service.count_invalid();
             return answer(rejection.status(), &rejection.body());
         }
     };
@@ -190,6 +210,14 @@ async fn heart_beat() -> Json<&'static str> {
 
 async fn jobs(State(api): State<Api>) -> Json<String> {
     Json(jobs_text(&api.service.jobs()))
+}
+
+/// The metrics page, read after the service's lock is let go.
+async fn metrics(State(api): State<Api>) -> Response {
+    let mut snapshot = api.service.metrics();
+    snapshot.http_requests = api.answers.answered();
+    let content_type = HeaderValue::from_static(METRICS_CONTENT_TYPE);
+    ([(header::CONTENT_TYPE, content_type)], snapshot.render()).into_response()
 }
 
 /// The service's debug list, as its route builds it: every job's fields,
@@ -306,10 +334,25 @@ async fn not_found(headers: HeaderMap, uri: Uri) -> Response {
 
 /// Whether a route takes `path`.
 fn is_route(path: &str) -> bool {
-    matches!(path, "/_build" | "/_heart_beat" | "/_jobs")
-        || path
+    route_of(path) != Route::Other
+}
+
+/// The route that takes `path`, as the metrics name it; a path with a
+/// trailing slash is no route's, though it is redirected to one.
+fn route_of(path: &str) -> Route {
+    match path {
+        "/_build" => Route::Build,
+        "/_heart_beat" => Route::HeartBeat,
+        "/_jobs" => Route::Jobs,
+        "/metrics" => Route::Metrics,
+        _ if path
             .strip_prefix("/_status/")
-            .is_some_and(|id| !id.is_empty() && !id.contains('/'))
+            .is_some_and(|id| !id.is_empty() && !id.contains('/')) =>
+        {
+            Route::Status
+        }
+        _ => Route::Other,
+    }
 }
 
 /// Basic Auth, when it is set: 401 for a request without the credentials,
@@ -391,11 +434,14 @@ fn answer(status: u16, body: &Value) -> Response {
     (status, Json(body)).into_response()
 }
 
-/// A line per request, as the service's server logs one.
-async fn log(request: Request, next: Next) -> Response {
+/// A line per request, as the service's server logs one, and the request
+/// counted by its route and answer.
+async fn log(State(api): State<Api>, request: Request, next: Next) -> Response {
     let (method, path) = (request.method().clone(), request.uri().path().to_owned());
     let start = Instant::now();
     let response = next.run(request).await;
+    api.answers
+        .count(route_of(&path), response.status().as_u16());
     tracing::info!(
         %method,
         path,
@@ -410,7 +456,8 @@ async fn log(request: Request, next: Next) -> Response {
 mod tests {
     use serde_json::Value;
 
-    use super::{decoded, encoded, is_route, jobs_text, same, status_body};
+    use super::{decoded, encoded, is_route, jobs_text, route_of, same, status_body};
+    use crate::metrics::Route;
     use crate::request;
     use crate::service::{Listed, Status};
 
@@ -479,8 +526,15 @@ mod tests {
 
     #[test]
     fn knows_its_routes() {
-        for route in ["/_build", "/_heart_beat", "/_jobs", "/_status/abc"] {
-            assert!(is_route(route), "{route}");
+        for (path, route) in [
+            ("/_build", Route::Build),
+            ("/_heart_beat", Route::HeartBeat),
+            ("/_jobs", Route::Jobs),
+            ("/_status/abc", Route::Status),
+            ("/metrics", Route::Metrics),
+        ] {
+            assert!(is_route(path), "{path}");
+            assert_eq!(route_of(path), route, "{path}");
         }
         for path in [
             "/",
@@ -489,8 +543,13 @@ mod tests {
             "/_status/a/b",
             "/_jobs/x",
             "/_build/x",
+            "/_build/",
+            "/metrics/",
+            "/metrics/x",
+            "/Metrics",
         ] {
             assert!(!is_route(path), "{path}");
+            assert_eq!(route_of(path), Route::Other, "{path}");
         }
     }
 
