@@ -1,0 +1,708 @@
+{
+ "service": "knn-builder",
+ "image": "knn-builder:dev",
+ "image_id": "sha256:a7ea5484f5c0e09c4c0d74372872d7e04169cc3543e9113372f87d987f30b8da",
+ "max_workers": 2,
+ "gpu": {
+  "name": "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "driver": "621.24",
+  "memory_mib": 8188
+ },
+ "started": "2026-11-20T17:09:45.127490-06:00",
+ "settings": {
+  "runs": 1,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 100,
+  "recall_check_k": 100,
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 8.0,
+  "s3": {
+   "store": "localstack"
+  }
+ },
+ "inputs": {
+  "ip-1000x64": {
+   "dir": "fixtures/inputs/ip-1000x64",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "l2-1000x64": {
+   "dir": "fixtures/inputs/l2-1000x64",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "l2-1000x64-fp16": {
+   "dir": "fixtures/inputs/l2-1000x64-fp16",
+   "data_type": "half_float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "l2-1000x64-fp16from32": {
+   "dir": "fixtures/inputs/l2-1000x64-fp16from32",
+   "data_type": "half_float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "l2-1000x64-skip": {
+   "dir": "fixtures/inputs/l2-1000x64-skip",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": true
+  },
+  "l2-150x64": {
+   "dir": "fixtures/inputs/l2-150x64",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 150,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "ip-1000x64-byte": {
+   "dir": "fixtures/byte/inputs/ip-1000x64-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "l2-1000x64-byte": {
+   "dir": "fixtures/byte/inputs/l2-1000x64-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "l2-1000x64-byte-skip": {
+   "dir": "fixtures/byte/inputs/l2-1000x64-byte-skip",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": true
+  },
+  "l2-150x64-byte": {
+   "dir": "fixtures/byte/inputs/l2-150x64-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 150,
+   "dimension": 64,
+   "skip_stored_vectors": false
+  },
+  "hamming-1000x1024-binary-clustered": {
+   "dir": "fixtures/binary/inputs/hamming-1000x1024-binary-clustered",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 1024,
+   "skip_stored_vectors": false
+  },
+  "hamming-1000x256-binary": {
+   "dir": "fixtures/binary/inputs/hamming-1000x256-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 256,
+   "skip_stored_vectors": false
+  },
+  "hamming-1000x256-binary-clustered": {
+   "dir": "fixtures/binary/inputs/hamming-1000x256-binary-clustered",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 256,
+   "skip_stored_vectors": false
+  },
+  "hamming-1000x256-binary-skip": {
+   "dir": "fixtures/binary/inputs/hamming-1000x256-binary-skip",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 256,
+   "skip_stored_vectors": true
+  },
+  "hamming-150x256-binary": {
+   "dir": "fixtures/binary/inputs/hamming-150x256-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 150,
+   "dimension": 256,
+   "skip_stored_vectors": false
+  },
+  "hamming-40x256-binary": {
+   "dir": "fixtures/binary/inputs/hamming-40x256-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 40,
+   "dimension": 256,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "hamming-1000x1024-binary-clustered",
+   "index": 0,
+   "job_id": "f4df6bfbaca520219ba00f4ac8b18aeb7e43e3c5d26d8d050c61670250a96677",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.129,
+   "start": "2026-11-20T17:09:56.392734-06:00",
+   "end": "2026-11-20T17:10:00.521634-06:00",
+   "host_peak_bytes": 427630592,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.012158156,
+    "build": 0.634687056,
+    "upload": 0.015736068
+   },
+   "recall_check": {
+    "recall": 0.9996,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.011669977
+   },
+   "device_samples": 66,
+   "device_held_bytes": 133169152,
+   "device_peak_bytes": 4194304
+  },
+  {
+   "input": "ip-1000x64",
+   "index": 1,
+   "job_id": "db48e75d6a91b2b94f1e153b6f83d0cf81c47aa3b3903c6bd74b52a4b9395947",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.132,
+   "start": "2026-11-20T17:10:05.390774-06:00",
+   "end": "2026-11-20T17:10:09.522634-06:00",
+   "host_peak_bytes": 713740288,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.006374615,
+    "build": 1.574730569,
+    "upload": 0.012559424
+   },
+   "recall_check": {
+    "recall": 0.9997,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.008230216
+   },
+   "device_samples": 67,
+   "device_held_bytes": 135266304,
+   "device_peak_bytes": 56623104
+  },
+  {
+   "input": "ip-1000x64-byte",
+   "index": 2,
+   "job_id": "4081fc846f5f9703adc5b9e1c589a43c00c4a02fb51b906227feb4064fe4d5d4",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.133,
+   "start": "2026-11-20T17:10:14.425906-06:00",
+   "end": "2026-11-20T17:10:18.558445-06:00",
+   "host_peak_bytes": 709922816,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.005904743,
+    "build": 0.438662944,
+    "upload": 0.00895758
+   },
+   "recall_check": {
+    "recall": 0.9998,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005481025
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 10485760
+  },
+  {
+   "input": "l2-1000x64-fp16",
+   "index": 3,
+   "job_id": "3b8fb80cab4a829c311106b161d20cbe595850e9b094dce0da2b6bfaf9574c1a",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.143,
+   "start": "2026-11-20T17:10:23.452182-06:00",
+   "end": "2026-11-20T17:10:27.595356-06:00",
+   "host_peak_bytes": 769118208,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "seconds": {
+    "download": 0.006007837,
+    "build": 1.329584264,
+    "upload": 0.009738228
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.006341657
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 14680064
+  }
+ ],
+ "single": [
+  {
+   "input": "hamming-1000x1024-binary-clustered",
+   "index": 16,
+   "job_id": "2a1c068c163c12ba7af78d9392618f2194fc858b7d10aa21e9f56c27a533aa1b",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.118,
+   "start": "2026-11-20T17:10:32.451797-06:00",
+   "end": "2026-11-20T17:10:36.569342-06:00",
+   "host_peak_bytes": 768831488,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 407697,
+   "seconds": {
+    "download": 0.006218581,
+    "build": 0.530616239,
+    "upload": 0.013071627
+   },
+   "recall_check": {
+    "recall": 0.9996,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.008598928
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "hamming-1000x256-binary",
+   "index": 17,
+   "job_id": "063f497cdba6f460d586219ca897e61569b4e36b30de4a5b36461968aac62475",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.126,
+   "start": "2026-11-20T17:10:43.488284-06:00",
+   "end": "2026-11-20T17:10:47.613941-06:00",
+   "host_peak_bytes": 768598016,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 311697,
+   "seconds": {
+    "download": 0.005882167,
+    "build": 0.319335049,
+    "upload": 0.010765222
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005061364
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "hamming-1000x256-binary-clustered",
+   "index": 18,
+   "job_id": "d6390c623a5b186b95e2e745ac3a5ac84ef96cff33536e47634b33d70a747f7d",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.141,
+   "start": "2026-11-20T17:10:54.547789-06:00",
+   "end": "2026-11-20T17:10:58.689174-06:00",
+   "host_peak_bytes": 769417216,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 311697,
+   "seconds": {
+    "download": 0.005795465,
+    "build": 0.294076932,
+    "upload": 0.008685349
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005671206
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "hamming-1000x256-binary-skip",
+   "index": 19,
+   "job_id": "00cdf704cc84b17acc7df2c949d802632a77c4d99edaf7096baf9d0237987da9",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.11,
+   "start": "2026-11-20T17:11:05.608727-06:00",
+   "end": "2026-11-20T17:11:09.719004-06:00",
+   "host_peak_bytes": 769896448,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 279668,
+   "seconds": {
+    "download": 0.005820911,
+    "build": 0.469834295,
+    "upload": 0.014057624
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.0091364
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "hamming-150x256-binary",
+   "index": 20,
+   "job_id": "d7494b236ebad47b879a6c0b2201f027086025cbf721bedf2cb0f01b7a77b344",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.163,
+   "start": "2026-11-20T17:11:16.636816-06:00",
+   "end": "2026-11-20T17:11:20.799561-06:00",
+   "host_peak_bytes": 769220608,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 46953,
+   "seconds": {
+    "download": 0.006234422,
+    "build": 0.442933768,
+    "upload": 0.009545455
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.007192229
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "hamming-40x256-binary",
+   "index": 21,
+   "job_id": "26edde4b63b7286f23db29d6d484411e53fc2f8b2e5bc9101a1e82fcc0f329b1",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.147,
+   "start": "2026-11-20T17:11:27.688748-06:00",
+   "end": "2026-11-20T17:11:31.835633-06:00",
+   "host_peak_bytes": 759873536,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 8729,
+   "seconds": {
+    "download": 0.005395987,
+    "build": 0.026693117,
+    "upload": 0.006280556
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 40,
+    "k": 100,
+    "seconds": 0.004439531
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "ip-1000x64",
+   "index": 22,
+   "job_id": "e8d4b9dfb15dac1145af037b0c83001ecef90eac59f403eb44d04c178b3e77c8",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.124,
+   "start": "2026-11-20T17:11:38.743484-06:00",
+   "end": "2026-11-20T17:11:42.867194-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 535737,
+   "seconds": {
+    "download": 0.006187695,
+    "build": 0.352465366,
+    "upload": 0.008911666
+   },
+   "recall_check": {
+    "recall": 0.9997,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.004974108
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "ip-1000x64-byte",
+   "index": 23,
+   "job_id": "0e62ee935022980b52b33ce617a21dd2e1de172daf2caf698e6403caaaa1cfa7",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.109,
+   "start": "2026-11-20T17:11:49.785182-06:00",
+   "end": "2026-11-20T17:11:53.893800-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 343773,
+   "seconds": {
+    "download": 0.006165492,
+    "build": 0.366577598,
+    "upload": 0.01257486
+   },
+   "recall_check": {
+    "recall": 0.9998,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.008458733
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-1000x64",
+   "index": 24,
+   "job_id": "021de0ddefe0a3dfebc8db60829d50dcd715ca340a26b502ac428330b7365750",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.143,
+   "start": "2026-11-20T17:12:00.830755-06:00",
+   "end": "2026-11-20T17:12:04.973767-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 535737,
+   "seconds": {
+    "download": 0.006123558,
+    "build": 0.348930438,
+    "upload": 0.008939536
+   },
+   "recall_check": {
+    "recall": 0.9999,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005050943
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-1000x64-byte",
+   "index": 25,
+   "job_id": "cd0ce4519a05bb32f626c8f1396d2fa0594514be3f449bb64ae6804ee3353f10",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.147,
+   "start": "2026-11-20T17:12:11.896200-06:00",
+   "end": "2026-11-20T17:12:16.043633-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 343773,
+   "seconds": {
+    "download": 0.00769737,
+    "build": 0.352867868,
+    "upload": 0.008251783
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005227304
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-1000x64-byte-skip",
+   "index": 26,
+   "job_id": "375a726af4cbd767e5b4f985dbed5cb31a0c17443bb9d0842da94879ae630537",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.126,
+   "start": "2026-11-20T17:12:22.949333-06:00",
+   "end": "2026-11-20T17:12:27.075421-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 279696,
+   "seconds": {
+    "download": 0.006425846,
+    "build": 0.354610302,
+    "upload": 0.009567475
+   },
+   "recall_check": {
+    "recall": 0.9999,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.006052769
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-1000x64-fp16",
+   "index": 27,
+   "job_id": "1fec4bffafe40c92ddb33303b5c965a9be2a3b2d037fcea448f0283a9ceff7a6",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.177,
+   "start": "2026-11-20T17:12:34.027753-06:00",
+   "end": "2026-11-20T17:12:38.204329-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 407773,
+   "seconds": {
+    "download": 0.005783418,
+    "build": 0.35684575,
+    "upload": 0.008774259
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005445665
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-1000x64-fp16from32",
+   "index": 28,
+   "job_id": "9e04ab76b635b7a78e44443e8f878eec6784555ee320eafffee6185f23b6a864",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.152,
+   "start": "2026-11-20T17:12:45.131774-06:00",
+   "end": "2026-11-20T17:12:49.284080-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 407773,
+   "seconds": {
+    "download": 0.006404504,
+    "build": 0.366247245,
+    "upload": 0.010254446
+   },
+   "recall_check": {
+    "recall": 0.9999,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.006417159
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-1000x64-skip",
+   "index": 29,
+   "job_id": "1a804a6c6f7f153ed6b027321999ed3e2788cd9bd087086f92c2fe9d04b0d60f",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.156,
+   "start": "2026-11-20T17:12:56.196230-06:00",
+   "end": "2026-11-20T17:13:00.352306-06:00",
+   "host_peak_bytes": 761487360,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 279696,
+   "seconds": {
+    "download": 0.006460016,
+    "build": 0.35569188,
+    "upload": 0.013261893
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.009381673
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  },
+  {
+   "input": "l2-150x64",
+   "index": 30,
+   "job_id": "3589b32b0e3d9977525221ef419bfaa07a8a6aa438a80685a49cb4d7953c36c5",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.153,
+   "start": "2026-11-20T17:13:07.250530-06:00",
+   "end": "2026-11-20T17:13:11.403767-06:00",
+   "host_peak_bytes": 773017600,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 59177,
+   "seconds": {
+    "download": 0.006457205,
+    "build": 0.815108356,
+    "upload": 0.009871295
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.007099686
+   },
+   "device_samples": 67,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 2097152
+  },
+  {
+   "input": "l2-150x64-byte",
+   "index": 31,
+   "job_id": "e63a5aa9adeb03aaf2ecbd1513a862fa77975972d24b3c5ca1c60b1eb63ee4d7",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 4.113,
+   "start": "2026-11-20T17:13:18.302860-06:00",
+   "end": "2026-11-20T17:13:22.416225-06:00",
+   "host_peak_bytes": 754028544,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "size": 30413,
+   "seconds": {
+    "download": 0.005698877,
+    "build": 0.364831114,
+    "upload": 0.013625583
+   },
+   "recall_check": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.007878631
+   },
+   "device_samples": 66,
+   "device_held_bytes": 177209344,
+   "device_peak_bytes": 0
+  }
+ ],
+ "service_starts": [
+  "2026-11-20T17:09:46.663833-06:00"
+ ],
+ "ended": "2026-11-20T17:13:29.591901-06:00"
+}

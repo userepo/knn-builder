@@ -1,0 +1,134 @@
+{
+ "service": "knn-builder",
+ "image_id": "sha256:a7ea5484f5c0e09c4c0d74372872d7e04169cc3543e9113372f87d987f30b8da",
+ "knn_inspect": "knn-inspect 0.18.0",
+ "seed": 1,
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.999,
+    "queries": 100,
+    "k": 10,
+    "seconds": 0.411190435
+   },
+   "knn_inspect": {
+    "recall": 0.999,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "cohere-ip-1000000x768": {
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.982,
+    "queries": 100,
+    "k": 10,
+    "seconds": 3.811395691
+   },
+   "knn_inspect": {
+    "recall": 0.982,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "cohere-l2-1000000x768": {
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.983,
+    "queries": 100,
+    "k": 10,
+    "seconds": 3.820630582
+   },
+   "knn_inspect": {
+    "recall": 0.983,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "cohere-l2-1000000x768-byte": {
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.987,
+    "queries": 100,
+    "k": 10,
+    "seconds": 3.724734101
+   },
+   "knn_inspect": {
+    "recall": 0.987,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "cohere-l2-1000000x768-fp16from32": {
+   "data_type": "half_float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.982,
+    "queries": 100,
+    "k": 10,
+    "seconds": 4.04647291
+   },
+   "knn_inspect": {
+    "recall": 0.982,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "cohere-l2-1000000x768-skip": {
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": true,
+   "job": {
+    "recall": 0.985,
+    "queries": 100,
+    "k": 10,
+    "seconds": 3.707519278
+   },
+   "knn_inspect": {
+    "recall": 0.985,
+    "of": "its graph with the vectors put back"
+   },
+   "equal": true
+  },
+  "gist-l2-1000000x960": {
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.943,
+    "queries": 100,
+    "k": 10,
+    "seconds": 4.916481089
+   },
+   "knn_inspect": {
+    "recall": 0.943,
+    "of": "its file"
+   },
+   "equal": true
+  }
+ }
+}

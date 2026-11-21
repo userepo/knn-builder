@@ -1,0 +1,292 @@
+{
+ "service": "knn-builder",
+ "image_id": "sha256:a7ea5484f5c0e09c4c0d74372872d7e04169cc3543e9113372f87d987f30b8da",
+ "knn_inspect": "knn-inspect 0.18.0",
+ "seed": 1,
+ "inputs": {
+  "hamming-1000x1024-binary-clustered": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 1024,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.9996,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.008598928
+   },
+   "knn_inspect": {
+    "recall": 0.9996,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "hamming-1000x256-binary": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 256,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005061364
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "hamming-1000x256-binary-clustered": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 256,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005671206
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "hamming-1000x256-binary-skip": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000,
+   "dimension": 256,
+   "skip_stored_vectors": true,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.0091364
+   },
+   "unscored": "knn-format reads no binary graph without its vectors"
+  },
+  "hamming-150x256-binary": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 150,
+   "dimension": 256,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.007192229
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "hamming-40x256-binary": {
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 40,
+   "dimension": 256,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 40,
+    "k": 100,
+    "seconds": 0.004439531
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "ip-1000x64": {
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.9997,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.004974108
+   },
+   "knn_inspect": {
+    "recall": 0.9997,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "ip-1000x64-byte": {
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.9998,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.008458733
+   },
+   "knn_inspect": {
+    "recall": 0.9998,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "l2-1000x64": {
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.9999,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005050943
+   },
+   "knn_inspect": {
+    "recall": 0.9999,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "l2-1000x64-byte": {
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005227304
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "l2-1000x64-byte-skip": {
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": true,
+   "job": {
+    "recall": 0.9999,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.006052769
+   },
+   "knn_inspect": {
+    "recall": 0.9999,
+    "of": "its graph with the vectors put back"
+   },
+   "equal": true
+  },
+  "l2-1000x64-fp16": {
+   "data_type": "half_float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.005445665
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "l2-1000x64-fp16from32": {
+   "data_type": "half_float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 0.9999,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.006417159
+   },
+   "knn_inspect": {
+    "recall": 0.9999,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "l2-1000x64-skip": {
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000,
+   "dimension": 64,
+   "skip_stored_vectors": true,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.009381673
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its graph with the vectors put back"
+   },
+   "equal": true
+  },
+  "l2-150x64": {
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 150,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.007099686
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  },
+  "l2-150x64-byte": {
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 150,
+   "dimension": 64,
+   "skip_stored_vectors": false,
+   "job": {
+    "recall": 1.0,
+    "queries": 100,
+    "k": 100,
+    "seconds": 0.007878631
+   },
+   "knn_inspect": {
+    "recall": 1.0,
+    "of": "its file"
+   },
+   "equal": true
+  }
+ }
+}

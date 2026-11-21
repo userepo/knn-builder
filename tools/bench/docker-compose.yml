@@ -56,6 +56,10 @@ services:
       MAX_WORKERS: ${MAX_WORKERS:-1}
       # Each job's stage times, in the logs of both services.
       LOG_LEVEL: DEBUG
+      # knn-builder's recall check, off unless run.py turns it on; the
+      # upstream service reads neither.
+      RECALL_CHECK_QUERIES: ${RECALL_CHECK_QUERIES:-0}
+      RECALL_CHECK_K: ${RECALL_CHECK_K:-10}
       <<: *aws
     ports:
       - "127.0.0.1:${SERVICE_PORT:-1026}:1025"

@@ -72,10 +72,15 @@ Usage: python tools/bench/run.py OUT_DIR SERVICE [--inputs DIR ...]
            [--sustain-seconds S] [--burst-jobs N] [--burst-timeout S]
            [--burst-poll S] [--phases LIST] [--seed N] [--project]
            [--fetch-runs N] [--s3-bucket BUCKET] [--max-workers N]
-           [NAME...]
+           [--recall-queries N] [--recall-k K] [NAME...]
 
 --project asks every build for the upper-level projection
 (project_link_to_base_layer), for tools/bench/projection.py.
+--recall-queries turns on knn-builder's recall check (RECALL_CHECK_QUERIES,
+with --recall-k as RECALL_CHECK_K, 10 by default), and each warm-up and
+single job records what its check found, from the service's log, for
+tools/bench/recall_parity.py; the upstream service has no such check. An
+input whose input.json sets skip_stored_vectors is requested with it.
 
 SERVICE is knn-builder (the knn-builder:dev image) or upstream (the pinned
 api-snapshot image on one worker, since two builds at once crash it under
@@ -160,10 +165,10 @@ UPSTREAM_STEPS = {
     "upload": re.compile(r"Total upload time for path (\S+): ([\d.]+) seconds"),
 }
 # A job that projected links has its projection's time between the build's
-# and the upload's.
+# and the upload's, and one whose recall check ran, the check's after it.
 KNN_BUILDER_STEPS = re.compile(
     r"job stage times job_id=(\w+) download_s=([\d.eE+-]+) build_s=([\d.eE+-]+)"
-    r"(?: projection_s=([\d.eE+-]+))? upload_s=([\d.eE+-]+)"
+    r"(?: projection_s=([\d.eE+-]+))?(?: recall_check_s=([\d.eE+-]+))? upload_s=([\d.eE+-]+)"
 )
 # The upper-level projection's lines in each service's log: whether it
 # ran, the share of the nodes reachable before it, its counts and times.
@@ -176,6 +181,10 @@ KNN_BUILDER_PROJECTION = re.compile(
     r"upper-level projection( skipped| stopped|: nothing to do| failed)?(?:[^\"]*?) vector_path=\"([^\"]+)\"(.*)"
 )
 KNN_BUILDER_COMPLETED = re.compile(r"job completed job_id=(\w+) vector_path=\"([^\"]+)\"")
+# What a job's recall check found, on its completion line.
+KNN_BUILDER_RECALL = re.compile(
+    r"job completed job_id=(\w+) .*?\brecall=([\d.eE+-]+) recall_queries=(\d+) recall_k=(\d+)"
+)
 FIELD = re.compile(r"(\w+)=([\d.eE+-]+)(?=[\s),]|$)")
 
 
@@ -204,11 +213,14 @@ class Service:
     their logs collected before each change, down at the end. `bucket` is
     a bucket on real S3, or None for LocalStack's."""
 
-    def __init__(self, image, max_workers, out, inputs, bucket):
+    def __init__(self, image, max_workers, out, inputs, bucket, recall_check):
         self.bucket = bucket or LOCAL_BUCKET
+        queries, k = recall_check
         self.env = {
             "SERVICE_IMAGE": image,
             "MAX_WORKERS": max_workers,
+            "RECALL_CHECK_QUERIES": str(queries),
+            "RECALL_CHECK_K": str(k),
             "GPU_MEMORY_LIMIT": gpu_memory_limit(),
             "SERVICE_PORT": os.environ.get("SERVICE_PORT", "1026"),
             "S3_PORT": os.environ.get("S3_PORT", "4568"),
@@ -455,7 +467,7 @@ def steps_from_log(log):
     """Each job's step seconds by job id, from either service's log."""
     steps = {}
     for m in KNN_BUILDER_STEPS.finditer(log):
-        steps[m[1]] = {"download": float(m[2]), "build": float(m[3]), "upload": float(m[5])}
+        steps[m[1]] = {"download": float(m[2]), "build": float(m[3]), "upload": float(m[6])}
         if m[4] is not None:
             steps[m[1]]["projection"] = float(m[4])
     # By vector path: the open block and the jobs of the path in flight.
@@ -493,6 +505,21 @@ def steps_from_log(log):
                     if block is not None:
                         block[step] = float(m[2])
     return steps
+
+
+def recalls_from_log(log):
+    """What each job's recall check found, by job id, from knn-builder's
+    log: the recall, as the service printed it, the queries and k it is
+    of, and the check's seconds, which ran beside the upload's and so are
+    kept out of the job's step seconds."""
+    out = {
+        m[1]: {"recall": float(m[2]), "queries": int(m[3]), "k": int(m[4])}
+        for m in KNN_BUILDER_RECALL.finditer(log)
+    }
+    for m in KNN_BUILDER_STEPS.finditer(log):
+        if m[5] is not None and m[1] in out:
+            out[m[1]]["seconds"] = float(m[5])
+    return out
 
 
 def fields(text):
@@ -533,7 +560,20 @@ def projections_from_log(log):
     return out
 
 
-class ProjectingNode(burst.DataNode):
+class BenchNode(burst.DataNode):
+    """A data node whose request leaves the vectors out of the file when
+    its input says so (skip_stored_vectors), as k-NN's does for a field
+    whose vectors Lucene keeps."""
+
+    def body(self, index, name):
+        body = super().body(index, name)
+        meta = json.loads((self.inputs[name] / "input.json").read_text())
+        if meta.get("skip_stored_vectors"):
+            body["skip_stored_vectors"] = True
+        return body
+
+
+class ProjectingNode(BenchNode):
     """A data node whose requests ask for the upper-level projection, as
     k-NN sends a field's project_link_to_base_layer."""
 
@@ -565,7 +605,8 @@ class Bench:
             if (self.out / name / "input.json").exists():
                 sys.exit(f"{self.out} holds the input {name}: give a run directory")
         self.out.mkdir(parents=True, exist_ok=True)
-        self.service = Service(image, max_workers, self.out, inputs, args.s3_bucket)
+        self.service = Service(image, max_workers, self.out, inputs, args.s3_bucket,
+                               (args.recall_queries, args.recall_k))
         # What a run before left here: its files, and what report.py and
         # projection.py cached of them.
         for cache in ("recall.json", "projection.json"):
@@ -594,6 +635,8 @@ class Bench:
                 "seed": args.seed,
                 "gpu_sample_ms": GPU_SAMPLE_MS,
                 "project_link_to_base_layer": args.project,
+                "recall_check_queries": args.recall_queries,
+                "recall_check_k": args.recall_k,
                 "fetch_runs": args.fetch_runs,
                 "gpu_memory_limit_gb": float(gpu_memory_limit()),
                 # Where the bucket was, not its name.
@@ -603,6 +646,7 @@ class Bench:
                 name: {
                     "dir": str(d.resolve().relative_to(ROOT)).replace("\\", "/"),
                     **{k: metas[name][k] for k in ("data_type", "space_type", "doc_count", "dimension")},
+                    "skip_stored_vectors": bool(metas[name].get("skip_stored_vectors")),
                 }
                 for name, d in inputs.items()
             },
@@ -630,7 +674,7 @@ class Bench:
         return types
 
     def node(self, label, timeout=KNN_TIMEOUT, poll=KNN_POLL):
-        node_type = ProjectingNode if self.args.project else burst.DataNode
+        node_type = ProjectingNode if self.args.project else BenchNode
         return node_type(
             self.service.url, self.inputs, self.service.bucket, f"{self.label}-{label}", timeout,
             poll, self.args.seed,
@@ -823,11 +867,14 @@ class Bench:
         log = self.service.log.read_text(encoding="utf-8", errors="replace")
         steps = steps_from_log(log)
         projections = projections_from_log(log)
+        recalls = recalls_from_log(log)
         for record in self.record["warm_up"] + self.record.get("single", []):
             if "job_id" in record:
                 record["seconds"] = steps.get(record["job_id"])
                 if record["job_id"] in projections:
                     record["projection"] = projections[record["job_id"]]
+                if record["job_id"] in recalls:
+                    record["recall_check"] = recalls[record["job_id"]]
         for phase in ("concurrent", "sustained", "burst"):
             for group in self.record.get(phase, {}).values():
                 for record in group["records"]:
@@ -911,6 +958,8 @@ def main():
     parser.add_argument("--fetch-runs", type=int, default=1)
     parser.add_argument("--s3-bucket")
     parser.add_argument("--max-workers", type=int)
+    parser.add_argument("--recall-queries", type=int, default=0)
+    parser.add_argument("--recall-k", type=int, default=10)
     parser.add_argument("names", nargs="*")
     args = parser.parse_args()
     if args.s3_bucket is not None:
@@ -924,6 +973,12 @@ def main():
             sys.exit("--s3-bucket needs GPU_MEMORY_LIMIT, the GPU's memory in GB")
     if args.max_workers is not None and args.max_workers <= 0:
         sys.exit("--max-workers takes a number above 0")
+    if args.recall_queries < 0:
+        sys.exit("--recall-queries takes a number, 0 or more")
+    if args.recall_queries > 0 and args.service == "upstream":
+        sys.exit("--recall-queries is knn-builder's: the upstream service has no recall check")
+    if not 1 <= args.recall_k <= 10_000:
+        sys.exit("--recall-k takes a number from 1 to 10000")
     try:
         if float(gpu_memory_limit()) <= 0:
             raise ValueError

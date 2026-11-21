@@ -323,4 +323,22 @@ python tools/bench/run.py target/bench/projection/upstream-on upstream $P --proj
 python tools/bench/projection.py ../knn-inspect/target/release/knn-inspect target/bench/projection/*/ --delete-files --summary target/bench/projection/summary.json
 ```
 
+### The recall check
+
+`--recall-queries N` starts knn-builder with its recall check on (`RECALL_CHECK_QUERIES`, and `--recall-k` as `RECALL_CHECK_K`), and each warm-up and single record then carries what its job's check found, from the service's log: the recall, the queries and k it is of, and the check's seconds, kept apart from the job's step seconds since the check runs beside the upload. An input whose `input.json` sets `skip_stored_vectors` is requested with it. `bench/recall_parity.py compare` then scores each job's fetched file with `knn-inspect recall --sample`, at the same count and k and seed 1, and the two recalls must be equal to the last digit. A job that leaves its vectors out of the file has no file knn-inspect can search that way, so it is held to its own graph with the vectors put back: `knn-write`'s `with_vectors` example writes that file from the job's file and its input's vector blob, the same as the service writes it with the vectors stored. Another build of the same input would not do, since two builds' graphs differ, at 1,000 vectors as at 1M. A binary job of that kind, which k-NN never sends, is left unscored: knn-format reads no binary graph without its vectors. `recall_parity.py inputs` writes an input again, its blobs hard links, as a `skip_stored_vectors` request or a float input's fp32 blob as a `half_float` one. On the fixtures' inputs of every data type at k 100, where a few recalls fall short of 1, then on seven of the benchmark's 1M inputs:
+
+```sh
+cargo build --release -p knn-write --example with_vectors
+TOOLS="../knn-inspect/target/release/knn-inspect target/release/examples/with_vectors"
+python tools/bench/run.py target/bench/recall-small knn-builder --inputs fixtures/inputs --inputs fixtures/byte/inputs --inputs fixtures/binary/inputs --phases single --runs 1 --recall-queries 100 --recall-k 100
+python tools/bench/recall_parity.py compare target/bench/recall-small $TOOLS target/bench/recall-small/parity.json
+R=target/bench/recall-inputs
+python tools/bench/recall_parity.py inputs $R skip target/bench/inputs/cohere-l2-1000000x768
+python tools/bench/recall_parity.py inputs $R fp16from32 target/bench/inputs/cohere-l2-1000000x768
+python tools/bench/run.py target/bench/recall-1m knn-builder --inputs target/bench/inputs --inputs $R --phases single --runs 1 --recall-queries 100 cohere-l2-1000000x768 cohere-ip-1000000x768 gist-l2-1000000x960 cohere-l2-1000000x768-byte cohere-hamming-1000000x768-binary cohere-l2-1000000x768-skip cohere-l2-1000000x768-fp16from32
+python tools/bench/recall_parity.py compare target/bench/recall-1m $TOOLS target/bench/recall-1m/parity.json
+```
+
+`fixtures/ea7db9f/recall-parity/` keeps both runs' `run.json` and `parity.json`.
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.
