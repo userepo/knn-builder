@@ -8,7 +8,9 @@
 //! when the service sets one. [`request`]
 //! reads a build request as the upstream service does, [`service`]
 //! holds the jobs and feeds them to a pipeline, and [`api`] answers HTTP
-//! requests with them, set up by [`config`].
+//! requests with them, set up by [`config`]. [`metrics`] holds the values
+//! of the service's metrics and writes them as the page a Prometheus
+//! scraper reads.
 
 pub mod api;
 mod builder;
@@ -19,6 +21,7 @@ pub mod forecast;
 mod gate;
 mod job;
 mod load;
+pub mod metrics;
 mod pipeline;
 mod project;
 pub mod recall;

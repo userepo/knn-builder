@@ -6,3 +6,7 @@ fixtures/** -text
 # core.autocrlf=true would give them, and they are run from such clones
 # under WSL.
 *.sh text eol=lf
+
+# The recorded metrics page is compared with the renderer's output to the
+# byte, and that output ends its lines with LF on every platform.
+crates/knn-builder/tests/data/metrics.txt text eol=lf

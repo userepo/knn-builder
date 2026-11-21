@@ -1,6 +1,7 @@
 # Every push and pull request: format and lints on Linux, the test suite
-# on Linux and Windows, the S3 transfers and the pipeline against
-# LocalStack, and the dependency policy. The toolchain comes
+# on Linux and Windows, the recorded metrics page through Prometheus's own
+# checker, the S3 transfers and the pipeline against LocalStack, and the
+# dependency policy. The toolchain comes
 # from rust-toolchain.toml. The runners have no GPU, so knn-gpu builds
 # without its `gpu` feature here; the GPU code is linted and tested on a
 # machine with a GPU and the conda environment in environment.yml.
@@ -36,6 +37,15 @@ jobs:
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Test
         run: cargo test --workspace --locked
+      # The page the tests hold the renderer to, read by promtool from
+      # prom/prometheus:v3.16.0, pinned by digest: the text format, and
+      # the naming rules for metrics.
+      - name: Metrics page
+        if: runner.os == 'Linux'
+        run: >
+          docker run --rm -i --entrypoint promtool
+          prom/prometheus@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
+          check metrics < crates/knn-builder/tests/data/metrics.txt
 
   s3:
     name: S3 transfers and pipeline (LocalStack)
