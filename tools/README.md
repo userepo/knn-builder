@@ -341,4 +341,16 @@ python tools/bench/recall_parity.py compare target/bench/recall-1m $TOOLS target
 
 `fixtures/ea7db9f/recall-parity/` keeps both runs' `run.json` and `parity.json`.
 
+`bench/recall_cost.py` gives what the check adds a job, from two runs over the same inputs, one with the check off and one with it on: for each input, the medians of the steps' sum, the upload, the check's seconds and the host peak, the host peak's growth from each round's build without the check to that round's with it, and the check's recall, the figures of the README's table, printed as a table and, given a path, written as JSON. Over six of the 1M inputs, the two derived ones from the commands above among them:
+
+```sh
+R=target/bench/recall-inputs
+N="cohere-l2-1000000x768 gist-l2-1000000x960 cohere-l2-1000000x768-fp16from32 cohere-l2-1000000x768-byte cohere-hamming-1000000x768-binary cohere-l2-1000000x768-skip"
+python tools/bench/run.py target/bench/recall-cost/off knn-builder --inputs target/bench/inputs --inputs $R --phases single --runs 5 $N
+python tools/bench/run.py target/bench/recall-cost/on knn-builder --inputs target/bench/inputs --inputs $R --phases single --runs 5 --recall-queries 100 $N
+python tools/bench/recall_cost.py target/bench/recall-cost/off target/bench/recall-cost/on target/bench/recall-cost/summary.json
+```
+
+`fixtures/ea7db9f/recall-cost/` keeps both runs' `run.json` and the summary.
+
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

@@ -1269,7 +1269,7 @@ dependencies = [
 
 [[package]]
 name = "knn-builder"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "aws-sdk-s3",
  "axum",
@@ -1310,7 +1310,7 @@ dependencies = [
 
 [[package]]
 name = "knn-gpu"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "cmake",
  "knn-write",
@@ -1331,7 +1331,7 @@ dependencies = [
 
 [[package]]
 name = "knn-store"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "aws-config",
  "aws-sdk-s3",
@@ -1344,7 +1344,7 @@ dependencies = [
 
 [[package]]
 name = "knn-write"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "half",
  "knn-check",

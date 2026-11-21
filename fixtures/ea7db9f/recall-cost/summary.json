@@ -1,0 +1,133 @@
+{
+ "image_id": "sha256:a7ea5484f5c0e09c4c0d74372872d7e04169cc3543e9113372f87d987f30b8da",
+ "recall_check_queries": 100,
+ "recall_check_k": 10,
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": {
+   "data_type": "binary",
+   "skip_stored_vectors": false,
+   "off": {
+    "builds": 5,
+    "steps_s": 25.141580102,
+    "upload_s": 0.659255081,
+    "host_peak_bytes": 2879377408
+   },
+   "on": {
+    "builds": 5,
+    "steps_s": 25.780855531,
+    "upload_s": 0.912124107,
+    "host_peak_bytes": 2978029568,
+    "check_s": 0.390217747,
+    "recall": 1.0,
+    "queries": 100,
+    "k": 10,
+    "host_added_bytes": 100634624
+   }
+  },
+  "cohere-l2-1000000x768": {
+   "data_type": "float",
+   "skip_stored_vectors": false,
+   "off": {
+    "builds": 5,
+    "steps_s": 32.515934303,
+    "upload_s": 7.35391032,
+    "host_peak_bytes": 4168642560
+   },
+   "on": {
+    "builds": 5,
+    "steps_s": 36.390491011,
+    "upload_s": 11.528379954,
+    "host_peak_bytes": 4263944192,
+    "check_s": 3.826192505,
+    "recall": 0.987,
+    "queries": 100,
+    "k": 10,
+    "host_added_bytes": 102711296
+   }
+  },
+  "cohere-l2-1000000x768-byte": {
+   "data_type": "byte",
+   "skip_stored_vectors": false,
+   "off": {
+    "builds": 5,
+    "steps_s": 20.872324497,
+    "upload_s": 2.391952269,
+    "host_peak_bytes": 1863102464
+   },
+   "on": {
+    "builds": 5,
+    "steps_s": 23.554706660999997,
+    "upload_s": 5.237492235,
+    "host_peak_bytes": 1955663872,
+    "check_s": 3.56797994,
+    "recall": 0.991,
+    "queries": 100,
+    "k": 10,
+    "host_added_bytes": 92561408
+   }
+  },
+  "cohere-l2-1000000x768-fp16from32": {
+   "data_type": "half_float",
+   "skip_stored_vectors": false,
+   "off": {
+    "builds": 5,
+    "steps_s": 28.111336259,
+    "upload_s": 3.767855104,
+    "host_peak_bytes": 2631933952
+   },
+   "on": {
+    "builds": 5,
+    "steps_s": 30.585794714000002,
+    "upload_s": 6.09726709,
+    "host_peak_bytes": 2741420032,
+    "check_s": 3.740744099,
+    "recall": 0.986,
+    "queries": 100,
+    "k": 10,
+    "host_added_bytes": 109486080
+   }
+  },
+  "cohere-l2-1000000x768-skip": {
+   "data_type": "float",
+   "skip_stored_vectors": true,
+   "off": {
+    "builds": 5,
+    "steps_s": 25.863259575999997,
+    "upload_s": 0.500901387,
+    "host_peak_bytes": 4167495680
+   },
+   "on": {
+    "builds": 5,
+    "steps_s": 29.013702471000002,
+    "upload_s": 3.633120644,
+    "host_peak_bytes": 4260139008,
+    "check_s": 3.482934576,
+    "recall": 0.985,
+    "queries": 100,
+    "k": 10,
+    "host_added_bytes": 92643328
+   }
+  },
+  "gist-l2-1000000x960": {
+   "data_type": "float",
+   "skip_stored_vectors": false,
+   "off": {
+    "builds": 5,
+    "steps_s": 54.367821239,
+    "upload_s": 20.971505657,
+    "host_peak_bytes": 4900323328
+   },
+   "on": {
+    "builds": 5,
+    "steps_s": 58.398675241,
+    "upload_s": 26.194898112,
+    "host_peak_bytes": 5003718656,
+    "check_s": 4.904020167,
+    "recall": 0.957,
+    "queries": 100,
+    "k": 10,
+    "host_added_bytes": 103395328
+   }
+  }
+ }
+}

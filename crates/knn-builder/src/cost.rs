@@ -60,15 +60,16 @@
 //! asks, though the gate leaves a graph that is already connected as
 //! built after its search alone.
 //!
-//! And the recall check, on the CPU beside the write, timed with
-//! knn-inspect's search on the same machine's 32 threads over 1M vectors
-//! of knn-builder's files (cohere-768 and gist-960 as float, cohere-768 as
-//! byte and as binary): its exact neighbors, a pass over every vector for
-//! each query, about q n d for q queries, at 4.6e-11 to 4.7e-11 s a float
-//! value, 3.3e-11 s a byte one and 3.3e-12 s a bit; and its searches,
-//! about 1.3 ms a query at efSearch 100. A `half_float` value, decoded by
-//! table, is counted as a float one, unmeasured. On 4 threads the exact
-//! neighbors take 2.5 to 3.9 times as long, which the model does not count.
+//! And the recall check, on the CPU beside the write: its exact neighbors,
+//! a pass over every vector for each query, about q n d for q queries; and
+//! its searches, about 1.3 ms a query at efSearch 100 (knn-inspect's, on
+//! the same machine). Timed in the service on the same machine's 32
+//! threads, the median of five jobs each at 100 queries over 1M vectors:
+//! 3.8 s for cohere-768 and 4.9 s for gist-960 as float, 3.7 s as
+//! `half_float`, 3.6 s as byte and 0.4 s as binary, so 4.9e-11 s a float
+//! or `half_float` value, 4.5e-11 s a byte one and 3.3e-12 s a bit. On 4
+//! threads the exact neighbors take 2.5 to 3.9 times as long, which the
+//! model does not count.
 
 use std::num::NonZeroUsize;
 
@@ -281,8 +282,8 @@ impl Fitted {
         let q = f64::from(check.queries_for(job.doc_count));
         // A value's time, a binary dimension counting bits.
         let value = match job.data_type {
-            DataType::Float | DataType::HalfFloat => 4.7e-11,
-            DataType::Byte => 3.3e-11,
+            DataType::Float | DataType::HalfFloat => 4.9e-11,
+            DataType::Byte => 4.5e-11,
             DataType::Binary => 3.3e-12,
         };
         value * q * x.n * x.d + 1.3e-3 * q
@@ -454,8 +455,9 @@ mod tests {
             queries: 100,
             ..RecallCheck::default()
         };
-        // Measured: 3.6 s for the exact neighbors of 100 queries, 0.13 s
-        // for their searches; 2.5 s and 0.25 s as byte and binary vectors.
+        // Measured in the service, at 100 queries over 1M vectors: 3.83 s
+        // for cohere-768 as float, 3.74 s as half_float, 3.57 s as byte,
+        // 0.39 s as binary, and 4.90 s for gist-960.
         let within = |job: &crate::Job, measured: f64| {
             let modeled = Fitted::check_seconds(job);
             assert!(
@@ -464,13 +466,18 @@ mod tests {
                 job.data_type
             );
         };
-        within(&cohere, 3.6 + 0.13);
+        within(&cohere, 3.83);
         let stages = Fitted::default().stages(&cohere);
         assert!((stages.check - Fitted::check_seconds(&cohere)).abs() < f64::EPSILON);
+        let mut gist = job("bucket", 1_000_000, 960);
+        gist.recall_check = cohere.recall_check;
+        within(&gist, 4.90);
+        cohere.data_type = DataType::HalfFloat;
+        within(&cohere, 3.74);
         cohere.data_type = DataType::Byte;
-        within(&cohere, 2.5 + 0.13);
+        within(&cohere, 3.57);
         cohere.data_type = DataType::Binary;
-        within(&cohere, 0.25 + 0.13);
+        within(&cohere, 0.39);
         // No more queries than vectors.
         cohere.doc_count = 50;
         cohere.data_type = DataType::Float;
