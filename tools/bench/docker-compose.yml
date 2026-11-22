@@ -7,7 +7,9 @@
 # samples the GPU; it starts the services with the settings each phase
 # needs and takes them down. Every port is published on the host's
 # loopback only: on a cloud host the s3 service would otherwise let anyone
-# read and delete the bucket's objects.
+# read and delete the bucket's objects. Needs Compose 2.20 or later, for
+# the dependencies on localstack that a run on real S3 leaves out
+# (`required: false`).
 name: knn-builder-bench
 
 x-aws: &aws

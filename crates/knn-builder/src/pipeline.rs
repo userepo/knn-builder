@@ -381,6 +381,9 @@ pub struct InFlight {
     /// Canceled: a queued job will not start, a download or upload stops,
     /// a build runs to its end and the job ends there.
     pub canceled: bool,
+    /// When its recall check started, while one runs: a check under way
+    /// runs to its end, canceled or not.
+    pub checking: Option<Instant>,
 }
 
 /// The jobs in flight of a pipeline, as [`Pipeline::flights`] gives
@@ -431,6 +434,8 @@ struct Progress {
     cancel: Cancel,
     /// Its stage and since when; `None` once it has ended.
     stage: Mutex<Option<(Stage, Instant)>>,
+    /// Since when its recall check has run; `None` while none does.
+    checking: Mutex<Option<Instant>>,
 }
 
 const BOARD_POISONED: &str = "a thread panicked holding the pipeline's job list";
@@ -446,6 +451,7 @@ impl Board {
             job: job.clone(),
             cancel: cancel.clone(),
             stage: Mutex::new(Some((Stage::Queued, Instant::now()))),
+            checking: Mutex::new(None),
         });
         board.push(Arc::clone(&progress));
         Track(progress)
@@ -467,6 +473,7 @@ impl Board {
                     stage,
                     since,
                     canceled: progress.cancel.is_canceled(),
+                    checking: *progress.checking.lock().expect(BOARD_POISONED),
                 })
             })
             .collect()
@@ -482,6 +489,11 @@ impl Track {
     fn enter(&self, stage: Stage) {
         *self.0.stage.lock().expect(BOARD_POISONED) = Some((stage, Instant::now()));
     }
+
+    /// The job's recall check on the board, for the thread that runs it.
+    fn check(&self) -> Checking {
+        Checking(Arc::clone(&self.0))
+    }
 }
 
 impl Drop for Track {
@@ -489,6 +501,26 @@ impl Drop for Track {
         // A poisoned lock is left as it is: the board's next look panics.
         if let Ok(mut stage) = self.0.stage.lock() {
             *stage = None;
+        }
+    }
+}
+
+/// A job's recall check on the board: under way from [`Checking::start`]
+/// until this drops, as the check's thread ends.
+#[derive(Debug)]
+struct Checking(Arc<Progress>);
+
+impl Checking {
+    fn start(&self) {
+        *self.0.checking.lock().expect(BOARD_POISONED) = Some(Instant::now());
+    }
+}
+
+impl Drop for Checking {
+    fn drop(&mut self) {
+        // A poisoned lock is left as it is: the board's next look panics.
+        if let Ok(mut checking) = self.0.checking.lock() {
+            *checking = None;
         }
     }
 }
@@ -731,6 +763,7 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
         } = job;
         queued.track.enter(Stage::Uploading);
         let (store, request, cancel) = (store.clone(), queued.job.clone(), queued.cancel.clone());
+        let checking = queued.track.check();
         // The inputs and the graph are freed as the write ends.
         let written = tokio::task::spawn_blocking(move || {
             let (mut dataset, mut graph) = (dataset, graph);
@@ -748,7 +781,7 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
                 let mut checker = request.recall_check.is_on().then(move || {
                     scope.spawn(move || {
                         let vectors = check_only.as_ref().unwrap_or(stored);
-                        run_check(job, vectors, graph, degree, cancel)
+                        run_check(job, vectors, graph, degree, cancel, &checking)
                     })
                 });
                 let (mut found, mut waited) = (None, Duration::ZERO);
@@ -804,17 +837,19 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
 
 /// `job`'s recall check over `vectors` and `graph`, and when it ran: none
 /// when the job was canceled first, or the check could not run, which it
-/// warns of.
+/// warns of. A check that starts tells the board so through `checking`.
 fn run_check(
     job: &Job,
     vectors: &Vectors,
     graph: &[u32],
     degree: usize,
     cancel: &Cancel,
+    checking: &Checking,
 ) -> Option<(Checked, Span)> {
     if cancel.is_canceled() {
         return None;
     }
+    checking.start();
     let start = Instant::now();
     match recall::check(job, vectors, graph, degree) {
         Ok(checked) => Some((checked, Span::since(start))),
@@ -832,8 +867,30 @@ fn run_check(
 
 #[cfg(test)]
 mod tests {
-    use super::Budget;
+    use std::time::Instant;
+
+    use knn_store::Cancel;
+
+    use super::{Board, Budget, Stage};
     use crate::job::tests::job;
+
+    #[test]
+    fn tells_a_recall_check_while_it_runs() {
+        let board = Board::default();
+        let request = job("bucket", 600, 16);
+        let track = Board::track(&mut board.0.lock().unwrap(), 1, &request, &Cancel::new());
+        track.enter(Stage::Uploading);
+        let checking = track.check();
+        assert_eq!(board.in_flight()[0].checking, None, "not started");
+        let before = Instant::now();
+        checking.start();
+        let since = board.in_flight()[0].checking.unwrap();
+        assert!(before <= since && since <= Instant::now());
+        // The check's thread ends, the job still uploading.
+        drop(checking);
+        let jobs = board.in_flight();
+        assert_eq!((jobs[0].stage, jobs[0].checking), (Stage::Uploading, None));
+    }
 
     #[test]
     fn counts_the_budget_in_whole_mib() {

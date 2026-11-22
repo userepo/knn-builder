@@ -368,7 +368,20 @@ mod tests {
         );
         assert_eq!(
             failed.to_string(),
-            "the recall check failed: recall@10 over 100 sampled vectors is 0.5000, below the least of 0.9"
+            "the recall check failed: recall@10 over 100 sampled vectors is 0.5, below the least of 0.9"
+        );
+        // One just below the least reads as below it.
+        let near = Checked {
+            recall: 0.949_96,
+            queries: 1_000,
+            k: 100,
+        };
+        let failed = verdict(&least(Some(0.95)), &near).unwrap_err();
+        assert!(
+            failed
+                .to_string()
+                .ends_with("is 0.94996, below the least of 0.95"),
+            "{failed}"
         );
     }
 

@@ -73,8 +73,10 @@ pub enum JobError {
     /// The recall check found the graph's recall below the least the
     /// service takes (`RECALL_CHECK_MIN`). Nothing was stored: the data
     /// node builds the segment itself.
+    // The recall in full: rounded, one just below the least could read as
+    // the least itself.
     #[error(
-        "the recall check failed: recall@{k} over {queries} sampled vectors is {recall:.4}, below the least of {min}"
+        "the recall check failed: recall@{k} over {queries} sampled vectors is {recall}, below the least of {min}"
     )]
     LowRecall {
         /// The recall found.

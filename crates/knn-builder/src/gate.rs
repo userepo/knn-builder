@@ -283,6 +283,7 @@ mod tests {
                 stage: Stage::Queued,
                 since: now,
                 canceled: false,
+                checking: None,
             })
             .collect();
         assert!(matches!(

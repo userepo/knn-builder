@@ -96,9 +96,9 @@ Linux); SERVICE_IMAGE in the environment names another image. --inputs
 GPU_MEMORY_LIMIT (8) is the GPU's memory in GB as the services are told
 it, printed at the start beside the GPU's own; --s3-bucket needs it set.
 SERVICE_PORT (1026) and S3_PORT (4568) are the host ports the services
-answer on, on the loopback only. Needs Docker with GPU access, nvidia-smi
-and Python 3 on the host, nothing else. Writes OUT_DIR/run.json,
-service.log and gpu.csv.
+answer on, on the loopback only. Needs Docker with GPU access and Compose
+2.20 or later, nvidia-smi and Python 3 on the host, nothing else. Writes
+OUT_DIR/run.json, service.log and gpu.csv.
 """
 
 import argparse

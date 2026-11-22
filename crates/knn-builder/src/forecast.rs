@@ -221,11 +221,17 @@ impl<M: StageModel> Forecaster<M> {
         let ends = in_flight
             .iter()
             .map(|job| {
-                let elapsed = now.saturating_duration_since(job.since).as_secs_f64();
-                duration(lanes.run(self, &job.job, job.stage, elapsed, job.canceled))
+                let since = |start| now.saturating_duration_since(start).as_secs_f64();
+                let place = Place {
+                    stage: job.stage,
+                    elapsed: since(job.since),
+                    canceled: job.canceled,
+                    checking: job.checking.map(since),
+                };
+                duration(lanes.run(self, &job.job, place))
             })
             .collect();
-        let next = next.map(|job| duration(lanes.run(self, job, Stage::Queued, 0.0, false)));
+        let next = next.map(|job| duration(lanes.run(self, job, Place::QUEUED)));
         Forecast { ends, next }
     }
 }
@@ -246,15 +252,33 @@ fn remaining(modeled: f64, elapsed: f64) -> f64 {
     }
 }
 
-/// The time left in a canceled upload stage `elapsed` into it: none while
-/// its projection runs, which stops at once and so starts no check, nor
-/// for a job without a check; a recall check under way runs to its end,
+/// The time left in a canceled upload stage: none, its projection and its
+/// write stopping at once and no check starting after, unless its recall
+/// check is under way, `checking` seconds into it, which runs to its end
 /// since nothing stops it partway.
-fn canceled_upload(stages: &Stages, elapsed: f64) -> f64 {
-    if stages.check <= 0.0 || elapsed < stages.projection {
-        return 0.0;
-    }
-    remaining(stages.projection + stages.check, elapsed)
+fn canceled_upload(stages: &Stages, checking: Option<f64>) -> f64 {
+    checking.map_or(0.0, |into| remaining(stages.check, into))
+}
+
+/// Where a job is as the forecast takes it up.
+#[derive(Debug, Clone, Copy)]
+struct Place {
+    stage: Stage,
+    /// Seconds in the stage.
+    elapsed: f64,
+    canceled: bool,
+    /// Seconds into its recall check, while one runs.
+    checking: Option<f64>,
+}
+
+impl Place {
+    /// A job submitted now.
+    const QUEUED: Self = Self {
+        stage: Stage::Queued,
+        elapsed: 0.0,
+        canceled: false,
+        checking: None,
+    };
 }
 
 /// When each stage, its slot and the budget are next free, in seconds from
@@ -276,16 +300,15 @@ struct Lanes {
 }
 
 impl Lanes {
-    /// Plays `job`, in `stage` for `elapsed` seconds, through what is left
-    /// of the pipeline; returns when it ends.
-    fn run<M: StageModel>(
-        &mut self,
-        forecaster: &Forecaster<M>,
-        job: &Job,
-        stage: Stage,
-        elapsed: f64,
-        canceled: bool,
-    ) -> f64 {
+    /// Plays `job`, at `place`, through what is left of the pipeline;
+    /// returns when it ends.
+    fn run<M: StageModel>(&mut self, forecaster: &Forecaster<M>, job: &Job, place: Place) -> f64 {
+        let Place {
+            stage,
+            elapsed,
+            canceled,
+            checking,
+        } = place;
         let stages = forecaster.stages(job);
         let share = Budget::share(job, forecaster.budget);
         // Withdrawn before it started: it never takes anything.
@@ -329,7 +352,7 @@ impl Lanes {
         // and so does its projection, but a check under way runs on.
         let upload = stages.upload_stage();
         let uploaded = match stage {
-            Stage::Uploading if canceled => canceled_upload(&stages, elapsed),
+            Stage::Uploading if canceled => canceled_upload(&stages, checking),
             Stage::Uploading => remaining(upload, elapsed),
             _ => {
                 let start = built.max(self.upload);
@@ -400,6 +423,7 @@ mod tests {
             stage,
             since: now.checked_sub(Duration::from_secs_f64(elapsed)).unwrap(),
             canceled,
+            checking: None,
         }
     }
 
@@ -575,18 +599,27 @@ mod tests {
         let now = Instant::now();
         let mut asks = checked();
         asks.project_link_to_base_layer = true;
+        // Canceled `elapsed` seconds into its upload stage, its check
+        // under way for `checking` of them.
+        let canceled = |job: &Job, elapsed: f64, checking: Option<f64>| InFlight {
+            checking: checking.map(|s| now.checked_sub(Duration::from_secs_f64(s)).unwrap()),
+            ..at(now, job.clone(), Stage::Uploading, elapsed, true)
+        };
         let jobs = [
             // A second into its three-second check: two left.
-            at(now, checked(), Stage::Uploading, 1.0, true),
+            canceled(&checked(), 1.0, Some(1.0)),
             // Its projection stops at once, and no check starts.
-            at(now, asks.clone(), Stage::Uploading, 0.25, true),
-            // Into the check, the projection's half second behind it.
-            at(now, asks, Stage::Uploading, 1.5, true),
+            canceled(&asks, 0.25, None),
+            // Its graph was connected, so its projection ended before the
+            // half second modeled: the check is under way already.
+            canceled(&asks, 0.25, Some(0.125)),
+            // Its check ended before the cancel: the write stops at once.
+            canceled(&checked(), 3.5, None),
             // No check: the upload stops at once.
-            at(now, job("bucket", 1_000, 64), Stage::Uploading, 1.0, true),
+            canceled(&job("bucket", 1_000, 64), 1.0, None),
         ];
         let forecast = Forecaster::new(fixed, u64::MAX).forecast(now, &jobs, None);
-        assert_eq!(seconds(&forecast.ends), [2.0, 0.0, 2.0, 0.0]);
+        assert_eq!(seconds(&forecast.ends), [2.0, 0.0, 2.875, 0.0, 0.0]);
     }
 
     #[test]

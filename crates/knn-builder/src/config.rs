@@ -258,6 +258,14 @@ fn recall_check(var: impl Fn(&str) -> Option<String>) -> Result<RecallCheck, Con
             }
         });
     }
+    // With the check off, no recall is ever compared with the least, so
+    // every job would be stored: refused here rather than ignored.
+    if check.min_recall.is_some() && !check.is_on() {
+        return Err(error(
+            "RECALL_CHECK_QUERIES",
+            "unset or 0, with RECALL_CHECK_MIN set: no job would be checked",
+        ));
+    }
     Ok(check)
 }
 
@@ -407,6 +415,11 @@ mod tests {
             (&[("RECALL_CHECK_MIN", "1.5")], "RECALL_CHECK_MIN"),
             (&[("RECALL_CHECK_MIN", "-0.1")], "RECALL_CHECK_MIN"),
             (&[("RECALL_CHECK_MIN", "nan")], "RECALL_CHECK_MIN"),
+            (&[("RECALL_CHECK_MIN", "0.9")], "RECALL_CHECK_QUERIES"),
+            (
+                &[("RECALL_CHECK_QUERIES", "0"), ("RECALL_CHECK_MIN", "0.9")],
+                "RECALL_CHECK_QUERIES",
+            ),
             (&[("MAX_WORKERS", "0")], "MAX_WORKERS"),
             (&[("LOG_LEVEL", "LOUD")], "LOG_LEVEL"),
             (&[("BASIC_AUTH_USERNAME", "admin")], "BASIC_AUTH_PASSWORD"),
@@ -443,7 +456,8 @@ mod tests {
         assert!(!Config::default().service.recall_check.is_on());
         // Both ends of a recall are one.
         for (value, min) in [("0", 0.0), ("1", 1.0)] {
-            let config = read(&[("RECALL_CHECK_MIN", value)]).unwrap();
+            let config =
+                read(&[("RECALL_CHECK_QUERIES", "100"), ("RECALL_CHECK_MIN", value)]).unwrap();
             assert_eq!(config.service.recall_check.min_recall, Some(min));
         }
     }
