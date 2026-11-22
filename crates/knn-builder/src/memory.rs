@@ -106,7 +106,8 @@ struct Readings {
     least_free: Option<u64>,
     /// Whether a build is under way.
     building: bool,
-    /// The most in use during the last build that ended.
+    /// The most in use during the last build that ended; 0 when it is
+    /// not known.
     last_build_peak: u64,
 }
 
@@ -242,10 +243,12 @@ impl Readings {
 
     fn end(&mut self) {
         self.building = false;
-        // Nothing known, nothing to tell.
-        if let (Some((reading, _)), Some(least)) = (self.last, self.least_free.take()) {
-            self.last_build_peak = reading.total.saturating_sub(least);
-        }
+        // Nothing known, nothing to tell: not the peak of the build
+        // before, which this one would pass for.
+        self.last_build_peak = match (self.last, self.least_free.take()) {
+            (Some((reading, _)), Some(least)) => reading.total.saturating_sub(least),
+            _ => 0,
+        };
     }
 
     fn lower(&mut self, free: u64) {
@@ -451,6 +454,11 @@ mod tests {
         );
         readings.end();
         assert_eq!(readings.last_build_peak, 3 * GIB);
+        // A build with no reading of its own, and the last one no longer
+        // kept, does not pass the build before's peak for its own.
+        readings.start(None, at + Duration::from_secs(10));
+        readings.end();
+        assert_eq!(readings.last_build_peak, 0);
         // A build with nothing read at all tells nothing.
         let mut unread = Readings::new(Duration::from_secs(1));
         unread.start(None, at);

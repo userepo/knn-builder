@@ -408,6 +408,15 @@ impl Flights {
     pub(crate) fn host_budget(&self) -> (u64, u64) {
         self.budget.bytes()
     }
+
+    /// The flights of no pipeline: no job, ever.
+    #[cfg(test)]
+    pub(crate) fn idle() -> Self {
+        Self {
+            board: Arc::default(),
+            budget: Budget::new(0),
+        }
+    }
 }
 
 /// The jobs submitted and not ended, in order.

@@ -312,9 +312,9 @@ pub struct Histogram {
 }
 
 impl Histogram {
-    /// An empty histogram whose buckets end at `bounds`, ascending.
-    #[must_use]
-    pub fn new(bounds: &'static [f64]) -> Self {
+    /// An empty histogram whose buckets end at `bounds`, ascending and
+    /// finite: the crate's own, which its tests hold to that.
+    pub(crate) fn new(bounds: &'static [f64]) -> Self {
         Self {
             bounds,
             counts: vec![0; bounds.len() + 1],
@@ -369,7 +369,9 @@ impl Histogram {
 /// for their recall.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Counted {
-    /// Build requests, by how they were answered.
+    /// Build requests whose body the service read, by how it answered
+    /// them: one refused before that, without its credentials or with a
+    /// body too large, is counted with the requests answered alone.
     pub build_requests: Family<BuildAnswer, u64>,
     /// Jobs ended, by how.
     pub jobs_ended: Family<Outcome, u64>,
@@ -492,7 +494,8 @@ pub struct GpuMemory {
     pub total: u64,
     /// Free when last read.
     pub free: u64,
-    /// The most in use during the last build that ended; 0 before one has.
+    /// The most in use during the last build that ended; 0 before one
+    /// has, and when its memory could not be read.
     pub last_build_peak: u64,
 }
 
@@ -605,7 +608,7 @@ impl Snapshot {
         page.counts(
             "knn_builder_build_requests_total",
             Kind::Counter,
-            "Build requests, by how they were answered.",
+            "Build requests whose body the service read, by how it answered them.",
             &self.counted.build_requests,
         );
     }
@@ -733,7 +736,7 @@ impl Snapshot {
             );
             page.single(
                 "knn_builder_gpu_memory_last_build_peak_bytes",
-                "The most GPU memory in use during the last build that ended; 0 before one has.",
+                "The most GPU memory in use during the last build that ended; 0 before one has, or when it could not be read.",
                 gpu.last_build_peak,
             );
         }

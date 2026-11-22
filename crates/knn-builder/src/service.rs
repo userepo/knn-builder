@@ -424,7 +424,7 @@ impl Service {
                     let mut inner = shared.lock().expect(POISONED);
                     inner.record_end(id, &job_id, &learned, times, outcome);
                 });
-                Ok(State::Running(canceler))
+                Ok(State::Running { canceler, id })
             });
         let answer = match &taken {
             Ok(_) if started => BuildAnswer::Accepted,
@@ -486,7 +486,7 @@ impl Service {
         // pipeline until its stage lets it go.
         let running = |id| {
             let watch: Option<&Watch> = inner.watches.get(&id);
-            watch.is_some_and(|watch| inner.jobs.is_running(&watch.job_id))
+            watch.is_some_and(|watch| inner.jobs.runs(&watch.job_id, id))
         };
         for flight in in_flight.iter().filter(|flight| running(flight.id)) {
             jobs_in_flight.add(flight.stage.into(), 1);
@@ -590,14 +590,16 @@ impl Inner {
         if let Ok(built) = &outcome {
             self.gate.learn(job, &built.timings);
         }
-        // A job the service dropped first is ended, and counted, already.
-        if self.jobs.is_running(job_id) {
+        // A job the service dropped first is ended, and counted, already;
+        // and the job of its id may by now be another run of the request,
+        // taken once the dropped one expired, which this report is not of.
+        if self.jobs.runs(job_id, id) {
             match &outcome {
                 Ok(built) => count_completion(&mut self.counted, job, built, times),
                 Err(error) => count_failure(&mut self.counted, error),
             }
         }
-        self.jobs.end(job_id, outcome, times.ended);
+        self.jobs.end(job_id, id, outcome, times.ended);
         self.watches.remove(&id);
         // What this one taught, and the room it left, may move the others'
         // forecasts.
@@ -629,10 +631,10 @@ impl Inner {
                 watch.canceler.cancel();
                 // The pipeline's report, when it comes, finds it ended.
                 let job_id = watch.job_id.clone();
-                if self.jobs.is_running(&job_id) {
+                if self.jobs.runs(&job_id, id) {
                     count_failure(&mut self.counted, &reason);
                 }
-                self.jobs.end(&job_id, Err(reason), now);
+                self.jobs.end(&job_id, id, Err(reason), now);
             }
         }
     }
@@ -768,11 +770,24 @@ struct Held {
 
 #[derive(Debug)]
 enum State {
-    Running(Canceler),
-    Ended { status: Status, at: Instant },
+    /// In the pipeline, as its job number `id`.
+    Running {
+        canceler: Canceler,
+        id: u64,
+    },
+    Ended {
+        status: Status,
+        at: Instant,
+    },
 }
 
 impl State {
+    /// Whether this is the run that is the pipeline's job number `id`,
+    /// not ended.
+    fn runs(&self, id: u64) -> bool {
+        matches!(self, Self::Running { id: run, .. } if *run == id)
+    }
+
     fn ended(outcome: Result<Built, JobError>, at: Instant) -> Self {
         let status = match outcome {
             Ok(built) => Status::Completed {
@@ -858,11 +873,13 @@ impl Jobs {
         Ok(job_id)
     }
 
-    /// Whether the job `job_id` is held and has not ended.
-    fn is_running(&self, job_id: &JobId) -> bool {
+    /// Whether the job `job_id` is held and runs as the pipeline's job
+    /// number `id`: not ended, and not a later run of the same request,
+    /// taken once the one before had ended and expired.
+    fn runs(&self, job_id: &JobId, id: u64) -> bool {
         self.held
             .get(job_id)
-            .is_some_and(|held| matches!(held.state, State::Running(_)))
+            .is_some_and(|held| held.state.runs(id))
     }
 
     /// The jobs held that have not expired.
@@ -872,11 +889,15 @@ impl Jobs {
         u64::try_from(live.count()).unwrap_or(u64::MAX)
     }
 
-    /// Records the end of the running job `job_id`.
-    fn end(&mut self, job_id: &JobId, outcome: Result<Built, JobError>, at: Instant) {
-        // A running job is never removed, so it is there.
+    /// Records the end of the job `job_id` running as the pipeline's job
+    /// number `id`. A job that has ended stays as it ended, and so does a
+    /// later run of the same request: the pipeline reports a job the
+    /// service dropped only when its stage lets it go, by when the dropped
+    /// one may have expired and its request been taken again.
+    fn end(&mut self, job_id: &JobId, id: u64, outcome: Result<Built, JobError>, at: Instant) {
+        // A running job is never removed, so its own run finds it there.
         if let Some(held) = self.held.get_mut(job_id)
-            && matches!(held.state, State::Running(_))
+            && held.state.runs(id)
         {
             held.state = State::ended(outcome, at);
         }
@@ -905,7 +926,7 @@ impl Jobs {
 
     fn running(&self) -> impl Iterator<Item = &Canceler> {
         self.held.values().filter_map(|held| match &held.state {
-            State::Running(canceler) => Some(canceler),
+            State::Running { canceler, .. } => Some(canceler),
             State::Ended { .. } => None,
         })
     }
@@ -925,7 +946,7 @@ impl Jobs {
 impl Held {
     fn status(&self) -> Status {
         match &self.state {
-            State::Running(_) => Status::Running,
+            State::Running { .. } => Status::Running,
             State::Ended { status, .. } => status.clone(),
         }
     }
@@ -933,7 +954,7 @@ impl Held {
     /// Ended `ttl` ago or longer.
     fn expired(&self, ttl: Duration, now: Instant) -> bool {
         match self.state {
-            State::Running(_) => false,
+            State::Running { .. } => false,
             State::Ended { at, .. } => now.saturating_duration_since(at) >= ttl,
         }
     }
@@ -975,18 +996,38 @@ fn estimate(request: &BuildRequest) -> (f64, f64) {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use std::time::{Duration, Instant};
 
     use serde_json::{Map, Value};
+    use tokio::task::JoinSet;
 
-    use super::{Admission, Jobs, Refusal, Settings, State, Status, estimate};
+    use super::{
+        Admission, Inner, Jobs, Refusal, Settings, State, Status, Times, count_failure, estimate,
+    };
+    use crate::gate::Gate;
+    use crate::metrics::{Counted, Outcome};
     use crate::request::{BuildRequest, JobId};
-    use crate::{Built, Canceler, DataType, JobError, RecallCheck, SpaceType, Span, Timings};
+    use crate::{
+        Built, Canceler, DataType, Flights, JobError, RecallCheck, SpaceType, Span, Timings,
+    };
 
     /// `tools/oracle/capacity.py`'s record of the service's estimates.
     const CAPACITY: &str = include_str!("../tests/data/capacity.json");
 
     const TTL: Duration = Duration::from_mins(30);
+
+    /// The pipeline's number of the one run the store's own tests give
+    /// each job.
+    const RUN: u64 = 1;
+
+    /// A job running as the pipeline's job number `id`.
+    fn running(id: u64) -> State {
+        State::Running {
+            canceler: Canceler::detached(),
+            id,
+        }
+    }
 
     fn request(path: &str, dimension: u64) -> BuildRequest {
         BuildRequest {
@@ -1020,7 +1061,7 @@ mod tests {
         let job_id = jobs
             .take(request.clone(), now, |_, _, _| {
                 started = true;
-                Ok(State::Running(Canceler::detached()))
+                Ok(running(RUN))
             })
             .unwrap();
         assert!(started, "{} held already", request.vector_path);
@@ -1176,7 +1217,7 @@ mod tests {
         assert_eq!(job_id, first.job_id());
         let held = Ok(Admission::Held(job_id.clone()));
         assert_eq!(jobs.admit(&first, now), held);
-        jobs.end(&job_id, Err(JobError::Canceled), now);
+        jobs.end(&job_id, RUN, Err(JobError::Canceled), now);
         assert_eq!(jobs.admit(&first, now), held, "a failed job is held too");
         assert_eq!(
             jobs.status(&job_id, now),
@@ -1196,7 +1237,7 @@ mod tests {
         for _ in 0..3 {
             let taken = jobs.take(request.clone(), now, |_, _, _| {
                 starts += 1;
-                Ok(State::Running(Canceler::detached()))
+                Ok(running(RUN))
             });
             assert_eq!(taken, Ok(job_id.clone()));
         }
@@ -1238,7 +1279,7 @@ mod tests {
         // Running, long past the TTL: held.
         let later = start_at + TTL * 10;
         assert_eq!(jobs.status(&job_id, later), Some(Status::Running));
-        jobs.end(&job_id, Ok(built("_0_f.faiss", later)), later);
+        jobs.end(&job_id, RUN, Ok(built("_0_f.faiss", later)), later);
         let completed = Some(Status::Completed {
             file_name: "_0_f.faiss".into(),
         });
@@ -1267,7 +1308,7 @@ mod tests {
             jobs.admit(&request("a/_0_a.knnvec", 8), now),
             Ok(Admission::Held(_))
         ));
-        jobs.end(&first, Err(JobError::Canceled), now);
+        jobs.end(&first, RUN, Err(JobError::Canceled), now);
         let before = (now + TTL).checked_sub(Duration::from_nanos(1)).unwrap();
         assert!(matches!(
             jobs.admit(&third, before),
@@ -1296,19 +1337,84 @@ mod tests {
         let now = Instant::now();
         let mut jobs = jobs(10);
         let job_id = start(&mut jobs, &request("a/_0_f.knnvec", 8), now);
-        assert!(jobs.is_running(&job_id));
-        assert!(!jobs.is_running(&JobId::from("no-such-job")));
-        jobs.end(&job_id, Ok(built("_0_f.faiss", now)), now);
+        assert!(jobs.runs(&job_id, RUN));
+        assert!(!jobs.runs(&job_id, RUN + 1));
+        assert!(!jobs.runs(&JobId::from("no-such-job"), RUN));
+        // Another run's end is not this one's.
+        jobs.end(&job_id, RUN + 1, Err(JobError::Stopped), now);
+        assert_eq!(jobs.status(&job_id, now), Some(Status::Running));
+        jobs.end(&job_id, RUN, Ok(built("_0_f.faiss", now)), now);
         let completed = Some(Status::Completed {
             file_name: "_0_f.faiss".into(),
         });
         assert_eq!(jobs.status(&job_id, now), completed);
-        assert!(!jobs.is_running(&job_id));
+        assert!(!jobs.runs(&job_id, RUN));
         // A second end changes nothing.
-        jobs.end(&job_id, Err(JobError::Stopped), now);
+        jobs.end(&job_id, RUN, Err(JobError::Stopped), now);
         assert_eq!(jobs.status(&job_id, now), completed);
         assert_eq!(jobs.running().count(), 0);
         assert_eq!(jobs.status(&JobId::from("no-such-job"), now), None);
+    }
+
+    /// The jobs `inner` counts as having ended as `outcome`.
+    fn ended_as(inner: &Inner, outcome: Outcome) -> u64 {
+        let mut counts = inner.counted.jobs_ended.iter();
+        *counts.find(|(known, _)| *known == outcome).unwrap().1
+    }
+
+    #[test]
+    fn keeps_a_job_taken_again_apart_from_its_dropped_run() {
+        let taken = Instant::now();
+        let settings = Settings::default();
+        let mut inner = Inner {
+            jobs: Jobs::new(settings),
+            gate: Gate::new(&settings),
+            flights: Flights::idle(),
+            watches: HashMap::new(),
+            recorders: JoinSet::new(),
+            counted: Counted::default(),
+        };
+        let request = request("a/_0_f.knnvec", 8);
+        let job = request.job().unwrap();
+        let take = |jobs: &mut Jobs, id, now| {
+            let mut started = false;
+            let job_id = jobs.take(request.clone(), now, |_, _, _| {
+                started = true;
+                Ok(running(id))
+            });
+            assert!(started, "run {id} held already");
+            job_id.unwrap()
+        };
+        // The first run, dropped as the forecast drops one: ended and
+        // counted at once, the pipeline holding it still.
+        let job_id = take(&mut inner.jobs, 1, taken);
+        let late = JobError::WouldMissDeadline { seconds: 4 };
+        count_failure(&mut inner.counted, &late);
+        inner.jobs.end(&job_id, 1, Err(late.clone()), taken);
+        // Expired before the pipeline let it go, and its request taken
+        // again: the same job id, running.
+        let again = taken + settings.ttl;
+        assert_eq!(take(&mut inner.jobs, 2, again), job_id);
+        let times = Times {
+            taken,
+            forecast: Duration::from_secs(1),
+            ended: again,
+        };
+        // The first run's report, when it comes, is not of the job running
+        // now: it ends nothing and counts nothing.
+        inner.record_end(1, &job_id, &job, times, Err(late));
+        assert_eq!(inner.jobs.status(&job_id, again), Some(Status::Running));
+        assert!(inner.jobs.runs(&job_id, 2));
+        assert_eq!(ended_as(&inner, Outcome::ForecastLate), 1);
+        // The second run's own end is counted.
+        let stored = built("_0_f.faiss", again);
+        inner.record_end(2, &job_id, &job, times, Ok(stored));
+        let completed = Some(Status::Completed {
+            file_name: "_0_f.faiss".into(),
+        });
+        assert_eq!(inner.jobs.status(&job_id, again), completed);
+        assert_eq!(ended_as(&inner, Outcome::ForecastLate), 1);
+        assert_eq!(ended_as(&inner, Outcome::Completed), 1);
     }
 
     #[test]
@@ -1320,7 +1426,7 @@ mod tests {
             .iter()
             .map(|path| start(&mut jobs, &request(path, 8), now))
             .collect();
-        jobs.end(&ids[1], Err(JobError::Canceled), now);
+        jobs.end(&ids[1], RUN, Err(JobError::Canceled), now);
         let listed = jobs.list(now);
         let order: Vec<&str> = listed.iter().map(|job| job.vector_path.as_str()).collect();
         assert_eq!(order, paths);

@@ -271,8 +271,14 @@ def page_values(text):
     values = {}
     for line in text.splitlines():
         if line and not line.startswith("#"):
-            series, _, value = line.rpartition(" ")
-            values[series] = float(value)
+            # The value follows the labels, or the name of a series with
+            # none; a timestamp may follow the value.
+            close = line.rfind("}")
+            cut = close + 1 if close >= 0 else line.find(" ")
+            fields = line[cut:].split() if cut > 0 else []
+            if not fields:
+                raise ValueError(f"no value in the metrics line {line!r}")
+            values[line[:cut]] = float(fields[0])
     return values
 
 
@@ -293,9 +299,13 @@ def scrape_when_idle(service, timeout=IDLE_TIMEOUT):
                 return None
             raise
         values = page_values(page)
-        in_flight = sum(v for s, v in values.items() if s.startswith("knn_builder_jobs_in_flight{"))
-        taken = values.get('knn_builder_build_requests_total{result="accepted"}', 0.0)
-        ended = sum(v for s, v in values.items() if s.startswith("knn_builder_jobs_ended_total{"))
+        flights = [v for s, v in values.items() if s.startswith("knn_builder_jobs_in_flight{")]
+        taken = values.get('knn_builder_build_requests_total{result="accepted"}')
+        ends = [v for s, v in values.items() if s.startswith("knn_builder_jobs_ended_total{")]
+        # A page without them would pass for an idle service's.
+        if not flights or taken is None or not ends:
+            raise ValueError(f"{service}/metrics does not count knn-builder's jobs")
+        in_flight, ended = sum(flights), sum(ends)
         if in_flight == 0 and ended == taken:
             return page
         if time.monotonic() > deadline:
@@ -335,20 +345,29 @@ def query_prometheus(url, after, timeout=120.0):
         q = urllib.parse.urlencode({"query": expr})
         with urllib.request.urlopen(f"{url}/api/v1/query?{q}", timeout=REQUEST_TIMEOUT) as resp:
             answer = json.loads(resp.read())
-        if answer.get("status") != "success":
+        if not isinstance(answer, dict) or answer.get("status") != "success":
             raise ValueError(f"Prometheus refused {expr}: {answer}")
-        return [(r["metric"], float(r["value"][1])) for r in answer["data"]["result"]]
+        try:
+            return [(r["metric"], float(r["value"][1])) for r in answer["data"]["result"]]
+        except (KeyError, IndexError, TypeError) as e:
+            raise ValueError(f"Prometheus answered {expr} with {answer}") from e
 
     deadline = time.monotonic() + timeout
     while True:
+        # What kept the last try from an answer, for the timeout to tell:
+        # a Prometheus that is not there fails every one.
+        failed = None
         try:
             scraped = query("timestamp(knn_builder_build_info)")
-        except SCRAPE_ERRORS:
-            scraped = []
+        except SCRAPE_ERRORS as e:
+            scraped, failed = [], e
         if scraped and scraped[0][1] >= after:
             break
         if time.monotonic() > deadline:
-            raise TimeoutError(f"Prometheus had not scraped the idle service after {timeout:g} s")
+            why = "" if failed is None else f": {failed!r}"
+            raise TimeoutError(
+                f"Prometheus had not scraped the idle service after {timeout:g} s{why}"
+            )
         time.sleep(IDLE_POLL)
     # NaN, as a quantile of no observations is, and the infinity of one
     # past the last bucket, are no JSON numbers.

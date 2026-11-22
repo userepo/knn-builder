@@ -11,14 +11,17 @@ For each page, from the run's own records and the service's log:
   error its status named, or, for a job whose end it did not see (a data
   node that timed out), the status asked once the service was idle;
 - vectors built, by data type: the vectors of the jobs completed;
-- the counts of the completed jobs' histograms (job, queue, stage times
-  and forecast ratio) and of the recall's;
-- each stage's seconds summed, against the stage times of the `DEBUG`
-  lines of the jobs completed;
+- the counts of the completed jobs' histograms: job, queue and forecast
+  ratio;
+- with the service's log, each stage's count and seconds summed, against
+  the stage times of the `DEBUG` lines of the jobs completed, and the
+  recall's count;
 - no job in flight.
 
 A process or a burst whose page the run could not have fails the check,
-as does a Prometheus that was asked and did not answer.
+a process the run ended before it could scrape among them, as do a run
+that ended with an error and a Prometheus that was asked and did not
+answer.
 
 A retry of a job held (`held`) is the client's, and the run does not know
 of one: it is listed, not checked.
@@ -90,7 +93,8 @@ def answer(record):
     status = record.get("status")
     detail = record.get("detail")
     text = json.dumps(detail) if detail is not None else ""
-    if status == 422:
+    # 422 for a body that is no request, 400 for one that is not UTF-8.
+    if status in (400, 422):
         return "invalid"
     if status in (409, 507):
         return first(REFUSALS, text) or f"status {status}"
@@ -170,8 +174,9 @@ def check_page(title, values, records, metas, steps):
     for data_type in sorted(set(built) | set(vectors)):
         compare(f"vectors_built {data_type}", built.get(data_type), float(vectors.get(data_type, 0)))
 
-    in_flight = sum(family(values, "knn_builder_jobs_in_flight", "stage").values())
-    compare("jobs_in_flight", in_flight, 0.0)
+    # A page without the stages is not one with none in flight.
+    in_flight = family(values, "knn_builder_jobs_in_flight", "stage")
+    compare("jobs_in_flight", sum(in_flight.values()) if in_flight else None, 0.0)
     for histogram in ("job_seconds", "queue_seconds", "forecast_ratio"):
         compare(f"{histogram} count", values.get(f"knn_builder_{histogram}_count"),
                 float(len(completed)))
@@ -233,6 +238,15 @@ def bench(run_dir):
         values = page_values((run_dir / scrape["file"]).read_text())
         mine = [r for r in records if r.get("process") == scrape["process"]]
         ok &= check_page(f"process {scrape['process']}: {scrape['file']}", values, mine, metas, steps)
+    # A run that stopped early scraped no page of its last process.
+    scraped = {scrape["process"] for scrape in record["scrapes"]}
+    for process in sorted({r["process"] for r in records if "process" in r} - scraped):
+        unchecked = sum(1 for r in records if r.get("process") == process)
+        print(f"== process {process}\nBAD no page: {unchecked} records not checked")
+        ok = False
+    if "error" in record:
+        print(f"== the run\nBAD ended with an error: {record['error']}")
+        ok = False
     return ok
 
 

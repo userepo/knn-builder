@@ -13,7 +13,7 @@ knn_builder_http_requests_total{route="jobs",code="401"} 1
 knn_builder_http_requests_total{route="heart_beat",code="200"} 240
 knn_builder_http_requests_total{route="metrics",code="200"} 239
 knn_builder_http_requests_total{route="other",code="404"} 4
-# HELP knn_builder_build_requests_total Build requests, by how they were answered.
+# HELP knn_builder_build_requests_total Build requests whose body the service read, by how it answered them.
 # TYPE knn_builder_build_requests_total counter
 knn_builder_build_requests_total{result="accepted"} 55
 knn_builder_build_requests_total{result="held"} 6
@@ -238,6 +238,6 @@ knn_builder_gpu_memory_total_bytes 8585216000
 # HELP knn_builder_gpu_memory_free_bytes The GPU's free memory when last read, every process on it counted.
 # TYPE knn_builder_gpu_memory_free_bytes gauge
 knn_builder_gpu_memory_free_bytes 6485442560
-# HELP knn_builder_gpu_memory_last_build_peak_bytes The most GPU memory in use during the last build that ended; 0 before one has.
+# HELP knn_builder_gpu_memory_last_build_peak_bytes The most GPU memory in use during the last build that ended; 0 before one has, or when it could not be read.
 # TYPE knn_builder_gpu_memory_last_build_peak_bytes gauge
 knn_builder_gpu_memory_last_build_peak_bytes 1899495424
