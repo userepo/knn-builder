@@ -4,7 +4,7 @@
 
 A remote vector index build service for [OpenSearch k-NN](https://github.com/opensearch-project/k-NN), written in Rust. It is meant as a drop-in replacement for [remote-vector-index-builder](https://github.com/opensearch-project/remote-vector-index-builder): the same HTTP API, the same index files, and the same cuVS CAGRA build on the GPU, with less host memory per build and a GPU that stays busy while vectors download and indexes upload.
 
-**Status:** released. `knn-gpu` builds the CAGRA graph on the GPU with the upstream service's parameters, and `knn-write` writes the index file the service writes, identical to it on every test file; `knn-store` downloads the vectors from S3 and streams the index file back up, with no temporary file; and the library half of `knn-builder` runs the three as a pipeline, the next job downloading while one builds and the last one uploading, within a budget of host memory. The `knn-builder` binary serves the HTTP API on port 1025, answering as the upstream service does, and runs from a container image as the upstream one does; an OpenSearch 3.9.0 node with k-NN's remote index build turned on builds its float, half_float, byte and binary segments through it. `project_link_to_base_layer: true`, an option of the upstream service's next, unreleased version that k-NN does not send yet, is taken as that version takes it: a float, half_float or byte graph whose clusters a search could not leave is linked through an HNSW layer over a sample of its vectors before it is written (`docs/params.md`), which on clustered inputs restores the recall as the upstream service's does (the projection, under Benchmarks). And, an option of knn-builder's own, off by default, each job can check its graph's recall before its index is stored, searching it as k-NN will, and fail when the recall falls below a set least, so that its data node builds the segment itself (Configuration).
+**Status:** released. `knn-gpu` builds the CAGRA graph on the GPU with the upstream service's parameters, and `knn-write` writes the index file the service writes, identical to it on every test file; `knn-store` downloads the vectors from S3 and streams the index file back up, with no temporary file; and the library half of `knn-builder` runs the three as a pipeline, the next job downloading while one builds and the last one uploading, within a budget of host memory. The `knn-builder` binary serves the HTTP API on port 1025, answering as the upstream service does, and runs from a container image as the upstream one does; an OpenSearch 3.9.0 node with k-NN's remote index build turned on builds its float, half_float, byte and binary segments through it. `project_link_to_base_layer: true`, an option of the upstream service's next, unreleased version that k-NN does not send yet, is taken as that version takes it: a float, half_float or byte graph whose clusters a search could not leave is linked through an HNSW layer over a sample of its vectors before it is written (`docs/params.md`), which on clustered inputs restores the recall as the upstream service's does (the projection, under Benchmarks). And, an option of knn-builder's own, off by default, each job can check its graph's recall before its index is stored, searching it as k-NN will, and fail when the recall falls below a set least, so that its data node builds the segment itself (Configuration). The service also answers `GET /metrics`, a Prometheus page of its requests, jobs, stage times, forecast and memory, which the upstream service does not have (Metrics).
 
 ## Building
 
@@ -32,7 +32,7 @@ Under WSL, the first build's CMake step can take minutes while CMake searches th
 Each release's image is on Docker Hub as `userepo/knn-builder:<version>`, the newest also as `latest`. It runs as the upstream user guide starts the upstream image, on a host with the NVIDIA container toolkit and a driver for CUDA 12.9:
 
 ```sh
-docker run --gpus all -p 80:1025 userepo/knn-builder:1.2.0
+docker run --gpus all -p 80:1025 userepo/knn-builder:1.3.0
 ```
 
 The `Dockerfile` builds the service with the `gpu` feature against the conda environment of `environment.yml`, then copies the binary and the CUDA and cuVS libraries it loads onto `nvidia/cuda:12.9.2-base-ubuntu24.04`, the latest patch release of the base the upstream image uses (12.9.0); it runs as its own user, on port 1025. The release workflow builds it from the tag; to build it yourself, with BuildKit, Docker's default builder:
@@ -49,6 +49,69 @@ The service reads the upstream service's environment variables, with the same de
 Three more describe the data nodes that call the service. `CLIENT_TIMEOUT_SECONDS` (3600) and `CLIENT_POLL_INTERVAL_SECONDS` (5) are k-NN's `knn.remote_index_build.client.timeout` and `knn.remote_index_build.poll.interval`, in seconds, and should match the cluster's. `CPU_BUILD_THREADS`, unset by default, is the data node's `knn.algo_param.index_thread_qty`, 1 or 4. The service forecasts when each new job would end, from the jobs ahead of it and what earlier jobs took, and answers 507 at once, rather than take the job, when the GPU's free memory cannot hold its build, when the data node would see it ended only past its timeout, or, with `CPU_BUILD_THREADS` set, when the data node would build the segment sooner itself. k-NN does not retry a 507: the data node builds that segment on its CPU right away, instead of after the timeout. A job whose build no longer fits the GPU's free memory when its turn comes fails at once, for the same reason. And a job the data node has stopped waiting for, its timeout counted from the request, is dropped: one still queued never starts, a transfer stops, and a build under way, which cannot be stopped, stores nothing, so the jobs still waited for move up. Whenever a job ends, the jobs not yet building are forecast again with what it taught, and those that would now miss are dropped at once, so their data nodes build the segments themselves at their next poll.
 
 Three more turn on a recall check, off by default. With `RECALL_CHECK_QUERIES` above 0, each job samples that many of its own vectors as queries (all of them in a smaller job), searches its graph for each one as k-NN will search the file, and compares the results with the exact nearest neighbors; the recall@k, k being `RECALL_CHECK_K` (10), is logged with the job's end. For a file that stores its vectors, it is the recall `knn-inspect recall --sample` reports on that file, with the same count and k and its default seed. A file written with `skip_stored_vectors` holds the graph alone, and k-NN searches it over the quantized vectors Lucene keeps on the data node, which the service never sees: for such a job the check gives the graph's recall over the full vectors instead. The queries being the index's own vectors, the recall reads a little higher than one of held-out queries. The check runs on the CPU beside the write, and the upload waits for it before it completes: 100 queries over 1M vectors of 768 dimensions take about 4 s on 32 threads and 0.1 GB of host memory, and the time grows with the queries (the recall check, under Benchmarks). With `RECALL_CHECK_MIN` set, a recall from 0 to 1, a job below it fails with nothing stored, so its data node builds the segment itself.
+
+### Metrics
+
+`GET /metrics` answers the service's metrics in the Prometheus text format (0.0.4) on the API's port, 1025, behind Basic Auth when it is set. It is always on: the counts cost a few additions per request and job, the GPU's memory is read once a second, and the page is built only when something scrapes. k-NN never asks for it, and the upstream service answers it 404. Every label takes a fixed set of values, so the page keeps about 200 series however many jobs and tenants it serves: no bucket, path, tenant or job id leaves the service through it, and `GET /_jobs` stays the per-job view. Every series is on the page from the start at 0, but the requests by route and code, listed as they come, and the memory lines, from their first reading. Counters start again at 0 when the service does, as `process_start_time_seconds` shows.
+
+| Metric | Type | Labels | What it tells |
+| --- | --- | --- | --- |
+| `knn_builder_build_info` | gauge, 1 | `version` | The running version |
+| `knn_builder_http_requests_total` | counter | `route` (build, status, jobs, heart_beat, metrics, other), `code` | Requests answered |
+| `knn_builder_build_requests_total` | counter | `result` (accepted, held, invalid, conflict, store_full, too_large, late, cpu_sooner) | `POST /_build` by answer: a new job, a retry of a job held, a body refused, the 409, and each 507 |
+| `knn_builder_jobs_in_flight` | gauge | `stage` (queued, downloading, loaded, building, graphed, uploading) | Jobs that have not ended, by pipeline stage |
+| `knn_builder_jobs_held`, `knn_builder_jobs_held_limit` | gauge | | Jobs in the store, running or ended within the TTL, and `REQUEST_STORE_MAX_SIZE` |
+| `knn_builder_jobs_ended_total` | counter | `outcome` (completed, download_failed, host_memory, bad_parameters, device_memory, build_failed, write_failed, upload_failed, low_recall, forecast_late, timed_out, canceled, panicked) | Jobs by how they ended, each once; `forecast_late` and `timed_out` are the drops of Configuration |
+| `knn_builder_vectors_built_total` | counter | `data_type` | Vectors in the indexes stored |
+| `knn_builder_job_seconds` | histogram | | From the request to the end, for completed jobs: what the data node waits, less its poll |
+| `knn_builder_queue_seconds` | histogram | | From the request until the job's download starts, for completed jobs |
+| `knn_builder_stage_seconds` | histogram | `stage` (download, build, projection, recall_check, upload) | Each stage's time, for completed jobs: the `DEBUG` stage-times line's |
+| `knn_builder_forecast_ratio` | histogram | | Seconds a completed job took over the seconds forecast when it was taken; above 1, slower |
+| `knn_builder_stage_model_ratio` | gauge | `stage` | The forecast's learned correction, observed over modeled seconds; far from 1, this host, its S3 or its load differs from those the model was fitted on |
+| `knn_builder_drain_seconds` | gauge | | Forecast seconds until the last job in flight ends; 0 when idle |
+| `knn_builder_recall` | histogram | | The recall check's recall, for completed jobs and those failed for it |
+| `knn_builder_host_budget_bytes`, `knn_builder_host_budget_used_bytes` | gauge | | `CPU_MEMORY_LIMIT` as the pipeline counts it, and the buffers of the jobs in flight |
+| `process_resident_memory_bytes` | gauge | | The service's resident memory (`VmRSS`); Linux only |
+| `process_start_time_seconds` | gauge | | When the service started, in Unix seconds |
+| `knn_builder_gpu_memory_total_bytes`, `knn_builder_gpu_memory_free_bytes` | gauge | | The GPU's memory and its free memory, every process on it counted, read once a second; the three GPU lines are left off the page once reads have failed for 5 s |
+| `knn_builder_gpu_memory_last_build_peak_bytes` | gauge | | The most GPU memory in use during the last build that ended, read every 50 ms during a build |
+
+Times are in seconds, sizes in bytes. The seconds histograms' buckets run from 0.1 to 2,500, the ratio's from 0.5 to 4 and the recall's from 0.5 to 1.
+
+The two request counters count differently. `build_requests_total` counts the requests that reach the service's parser; `http_requests_total{route="build"}` counts every answer, the 401s, 405s and 413s that never get there among them. The GPU's peak counts every process on the device and what is in use at idle (1.2 GB under WSL2 on the benchmark laptop, 0.13 to 0.17 GB of it the service's own CUDA context and cuVS's), so read it against the free memory of an idle service; a peak shorter than 50 ms can be missed.
+
+On the benchmark laptop a scrape of a full store, 10,000 jobs held with 1,000 of them in flight, took under half a millisecond, and the reads of the GPU's memory left the build times within their run-to-run spread. A Prometheus scrape config, with the service's Basic Auth when it is set:
+
+```yaml
+scrape_configs:
+  - job_name: knn-builder
+    scrape_interval: 15s
+    basic_auth:
+      username: admin
+      password_file: /etc/prometheus/knn-builder-password
+    static_configs:
+      - targets: ["knn-builder:1025"]
+```
+
+Five queries to start from:
+
+```promql
+# Share of build requests refused: the data nodes build those segments themselves.
+sum(rate(knn_builder_build_requests_total{result=~"store_full|too_large|late|cpu_sooner"}[5m]))
+  / sum(rate(knn_builder_build_requests_total[5m]))
+
+# Forecast time to drain over CLIENT_TIMEOUT_SECONDS (3600 here): near 1, new jobs are refused as late.
+knn_builder_drain_seconds / 3600
+
+# Median of the time completed jobs took over the time forecast.
+histogram_quantile(0.5, sum by (le) (rate(knn_builder_forecast_ratio_bucket[1h])))
+
+# Share of the jobs checked whose recall was 0.95 or less.
+sum(rate(knn_builder_recall_bucket{le="0.95"}[1h])) / sum(rate(knn_builder_recall_count[1h]))
+
+# Share of the job store taken: at 1, new jobs are refused as store_full.
+knn_builder_jobs_held / knn_builder_jobs_held_limit
+```
 
 ### S3 tests
 
