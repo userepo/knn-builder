@@ -19,6 +19,10 @@ holds:
             at least this, so it decides the draw alone
   layer1    build_layer1 on vectors() below, which knn-write's test
             builds again: the graph, as a string of ids
+  layer1_small  the same for 100 vectors or fewer, built on SMALL_THREADS
+            OpenMP threads: Faiss adds a level that small on one thread
+            whatever its thread count, so each is the graph one thread
+            builds, every run
   links     project_links on a graph() with the promoted ids and layer-1
             graph each case lists, for a few settings: the links it wrote
             and every slot it changed, with its new id; layer 1 is
@@ -28,8 +32,10 @@ holds:
             separated, the changes as index and id in turn
 
 Faiss runs on one OpenMP thread here, where its HNSW insertion, and so
-build_layer1, is the same every run (the service's runs on several and
-varies), so a run writes the same file again.
+build_layer1, is the same every run (on several threads, as the service's
+are on a machine of 8 processors or more, a level of more than 100 nodes
+varies). Only layer1_small is built on more, and comes out the same too, so
+a run writes the same file again.
 """
 
 import json
@@ -93,6 +99,14 @@ LAYER1_CASES = [
     (3, 4, 1, "float", "l2", 2, 10, 42),
     (1, 4, 1, "float", "ip", 2, 10, 43),
 ]
+# The same of 100 vectors or fewer, which Faiss adds on one thread whatever
+# its thread count, and the count they are built on.
+LAYER1_SMALL_CASES = [
+    (80, 8, 3, "float", "l2", 4, 40, 44),
+    (100, 16, 4, "float", "ip", 8, 40, 45),  # the most it adds so
+    (64, 6, 2, "byte", "l2", 6, 20, 46),  # equal scores
+]
+SMALL_THREADS = 8
 # (name, graph() parameters, promoted, layer 1, [(max_share, protect)]):
 # promoted ("draw", m) or ("ids", [...]); layer 1 ("synthetic", M, seed,
 # empty_every, self_every), ("present", M) or ("faiss", M, ef, d, seed).
@@ -228,6 +242,31 @@ def layer1(case):
     }
 
 
+def on_several_threads(case):
+    """build_layer1 on the case's vectors, on SMALL_THREADS OpenMP threads."""
+    n, d, clusters, kind, metric, M, ef, seed = case
+    x = vectors(n, d, clusters, kind, seed)
+    faiss_metric = faiss.METRIC_L2 if metric == "l2" else faiss.METRIC_INNER_PRODUCT
+    faiss.omp_set_num_threads(SMALL_THREADS)
+    try:
+        assert faiss.omp_get_max_threads() == SMALL_THREADS
+        return numbers(build_layer1(x, faiss_metric, M, ef).ravel())
+    finally:
+        faiss.omp_set_num_threads(1)
+
+
+def layer1_small(case):
+    """layer1(case), held to what SMALL_THREADS threads build, run after
+    run: the same graph."""
+    record = layer1(case)
+    assert record["n"] <= 100
+    for _ in range(5):
+        assert on_several_threads(case) == record["graph"], (
+            f"{SMALL_THREADS} threads should build one thread's layer 1 of {record['n']} nodes"
+        )
+    return {**record, "threads": SMALL_THREADS}
+
+
 def layer1_of(spec, neighbors, n, degree, promoted):
     """The layer-1 graph [len(promoted), M], positions into promoted."""
     kind, M = spec[0], spec[1]
@@ -357,8 +396,16 @@ def main():
         "gate": gate,
         "level0": level0,
         "layer1": [layer1(case) for case in LAYER1_CASES],
+        "layer1_small": [layer1_small(case) for case in LAYER1_SMALL_CASES],
         "links": [links(case) for case in LINK_CASES],
     }
+    # The threads are Faiss's to use: on them, a level of more than 100
+    # nodes comes out another graph than one thread's.
+    large = max(LAYER1_CASES)
+    one_thread = next(r["graph"] for r in record["layer1"] if r["n"] == large[0])
+    assert any(on_several_threads(large) != one_thread for _ in range(5)), (
+        f"{SMALL_THREADS} threads should build another layer 1 of {large[0]} nodes"
+    )
     out.write_bytes((json.dumps(record, indent=1) + "\n").encode())
 
 

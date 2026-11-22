@@ -290,6 +290,43 @@ fn builds_the_layer_faiss_builds_on_one_thread() {
     assert_eq!(checked, 13);
 }
 
+#[test]
+fn batches_a_layer_faiss_adds_on_one_thread_to_faiss_s_own() {
+    // Faiss adds a layer of 100 nodes or fewer on one thread whatever its
+    // thread count: the oracle built these on 8, each the same graph every
+    // run, and the one a single thread builds.
+    let data = data();
+    let small = data["layer1_small"].as_array().unwrap();
+    assert_eq!(small.len(), 3);
+    for record in small {
+        assert!(field(record, "n") <= 100, "{record}");
+        assert_eq!(field(record, "threads"), 8, "{record}");
+        let x = vectors(record);
+        let first: Vec<f32> = record["first_row"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|v| {
+                #[expect(
+                    clippy::cast_possible_truncation,
+                    reason = "the oracle wrote float32 values"
+                )]
+                let value = v.as_f64().unwrap() as f32;
+                value
+            })
+            .collect();
+        assert_eq!(x[..first.len()], first, "{record}");
+        let want = ids(&record["graph"]);
+        for threads in [1, 4, 8] {
+            assert_eq!(
+                batched(record, &x, threads),
+                want,
+                "{threads} threads, {record}"
+            );
+        }
+    }
+}
+
 /// Batched layer 1 on `threads` threads for the oracle's case `record`.
 fn batched(record: &Value, x: &[f32], threads: usize) -> Vec<u32> {
     let d = usize::try_from(field(record, "dimension")).unwrap();

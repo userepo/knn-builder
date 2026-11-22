@@ -1030,7 +1030,10 @@ def main():
     parser.add_argument("--recall-queries", type=int, default=0)
     parser.add_argument("--recall-k", type=int, default=10)
     parser.add_argument("names", nargs="*")
-    args = parser.parse_args()
+    # Intermixed: the usage puts the names after the options, where
+    # parse_args on older Pythons (3.12.3 among them) has given them an
+    # empty list already and refuses them as unrecognized.
+    args = parser.parse_intermixed_args()
     if args.s3_bucket is not None:
         if not args.s3_bucket:
             sys.exit("--s3-bucket takes a bucket's name")

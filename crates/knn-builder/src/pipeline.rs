@@ -674,6 +674,8 @@ fn builds<B: Builder>(
     to_upload: &mpsc::Sender<Graphed>,
     runtime: &Handle,
 ) {
+    // Until a build ends well, the next may be the process's first.
+    let mut first_build = true;
     loop {
         // The upload slot, taken before the next job leaves the build
         // slot: until its graph has somewhere to go, that job waits there,
@@ -699,10 +701,12 @@ fn builds<B: Builder>(
         let start = Instant::now();
         // Defense in depth at the job boundary: a panicking build fails
         // its job, not the stage.
-        let built = panic::catch_unwind(AssertUnwindSafe(|| build(&mut builder, &job)))
-            .unwrap_or(Err(JobError::Panicked { stage: "build" }));
+        let built =
+            panic::catch_unwind(AssertUnwindSafe(|| build(&mut builder, &job, first_build)))
+                .unwrap_or(Err(JobError::Panicked { stage: "build" }));
         match built {
             Ok((graph, degree)) => {
+                first_build = false;
                 // Not in the file, so not needed past the build, nor past
                 // the projection or the recall check when the job has them.
                 let request = &job.queued.job;
@@ -726,13 +730,24 @@ fn builds<B: Builder>(
     }
 }
 
-/// A job's graph and its degree.
-fn build<B: Builder>(builder: &mut B, job: &Loaded) -> Result<(Vec<u32>, usize), JobError> {
+/// A job's graph and its degree. `first_build` says no build of the
+/// process has ended well yet.
+fn build<B: Builder>(
+    builder: &mut B,
+    job: &Loaded,
+    first_build: bool,
+) -> Result<(Vec<u32>, usize), JobError> {
     let request = &job.queued.job;
     // Another process may have taken device memory since the job was
-    // admitted: fail it now rather than out of memory partway.
+    // admitted: fail it now rather than out of memory partway. The free
+    // memory is read now, so after a build it is already less by what the
+    // first one loaded and the process keeps.
     if let Some(free) = builder.free_device_memory() {
-        let needed = Fitted::device_bytes_needed(request);
+        let needed = if first_build {
+            Fitted::device_bytes_needed(request)
+        } else {
+            Fitted::device_bytes_needed_once_built(request)
+        };
         if needed > free {
             return Err(JobError::DeviceMemory {
                 needed_mib: needed.div_ceil(1 << 20),

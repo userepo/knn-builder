@@ -228,8 +228,7 @@ async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, args: &[S
     let runs_path = out.join("runs.json");
     let mut runs: Vec<Value> = fs::read(&runs_path)
         .ok()
-        .map(|bytes| serde_json::from_slice(&bytes).unwrap())
-        .unwrap_or_default();
+        .map_or_default(|bytes| serde_json::from_slice(&bytes).unwrap());
     for name in names {
         let meta: Value =
             serde_json::from_slice(&fs::read(inputs.join(name).join("input.json")).unwrap())

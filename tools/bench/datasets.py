@@ -347,7 +347,10 @@ def main():
     parser.add_argument("--gpu-gb", type=float, default=8.0)
     parser.add_argument("--rows", action="append", default=[], metavar="DATASET=N")
     parser.add_argument("datasets", nargs="*")
-    args = parser.parse_args()
+    # Intermixed: the usage puts the names after the options, where
+    # parse_args on older Pythons (3.12.3 among them) has given them an
+    # empty list already and refuses them as unrecognized.
+    args = parser.parse_intermixed_args()
     for dataset in args.datasets:
         if dataset not in DATASETS:
             sys.exit(f"no dataset {dataset}; one of {', '.join(DATASETS)}")

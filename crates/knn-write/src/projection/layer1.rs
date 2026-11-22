@@ -3,9 +3,11 @@
 //! node with every node on one level, filled by `IndexHNSW::add` over
 //! float32 copies of the promoted vectors. [`Insertion::Sequential`] is that
 //! insertion as Faiss runs it on one thread, where its result is the same
-//! every run; the service adds on several OpenMP threads, so its own
-//! varies run to run. [`Insertion::Batched`] runs on several threads and
-//! still gives one result.
+//! every run: a level of 100 nodes or fewer always, and any level where
+//! the service gives Faiss one OpenMP thread. On more threads the
+//! service's larger levels vary run to run. [`Insertion::Batched`] runs on
+//! several threads and still gives one result, Faiss's own for a level of
+//! 100 nodes or fewer.
 //!
 //! Faiss's heaps are `std::priority_queue`s, whose order among equal
 //! distances is libstdc++'s heap algorithm; [`Heap`] runs that algorithm,
@@ -40,6 +42,11 @@ const PRUNE_HEADROOM: f32 = 0.2;
 /// An empty slot.
 const EMPTY: u32 = u32::MAX;
 
+/// The most nodes Faiss adds on one thread whatever its thread count
+/// (`hnsw_add_vertices`'s `omp parallel if (i1 > i0 + 100)`): its level is
+/// then the same every run, and the batched one is built as it is.
+const ONE_THREAD_NODES: u32 = 100;
+
 /// A batch is at most this share of the nodes already in, so most of what
 /// a batch's searches could find is there.
 const BATCH_SHARE: usize = 16;
@@ -73,7 +80,9 @@ pub enum Insertion {
     /// it left it, on up to `threads` threads. The level is the same
     /// whatever the thread count, and close to the sequential one: the
     /// nodes of a batch do not see each other, as Faiss's own threads see
-    /// only part of each other's work.
+    /// only part of each other's work. A level of 100 nodes or fewer goes
+    /// in as [`Insertion::Sequential`]'s does: Faiss adds one that small
+    /// on one thread whatever its thread count, so the level is its own.
     Batched {
         /// The most threads to search and link on, the calling one among
         /// them; the others are started once and kept for every batch. A
@@ -424,7 +433,10 @@ impl Build<'_> {
             return Some(neighbors);
         };
         match insertion {
-            Insertion::Sequential => {
+            Insertion::Batched { threads } if n > ONE_THREAD_NODES => {
+                self.batched::<O>(&mut neighbors, n, entry, rest, threads, stop)?;
+            }
+            Insertion::Sequential | Insertion::Batched { .. } => {
                 let mut visited = Visited::new(n);
                 for &pt in rest {
                     if stop() {
@@ -433,9 +445,6 @@ impl Build<'_> {
                     let targets = self.targets::<O>(&neighbors, &mut visited, pt, entry);
                     self.link::<O>(&mut neighbors, pt, &targets);
                 }
-            }
-            Insertion::Batched { threads } => {
-                self.batched::<O>(&mut neighbors, n, entry, rest, threads, stop)?;
             }
         }
         Some(neighbors)
@@ -1199,6 +1208,28 @@ mod tests {
         for threads in [33, 40, 64] {
             assert_eq!(on(threads), one, "{threads} threads");
         }
+    }
+
+    #[test]
+    fn builds_a_level_faiss_adds_on_one_thread_as_faiss_does() {
+        // Faiss adds 100 nodes or fewer on one thread, in order; from 101
+        // its threads share them, and the batches stand in for those.
+        let (dimension, m) = (4, 6);
+        let batched = Insertion::Batched {
+            threads: NonZeroUsize::new(4).unwrap(),
+        };
+        let level = |count: usize, insertion| {
+            let vectors = uniform(count, dimension, 7);
+            build_layer1(&vectors, dimension, Metric::L2, m, 80, insertion).unwrap()
+        };
+        for count in [2, 33, 64, 100] {
+            assert_eq!(
+                level(count, batched),
+                level(count, Insertion::Sequential),
+                "{count} nodes"
+            );
+        }
+        assert_ne!(level(101, batched), level(101, Insertion::Sequential));
     }
 
     #[test]

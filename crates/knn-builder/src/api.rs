@@ -315,7 +315,7 @@ async fn not_found(headers: HeaderMap, uri: Uri) -> Response {
     let path = uri.path();
     let route = path.trim_end_matches('/');
     if route.len() < path.len() && is_route(route) {
-        let query = uri.query().map(|q| format!("?{q}")).unwrap_or_default();
+        let query = uri.query().map_or_default(|q| format!("?{q}"));
         let host = headers.get(header::HOST).and_then(|h| h.to_str().ok());
         let location = match host {
             Some(host) => format!("http://{host}{route}{query}"),

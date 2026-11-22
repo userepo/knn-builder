@@ -485,6 +485,41 @@ async fn fails_a_build_the_free_device_memory_cannot_hold() {
     s3.remove().await;
 }
 
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn needs_what_the_first_build_loads_until_a_build_ends_well() {
+    let s3 = S3::new("first-build").await;
+    let first = job(&s3.bucket, "first", 20_000, 32);
+    let small = job(&s3.bucket, "small", 600, 16);
+    let later = job(&s3.bucket, "later", 20_000, 32);
+    for job in [&first, &small, &later] {
+        s3.put_inputs(job, &values(job), Blob::F32, None).await;
+    }
+    // Free memory a byte short of the large build as a process's first,
+    // which covers it once a build has loaded what the process keeps.
+    let free = Fitted::device_bytes_needed(&first) - 1;
+    assert!(Fitted::device_bytes_needed_once_built(&later) <= free);
+    assert!(Fitted::device_bytes_needed(&small) <= free);
+    let builder = FakeBuilder::new(Duration::ZERO).with_free_device_memory(free);
+    let pipeline = s3.pipeline(builder.clone());
+    let first_outcome = pipeline.submit(first.clone()).outcome();
+    let small_outcome = pipeline.submit(small.clone()).outcome();
+    let later_outcome = pipeline.submit(later.clone()).outcome();
+    // Refused as the first build, before it reached the builder, so with
+    // nothing loaded.
+    let failed = first_outcome.await;
+    assert!(
+        matches!(failed, Err(JobError::DeviceMemory { .. })),
+        "{failed:?}"
+    );
+    small_outcome.await.unwrap();
+    // The same build after the small one: no longer the first.
+    later_outcome.await.unwrap();
+    pipeline.close().await;
+    assert_eq!(builder.builds(), 2);
+    s3.remove().await;
+}
+
 /// How far a forecast may miss when it knows each stage's time, in
 /// seconds: what the stages' hand-offs take.
 const FORECAST_SLACK: f64 = 0.05;

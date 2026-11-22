@@ -228,6 +228,15 @@ fn needs_what_a_process_s_first_build_takes() {
         let more = first - later;
         assert!((40 << 20..=42 << 20).contains(&more), "{}", record["input"]);
         assert!(needed >= first, "{}: {needed} for {first}", record["input"]);
+        // A later build needs that less the 42 MiB the first loaded, which
+        // the process keeps: still its own peak and more.
+        let once_built = Fitted::device_bytes_needed_once_built(&job);
+        assert_eq!(needed - once_built, 42 << 20, "{}", record["input"]);
+        assert!(
+            once_built >= later,
+            "{}: {once_built} for {later}",
+            record["input"]
+        );
         // Below the 100,000 vectors the model is fitted from, it
         // over-estimates: the peak alone covers a later build.
         assert!(
@@ -236,6 +245,29 @@ fn needs_what_a_process_s_first_build_takes() {
             "{}",
             record["input"]
         );
+    }
+}
+
+#[test]
+fn covers_a_later_build_s_peak_with_the_margin_alone() {
+    // Every build of the grids follows a warm-up build in its process, so
+    // its peak is a later build's: what the first loaded is not in it.
+    for (name, count) in [
+        ("runs.json", 58),
+        ("byte-runs.json", 24),
+        ("binary-runs.json", 30),
+    ] {
+        let builds = completed(name);
+        assert_eq!(builds.len(), count, "{name}");
+        for record in &builds {
+            let needed = Fitted::device_bytes_needed_once_built(&job(record));
+            #[expect(
+                clippy::cast_precision_loss,
+                reason = "bytes of a few GB, exact in f64"
+            )]
+            let needed = needed as f64;
+            assert!(needed >= peak(record), "{name}: {}", record["shape"]);
+        }
     }
 }
 

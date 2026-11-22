@@ -218,7 +218,7 @@ const BATCH_ROWS: f64 = 65_536.0;
 /// cuVS loads its kernels and creates its library handles then, and keeps
 /// them: 40 to 42 MiB more at the peak, at every size measured
 /// (`fixtures/grid/first.json`).
-const FIRST_BUILD_BYTES: f64 = 44_040_192.0;
+const FIRST_BUILD_BYTES: u64 = 42 << 20;
 
 /// The candidates the IVF-PQ search that seeds a graph of `degree` over
 /// `doc_count` vectors asks for at `refinement_rate`, as cuVS's CAGRA build
@@ -389,13 +389,22 @@ impl Fitted {
         ivf_pq.max(graph)
     }
 
-    /// The device memory to have free for `job`'s build, in bytes: its
-    /// peak, a margin of [`DEVICE_MARGIN`], and what the build takes
-    /// besides if it is the process's first, which the forecast does not
-    /// know.
+    /// The device memory to have free for `job`'s build, in bytes, when
+    /// the process may not have built a graph yet: its peak, a margin of
+    /// [`DEVICE_MARGIN`], and what the build takes besides if it is the
+    /// process's first, which the forecast does not know.
     #[must_use]
     pub fn device_bytes_needed(job: &Job) -> u64 {
-        let needed = Self::device_peak_bytes(job) * (1.0 + DEVICE_MARGIN) + FIRST_BUILD_BYTES;
+        Self::device_bytes_needed_once_built(job).saturating_add(FIRST_BUILD_BYTES)
+    }
+
+    /// The device memory to have free for `job`'s build once the process
+    /// has built a graph, in bytes: its peak and a margin of
+    /// [`DEVICE_MARGIN`]. What the first build loaded the process keeps,
+    /// so the free memory read since is already less by it.
+    #[must_use]
+    pub fn device_bytes_needed_once_built(job: &Job) -> u64 {
+        let needed = Self::device_peak_bytes(job) * (1.0 + DEVICE_MARGIN);
         #[expect(
             clippy::cast_possible_truncation,
             clippy::cast_sign_loss,
