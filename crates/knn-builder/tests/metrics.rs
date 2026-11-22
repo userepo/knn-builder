@@ -37,16 +37,21 @@ fn spread(count: usize, first: f64, step: f64) -> impl Iterator<Item = f64> {
         .take(count)
 }
 
-/// Every metric with values in it, the optional ones included; a few
-/// series are left at 0, as a running service leaves them.
+/// One service's page, its totals adding up as a running service's do:
+/// modeled on a scrape during a burst (`fixtures/ea7db9f/metrics/`), with
+/// a day's rarer answers and outcomes added, and four jobs in flight. Every
+/// metric has values, the optional ones included; a few series are left at
+/// 0, as a running service leaves them.
 fn sample() -> Snapshot {
     let mut snapshot = Snapshot {
         // Not the crate's, so a release leaves the page as it is.
         version: "0.0.0",
+        // The answers below: 55 jobs taken and 6 held, then each refusal.
         http_requests: [
             (Route::Build, 200, 61),
+            (Route::Build, 409, 1),
             (Route::Build, 422, 2),
-            (Route::Build, 507, 9),
+            (Route::Build, 507, 29),
             (Route::Status, 200, 1403),
             (Route::Status, 404, 3),
             (Route::Jobs, 401, 1),
@@ -61,52 +66,62 @@ fn sample() -> Snapshot {
             requests,
         })
         .collect(),
-        jobs_held: 57,
+        // Ended within the TTL, or in flight.
+        jobs_held: 41,
         jobs_held_limit: 10_000,
-        drain_seconds: 148.25,
+        drain_seconds: 82.5,
         host_budget: 30_517 << 20,
         host_budget_used: 7_412 << 20,
         resident_memory: Some(4_104_531_968),
         start_time_seconds: 1_795_219_200.5,
+        // 8188 MiB, with a build under way.
         gpu_memory: Some(GpuMemory {
-            total: 8_585_740_288,
-            free: 7_301_234_688,
-            last_build_peak: 2_164_260_864,
+            total: 8_585_216_000,
+            free: 6_485_442_560,
+            last_build_peak: 1_899_495_424,
         }),
         ..Snapshot::default()
     };
     let counted = &mut snapshot.counted;
-    for (answer, count) in BuildAnswer::ALL.iter().zip([55_u64, 6, 2, 1, 0, 3, 4, 2]) {
+    // Taken, held, invalid, conflict, store full, too large, late, CPU
+    // sooner: the burst's 24 late refusals among them.
+    for (answer, count) in BuildAnswer::ALL.iter().zip([55_u64, 6, 2, 1, 0, 3, 24, 2]) {
         counted.build_requests.add(*answer, count);
     }
+    // The 51 of the 55 taken that ended: 34 completed, the burst's 9
+    // dropped by the forecast, and one or two of most failures.
     for (outcome, count) in Outcome::ALL
         .iter()
-        .zip([44_u64, 2, 0, 1, 1, 0, 0, 1, 2, 3, 1, 0, 0])
+        .zip([34_u64, 1, 0, 1, 1, 0, 0, 1, 2, 9, 1, 1, 0])
     {
         counted.jobs_ended.add(*outcome, count);
     }
+    // The 34 completed: 20 float, 4 half_float, 6 byte and 4 binary jobs
+    // of the burst's sizes, 100,000 to 1M vectors.
     for (data_type, vectors) in
         VectorType::ALL
             .iter()
-            .zip([18_000_000_u64, 6_500_000, 9_250_000, 4_000_000])
+            .zip([11_250_000_u64, 2_000_000, 3_500_000, 4_000_000])
     {
         counted.vectors_built.add(*data_type, vectors);
     }
-    for (stage, jobs) in FlightStage::ALL.iter().zip([5_u64, 1, 0, 1, 0, 1]) {
+    for (stage, jobs) in FlightStage::ALL.iter().zip([1_u64, 1, 0, 1, 0, 1]) {
         snapshot.jobs_in_flight.set(*stage, jobs);
     }
-    for seconds in spread(44, 0.4, 2.5) {
+    for seconds in spread(34, 0.4, 2.5) {
         counted.job_seconds.observe(seconds);
     }
-    for seconds in spread(44, 0.06, 2.75) {
+    for seconds in spread(34, 0.06, 2.75) {
         counted.queue_seconds.observe(seconds);
     }
+    // Every completed job's download, build and upload; six projected,
+    // and 20 checked. The ratios are the burst's, rounded.
     let stages = [
-        (TimedStage::Download, 44, 0.08, 2.0, 1.25),
-        (TimedStage::Build, 44, 0.2, 2.25, 0.5),
-        (TimedStage::Projection, 9, 1.5, 3.0, 1.75),
-        (TimedStage::RecallCheck, 30, 0.3, 1.5, 0.875),
-        (TimedStage::Upload, 44, 0.15, 2.125, 2.5),
+        (TimedStage::Download, 34, 0.08, 2.0, 2.144),
+        (TimedStage::Build, 34, 0.2, 2.25, 1.174),
+        (TimedStage::Projection, 6, 1.5, 3.0, 1.75),
+        (TimedStage::RecallCheck, 20, 0.3, 1.5, 0.875),
+        (TimedStage::Upload, 34, 0.15, 2.125, 5.169),
     ];
     for (stage, count, first, step, ratio) in stages {
         for seconds in spread(count, first, step) {
@@ -114,11 +129,13 @@ fn sample() -> Snapshot {
         }
         snapshot.stage_model_ratio.set(stage, ratio);
     }
-    for ratio in spread(44, 0.375, 1.25) {
+    for ratio in spread(34, 0.375, 1.25) {
         counted.forecast_ratio.observe(ratio);
     }
-    // Thirty jobs checked, two of them failed for it.
-    for recall in (0..30).map(|i| 1.0 - f64::from(i * i) / 1600.0) {
+    // The 20 completed jobs checked, then the two failed for it, below a
+    // least of 0.9.
+    let recalls = (0..20).map(|i| 1.0 - f64::from(i) / 400.0);
+    for recall in recalls.chain([0.85, 0.7]) {
         counted.recall.observe(recall);
     }
     snapshot
@@ -146,7 +163,7 @@ fn the_sample_fills_the_page() {
     let idle = Snapshot::default().render();
     let series = |page: &str| page.lines().filter(|line| !line.starts_with('#')).count();
     // The requests and the memory an idle page does not list.
-    assert_eq!(series(&page), series(&idle) + 9 + 4);
+    assert_eq!(series(&page), series(&idle) + 10 + 4);
     let zeros = page.lines().filter(|line| line.ends_with(" 0")).count();
     // Those left: a few outcomes, answers and stages, and the buckets
     // below a histogram's least value.

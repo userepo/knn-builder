@@ -1,0 +1,11 @@
+# The Prometheus of docker-compose.yml's prometheus profile: the service
+# scraped every second, so a burst of a few minutes gives its queries
+# enough samples.
+global:
+  scrape_interval: 1s
+  evaluation_interval: 1s
+
+scrape_configs:
+  - job_name: knn-builder
+    static_configs:
+      - targets: ["service:1025"]

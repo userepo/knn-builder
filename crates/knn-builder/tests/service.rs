@@ -444,3 +444,61 @@ async fn drops_the_jobs_forecast_again_to_miss_once_one_ends() {
     service.close().await;
     s3.remove().await;
 }
+
+/// A scrape of a store as full as the service holds by default, 10,000
+/// jobs, with 1,000 in flight and one building, takes the lock for the
+/// copy of each job in flight and renders the page: about a millisecond
+/// in a debug build, and less in a release one.
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn scrapes_a_full_store_in_under_20_ms() {
+    let s3 = S3::new("service-scrape").await;
+    put_inputs(&s3, &request(&s3, "scrape", &json!({}))).await;
+    // Long enough to time the scrapes during the first build, and short
+    // enough for the test to wait for it to end.
+    let builder = FakeBuilder::new(Duration::from_secs(5));
+    // So that the forecast lets in all 1,000.
+    let settings = Settings {
+        client_timeout: Duration::from_hours(24),
+        ..Settings::default()
+    };
+    let service = Service::start(s3.store.clone(), builder, settings);
+    // 9,000 that no build can take, held as failed at once.
+    let unbuildable = json!({"index_parameters": {"algorithm_parameters": {"m": -1}}});
+    for tenant in 0..10_000 {
+        let mut changes = if tenant < 9_000 {
+            unbuildable.clone()
+        } else {
+            json!({})
+        };
+        changes["tenant_id"] = json!(format!("tenant-{tenant}"));
+        service.submit(request(&s3, "scrape", &changes)).unwrap();
+    }
+    let deadline = Instant::now() + Duration::from_secs(30);
+    while *of(&service.metrics().jobs_in_flight, FlightStage::Building) == 0 {
+        assert!(Instant::now() < deadline, "never built");
+        tokio::time::sleep(Duration::from_millis(5)).await;
+    }
+    let mut times: Vec<_> = (0..21)
+        .map(|_| {
+            let start = Instant::now();
+            let snapshot = service.metrics();
+            let page = snapshot.render();
+            let took = start.elapsed();
+            assert_eq!(snapshot.jobs_held, 10_000);
+            assert_eq!(in_flight(&snapshot), 1_000);
+            assert_eq!(ended_as(&snapshot, Outcome::BadParameters), 9_000);
+            assert!(page.contains("knn_builder_jobs_held 10000\n"));
+            took
+        })
+        .collect();
+    times.sort();
+    let median = times[times.len() / 2];
+    println!(
+        "scrape of 10,000 held, 1,000 in flight: median {median:?}, most {:?}",
+        times[times.len() - 1]
+    );
+    assert!(median < Duration::from_millis(20), "{median:?}");
+    service.close().await;
+    s3.remove().await;
+}

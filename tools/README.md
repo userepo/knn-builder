@@ -205,6 +205,16 @@ docker compose -f tools/cluster/docker-compose.yml down -v
 
 `fixtures/burst/` holds the results.
 
+Against knn-builder, the driver also waits once the burst has ended for the service to be idle, no job in flight and every job it took ended by its metrics page's own counts, then saves that page as `<LABEL>-metrics.txt` and asks the status of each job whose end its data node did not see, for `bench/check_metrics.py` (below); a page it cannot have, as of a service that is gone, is noted in the burst's file, which is written all the same. With the `prometheus` profile, a Prometheus (the version CI's `promtool` is, pinned by digest) scrapes the service every second through the burst (`burst/prometheus.yml`), and the driver, given its URL, waits for it to scrape the idle service and keeps what it answers: whether it read the page, the counts by answer and by outcome, which the check holds to the page's, and a few queries an operator would run, recorded as they came. The service's log, for the check's stage times, is the compose log:
+
+```sh
+export SERVICE_IMAGE=knn-builder:dev LABEL=knn-builder-prometheus COMPOSE_PROFILES=prometheus PROMETHEUS_URL=http://prometheus:9090
+docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
+docker compose -f tools/burst/docker-compose.yml logs --no-color service > target/burst/knn-builder-prometheus.service.log
+docker compose -f tools/burst/docker-compose.yml down
+python tools/bench/check_metrics.py target/burst/knn-builder-prometheus.json --log target/burst/knn-builder-prometheus.service.log
+```
+
 ## Peak memory
 
 `knn-builder`'s `e2e` example runs whole jobs through its pipeline on the GPU against LocalStack: `put` uploads inputs, `build` runs them and appends each job's stage times and peak resident memory (`VmHWM`, reset before each job: what is resident when the job starts, the CUDA runtime and whatever the allocator kept from earlier jobs, plus the job's own peak; one job per invocation gives a job's figure alone) to `runs.json`, `get` streams the index files to disk for `score.py`. Each runs as a process of its own, so `put` and `get` stay out of the measured peak. In WSL, in the conda environment, with LocalStack on port 4566 and the S3 settings the service reads:
@@ -352,5 +362,16 @@ python tools/bench/recall_cost.py target/bench/recall-cost/off target/bench/reca
 ```
 
 `fixtures/ea7db9f/recall-cost/` keeps both runs' `run.json` and the summary.
+
+### The metrics
+
+Before each of the service's processes ends, once it is idle, `run.py` saves knn-builder's metrics page to `metrics/process-N.txt` and asks the status of each of that process's jobs whose end it did not see; each record names its process, and `run.json`'s `scrapes` lists the pages, or what kept one from being saved, which does not end the run. A run of every phase has one process up to the bursts and one for each data type's burst. `bench/check_metrics.py` holds each page to the run's own records and the service's log: the build requests by answer, each refusal by the kind its detail names; the jobs ended by outcome, by the error each job's status named; the vectors built by data type; the counts of the completed jobs' histograms; and each stage's seconds summed, against the jobs' `DEBUG` stage-times lines to their nine digits. It prints every row and exits 1 on any difference. A short run of every phase over three of the burst's inputs, two data types:
+
+```sh
+python tools/bench/run.py target/bench/metrics knn-builder --inputs target/burst/inputs --runs 1 --concurrent 4 --rounds 1 --queue 2 --sustain-seconds 120 --burst-jobs 24 l2-100000x768 l2-500000x384 hamming-500000x256-binary-clustered
+python tools/bench/check_metrics.py target/bench/metrics
+```
+
+`fixtures/ea7db9f/metrics/` keeps that run and a burst through Prometheus, each with its pages and its service's log, so the check runs on them as they are. A scrape of a full store, 10,000 jobs held with 1,000 of them in flight and one building, is the `scrapes_a_full_store_in_under_20_ms` test of `crates/knn-builder/tests/service.rs`, on LocalStack as the README runs those tests, held to 20 ms: `cargo test --release -p knn-builder --test service scrapes_a_full_store -- --ignored --nocapture` prints its median.
 
 See `docs/faiss-layout.md` for the layout and `docs/params.md` for the build parameters.

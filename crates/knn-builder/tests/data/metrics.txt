@@ -4,8 +4,9 @@ knn_builder_build_info{version="0.0.0"} 1
 # HELP knn_builder_http_requests_total Requests answered, by route and status code.
 # TYPE knn_builder_http_requests_total counter
 knn_builder_http_requests_total{route="build",code="200"} 61
+knn_builder_http_requests_total{route="build",code="409"} 1
 knn_builder_http_requests_total{route="build",code="422"} 2
-knn_builder_http_requests_total{route="build",code="507"} 9
+knn_builder_http_requests_total{route="build",code="507"} 29
 knn_builder_http_requests_total{route="status",code="200"} 1403
 knn_builder_http_requests_total{route="status",code="404"} 3
 knn_builder_http_requests_total{route="jobs",code="401"} 1
@@ -20,11 +21,11 @@ knn_builder_build_requests_total{result="invalid"} 2
 knn_builder_build_requests_total{result="conflict"} 1
 knn_builder_build_requests_total{result="store_full"} 0
 knn_builder_build_requests_total{result="too_large"} 3
-knn_builder_build_requests_total{result="late"} 4
+knn_builder_build_requests_total{result="late"} 24
 knn_builder_build_requests_total{result="cpu_sooner"} 2
 # HELP knn_builder_jobs_in_flight Jobs that have not ended, by pipeline stage.
 # TYPE knn_builder_jobs_in_flight gauge
-knn_builder_jobs_in_flight{stage="queued"} 5
+knn_builder_jobs_in_flight{stage="queued"} 1
 knn_builder_jobs_in_flight{stage="downloading"} 1
 knn_builder_jobs_in_flight{stage="loaded"} 0
 knn_builder_jobs_in_flight{stage="building"} 1
@@ -32,14 +33,14 @@ knn_builder_jobs_in_flight{stage="graphed"} 0
 knn_builder_jobs_in_flight{stage="uploading"} 1
 # HELP knn_builder_jobs_held Jobs held: running, or ended and not yet expired.
 # TYPE knn_builder_jobs_held gauge
-knn_builder_jobs_held 57
+knn_builder_jobs_held 41
 # HELP knn_builder_jobs_held_limit Jobs held at most (REQUEST_STORE_MAX_SIZE).
 # TYPE knn_builder_jobs_held_limit gauge
 knn_builder_jobs_held_limit 10000
 # HELP knn_builder_jobs_ended_total Jobs ended, by how.
 # TYPE knn_builder_jobs_ended_total counter
-knn_builder_jobs_ended_total{outcome="completed"} 44
-knn_builder_jobs_ended_total{outcome="download_failed"} 2
+knn_builder_jobs_ended_total{outcome="completed"} 34
+knn_builder_jobs_ended_total{outcome="download_failed"} 1
 knn_builder_jobs_ended_total{outcome="host_memory"} 0
 knn_builder_jobs_ended_total{outcome="bad_parameters"} 1
 knn_builder_jobs_ended_total{outcome="device_memory"} 1
@@ -47,29 +48,29 @@ knn_builder_jobs_ended_total{outcome="build_failed"} 0
 knn_builder_jobs_ended_total{outcome="write_failed"} 0
 knn_builder_jobs_ended_total{outcome="upload_failed"} 1
 knn_builder_jobs_ended_total{outcome="low_recall"} 2
-knn_builder_jobs_ended_total{outcome="forecast_late"} 3
+knn_builder_jobs_ended_total{outcome="forecast_late"} 9
 knn_builder_jobs_ended_total{outcome="timed_out"} 1
-knn_builder_jobs_ended_total{outcome="canceled"} 0
+knn_builder_jobs_ended_total{outcome="canceled"} 1
 knn_builder_jobs_ended_total{outcome="panicked"} 0
 # HELP knn_builder_vectors_built_total Vectors in the indexes stored, by data type.
 # TYPE knn_builder_vectors_built_total counter
-knn_builder_vectors_built_total{data_type="float"} 18000000
-knn_builder_vectors_built_total{data_type="half_float"} 6500000
-knn_builder_vectors_built_total{data_type="byte"} 9250000
+knn_builder_vectors_built_total{data_type="float"} 11250000
+knn_builder_vectors_built_total{data_type="half_float"} 2000000
+knn_builder_vectors_built_total{data_type="byte"} 3500000
 knn_builder_vectors_built_total{data_type="binary"} 4000000
 # HELP knn_builder_recall Recall the recall check found, for jobs that stored an index or failed for their recall.
 # TYPE knn_builder_recall histogram
-knn_builder_recall_bucket{le="0.5"} 1
-knn_builder_recall_bucket{le="0.8"} 12
-knn_builder_recall_bucket{le="0.9"} 17
-knn_builder_recall_bucket{le="0.95"} 21
-knn_builder_recall_bucket{le="0.97"} 23
-knn_builder_recall_bucket{le="0.98"} 24
-knn_builder_recall_bucket{le="0.99"} 26
-knn_builder_recall_bucket{le="1"} 30
-knn_builder_recall_bucket{le="+Inf"} 30
-knn_builder_recall_sum 24.653125
-knn_builder_recall_count 30
+knn_builder_recall_bucket{le="0.5"} 0
+knn_builder_recall_bucket{le="0.8"} 1
+knn_builder_recall_bucket{le="0.9"} 2
+knn_builder_recall_bucket{le="0.95"} 2
+knn_builder_recall_bucket{le="0.97"} 10
+knn_builder_recall_bucket{le="0.98"} 14
+knn_builder_recall_bucket{le="0.99"} 18
+knn_builder_recall_bucket{le="1"} 22
+knn_builder_recall_bucket{le="+Inf"} 22
+knn_builder_recall_sum 21.075
+knn_builder_recall_count 22
 # HELP knn_builder_job_seconds Seconds from a build request to its job's end, for jobs that stored an index.
 # TYPE knn_builder_job_seconds histogram
 knn_builder_job_seconds_bucket{le="0.1"} 0
@@ -84,11 +85,11 @@ knn_builder_job_seconds_bucket{le="50"} 24
 knn_builder_job_seconds_bucket{le="100"} 28
 knn_builder_job_seconds_bucket{le="250"} 32
 knn_builder_job_seconds_bucket{le="500"} 32
-knn_builder_job_seconds_bucket{le="1000"} 36
-knn_builder_job_seconds_bucket{le="2500"} 40
-knn_builder_job_seconds_bucket{le="+Inf"} 44
-knn_builder_job_seconds_sum 25430.2484375
-knn_builder_job_seconds_count 44
+knn_builder_job_seconds_bucket{le="1000"} 34
+knn_builder_job_seconds_bucket{le="2500"} 34
+knn_builder_job_seconds_bucket{le="+Inf"} 34
+knn_builder_job_seconds_sum 2847.240625
+knn_builder_job_seconds_count 34
 # HELP knn_builder_queue_seconds Seconds from a build request until its download started, for jobs that stored an index.
 # TYPE knn_builder_queue_seconds histogram
 knn_builder_queue_seconds_bucket{le="0.1"} 4
@@ -101,13 +102,13 @@ knn_builder_queue_seconds_bucket{le="10"} 24
 knn_builder_queue_seconds_bucket{le="25"} 24
 knn_builder_queue_seconds_bucket{le="50"} 28
 knn_builder_queue_seconds_bucket{le="100"} 32
-knn_builder_queue_seconds_bucket{le="250"} 36
-knn_builder_queue_seconds_bucket{le="500"} 36
-knn_builder_queue_seconds_bucket{le="1000"} 40
-knn_builder_queue_seconds_bucket{le="2500"} 44
-knn_builder_queue_seconds_bucket{le="+Inf"} 44
-knn_builder_queue_seconds_sum 9328.814140548704
-knn_builder_queue_seconds_count 44
+knn_builder_queue_seconds_bucket{le="250"} 34
+knn_builder_queue_seconds_bucket{le="500"} 34
+knn_builder_queue_seconds_bucket{le="1000"} 34
+knn_builder_queue_seconds_bucket{le="2500"} 34
+knn_builder_queue_seconds_bucket{le="+Inf"} 34
+knn_builder_queue_seconds_sum 840.9403582763671
+knn_builder_queue_seconds_count 34
 # HELP knn_builder_stage_seconds Seconds each stage took, for jobs that stored an index.
 # TYPE knn_builder_stage_seconds histogram
 knn_builder_stage_seconds_bucket{stage="download",le="0.1"} 4
@@ -117,16 +118,16 @@ knn_builder_stage_seconds_bucket{stage="download",le="1"} 16
 knn_builder_stage_seconds_bucket{stage="download",le="2.5"} 20
 knn_builder_stage_seconds_bucket{stage="download",le="5"} 24
 knn_builder_stage_seconds_bucket{stage="download",le="10"} 28
-knn_builder_stage_seconds_bucket{stage="download",le="25"} 36
-knn_builder_stage_seconds_bucket{stage="download",le="50"} 40
-knn_builder_stage_seconds_bucket{stage="download",le="100"} 44
-knn_builder_stage_seconds_bucket{stage="download",le="250"} 44
-knn_builder_stage_seconds_bucket{stage="download",le="500"} 44
-knn_builder_stage_seconds_bucket{stage="download",le="1000"} 44
-knn_builder_stage_seconds_bucket{stage="download",le="2500"} 44
-knn_builder_stage_seconds_bucket{stage="download",le="+Inf"} 44
-knn_builder_stage_seconds_sum{stage="download"} 655.04
-knn_builder_stage_seconds_count{stage="download"} 44
+knn_builder_stage_seconds_bucket{stage="download",le="25"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="50"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="100"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="250"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="500"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="1000"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="2500"} 34
+knn_builder_stage_seconds_bucket{stage="download",le="+Inf"} 34
+knn_builder_stage_seconds_sum{stage="download"} 122.56
+knn_builder_stage_seconds_count{stage="download"} 34
 knn_builder_stage_seconds_bucket{stage="build",le="0.1"} 0
 knn_builder_stage_seconds_bucket{stage="build",le="0.25"} 4
 knn_builder_stage_seconds_bucket{stage="build",le="0.5"} 8
@@ -137,47 +138,47 @@ knn_builder_stage_seconds_bucket{stage="build",le="10"} 20
 knn_builder_stage_seconds_bucket{stage="build",le="25"} 24
 knn_builder_stage_seconds_bucket{stage="build",le="50"} 28
 knn_builder_stage_seconds_bucket{stage="build",le="100"} 32
-knn_builder_stage_seconds_bucket{stage="build",le="250"} 36
-knn_builder_stage_seconds_bucket{stage="build",le="500"} 40
-knn_builder_stage_seconds_bucket{stage="build",le="1000"} 44
-knn_builder_stage_seconds_bucket{stage="build",le="2500"} 44
-knn_builder_stage_seconds_bucket{stage="build",le="+Inf"} 44
-knn_builder_stage_seconds_sum{stage="build"} 4787.7296913146965
-knn_builder_stage_seconds_count{stage="build"} 44
+knn_builder_stage_seconds_bucket{stage="build",le="250"} 34
+knn_builder_stage_seconds_bucket{stage="build",le="500"} 34
+knn_builder_stage_seconds_bucket{stage="build",le="1000"} 34
+knn_builder_stage_seconds_bucket{stage="build",le="2500"} 34
+knn_builder_stage_seconds_bucket{stage="build",le="+Inf"} 34
+knn_builder_stage_seconds_sum{stage="build"} 682.4744689941406
+knn_builder_stage_seconds_count{stage="build"} 34
 knn_builder_stage_seconds_bucket{stage="projection",le="0.1"} 0
 knn_builder_stage_seconds_bucket{stage="projection",le="0.25"} 0
 knn_builder_stage_seconds_bucket{stage="projection",le="0.5"} 0
 knn_builder_stage_seconds_bucket{stage="projection",le="1"} 0
 knn_builder_stage_seconds_bucket{stage="projection",le="2.5"} 4
-knn_builder_stage_seconds_bucket{stage="projection",le="5"} 8
-knn_builder_stage_seconds_bucket{stage="projection",le="10"} 8
-knn_builder_stage_seconds_bucket{stage="projection",le="25"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="50"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="100"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="250"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="500"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="1000"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="2500"} 9
-knn_builder_stage_seconds_bucket{stage="projection",le="+Inf"} 9
-knn_builder_stage_seconds_sum{stage="projection"} 37.5
-knn_builder_stage_seconds_count{stage="projection"} 9
+knn_builder_stage_seconds_bucket{stage="projection",le="5"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="10"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="25"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="50"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="100"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="250"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="500"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="1000"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="2500"} 6
+knn_builder_stage_seconds_bucket{stage="projection",le="+Inf"} 6
+knn_builder_stage_seconds_sum{stage="projection"} 15
+knn_builder_stage_seconds_count{stage="projection"} 6
 knn_builder_stage_seconds_bucket{stage="recall_check",le="0.1"} 0
 knn_builder_stage_seconds_bucket{stage="recall_check",le="0.25"} 0
 knn_builder_stage_seconds_bucket{stage="recall_check",le="0.5"} 8
 knn_builder_stage_seconds_bucket{stage="recall_check",le="1"} 12
-knn_builder_stage_seconds_bucket{stage="recall_check",le="2.5"} 24
-knn_builder_stage_seconds_bucket{stage="recall_check",le="5"} 28
-knn_builder_stage_seconds_bucket{stage="recall_check",le="10"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="25"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="50"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="100"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="250"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="500"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="1000"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="2500"} 30
-knn_builder_stage_seconds_bucket{stage="recall_check",le="+Inf"} 30
-knn_builder_stage_seconds_sum{stage="recall_check"} 48.857812499999994
-knn_builder_stage_seconds_count{stage="recall_check"} 30
+knn_builder_stage_seconds_bucket{stage="recall_check",le="2.5"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="5"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="10"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="25"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="50"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="100"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="250"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="500"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="1000"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="2500"} 20
+knn_builder_stage_seconds_bucket{stage="recall_check",le="+Inf"} 20
+knn_builder_stage_seconds_sum{stage="recall_check"} 15.825
+knn_builder_stage_seconds_count{stage="recall_check"} 20
 knn_builder_stage_seconds_bucket{stage="upload",le="0.1"} 0
 knn_builder_stage_seconds_bucket{stage="upload",le="0.25"} 4
 knn_builder_stage_seconds_bucket{stage="upload",le="0.5"} 8
@@ -187,14 +188,14 @@ knn_builder_stage_seconds_bucket{stage="upload",le="5"} 20
 knn_builder_stage_seconds_bucket{stage="upload",le="10"} 24
 knn_builder_stage_seconds_bucket{stage="upload",le="25"} 28
 knn_builder_stage_seconds_bucket{stage="upload",le="50"} 32
-knn_builder_stage_seconds_bucket{stage="upload",le="100"} 36
-knn_builder_stage_seconds_bucket{stage="upload",le="250"} 40
-knn_builder_stage_seconds_bucket{stage="upload",le="500"} 44
-knn_builder_stage_seconds_bucket{stage="upload",le="1000"} 44
-knn_builder_stage_seconds_bucket{stage="upload",le="2500"} 44
-knn_builder_stage_seconds_bucket{stage="upload",le="+Inf"} 44
-knn_builder_stage_seconds_sum{stage="upload"} 2127.346047078632
-knn_builder_stage_seconds_count{stage="upload"} 44
+knn_builder_stage_seconds_bucket{stage="upload",le="100"} 34
+knn_builder_stage_seconds_bucket{stage="upload",le="250"} 34
+knn_builder_stage_seconds_bucket{stage="upload",le="500"} 34
+knn_builder_stage_seconds_bucket{stage="upload",le="1000"} 34
+knn_builder_stage_seconds_bucket{stage="upload",le="2500"} 34
+knn_builder_stage_seconds_bucket{stage="upload",le="+Inf"} 34
+knn_builder_stage_seconds_sum{stage="upload"} 345.9562869250774
+knn_builder_stage_seconds_count{stage="upload"} 34
 # HELP knn_builder_forecast_ratio Seconds a job took over the seconds forecast when it was taken, for jobs that stored an index.
 # TYPE knn_builder_forecast_ratio histogram
 knn_builder_forecast_ratio_bucket{le="0.5"} 8
@@ -205,20 +206,20 @@ knn_builder_forecast_ratio_bucket{le="1.1"} 20
 knn_builder_forecast_ratio_bucket{le="1.25"} 24
 knn_builder_forecast_ratio_bucket{le="1.5"} 28
 knn_builder_forecast_ratio_bucket{le="2"} 32
-knn_builder_forecast_ratio_bucket{le="4"} 44
-knn_builder_forecast_ratio_bucket{le="+Inf"} 44
-knn_builder_forecast_ratio_sum 63.84919309616089
-knn_builder_forecast_ratio_count 44
+knn_builder_forecast_ratio_bucket{le="4"} 34
+knn_builder_forecast_ratio_bucket{le="+Inf"} 34
+knn_builder_forecast_ratio_sum 34.23313522338867
+knn_builder_forecast_ratio_count 34
 # HELP knn_builder_stage_model_ratio Observed over modeled seconds of each stage, as learned from the jobs that ended.
 # TYPE knn_builder_stage_model_ratio gauge
-knn_builder_stage_model_ratio{stage="download"} 1.25
-knn_builder_stage_model_ratio{stage="build"} 0.5
+knn_builder_stage_model_ratio{stage="download"} 2.144
+knn_builder_stage_model_ratio{stage="build"} 1.174
 knn_builder_stage_model_ratio{stage="projection"} 1.75
 knn_builder_stage_model_ratio{stage="recall_check"} 0.875
-knn_builder_stage_model_ratio{stage="upload"} 2.5
+knn_builder_stage_model_ratio{stage="upload"} 5.169
 # HELP knn_builder_drain_seconds Forecast seconds until the last job in flight ends; 0 with none.
 # TYPE knn_builder_drain_seconds gauge
-knn_builder_drain_seconds 148.25
+knn_builder_drain_seconds 82.5
 # HELP knn_builder_host_budget_bytes Host memory the jobs' buffers may take at once (CPU_MEMORY_LIMIT).
 # TYPE knn_builder_host_budget_bytes gauge
 knn_builder_host_budget_bytes 31999393792
@@ -233,10 +234,10 @@ process_resident_memory_bytes 4104531968
 process_start_time_seconds 1795219200.5
 # HELP knn_builder_gpu_memory_total_bytes The GPU's memory.
 # TYPE knn_builder_gpu_memory_total_bytes gauge
-knn_builder_gpu_memory_total_bytes 8585740288
+knn_builder_gpu_memory_total_bytes 8585216000
 # HELP knn_builder_gpu_memory_free_bytes The GPU's free memory when last read, every process on it counted.
 # TYPE knn_builder_gpu_memory_free_bytes gauge
-knn_builder_gpu_memory_free_bytes 7301234688
+knn_builder_gpu_memory_free_bytes 6485442560
 # HELP knn_builder_gpu_memory_last_build_peak_bytes The most GPU memory in use during the last build that ended; 0 before one has.
 # TYPE knn_builder_gpu_memory_last_build_peak_bytes gauge
-knn_builder_gpu_memory_last_build_peak_bytes 2164260864
+knn_builder_gpu_memory_last_build_peak_bytes 1899495424

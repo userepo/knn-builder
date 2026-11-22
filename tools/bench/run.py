@@ -39,6 +39,12 @@ host, where nvidia-smi samples the GPU's memory. The phases, in order:
               time: how many were built in time, refused, failed or timed
               out, as the burst fixtures count them
 
+Before each of the service's processes ends (a phase that restarts it,
+or the run's end), once no job is in flight, the run saves knn-builder's
+metrics page to OUT_DIR/metrics/process-N.txt and asks the status of each
+job whose end it did not see; each record names its process, for
+tools/bench/check_metrics.py to hold each page to the run's own counts.
+
 A run starts from fresh services and an empty OUT_DIR record: whatever a
 run before left in Docker is taken down first, and its files and recall
 are replaced. A run that fails or is interrupted still takes the services
@@ -258,6 +264,8 @@ class Service:
         # When each of the service's processes started, for what each held
         # on the device before a job: an earlier one's is not counted.
         self.starts = []
+        # The process up, numbered from 1 as each starts.
+        self.process = 0
 
     def start(self, timeout, poll):
         """Starts the service with these client settings; a change restarts
@@ -283,6 +291,7 @@ class Service:
         # Before the wait: what the process holds from its start shows
         # only until the GPU idles, which a slow wait for S3 can outlast.
         self.starts.append(now())
+        self.process += 1
         self.settings = (timeout, poll)
         self.wait()
 
@@ -292,6 +301,7 @@ class Service:
         so it is collected whole at the end)."""
         run(*COMPOSE, "restart", "service", env=self.env)
         self.starts.append(now())
+        self.process += 1
         self.wait()
 
     def wait(self):
@@ -651,6 +661,7 @@ class Bench:
                 for name, d in inputs.items()
             },
             "warm_up": [],
+            "scrapes": [],
         }
 
     def alive(self):
@@ -672,6 +683,55 @@ class Bench:
         for name in sorted(self.inputs):
             types.setdefault(self.metas[name]["data_type"], []).append(name)
         return types
+
+    def stamp(self, records):
+        """Marks `records` as the service's process up now."""
+        for record in records:
+            record["process"] = self.service.process
+
+    def records_of(self, process):
+        """Every record of the jobs sent to `process`."""
+        records = self.record["warm_up"] + self.record.get("single", [])
+        for phase in ("concurrent", "sustained", "burst"):
+            for group in self.record.get(phase, {}).values():
+                records += group["records"]
+        return [r for r in records if r.get("process") == process]
+
+    def end_process(self):
+        """Before the service's process ends: once no job is in flight,
+        its metrics page, and the status of each of its jobs whose end the
+        run did not see. A process sent no job, or a service with no page,
+        has nothing to check. A page the run cannot have, a job still in
+        flight when the wait gives up among them, is noted for the check to
+        report: the run's measurements come first."""
+        process = self.service.process
+        records = self.records_of(process)
+        if not records:
+            return
+        try:
+            page = burst.scrape_when_idle(self.service.url)
+        except burst.SCRAPE_ERRORS as e:
+            self.record["scrapes"].append({
+                "process": process,
+                "error": repr(e),
+                "at": now().isoformat(),
+            })
+            print(f"no metrics of process {process}: {e!r}", file=sys.stderr, flush=True)
+            return
+        if page is None:
+            return
+        path = self.out / "metrics" / f"process-{process}.txt"
+        path.parent.mkdir(exist_ok=True)
+        path.write_bytes(page.encode())
+        timeout, poll = self.service.settings
+        burst.ask_ends(burst.DataNode(self.service.url, {}, self.service.bucket, "", timeout, poll),
+                       records)
+        self.record["scrapes"].append({
+            "process": process,
+            "file": path.relative_to(self.out).as_posix(),
+            "at": now().isoformat(),
+        })
+        print(f"metrics of process {process}: {path}", flush=True)
 
     def node(self, label, timeout=KNN_TIMEOUT, poll=KNN_POLL):
         node_type = ProjectingNode if self.args.project else BenchNode
@@ -743,6 +803,7 @@ class Bench:
             record = self.one_build(node, index, names[0])
             self.discard(record)
             record["phase"] = phase
+            self.stamp([record])
             self.record["warm_up"].append(record)
             print(f"warm-up {data_type}: {record['task_status']} in {record.get('wall_seconds')} s", flush=True)
 
@@ -755,6 +816,7 @@ class Bench:
             for i, name in enumerate(sorted(self.inputs)):
                 record = self.one_build(node, run_number * len(self.inputs) + i, name)
                 record["run"] = run_number
+                self.stamp([record])
                 if run_number <= self.args.fetch_runs and record["task_status"] == "COMPLETED_INDEX_BUILD":
                     path = self.out / name / f"run-{run_number}.faiss"
                     record["size"] = self.service.fetch(f"{name}/{record['file_name']}", path)
@@ -773,6 +835,7 @@ class Bench:
                 base = round_number * self.args.concurrent
                 jobs = [(base + i, names[i % len(names)]) for i in range(self.args.concurrent)]
                 records = burst.at_once(node, jobs)
+                self.stamp(records)
                 for r in records:
                     r["round"] = round_number
                     self.discard(r)
@@ -810,6 +873,7 @@ class Bench:
                     except Exception as e:  # noqa: BLE001  (the job's, not the queue's)
                         record.update(outcome="error", detail=repr(e),
                                       cpu_after=time.monotonic() - start)
+                    self.stamp([record])
                     with lock:
                         records.append(record)
                     self.discard(record)
@@ -845,12 +909,14 @@ class Bench:
                 # The upstream service builds the jobs a burst's data
                 # nodes gave up on all the same; restarted, it meets the
                 # next burst with an empty queue, as the first one.
+                self.end_process()
                 self.service.restart()
             self.warm_up("burst", [data_type])
             self.alive()
             l2 = [n for n in names if self.metas[n]["space_type"] in ("l2", "hamming")] or names
             jobs = [(i, l2[i % len(l2)]) for i in range(self.args.burst_jobs)]
             records = burst.at_once(node, jobs)
+            self.stamp(records)
             for r in records:
                 self.discard(r)
             phase[data_type] = {
@@ -904,8 +970,11 @@ class Bench:
             for phase in defaults:
                 getattr(self, phase)()
             if "burst" in phases:
+                if self.service.settings != (self.args.burst_timeout, self.args.burst_poll):
+                    self.end_process()
                 self.service.start(self.args.burst_timeout, self.args.burst_poll)
                 self.burst()
+            self.end_process()
         except BaseException as e:
             self.record["error"] = repr(e)
             self.stop.set()

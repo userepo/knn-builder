@@ -1,0 +1,417 @@
+service-1  | 2026-11-22T02:36:02.969393Z  INFO knn_builder: GPU free_mib=7054 shared_memory_per_block=101376
+service-1  | 2026-11-22T02:36:03.015831Z  INFO knn_builder: listening version="1.2.0" port=1025 basic_auth=false recall_check_queries=0
+service-1  | 2026-11-22T02:36:07.661455Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:08.660828Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:09.661121Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:10.660827Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:11.661414Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:12.661026Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:13.661614Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:14.661258Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:15.660841Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:16.661214Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:17.661342Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:18.661426Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:19.660828Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:20.660866Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:21.661736Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:22.661510Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:23.661821Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:24.661453Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:25.661217Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:26.661073Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:27.661449Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:28.661166Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:29.661200Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:30.661149Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:31.661170Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:32.661545Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:33.660990Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:34.661501Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:38.605521Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:38.661447Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:39.661832Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:40.661806Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:41.661336Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:42.661461Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:43.661414Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:43.950554Z  INFO knn_builder::api: request method=GET path="/_heart_beat" status=200 ms=0
+service-1  | 2026-11-22T02:36:43.987071Z  INFO knn_builder::service: job queued job_id=8c16575b06678167c06262b5a73677074ebb5acd51b2e8ca8cfcce43e32439ac vector_path="l2-250000x768/vectors.knnvec" forecast_s=7.32327601
+service-1  | 2026-11-22T02:36:43.987111Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=0
+service-1  | 2026-11-22T02:36:43.992465Z  INFO knn_builder::service: job queued job_id=f62ede0d2866edc43db7fd6d854acfac6ac39066c64099d6957169a1969c1323 vector_path="l2-250000x768/vectors.knnvec" forecast_s=11.133259004
+service-1  | 2026-11-22T02:36:43.992487Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:43.996118Z  INFO knn_builder::service: job queued job_id=c6610cbf6b9d4d5583991aec218115ecd16fc9e589abcb59d47d0ef896f7825a vector_path="l2-100000x768/vectors.knnvec" forecast_s=11.817000773
+service-1  | 2026-11-22T02:36:43.996142Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:43.996748Z  INFO knn_builder::service: job queued job_id=08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431 vector_path="l2-250000x768/vectors.knnvec" forecast_s=16.733765789
+service-1  | 2026-11-22T02:36:43.996766Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:43.997011Z  INFO knn_builder::service: job queued job_id=ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6 vector_path="l2-250000x768/vectors.knnvec" forecast_s=20.548818837
+service-1  | 2026-11-22T02:36:43.997027Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:43.997561Z  INFO knn_builder::service: job queued job_id=bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6 vector_path="l2-250000x768/vectors.knnvec" forecast_s=24.363589065
+service-1  | 2026-11-22T02:36:43.997597Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:43.997696Z  INFO knn_builder::service: job queued job_id=e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7 vector_path="l2-100000x768/vectors.knnvec" forecast_s=25.050846628
+service-1  | 2026-11-22T02:36:43.997720Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:43.997941Z  INFO knn_builder::service: job queued job_id=953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931 vector_path="l2-1000000x128/vectors.knnvec" forecast_s=29.650258476
+service-1  | 2026-11-22T02:36:43.997966Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=0
+service-1  | 2026-11-22T02:36:43.998377Z  INFO knn_builder::service: job queued job_id=113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896 vector_path="l2-250000x768/vectors.knnvec" forecast_s=33.637659623
+service-1  | 2026-11-22T02:36:43.998404Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=3
+service-1  | 2026-11-22T02:36:43.998418Z  INFO knn_builder::service: job queued job_id=0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f vector_path="l2-250000x768/vectors.knnvec" forecast_s=37.452939129
+service-1  | 2026-11-22T02:36:43.998435Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:43.998544Z  INFO knn_builder::service: job queued job_id=1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4 vector_path="l2-1000000x128/vectors.knnvec" forecast_s=41.021377294
+service-1  | 2026-11-22T02:36:43.998563Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:43.998975Z  INFO knn_builder::service: job queued job_id=b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb vector_path="l2-500000x384/vectors.knnvec" forecast_s=45.631301616
+service-1  | 2026-11-22T02:36:43.998993Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=3
+service-1  | 2026-11-22T02:36:43.999446Z  INFO knn_builder::service: job queued job_id=c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b vector_path="l2-500000x384/vectors.knnvec" forecast_s=49.948573746
+service-1  | 2026-11-22T02:36:43.999464Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=5
+service-1  | 2026-11-22T02:36:43.999511Z  INFO knn_builder::service: job queued job_id=5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62 vector_path="l2-500000x384/vectors.knnvec" forecast_s=54.266252914
+service-1  | 2026-11-22T02:36:43.999525Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:43.999845Z  INFO knn_builder::service: job queued job_id=9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe vector_path="l2-250000x768/vectors.knnvec" forecast_s=57.961144967
+service-1  | 2026-11-22T02:36:43.999879Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:44.000065Z  INFO knn_builder::service: job queued job_id=9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd vector_path="l2-1000000x128/vectors.knnvec" forecast_s=61.529489459
+service-1  | 2026-11-22T02:36:44.000089Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=3
+service-1  | 2026-11-22T02:36:44.000135Z  INFO knn_builder::service: job queued job_id=072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b vector_path="l2-100000x768/vectors.knnvec" forecast_s=62.383320997
+service-1  | 2026-11-22T02:36:44.000151Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=5
+service-1  | 2026-11-22T02:36:44.000628Z  INFO knn_builder::service: job queued job_id=1c3de533f0f099cc077b4bdbc4a5b9da2d2938b645b9b95ecb2d1442a9cfb0eb vector_path="l2-1000000x128/vectors.knnvec" forecast_s=66.982488235
+service-1  | 2026-11-22T02:36:44.000646Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=6
+service-1  | 2026-11-22T02:36:44.000969Z  INFO knn_builder::service: job queued job_id=98db50b4505f0bef25adbeeb5e5b9f7e958db08c8911999c563516ab3acd634a vector_path="l2-1000000x128/vectors.knnvec" forecast_s=70.723235586
+service-1  | 2026-11-22T02:36:44.000988Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:44.001254Z  INFO knn_builder::service: job queued job_id=4a95116d2f0e19842b94f9d213481d0668f65a541829b5486145724bb5c7f56d vector_path="l2-100000x768/vectors.knnvec" forecast_s=71.57685753
+service-1  | 2026-11-22T02:36:44.001289Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=5
+service-1  | 2026-11-22T02:36:44.001472Z  INFO knn_builder::service: job queued job_id=4dfe79f670c425c263e6e01e825e8fcdaa7de1aedb8e15d48a9a7d2e78574caa vector_path="l2-100000x768/vectors.knnvec" forecast_s=73.289110676
+service-1  | 2026-11-22T02:36:44.001490Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:44.002741Z  INFO knn_builder::service: job queued job_id=c32870416f1e676bfdfca7c3f84801cc5621ca36dc5a84a433a1c6aa3b2af65a vector_path="l2-100000x768/vectors.knnvec" forecast_s=75.000316986
+service-1  | 2026-11-22T02:36:44.002760Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=1
+service-1  | 2026-11-22T02:36:44.002813Z  INFO knn_builder::service: job queued job_id=0883fd5a45d095380a6c1edc0c3a971edbe5fdb593ddfb331cd259615cfc88ec vector_path="l2-1000000x128/vectors.knnvec" forecast_s=79.599898469
+service-1  | 2026-11-22T02:36:44.002829Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=2
+service-1  | 2026-11-22T02:36:44.003111Z  INFO knn_builder::service: job queued job_id=78dfe9b4d2802f327615d8d8841b8985e467a728e1d2ed25d1baddb10cf47d18 vector_path="l2-1000000x128/vectors.knnvec" forecast_s=83.34068998
+service-1  | 2026-11-22T02:36:44.003129Z  INFO knn_builder::api: request method=POST path="/_build" status=200 ms=5
+service-1  | 2026-11-22T02:36:44.004005Z  INFO knn_builder::gate: forecast to end too late job_id=6e4ad309be93978ffca041521649a04035c12960bd234d5736db956ef630fc0d vector_path="l2-250000x768/vectors.knnvec" forecast_s=87.327650348
+service-1  | 2026-11-22T02:36:44.004038Z  WARN knn_builder::service: build request refused refusal=Job 6e4ad309be93978ffca041521649a04035c12960bd234d5736db956ef630fc0d with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.004050Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=2
+service-1  | 2026-11-22T02:36:44.004834Z  INFO knn_builder::gate: forecast to end too late job_id=90b8af6616a91a95a29b817f4f3372328e3a6e0362f274e4cd3b9737befb3235 vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.949323397
+service-1  | 2026-11-22T02:36:44.004848Z  WARN knn_builder::service: build request refused refusal=Job 90b8af6616a91a95a29b817f4f3372328e3a6e0362f274e4cd3b9737befb3235 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.004855Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=4
+service-1  | 2026-11-22T02:36:44.012304Z  INFO knn_builder::gate: forecast to end too late job_id=be4047362b3044687b294376ea89c8763b65b3c1b47e9aa5fd168554899ebb1c vector_path="l2-100000x768/vectors.knnvec" forecast_s=84.185414284
+service-1  | 2026-11-22T02:36:44.012321Z  WARN knn_builder::service: build request refused refusal=Job be4047362b3044687b294376ea89c8763b65b3c1b47e9aa5fd168554899ebb1c with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012336Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012340Z  INFO knn_builder::gate: forecast to end too late job_id=3ad7edaa22d25a908f8b91101121e526e8a698638fb1268367e93a60b8b2649f vector_path="l2-1000000x128/vectors.knnvec" forecast_s=87.07254945
+service-1  | 2026-11-22T02:36:44.012346Z  WARN knn_builder::service: build request refused refusal=Job 3ad7edaa22d25a908f8b91101121e526e8a698638fb1268367e93a60b8b2649f with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012360Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012387Z  INFO knn_builder::gate: forecast to end too late job_id=5419ff67bad712e08b473c030168cf84b9a07f11b8ab0eaa0673d7d7afe4057f vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.94177789
+service-1  | 2026-11-22T02:36:44.012392Z  WARN knn_builder::service: build request refused refusal=Job 5419ff67bad712e08b473c030168cf84b9a07f11b8ab0eaa0673d7d7afe4057f with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012406Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012409Z  INFO knn_builder::gate: forecast to end too late job_id=f7bea557b114f68f26831718e4dead5fdf25ac0a41064f9e44c9e6410aa9ba7f vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.941745858
+service-1  | 2026-11-22T02:36:44.012412Z  WARN knn_builder::service: build request refused refusal=Job f7bea557b114f68f26831718e4dead5fdf25ac0a41064f9e44c9e6410aa9ba7f with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012416Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012434Z  INFO knn_builder::gate: forecast to end too late job_id=04c80ea38f75a87e2f1108c9267b309d4d235842c9adcd04587d0557a99d0951 vector_path="l2-100000x768/vectors.knnvec" forecast_s=84.185273254
+service-1  | 2026-11-22T02:36:44.012440Z  WARN knn_builder::service: build request refused refusal=Job 04c80ea38f75a87e2f1108c9267b309d4d235842c9adcd04587d0557a99d0951 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012450Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012472Z  INFO knn_builder::gate: forecast to end too late job_id=545452c221d75d74cdb0ddc878ff0da564d0657d90cd118aa4f98b36c9f1daf4 vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.941682632
+service-1  | 2026-11-22T02:36:44.012483Z  WARN knn_builder::service: build request refused refusal=Job 545452c221d75d74cdb0ddc878ff0da564d0657d90cd118aa4f98b36c9f1daf4 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012488Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012496Z  INFO knn_builder::gate: forecast to end too late job_id=ef0a6e4221391f7acedd9b2a40e3b56288f4cf6c904a7c5bb399b5679b2c44d7 vector_path="l2-100000x768/vectors.knnvec" forecast_s=84.185209461
+service-1  | 2026-11-22T02:36:44.012500Z  WARN knn_builder::service: build request refused refusal=Job ef0a6e4221391f7acedd9b2a40e3b56288f4cf6c904a7c5bb399b5679b2c44d7 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012508Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012539Z  INFO knn_builder::gate: forecast to end too late job_id=3d766ce53b119109d62828eb8b475e4f43f344010316e1d8d1accbabd3ce5b56 vector_path="l2-100000x768/vectors.knnvec" forecast_s=84.185166901
+service-1  | 2026-11-22T02:36:44.012553Z  WARN knn_builder::service: build request refused refusal=Job 3d766ce53b119109d62828eb8b475e4f43f344010316e1d8d1accbabd3ce5b56 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012566Z  INFO knn_builder::gate: forecast to end too late job_id=23a93f14536d647e7352a2c370a4ef0fcf53269d6b4552f039bcfbc00bea206f vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.941589414
+service-1  | 2026-11-22T02:36:44.012569Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012570Z  WARN knn_builder::service: build request refused refusal=Job 23a93f14536d647e7352a2c370a4ef0fcf53269d6b4552f039bcfbc00bea206f with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012574Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012592Z  INFO knn_builder::gate: forecast to end too late job_id=1033c5f73e4a4eb22b57de04864eb5b938398fab01684867de1f1b3d6038f0d0 vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.941573108
+service-1  | 2026-11-22T02:36:44.012609Z  WARN knn_builder::service: build request refused refusal=Job 1033c5f73e4a4eb22b57de04864eb5b938398fab01684867de1f1b3d6038f0d0 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012631Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012630Z  INFO knn_builder::gate: forecast to end too late job_id=d05ff84efb90b6622c2f371c533f5b1110348453ca556f277a58d68105e26f48 vector_path="l2-250000x768/vectors.knnvec" forecast_s=87.319014506
+service-1  | 2026-11-22T02:36:44.012641Z  WARN knn_builder::service: build request refused refusal=Job d05ff84efb90b6622c2f371c533f5b1110348453ca556f277a58d68105e26f48 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012657Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012666Z  INFO knn_builder::gate: forecast to end too late job_id=a8719524bcd456e018841d805056d7cf9cd2bd923833540cce99b49d65d2e650 vector_path="l2-1000000x128/vectors.knnvec" forecast_s=87.072234484
+service-1  | 2026-11-22T02:36:44.012715Z  WARN knn_builder::service: build request refused refusal=Job a8719524bcd456e018841d805056d7cf9cd2bd923833540cce99b49d65d2e650 with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012775Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012783Z  INFO knn_builder::gate: forecast to end too late job_id=32c9c7c1682755366be405bfffe20c471e7b1607b12c096496aa1792510cf8ca vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.941374963
+service-1  | 2026-11-22T02:36:44.012788Z  WARN knn_builder::service: build request refused refusal=Job 32c9c7c1682755366be405bfffe20c471e7b1607b12c096496aa1792510cf8ca with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012803Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.012905Z  INFO knn_builder::gate: forecast to end too late job_id=c447f99790af8295a541b70e69cc15437d418f06d6545b99adc59e985cc855c2 vector_path="l2-1000000x128/vectors.knnvec" forecast_s=87.072002012
+service-1  | 2026-11-22T02:36:44.012935Z  WARN knn_builder::service: build request refused refusal=Job c447f99790af8295a541b70e69cc15437d418f06d6545b99adc59e985cc855c2 with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.012956Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.013024Z  INFO knn_builder::gate: forecast to end too late job_id=4ac8333cb3266f26fcb2e713915fd3c0f5513b92c72063963c158055e83216d3 vector_path="l2-100000x768/vectors.knnvec" forecast_s=84.184690822
+service-1  | 2026-11-22T02:36:44.013058Z  WARN knn_builder::service: build request refused refusal=Job 4ac8333cb3266f26fcb2e713915fd3c0f5513b92c72063963c158055e83216d3 with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013096Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.013106Z  INFO knn_builder::gate: forecast to end too late job_id=698b5454fd408e6762bc485dead0dbdef138f1295fe604ee5fe6e21667add3f8 vector_path="l2-250000x768/vectors.knnvec" forecast_s=87.318538313
+service-1  | 2026-11-22T02:36:44.013139Z  WARN knn_builder::service: build request refused refusal=Job 698b5454fd408e6762bc485dead0dbdef138f1295fe604ee5fe6e21667add3f8 with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013210Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.013226Z  INFO knn_builder::gate: forecast to end too late job_id=449aab8d031782e08b533d68da7ff2f1cdfc22780bbb32166daad87968ef39de vector_path="l2-1000000x128/vectors.knnvec" forecast_s=87.071675074
+service-1  | 2026-11-22T02:36:44.013275Z  WARN knn_builder::service: build request refused refusal=Job 449aab8d031782e08b533d68da7ff2f1cdfc22780bbb32166daad87968ef39de with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013296Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.013322Z  INFO knn_builder::gate: forecast to end too late job_id=e41fea44577b2fe9f28ee2c1bf69c89574b329e2c73e3b9cfe7a87e6de174de9 vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.940843208
+service-1  | 2026-11-22T02:36:44.013354Z  WARN knn_builder::service: build request refused refusal=Job e41fea44577b2fe9f28ee2c1bf69c89574b329e2c73e3b9cfe7a87e6de174de9 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013388Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=1
+service-1  | 2026-11-22T02:36:44.013398Z  INFO knn_builder::gate: forecast to end too late job_id=a2a070d78bd380c5085a2420bf0f1a02f3a8d65236f696641ac3b694d480bd5d vector_path="l2-100000x768/vectors.knnvec" forecast_s=84.184312592
+service-1  | 2026-11-22T02:36:44.013515Z  WARN knn_builder::service: build request refused refusal=Job a2a070d78bd380c5085a2420bf0f1a02f3a8d65236f696641ac3b694d480bd5d with vector path l2-100000x768/vectors.knnvec would be seen ended in about 91 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013554Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=1
+service-1  | 2026-11-22T02:36:44.013577Z  INFO knn_builder::gate: forecast to end too late job_id=bc316e5ded6b39dc26c3c612de5a375243ff11d472dab37e43414513169449ba vector_path="l2-250000x768/vectors.knnvec" forecast_s=87.318065593
+service-1  | 2026-11-22T02:36:44.013582Z  WARN knn_builder::service: build request refused refusal=Job bc316e5ded6b39dc26c3c612de5a375243ff11d472dab37e43414513169449ba with vector path l2-250000x768/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013602Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=0
+service-1  | 2026-11-22T02:36:44.013644Z  INFO knn_builder::gate: forecast to end too late job_id=cde1e1f35615e33ddc74fe64262ce0f5898912ac3222dfcd7aaf0044a98e164b vector_path="l2-1000000x128/vectors.knnvec" forecast_s=87.071263198
+service-1  | 2026-11-22T02:36:44.013685Z  WARN knn_builder::service: build request refused refusal=Job cde1e1f35615e33ddc74fe64262ce0f5898912ac3222dfcd7aaf0044a98e164b with vector path l2-1000000x128/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013721Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=1
+service-1  | 2026-11-22T02:36:44.013735Z  INFO knn_builder::gate: forecast to end too late job_id=7e3e2ee6c34d6c7d976126e72f9a2d63edeaf62ae45dac2d09e7a712bc6e9644 vector_path="l2-500000x384/vectors.knnvec" forecast_s=87.940427796
+service-1  | 2026-11-22T02:36:44.013773Z  WARN knn_builder::service: build request refused refusal=Job 7e3e2ee6c34d6c7d976126e72f9a2d63edeaf62ae45dac2d09e7a712bc6e9644 with vector path l2-500000x384/vectors.knnvec would be seen ended in about 94 s, past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:44.013792Z  INFO knn_builder::api: request method=POST path="/_build" status=507 ms=1
+service-1  | 2026-11-22T02:36:44.660937Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:45.661487Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:46.661222Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:47.661150Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:48.662534Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:49.661216Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:50.661370Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:51.663488Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:52.661815Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:53.661843Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:54.661137Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:55.661720Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:55.833648Z  INFO knn_builder::service: job completed job_id=8c16575b06678167c06262b5a73677074ebb5acd51b2e8ca8cfcce43e32439ac vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:36:55.833673Z DEBUG knn_builder::service: job stage times job_id=8c16575b06678167c06262b5a73677074ebb5acd51b2e8ca8cfcce43e32439ac download_s=1.643505698 build_s=5.292328584 upload_s=4.894057883 total_s=11.83000263
+service-1  | 2026-11-22T02:36:55.833746Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=98db50b4505f0bef25adbeeb5e5b9f7e958db08c8911999c563516ab3acd634a vector_path="l2-1000000x128/vectors.knnvec"
+service-1  | 2026-11-22T02:36:55.833754Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=4a95116d2f0e19842b94f9d213481d0668f65a541829b5486145724bb5c7f56d vector_path="l2-100000x768/vectors.knnvec"
+service-1  | 2026-11-22T02:36:55.833765Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=4dfe79f670c425c263e6e01e825e8fcdaa7de1aedb8e15d48a9a7d2e78574caa vector_path="l2-100000x768/vectors.knnvec"
+service-1  | 2026-11-22T02:36:55.833768Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=c32870416f1e676bfdfca7c3f84801cc5621ca36dc5a84a433a1c6aa3b2af65a vector_path="l2-100000x768/vectors.knnvec"
+service-1  | 2026-11-22T02:36:55.833769Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=0883fd5a45d095380a6c1edc0c3a971edbe5fdb593ddfb331cd259615cfc88ec vector_path="l2-1000000x128/vectors.knnvec"
+service-1  | 2026-11-22T02:36:55.833771Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=78dfe9b4d2802f327615d8d8841b8985e467a728e1d2ed25d1baddb10cf47d18 vector_path="l2-1000000x128/vectors.knnvec"
+service-1  | 2026-11-22T02:36:55.833779Z  WARN knn_builder::service: job failed job_id=78dfe9b4d2802f327615d8d8841b8985e467a728e1d2ed25d1baddb10cf47d18 vector_path="l2-1000000x128/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:55.833788Z  WARN knn_builder::service: job failed job_id=4dfe79f670c425c263e6e01e825e8fcdaa7de1aedb8e15d48a9a7d2e78574caa vector_path="l2-100000x768/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:55.833792Z  WARN knn_builder::service: job failed job_id=c32870416f1e676bfdfca7c3f84801cc5621ca36dc5a84a433a1c6aa3b2af65a vector_path="l2-100000x768/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:55.833821Z  WARN knn_builder::service: job failed job_id=0883fd5a45d095380a6c1edc0c3a971edbe5fdb593ddfb331cd259615cfc88ec vector_path="l2-1000000x128/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:55.833839Z  WARN knn_builder::service: job failed job_id=98db50b4505f0bef25adbeeb5e5b9f7e958db08c8911999c563516ab3acd634a vector_path="l2-1000000x128/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:55.833859Z  WARN knn_builder::service: job failed job_id=4a95116d2f0e19842b94f9d213481d0668f65a541829b5486145724bb5c7f56d vector_path="l2-100000x768/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:36:56.394629Z  INFO knn_builder::api: request method=GET path="/_status/08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431" status=200 ms=0
+service-1  | 2026-11-22T02:36:56.666549Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:56.781710Z  INFO knn_builder::api: request method=GET path="/_status/ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6" status=200 ms=0
+service-1  | 2026-11-22T02:36:56.815599Z  INFO knn_builder::api: request method=GET path="/_status/9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe" status=200 ms=0
+service-1  | 2026-11-22T02:36:56.853230Z  INFO knn_builder::api: request method=GET path="/_status/4dfe79f670c425c263e6e01e825e8fcdaa7de1aedb8e15d48a9a7d2e78574caa" status=200 ms=0
+service-1  | 2026-11-22T02:36:56.877118Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:36:57.370270Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:36:57.477742Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:36:57.661536Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:58.045195Z  INFO knn_builder::api: request method=GET path="/_status/9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd" status=200 ms=0
+service-1  | 2026-11-22T02:36:58.180708Z  INFO knn_builder::api: request method=GET path="/_status/c6610cbf6b9d4d5583991aec218115ecd16fc9e589abcb59d47d0ef896f7825a" status=200 ms=0
+service-1  | 2026-11-22T02:36:58.232022Z  INFO knn_builder::api: request method=GET path="/_status/98db50b4505f0bef25adbeeb5e5b9f7e958db08c8911999c563516ab3acd634a" status=200 ms=0
+service-1  | 2026-11-22T02:36:58.661012Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:36:58.852291Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:36:59.040529Z  INFO knn_builder::api: request method=GET path="/_status/4a95116d2f0e19842b94f9d213481d0668f65a541829b5486145724bb5c7f56d" status=200 ms=0
+service-1  | 2026-11-22T02:36:59.142836Z  INFO knn_builder::api: request method=GET path="/_status/78dfe9b4d2802f327615d8d8841b8985e467a728e1d2ed25d1baddb10cf47d18" status=200 ms=0
+service-1  | 2026-11-22T02:36:59.146870Z  INFO knn_builder::api: request method=GET path="/_status/8c16575b06678167c06262b5a73677074ebb5acd51b2e8ca8cfcce43e32439ac" status=200 ms=0
+service-1  | 2026-11-22T02:36:59.454803Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:36:59.658635Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:36:59.660739Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:00.027304Z  INFO knn_builder::api: request method=GET path="/_status/1c3de533f0f099cc077b4bdbc4a5b9da2d2938b645b9b95ecb2d1442a9cfb0eb" status=200 ms=0
+service-1  | 2026-11-22T02:37:00.548385Z  INFO knn_builder::api: request method=GET path="/_status/f62ede0d2866edc43db7fd6d854acfac6ac39066c64099d6957169a1969c1323" status=200 ms=0
+service-1  | 2026-11-22T02:37:00.642973Z  INFO knn_builder::api: request method=GET path="/_status/c32870416f1e676bfdfca7c3f84801cc5621ca36dc5a84a433a1c6aa3b2af65a" status=200 ms=0
+service-1  | 2026-11-22T02:37:00.660829Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:00.734943Z  INFO knn_builder::service: job completed job_id=f62ede0d2866edc43db7fd6d854acfac6ac39066c64099d6957169a1969c1323 vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:00.734962Z DEBUG knn_builder::service: job stage times job_id=f62ede0d2866edc43db7fd6d854acfac6ac39066c64099d6957169a1969c1323 download_s=1.860843212 build_s=3.9415443249999997 upload_s=4.887046968 total_s=15.090058437
+service-1  | 2026-11-22T02:37:01.159042Z  INFO knn_builder::api: request method=GET path="/_status/08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.172818Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.346393Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.374621Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.427272Z  INFO knn_builder::api: request method=GET path="/_status/0883fd5a45d095380a6c1edc0c3a971edbe5fdb593ddfb331cd259615cfc88ec" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.556908Z  INFO knn_builder::api: request method=GET path="/_status/072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.581700Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.661304Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:01.667070Z  INFO knn_builder::api: request method=GET path="/_status/ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6" status=200 ms=0
+service-1  | 2026-11-22T02:37:02.219469Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:02.293197Z  INFO knn_builder::api: request method=GET path="/_status/9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd" status=200 ms=0
+service-1  | 2026-11-22T02:37:02.661301Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:02.664043Z  INFO knn_builder::api: request method=GET path="/_status/9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe" status=200 ms=0
+service-1  | 2026-11-22T02:37:02.795354Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:37:03.661497Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:03.822733Z  INFO knn_builder::service: job completed job_id=c6610cbf6b9d4d5583991aec218115ecd16fc9e589abcb59d47d0ef896f7825a vector_path="l2-100000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:03.822750Z DEBUG knn_builder::service: job stage times job_id=c6610cbf6b9d4d5583991aec218115ecd16fc9e589abcb59d47d0ef896f7825a download_s=1.175770102 build_s=2.603535566 upload_s=3.08184001 total_s=12.893769746
+service-1  | 2026-11-22T02:37:03.822777Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=1c3de533f0f099cc077b4bdbc4a5b9da2d2938b645b9b95ecb2d1442a9cfb0eb vector_path="l2-1000000x128/vectors.knnvec"
+service-1  | 2026-11-22T02:37:03.822784Z  WARN knn_builder::service: job failed job_id=1c3de533f0f099cc077b4bdbc4a5b9da2d2938b645b9b95ecb2d1442a9cfb0eb vector_path="l2-1000000x128/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:03.916192Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:04.048950Z  INFO knn_builder::api: request method=GET path="/_status/c6610cbf6b9d4d5583991aec218115ecd16fc9e589abcb59d47d0ef896f7825a" status=200 ms=0
+service-1  | 2026-11-22T02:37:04.460384Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:04.641810Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:04.660948Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:04.949960Z  INFO knn_builder::api: request method=GET path="/_status/1c3de533f0f099cc077b4bdbc4a5b9da2d2938b645b9b95ecb2d1442a9cfb0eb" status=200 ms=0
+service-1  | 2026-11-22T02:37:05.345518Z  INFO knn_builder::api: request method=GET path="/_status/08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431" status=200 ms=0
+service-1  | 2026-11-22T02:37:05.661226Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:05.685620Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:05.962050Z  INFO knn_builder::api: request method=GET path="/_status/ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6" status=200 ms=0
+service-1  | 2026-11-22T02:37:05.968440Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:06.198917Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:06.318633Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:06.543847Z  INFO knn_builder::api: request method=GET path="/_status/f62ede0d2866edc43db7fd6d854acfac6ac39066c64099d6957169a1969c1323" status=200 ms=0
+service-1  | 2026-11-22T02:37:06.661186Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:06.876468Z  INFO knn_builder::api: request method=GET path="/_status/072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b" status=200 ms=0
+service-1  | 2026-11-22T02:37:07.218220Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:07.460935Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:37:07.662355Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:07.833457Z  INFO knn_builder::api: request method=GET path="/_status/9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd" status=200 ms=0
+service-1  | 2026-11-22T02:37:08.341264Z  INFO knn_builder::api: request method=GET path="/_status/9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe" status=200 ms=0
+service-1  | 2026-11-22T02:37:08.661136Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:08.849322Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:09.369831Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:09.661858Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:09.762634Z  INFO knn_builder::service: job completed job_id=08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431 vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:09.762652Z DEBUG knn_builder::service: job stage times job_id=08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431 download_s=3.9331557200000002 build_s=4.1700752 upload_s=4.841114245 total_s=13.912603563
+service-1  | 2026-11-22T02:37:10.288139Z  INFO knn_builder::api: request method=GET path="/_status/ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6" status=200 ms=0
+service-1  | 2026-11-22T02:37:10.421831Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:10.661436Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:10.662797Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:10.939166Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:11.134737Z  INFO knn_builder::api: request method=GET path="/_status/08b68181bd0897666dda5ff58aa1885a8b3e642b305e49616daa73c6861cd431" status=200 ms=0
+service-1  | 2026-11-22T02:37:11.391033Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:11.462402Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:11.661783Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:12.527925Z  INFO knn_builder::api: request method=GET path="/_status/072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b" status=200 ms=0
+service-1  | 2026-11-22T02:37:12.661663Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:12.740740Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:12.751556Z  INFO knn_builder::api: request method=GET path="/_status/9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe" status=200 ms=0
+service-1  | 2026-11-22T02:37:12.756100Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:37:13.559034Z  INFO knn_builder::api: request method=GET path="/_status/9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd" status=200 ms=0
+service-1  | 2026-11-22T02:37:13.661051Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:13.742179Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:14.581700Z  INFO knn_builder::api: request method=GET path="/_status/ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6" status=200 ms=0
+service-1  | 2026-11-22T02:37:14.632864Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:14.661911Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:15.405273Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:15.539082Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:16.335135Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:16.346799Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:16.557056Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:16.805184Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:17.230452Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:17.661938Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:17.689343Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:37:17.720751Z  INFO knn_builder::service: job completed job_id=ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6 vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:17.720770Z DEBUG knn_builder::service: job stage times job_id=ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6 download_s=2.9988687 build_s=4.179259157 upload_s=7.942593861 total_s=16.970366754
+service-1  | 2026-11-22T02:37:17.720797Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe vector_path="l2-250000x768/vectors.knnvec"
+service-1  | 2026-11-22T02:37:17.720801Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd vector_path="l2-1000000x128/vectors.knnvec"
+service-1  | 2026-11-22T02:37:17.720802Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b vector_path="l2-100000x768/vectors.knnvec"
+service-1  | 2026-11-22T02:37:17.720807Z  WARN knn_builder::service: job failed job_id=072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b vector_path="l2-100000x768/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:17.720850Z  WARN knn_builder::service: job failed job_id=9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe vector_path="l2-250000x768/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:17.720876Z  WARN knn_builder::service: job failed job_id=9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd vector_path="l2-1000000x128/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:17.905250Z  INFO knn_builder::api: request method=GET path="/_status/9449512e6bc2b9cd8748ca2eca6c8a9de59566523a576a7083f03d7ce12084cd" status=200 ms=0
+service-1  | 2026-11-22T02:37:17.913395Z  INFO knn_builder::api: request method=GET path="/_status/072e10b58bc48c5eecf328cc4e417e27089b90ad3d6befd3c4029f8f4c51e39b" status=200 ms=0
+service-1  | 2026-11-22T02:37:18.306447Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:18.413303Z  INFO knn_builder::api: request method=GET path="/_status/9e0c1729af49fe1364966d9c86731251b958c257809327fd3d3b176f202761fe" status=200 ms=0
+service-1  | 2026-11-22T02:37:18.661138Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:19.637834Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:19.661314Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:19.833372Z  INFO knn_builder::api: request method=GET path="/_status/ef0111d5c1d65fcfc0aa1f844b82b5d3a8ff3eb3067f1a67da862aa76234b2d6" status=200 ms=0
+service-1  | 2026-11-22T02:37:20.661147Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.229954Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.249154Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.416672Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.428315Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.662241Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.701142Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:37:21.746946Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:22.176494Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:22.662505Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:23.382129Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:23.661556Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:24.149716Z  INFO knn_builder::service: job completed job_id=bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6 vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:24.149734Z DEBUG knn_builder::service: job stage times job_id=bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6 download_s=3.823621599 build_s=4.34146831 upload_s=6.414101999 total_s=19.229789953
+service-1  | 2026-11-22T02:37:24.661413Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:25.495323Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:25.661462Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:26.182607Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:26.629756Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:26.661059Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:26.875777Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:26.951285Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:27.008515Z  INFO knn_builder::api: request method=GET path="/_status/bb29b3453da5832b80f286e6f37c47f9ee2a40f7d5ffa80c5838740417bd9bc6" status=200 ms=0
+service-1  | 2026-11-22T02:37:27.044162Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:27.153757Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:27.396852Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:27.660933Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:28.661242Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:29.285433Z  INFO knn_builder::service: job completed job_id=e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7 vector_path="l2-100000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:29.285454Z DEBUG knn_builder::service: job stage times job_id=e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7 download_s=1.302334641 build_s=2.775388156 upload_s=5.128452453 total_s=19.515564895
+service-1  | 2026-11-22T02:37:29.285480Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b vector_path="l2-500000x384/vectors.knnvec"
+service-1  | 2026-11-22T02:37:29.285483Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62 vector_path="l2-500000x384/vectors.knnvec"
+service-1  | 2026-11-22T02:37:29.285487Z  WARN knn_builder::service: job failed job_id=5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62 vector_path="l2-500000x384/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:29.285507Z  WARN knn_builder::service: job failed job_id=c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b vector_path="l2-500000x384/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:29.502283Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:29.660788Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:30.661543Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:31.097793Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:31.465839Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:31.665123Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:31.805409Z  INFO knn_builder::api: request method=GET path="/_status/5272b84a782de459ee3ab03e3a0d891144313fd4ee776666719de79610c60a62" status=200 ms=0
+service-1  | 2026-11-22T02:37:32.495583Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:32.661751Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:32.835661Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:32.962897Z  INFO knn_builder::api: request method=GET path="/_status/e96528fcb55da32a70d3a0b0babf4623b16f98978902735b7066465da5892bb7" status=200 ms=0
+service-1  | 2026-11-22T02:37:33.185713Z  INFO knn_builder::api: request method=GET path="/_status/c202081d152cace9ef6e17fa4a41538d4e6ed6d4469457dbee9f9b94e2202f9b" status=200 ms=0
+service-1  | 2026-11-22T02:37:33.660901Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:34.662191Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:35.158001Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:35.588664Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:36.326794Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:36.618495Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:36.647084Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:36.661809Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:37.661470Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:37.998559Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:38.661864Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:38.893884Z  INFO knn_builder::service: job completed job_id=953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931 vector_path="l2-1000000x128/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:38.893902Z DEBUG knn_builder::service: job stage times job_id=953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931 download_s=2.472512411 build_s=4.186273867 upload_s=9.592667113 total_s=21.157442186
+service-1  | 2026-11-22T02:37:38.893931Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb vector_path="l2-500000x384/vectors.knnvec"
+service-1  | 2026-11-22T02:37:38.893937Z  WARN knn_builder::service: job failed job_id=b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb vector_path="l2-500000x384/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:39.661922Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:40.625150Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:40.660908Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:40.948803Z  INFO knn_builder::api: request method=GET path="/_status/953bf23e56a00b8e287d6511120e8c1d63f734891d0b0de9c4eb92874391f931" status=200 ms=0
+service-1  | 2026-11-22T02:37:41.553480Z  INFO knn_builder::api: request method=GET path="/_status/b53a29690438919d34f59d9d46afb982f10fa00d94d757289e96b57751efadbb" status=200 ms=0
+service-1  | 2026-11-22T02:37:41.661785Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:41.829151Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:42.113348Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:42.661642Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:43.664312Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:44.661386Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:45.661564Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:45.664957Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:46.662137Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:47.132405Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:47.484514Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:47.661637Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:48.662165Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:49.661695Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:50.313295Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:50.662416Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:51.661475Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:52.290962Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:52.309085Z  INFO knn_builder::service: job completed job_id=113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896 vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:37:52.309116Z DEBUG knn_builder::service: job stage times job_id=113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896 download_s=2.7751142189999998 build_s=3.799806269 upload_s=13.396142611 total_s=28.140273444
+service-1  | 2026-11-22T02:37:52.309130Z  INFO knn_builder::service: forecast to miss the data node's timeout: canceling the job job_id=1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4 vector_path="l2-1000000x128/vectors.knnvec"
+service-1  | 2026-11-22T02:37:52.309339Z  WARN knn_builder::service: job failed job_id=1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4 vector_path="l2-1000000x128/vectors.knnvec" error=the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s
+service-1  | 2026-11-22T02:37:52.422649Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:52.661558Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:53.661938Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:54.661510Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:55.135495Z  INFO knn_builder::api: request method=GET path="/_status/1643791fca982351e7bb9779ede247ab14e35dcb688edbf4d5980c7851a1d9a4" status=200 ms=0
+service-1  | 2026-11-22T02:37:55.662071Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:56.661489Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:57.609564Z  INFO knn_builder::api: request method=GET path="/_status/113868974327a25039a684b47897a3da762aeea1667bbf2568ffbc3870793896" status=200 ms=0
+service-1  | 2026-11-22T02:37:57.662028Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:57.729849Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:37:58.661795Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:37:59.661712Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:00.662039Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:01.661634Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:01.847989Z  INFO knn_builder::service: job completed job_id=0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f vector_path="l2-250000x768/vectors.knnvec" file_name="vectors.faiss"
+service-1  | 2026-11-22T02:38:01.848010Z DEBUG knn_builder::service: job stage times job_id=0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f download_s=8.022865795 build_s=4.638382425 upload_s=9.522887433 total_s=32.546516199
+service-1  | 2026-11-22T02:38:02.661168Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:03.405142Z  INFO knn_builder::api: request method=GET path="/_status/0d4b7df0d6f458968ee4d55d4ad79e24f99ce3d118b4c8e0b9b4ecd17c0f9e5f" status=200 ms=0
+service-1  | 2026-11-22T02:38:03.413024Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:03.661686Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:04.661503Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:05.661657Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:06.662115Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:07.661530Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:08.661529Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:09.661720Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:10.663220Z  INFO knn_builder::api: request method=GET path="/metrics" status=200 ms=0
+service-1  | 2026-11-22T02:38:11.756904Z  INFO knn_builder: stopping

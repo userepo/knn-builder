@@ -12,6 +12,10 @@
 #   SERVICE_IMAGE=opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc LABEL=upstream \
 #     docker compose -f tools/burst/docker-compose.yml up --abort-on-container-exit --exit-code-from driver
 #   docker compose -f tools/burst/docker-compose.yml down
+#
+# With COMPOSE_PROFILES=prometheus and PROMETHEUS_URL=http://prometheus:9090,
+# a Prometheus scrapes knn-builder through the burst, and the driver saves
+# what it read once the service is idle.
 name: knn-builder-burst
 
 x-aws: &aws
@@ -49,11 +53,21 @@ services:
     depends_on:
       - localstack
 
+  prometheus:
+    profiles: ["prometheus"]
+    # v3.16.0, the version CI's promtool is.
+    image: prom/prometheus@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - service
+
   driver:
     image: opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc
     entrypoint: ["python", "/work/tools/burst/burst.py"]
     environment:
       SERVICE_URL: http://service:1025
+      PROMETHEUS_URL: ${PROMETHEUS_URL:-}
       S3_ENDPOINT_URL: http://localstack:4566
       INPUTS: /work/${INPUTS:-target/burst/inputs}
       NAMES: ${NAMES:-l2-1000000x128,l2-500000x384,l2-250000x768,l2-100000x768}
