@@ -10,7 +10,8 @@
 //! holds the jobs and feeds them to a pipeline, and [`api`] answers HTTP
 //! requests with them, set up by [`config`]. [`metrics`] holds the values
 //! of the service's metrics and writes them as the page a Prometheus
-//! scraper reads.
+//! scraper reads, with the host's and the GPU's memory as [`memory`]
+//! reads it.
 
 pub mod api;
 mod builder;
@@ -21,6 +22,7 @@ pub mod forecast;
 mod gate;
 mod job;
 mod load;
+pub mod memory;
 pub mod metrics;
 mod pipeline;
 mod project;

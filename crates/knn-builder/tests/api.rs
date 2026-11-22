@@ -25,6 +25,7 @@ use knn_builder::FakeBuilder;
 use knn_builder::api;
 use knn_builder::config::Credentials;
 use knn_builder::cost::CpuThreads;
+use knn_builder::memory::{GpuMeter, Pace, Reading};
 use knn_builder::service::{Device, Service, Settings};
 use knn_store::{Store, Transfers};
 use serde_json::{Value, json};
@@ -282,6 +283,47 @@ async fn asks_for_basic_auth_when_it_is_set() {
     );
 }
 
+/// With a GPU meter, the page has the GPU's memory once it is read.
+#[tokio::test(flavor = "multi_thread")]
+async fn serves_the_gpu_memory_its_meter_reads() {
+    let read = || {
+        Some(Reading {
+            total: 8 << 30,
+            free: 6 << 30,
+        })
+    };
+    let every_ms = Pace {
+        idle: Duration::from_millis(1),
+        building: Duration::from_millis(1),
+    };
+    let meter = GpuMeter::start(read, every_ms).unwrap();
+    let service = Service::start(
+        nowhere().await,
+        FakeBuilder::new(Duration::ZERO),
+        Settings::default(),
+    );
+    let router = api::app(Arc::new(service.with_gpu_meter(meter)), None);
+    let start = Instant::now();
+    let page = loop {
+        let page = scrape(&router).await;
+        if page.contains("knn_builder_gpu_memory") {
+            break page;
+        }
+        assert!(start.elapsed() < Duration::from_secs(5), "never read");
+        tokio::time::sleep(Duration::from_millis(1)).await;
+    };
+    for (series, bytes) in [
+        ("knn_builder_gpu_memory_total_bytes", 8 << 30),
+        ("knn_builder_gpu_memory_free_bytes", 6 << 30),
+        // No build yet.
+        ("knn_builder_gpu_memory_last_build_peak_bytes", 0_u64),
+    ] {
+        #[expect(clippy::cast_precision_loss, reason = "exact below 2^53")]
+        let bytes = bytes as f64;
+        assert_eq!(value(&page, series), Some(bytes), "{series}");
+    }
+}
+
 /// Requests refused for their credentials are counted as any other, the
 /// scrape's own among them.
 #[tokio::test(flavor = "multi_thread")]
@@ -383,7 +425,14 @@ async fn serves_its_metrics_on_get_only() {
         Some(0.0)
     );
     assert!(value(&page.body, "process_start_time_seconds").unwrap() > 1.7e9);
-    assert!(!page.body.contains("process_resident_memory_bytes"));
+    // Read where `/proc` gives it.
+    let resident = value(&page.body, "process_resident_memory_bytes");
+    assert_eq!(
+        resident.is_some_and(|bytes| bytes > 0.0),
+        cfg!(target_os = "linux")
+    );
+    // No GPU to read.
+    assert!(!page.body.contains("knn_builder_gpu_memory"));
     for method in ["POST", "HEAD", "PUT"] {
         let answer = send(&router, method, "/metrics", &[], "").await;
         assert_eq!(answer.status, 405, "{method}");

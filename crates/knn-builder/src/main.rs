@@ -6,6 +6,9 @@
 //! It builds on the GPU, so it needs the `gpu` feature; built without it,
 //! it says so and exits.
 //!
+//! A thread reads the GPU's memory for the metrics, once a second and
+//! more often during a build, whose peak it keeps.
+//!
 //! On SIGTERM or Ctrl-C it stops taking requests, cancels its jobs and
 //! waits a few seconds for them to end: a build under way cannot stop,
 //! and a stopping container has little time. A build still running then
@@ -17,6 +20,7 @@ use std::time::Duration;
 
 use knn_builder::api;
 use knn_builder::config::Config;
+use knn_builder::memory::{GpuMeter, Metered, Pace, Reading};
 use knn_builder::service::{Device, Service};
 use knn_store::{Settings, Store, Transfers};
 use tokio::net::TcpListener;
@@ -77,6 +81,15 @@ async fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
+    // Started once the GPU's context exists, which its reads then share.
+    let meter = match GpuMeter::start(read_gpu, Pace::default()) {
+        Ok(meter) => meter,
+        Err(error) => {
+            tracing::error!(%error, "cannot start the GPU memory reader");
+            return ExitCode::FAILURE;
+        }
+    };
+    let builder = Metered::new(builder, meter.clone());
     let listener = match TcpListener::bind(("0.0.0.0", PORT)).await {
         Ok(listener) => listener,
         Err(error) => {
@@ -85,7 +98,7 @@ async fn main() -> ExitCode {
         }
     };
     let store = Store::new(&Settings::from_env(), Transfers::default()).await;
-    let service = Arc::new(Service::start(store, builder, config.service));
+    let service = Arc::new(Service::start(store, builder, config.service).with_gpu_meter(meter));
     tracing::info!(
         version = env!("CARGO_PKG_VERSION"),
         port = PORT,
@@ -144,6 +157,23 @@ fn device() -> Result<Device, String> {
 #[cfg(not(feature = "gpu"))]
 fn device() -> Result<Device, String> {
     Err("built without the gpu feature".to_owned())
+}
+
+/// The GPU's memory; `None` when the runtime cannot tell.
+#[cfg(feature = "gpu")]
+fn read_gpu() -> Option<Reading> {
+    let memory = knn_gpu::device_memory().ok()?;
+    Some(Reading {
+        total: u64::try_from(memory.total).ok()?,
+        free: u64::try_from(memory.free).ok()?,
+    })
+}
+
+/// No GPU without the `gpu` feature: never called, the builder having
+/// failed first.
+#[cfg(not(feature = "gpu"))]
+fn read_gpu() -> Option<Reading> {
+    None
 }
 
 /// A SIGTERM, or Ctrl-C. A signal that cannot be listened for never comes.

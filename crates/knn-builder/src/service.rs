@@ -55,6 +55,7 @@ use tokio::task::JoinSet;
 
 use crate::cost::CpuThreads;
 use crate::gate::Gate;
+use crate::memory::{self, GpuMeter};
 use crate::metrics::{BuildAnswer, Counted, Family, Outcome, Snapshot, TimedStage};
 use crate::request::{BuildRequest, JobId};
 use crate::{
@@ -257,6 +258,8 @@ pub struct Service {
     pipeline: Pipeline,
     /// When it started, in seconds of Unix time.
     started: f64,
+    /// The GPU's memory, where there is a GPU to read.
+    gpu: Option<GpuMeter>,
 }
 
 #[derive(Debug)]
@@ -302,6 +305,17 @@ impl Service {
             started: SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .map_or(0.0, |since| since.as_secs_f64()),
+            gpu: None,
+        }
+    }
+
+    /// The same service, its metrics reporting the GPU's memory as `meter`
+    /// reads it.
+    #[must_use]
+    pub fn with_gpu_meter(self, meter: GpuMeter) -> Self {
+        Self {
+            gpu: Some(meter),
+            ..self
         }
     }
 
@@ -453,14 +467,17 @@ impl Service {
     }
 
     /// Every metric's value now, but the requests answered, which are the
-    /// API's to count, and the process's and the GPU's memory.
+    /// API's to count.
     ///
     /// # Panics
     ///
-    /// After a thread panicked holding the job store or the pipeline's job
-    /// list, a bug.
+    /// After a thread panicked holding the job store, the pipeline's job
+    /// list or the GPU meter's readings, a bug.
     #[must_use]
     pub fn metrics(&self) -> Snapshot {
+        // Read before the lock is taken, as it reads a file.
+        let resident_memory = memory::resident();
+        let gpu_memory = self.gpu.as_ref().and_then(GpuMeter::memory);
         let now = Instant::now();
         let inner = self.inner.lock().expect(POISONED);
         let in_flight = inner.flights.in_flight();
@@ -496,7 +513,9 @@ impl Service {
             drain_seconds: inner.gate.drain(now, &in_flight).as_secs_f64(),
             host_budget,
             host_budget_used,
+            resident_memory,
             start_time_seconds: self.started,
+            gpu_memory,
             ..Snapshot::default()
         }
     }
