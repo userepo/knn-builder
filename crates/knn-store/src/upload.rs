@@ -12,7 +12,7 @@ use futures_util::StreamExt;
 use futures_util::stream::FuturesUnordered;
 use tokio::sync::{mpsc, oneshot};
 
-use crate::store::{Store, s3_error};
+use crate::store::{Payload, Store, s3_error};
 use crate::{Cancel, Error};
 
 /// S3's limit on parts per upload.
@@ -26,7 +26,10 @@ impl Store {
     /// written; a larger one in a multipart upload, each part sent as soon
     /// as it is written, [`Transfers::upload_concurrency`] at a time. The
     /// file, or each part, carries a CRC32 checksum, as the service's
-    /// uploads do.
+    /// uploads do, and over HTTPS its signature leaves the body out, as
+    /// theirs does, unless [`Settings::payload_signing`] says otherwise:
+    /// hashing the body to sign it would hold the upload to one thread's
+    /// SHA-256.
     ///
     /// `cancel` gives the upload up from another thread: it takes no more
     /// parts, so the writer's next part or [`Upload::finish`] fails with
@@ -36,6 +39,7 @@ impl Store {
     ///
     /// The requests run on the runtime the store was created on.
     ///
+    /// [`Settings::payload_signing`]: crate::Settings::payload_signing
     /// [`Transfers::part_size`]: crate::Transfers::part_size
     /// [`Transfers::upload_concurrency`]: crate::Transfers::upload_concurrency
     #[must_use]
@@ -58,6 +62,7 @@ impl Store {
             size,
             kms_key: kms_key.map(str::to_owned),
             cancel: cancel.clone(),
+            payload: self.payload,
         };
         let concurrency = self.transfers.upload_concurrency;
         self.runtime.spawn(async move {
@@ -289,6 +294,7 @@ struct Object {
     size: u64,
     kms_key: Option<String>,
     cancel: Cancel,
+    payload: Payload,
 }
 
 impl Object {
@@ -318,17 +324,20 @@ impl Object {
             return Err(self.canceled());
         }
         let (encryption, kms_key) = self.encryption();
-        self.client
+        let put = self
+            .client
             .put_object()
             .bucket(&self.bucket)
             .key(&self.key)
             .body(ByteStream::from(body))
             .checksum_algorithm(ChecksumAlgorithm::Crc32)
             .set_server_side_encryption(encryption)
-            .set_ssekms_key_id(kms_key)
-            .send()
-            .await
-            .map_err(|e| s3_error("PutObject", &self.bucket, &self.key, &e))?;
+            .set_ssekms_key_id(kms_key);
+        match self.payload {
+            Payload::Signed => put.send().await,
+            Payload::Unsigned => put.customize().disable_payload_signing().send().await,
+        }
+        .map_err(|e| s3_error("PutObject", &self.bucket, &self.key, &e))?;
         Ok(())
     }
 
@@ -445,7 +454,7 @@ impl Object {
         body: Vec<u8>,
     ) -> Result<(CompletedPart, u64), Error> {
         let len = body.len() as u64;
-        let uploaded = self
+        let part = self
             .client
             .upload_part()
             .bucket(&self.bucket)
@@ -453,10 +462,12 @@ impl Object {
             .upload_id(id)
             .part_number(number)
             .body(ByteStream::from(body))
-            .checksum_algorithm(ChecksumAlgorithm::Crc32)
-            .send()
-            .await
-            .map_err(|e| s3_error("UploadPart", &self.bucket, &self.key, &e))?;
+            .checksum_algorithm(ChecksumAlgorithm::Crc32);
+        let uploaded = match self.payload {
+            Payload::Signed => part.send().await,
+            Payload::Unsigned => part.customize().disable_payload_signing().send().await,
+        }
+        .map_err(|e| s3_error("UploadPart", &self.bucket, &self.key, &e))?;
         let part = CompletedPart::builder()
             .part_number(number)
             .set_e_tag(uploaded.e_tag().map(str::to_owned))

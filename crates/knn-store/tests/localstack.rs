@@ -28,7 +28,7 @@ use aws_sdk_s3::types::{
     BucketLocationConstraint, CreateBucketConfiguration, ServerSideEncryption,
 };
 use half::f16;
-use knn_store::{Cancel, Error, Settings, Store, Transfers, Upload};
+use knn_store::{Cancel, Error, PayloadSigning, Settings, Store, Transfers, Upload};
 
 const NEEDS_S3: &str =
     "needs LocalStack: set S3_ENDPOINT_URL and credentials (see the file's docs)";
@@ -398,6 +398,31 @@ async fn uploads_a_large_file_in_parts() {
         .await
         .unwrap();
     assert_eq!(first.parts_count(), Some(3));
+    assert_eq!(s3.pending_uploads().await, 0);
+    s3.remove().await;
+}
+
+#[tokio::test(flavor = "multi_thread")]
+#[ignore = "needs LocalStack"]
+async fn uploads_with_unsigned_bodies_as_over_https() {
+    // LocalStack is on plain HTTP, where the store signs each body; this
+    // is what it sends AWS, in one PUT and in parts.
+    let mut s3 = S3::new("unsigned").await;
+    let settings = Settings {
+        payload_signing: PayloadSigning::Never,
+        ..Settings::from_env()
+    };
+    s3.store = Store::new(&settings, transfers()).await;
+    for (key, len) in [
+        ("small.faiss", 100_000),
+        ("parts.faiss", 2 * 5 * MIB + 12_345),
+    ] {
+        let file = bytes(len);
+        s3.upload(key, len as u64, file.clone(), None)
+            .await
+            .unwrap();
+        assert!(s3.get(key).await == Some(file), "stored {key} differs");
+    }
     assert_eq!(s3.pending_uploads().await, 0);
     s3.remove().await;
 }

@@ -62,6 +62,10 @@ services:
       # upstream service reads neither.
       RECALL_CHECK_QUERIES: ${RECALL_CHECK_QUERIES:-0}
       RECALL_CHECK_K: ${RECALL_CHECK_K:-10}
+      # Whether knn-builder signs its uploads' bodies, from the host's
+      # environment: unset there, unset here, and it signs them over
+      # plain HTTP alone. The upstream service does not read it.
+      S3_PAYLOAD_SIGNING_ENABLED:
       <<: *aws
     ports:
       - "127.0.0.1:${SERVICE_PORT:-1026}:1025"

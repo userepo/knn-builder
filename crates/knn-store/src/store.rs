@@ -16,6 +16,7 @@ use aws_sdk_s3::config::Region;
 use aws_sdk_s3::config::http::HttpResponse;
 use aws_sdk_s3::error::{ProvideErrorMetadata, SdkError};
 use aws_smithy_http_client::tls::{self, rustls_provider::CryptoMode};
+use aws_types::service_config::ServiceConfigKey;
 use tokio::runtime::Handle;
 
 use crate::Error;
@@ -59,6 +60,28 @@ pub struct Settings {
     /// `us-east-1`. A bucket in another region is reached through S3's
     /// redirect to it, as boto3 reaches it.
     pub region: Option<String>,
+    /// Whether uploads sign their bodies. [`Settings::from_env`] leaves
+    /// it at its default; the service reads it from
+    /// `S3_PAYLOAD_SIGNING_ENABLED`, a variable of its own.
+    pub payload_signing: PayloadSigning,
+}
+
+/// Whether an upload's requests sign their body, as boto3's
+/// `payload_signing_enabled` sets it. Signing one takes its SHA-256
+/// first, the whole of it on the thread that sends it, which on a CPU
+/// without SHA instructions is the slowest step of an upload.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum PayloadSigning {
+    /// Bodies are signed over plain HTTP alone, boto3's default for a
+    /// body with a checksum: over HTTPS, TLS keeps the body on the way
+    /// and S3 holds it to its CRC32.
+    #[default]
+    ByEndpoint,
+    /// Every body is signed, for a bucket whose policy refuses unsigned
+    /// ones.
+    Always,
+    /// No body is signed, over plain HTTP either.
+    Never,
 }
 
 impl Settings {
@@ -70,6 +93,7 @@ impl Settings {
         Self {
             endpoint_url: var("S3_ENDPOINT_URL"),
             region: var("AWS_DEFAULT_REGION"),
+            payload_signing: PayloadSigning::default(),
         }
     }
 }
@@ -131,6 +155,59 @@ fn per_cpu(numerator: usize, denominator: usize) -> usize {
     (cpus.saturating_mul(numerator) / denominator).max(8)
 }
 
+/// What a store's uploads do with their bodies: its
+/// [`PayloadSigning`], settled for its endpoint.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Payload {
+    /// The signature covers the body's SHA-256.
+    Signed,
+    /// The signature leaves the body out.
+    Unsigned,
+}
+
+impl Payload {
+    /// What an upload to `endpoint` sends under `signing`; no endpoint
+    /// is AWS's own, over HTTPS. Left to the endpoint, a body is signed
+    /// to an `http://` one and unsigned to any other.
+    fn of(signing: PayloadSigning, endpoint: Option<&str>) -> Self {
+        const PLAIN: &str = "http://";
+        match signing {
+            PayloadSigning::Always => Self::Signed,
+            PayloadSigning::Never => Self::Unsigned,
+            PayloadSigning::ByEndpoint => {
+                let plain = endpoint
+                    .and_then(|url| url.trim_start().get(..PLAIN.len()))
+                    .is_some_and(|scheme| scheme.eq_ignore_ascii_case(PLAIN));
+                if plain { Self::Signed } else { Self::Unsigned }
+            }
+        }
+    }
+}
+
+/// The endpoint a client of `config` and `settings` sends to, when it is
+/// not AWS's own: `S3_ENDPOINT_URL`, else the one the SDK finds for
+/// itself, picked as its S3 client picks it. One set on the
+/// configuration in code comes first, then S3's own
+/// (`AWS_ENDPOINT_URL_S3`, or the profile's), then every service's
+/// (`AWS_ENDPOINT_URL`, or the profile's).
+fn endpoint(config: &SdkConfig, settings: &Settings) -> Option<String> {
+    if let Some(url) = &settings.endpoint_url {
+        return Some(url.clone());
+    }
+    let shared = || config.endpoint_url().map(str::to_owned);
+    if config.get_origin("endpoint_url").is_client_config() {
+        return shared();
+    }
+    ServiceConfigKey::builder()
+        .service_id("S3")
+        .env("AWS_ENDPOINT_URL")
+        .profile("endpoint_url")
+        .build()
+        .ok()
+        .and_then(|key| config.service_config()?.load_config(key))
+        .or_else(shared)
+}
+
 /// A blob's size and what a transfer needs to know about it, from a
 /// `HeadObject`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -168,6 +245,9 @@ pub struct Store {
     /// A client per bucket S3 redirected, signing for its region.
     redirected: Arc<Mutex<HashMap<String, Client>>>,
     pub(crate) transfers: Transfers,
+    /// Whether uploads sign their bodies: the settings' choice, settled
+    /// for the endpoint.
+    pub(crate) payload: Payload,
     /// The runtime the requests run on, so downloads and uploads can be
     /// driven from blocking threads.
     pub(crate) runtime: Handle,
@@ -221,6 +301,10 @@ impl Store {
             client: Client::from_conf(s3.build()),
             redirected: Arc::default(),
             transfers: transfers.floored(),
+            payload: Payload::of(
+                settings.payload_signing,
+                endpoint(config, settings).as_deref(),
+            ),
             runtime: Handle::current(),
         }
     }
@@ -463,10 +547,11 @@ mod tests {
     use aws_config::retry::RetryConfig;
     use aws_config::timeout::TimeoutConfig;
     use aws_sdk_s3::Client;
+    use aws_types::service_config::{LoadServiceConfig, ServiceConfigKey};
     use tokio::runtime::Runtime;
 
-    use super::{MIB, REDIRECTED_BUCKETS, Settings, Store, Transfers};
-    use crate::testing::{Elsewhere, FakeS3Server, Signed, test_loader, test_store};
+    use super::{MIB, Payload, PayloadSigning, REDIRECTED_BUCKETS, Settings, Store, Transfers};
+    use crate::testing::{Elsewhere, FakeS3Server, Put, Signed, test_loader, test_store};
     use crate::{Cancel, Error};
 
     #[test]
@@ -523,7 +608,7 @@ mod tests {
             .await;
         let settings = Settings {
             endpoint_url: Some(silent.endpoint.clone()),
-            region: None,
+            ..Settings::default()
         };
         let store = Store::with_config(&config, &settings, Transfers::default());
         let start = Instant::now();
@@ -539,6 +624,199 @@ mod tests {
             "{error}"
         );
         assert!(start.elapsed() < Duration::from_secs(10));
+    }
+
+    fn settings(endpoint_url: Option<&str>, payload_signing: PayloadSigning) -> Settings {
+        Settings {
+            endpoint_url: endpoint_url.map(str::to_owned),
+            region: None,
+            payload_signing,
+        }
+    }
+
+    #[test]
+    fn signs_bodies_over_plain_http_alone() {
+        let left = |url| Payload::of(PayloadSigning::ByEndpoint, url);
+        assert_eq!(left(None), Payload::Unsigned);
+        for url in [
+            "https://s3.example",
+            "HTTPS://s3.example",
+            "s3.example",
+            "",
+            "http:/",
+        ] {
+            assert_eq!(left(Some(url)), Payload::Unsigned, "{url}");
+        }
+        for url in [
+            "http://localhost:4566",
+            "HTTP://localhost:4566",
+            "http://",
+            " http://localhost:4566",
+        ] {
+            assert_eq!(left(Some(url)), Payload::Signed, "{url}");
+        }
+        // Told to, it signs or not whatever the endpoint.
+        for url in [
+            None,
+            Some("https://s3.example"),
+            Some("http://localhost:4566"),
+        ] {
+            assert_eq!(Payload::of(PayloadSigning::Always, url), Payload::Signed);
+            assert_eq!(Payload::of(PayloadSigning::Never, url), Payload::Unsigned);
+        }
+    }
+
+    /// S3's own endpoint among the SDK's settings, as
+    /// `AWS_ENDPOINT_URL_S3` gives it.
+    #[derive(Debug)]
+    struct OfS3(Option<&'static str>);
+
+    impl LoadServiceConfig for OfS3 {
+        fn load_config(&self, key: ServiceConfigKey<'_>) -> Option<String> {
+            // The client asks for other settings of S3's too.
+            let endpoint = (key.service_id(), key.env(), key.profile())
+                == ("S3", "AWS_ENDPOINT_URL", "endpoint_url");
+            self.0.filter(|_| endpoint).map(str::to_owned)
+        }
+    }
+
+    const PLAIN: &str = "http://minio:9000";
+    const TLS: &str = "https://minio:9000";
+
+    /// What a store sends whose SDK configuration has `shared` as every
+    /// service's endpoint and `of_s3` as S3's, whatever this machine's
+    /// environment holds, with `S3_ENDPOINT_URL` at `setting`.
+    fn payload_with(
+        runtime: &Runtime,
+        shared: Option<&str>,
+        of_s3: Option<&'static str>,
+        setting: Option<&str>,
+    ) -> Payload {
+        let mut config = runtime.block_on(test_loader().load()).into_builder();
+        config.set_endpoint_url(shared.map(str::to_owned));
+        let config = config.service_config(OfS3(of_s3)).build();
+        let settings = settings(setting, PayloadSigning::ByEndpoint);
+        let _runtime = runtime.enter();
+        Store::with_config(&config, &settings, Transfers::default()).payload
+    }
+
+    #[test]
+    fn leaves_bodies_unsigned_to_aws_itself() {
+        let runtime = Runtime::new().unwrap();
+        assert_eq!(payload_with(&runtime, None, None, None), Payload::Unsigned);
+        let fake = FakeS3Server::serving(Vec::new(), 0);
+        let store = runtime.block_on(test_store(Some(&fake), Transfers::default()));
+        assert_eq!(store.payload, Payload::Signed);
+    }
+
+    #[test]
+    fn signs_bodies_to_a_plain_http_endpoint_the_sdk_found() {
+        let runtime = Runtime::new().unwrap();
+        // Every service's, S3's own before it, and `S3_ENDPOINT_URL`
+        // before both.
+        for (shared, of_s3, setting, want) in [
+            (Some(PLAIN), None, None, Payload::Signed),
+            (Some(TLS), None, None, Payload::Unsigned),
+            (None, Some(PLAIN), None, Payload::Signed),
+            (Some(TLS), Some(PLAIN), None, Payload::Signed),
+            (Some(PLAIN), Some(TLS), None, Payload::Unsigned),
+            (Some(PLAIN), Some(PLAIN), Some(TLS), Payload::Unsigned),
+            (Some(TLS), Some(TLS), Some(PLAIN), Payload::Signed),
+        ] {
+            assert_eq!(
+                payload_with(&runtime, shared, of_s3, setting),
+                want,
+                "{shared:?} {of_s3:?} {setting:?}"
+            );
+        }
+        // One set in code comes before S3's own.
+        let config = runtime
+            .block_on(test_loader().endpoint_url(PLAIN).load())
+            .into_builder()
+            .service_config(OfS3(Some(TLS)))
+            .build();
+        let _runtime = runtime.enter();
+        let settings = settings(None, PayloadSigning::ByEndpoint);
+        let store = Store::with_config(&config, &settings, Transfers::default());
+        assert_eq!(store.payload, Payload::Signed);
+    }
+
+    /// A store on `fake`, a plain-HTTP endpoint, signing as told.
+    fn store_on(
+        runtime: &Runtime,
+        fake: &FakeS3Server,
+        signing: PayloadSigning,
+        transfers: Transfers,
+    ) -> Store {
+        let settings = settings(Some(&fake.endpoint), signing);
+        runtime.block_on(async {
+            Store::with_config(&test_loader().load().await, &settings, transfers)
+        })
+    }
+
+    fn upload(store: &Store, size: usize) {
+        let mut upload = store.upload("bucket", "index.faiss", size as u64, None, &Cancel::new());
+        upload.write_all(&vec![7; size]).unwrap();
+        upload.finish().unwrap();
+    }
+
+    const UNSIGNED: &str = "UNSIGNED-PAYLOAD";
+
+    #[test]
+    fn leaves_the_body_out_of_the_signature_when_unsigned() {
+        let fake = FakeS3Server::serving(Vec::new(), 0);
+        let runtime = Runtime::new().unwrap();
+        for signing in [PayloadSigning::ByEndpoint, PayloadSigning::Never] {
+            upload(
+                &store_on(&runtime, &fake, signing, Transfers::default()),
+                12,
+            );
+        }
+        // The SHA-256 of twelve bytes of 7, then S3's word for no hash.
+        // Both carry the body's CRC32.
+        let put = |payload: &str| Put {
+            payload: Some(payload.to_owned()),
+            crc32: Some("iTG6tA==".to_owned()),
+        };
+        assert_eq!(
+            fake.puts(),
+            [
+                put("8c62e33c921a684edb51ef2a4d736908a18f35ff4ff8e56862d4021b81bea2fa"),
+                put(UNSIGNED),
+            ]
+        );
+    }
+
+    #[test]
+    fn leaves_each_part_out_of_the_signature_when_unsigned() {
+        // Two parts: the smallest S3 takes, and one byte.
+        let transfers = Transfers {
+            part_size: 5 * MIB,
+            ..Transfers::default()
+        };
+        let fake = FakeS3Server::serving(Vec::new(), 0);
+        let runtime = Runtime::new().unwrap();
+        for signing in [PayloadSigning::ByEndpoint, PayloadSigning::Never] {
+            upload(&store_on(&runtime, &fake, signing, transfers), 5 * MIB + 1);
+        }
+        let methods: Vec<String> = fake.signed().into_iter().map(|r| r.method).collect();
+        let parts = ["POST", "PUT", "PUT", "POST"];
+        assert_eq!(methods, [parts, parts].concat());
+        let puts = fake.puts();
+        assert!(puts.iter().all(|put| put.crc32.is_some()), "{puts:?}");
+        let payloads: Vec<&str> = puts
+            .iter()
+            .map(|put| put.payload.as_deref().unwrap())
+            .collect();
+        let (signed, unsigned) = payloads.split_at(2);
+        // A SHA-256 in hex for each part, then no hash for either.
+        assert!(
+            signed
+                .iter()
+                .all(|hash| hash.len() == 64 && hash.bytes().all(|b| b.is_ascii_hexdigit())),
+            "{payloads:?}"
+        );
+        assert_eq!(unsigned, [UNSIGNED, UNSIGNED]);
     }
 
     /// Twelve bytes in a bucket in `region`, where the test store signs for

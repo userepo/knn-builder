@@ -23,6 +23,7 @@ use std::ffi::OsString;
 use std::fmt;
 use std::time::Duration;
 
+use knn_store::{PayloadSigning, Settings};
 use thiserror::Error;
 
 use crate::RecallCheck;
@@ -52,6 +53,10 @@ pub struct Config {
     /// every request must carry them. Unset by default, and every
     /// request's `Authorization` header is ignored.
     pub auth: Option<Credentials>,
+    /// `S3_PAYLOAD_SIGNING_ENABLED`, the service's own: `true` signs
+    /// every upload's body, `false` none. Unset by default, and a body is
+    /// signed over plain HTTP alone.
+    pub payload_signing: PayloadSigning,
 }
 
 impl Default for Config {
@@ -60,6 +65,7 @@ impl Default for Config {
             service: service::Settings::default(),
             log_level: tracing::Level::INFO,
             auth: None,
+            payload_signing: PayloadSigning::default(),
         }
     }
 }
@@ -101,6 +107,17 @@ impl Config {
     /// The first variable whose value the service cannot start with.
     pub fn from_env() -> Result<Self, ConfigError> {
         Self::from_os(|name| std::env::var_os(name))
+    }
+
+    /// S3's settings for the store: `s3`, as
+    /// [`knn_store::Settings::from_env`] reads them, with the payload
+    /// signing read here.
+    #[must_use]
+    pub fn store(&self, s3: Settings) -> Settings {
+        Settings {
+            payload_signing: self.payload_signing,
+            ..s3
+        }
     }
 
     /// Reads the variables `var` gives, as the environment holds them:
@@ -181,6 +198,18 @@ impl Config {
         if let Some(value) = var("LOG_LEVEL") {
             config.log_level = level(&value)?;
         }
+        if let Some(value) = var("S3_PAYLOAD_SIGNING_ENABLED") {
+            config.payload_signing = match value.trim().to_ascii_lowercase().as_str() {
+                "true" => PayloadSigning::Always,
+                "false" => PayloadSigning::Never,
+                _ => {
+                    return Err(error(
+                        "S3_PAYLOAD_SIGNING_ENABLED",
+                        &format!("{value:?} is not true or false"),
+                    ));
+                }
+            };
+        }
         config.auth = match (var("BASIC_AUTH_USERNAME"), var("BASIC_AUTH_PASSWORD")) {
             (None, None) => None,
             (Some(username), Some(password)) => {
@@ -211,7 +240,7 @@ impl Config {
 
 /// Every variable the service reads: its own, and S3's, which
 /// `knn_store::Settings::from_env` reads.
-const VARIABLES: [&str; 18] = [
+const VARIABLES: [&str; 19] = [
     "REQUEST_STORE_TYPE",
     "REQUEST_STORE_MAX_SIZE",
     "REQUEST_STORE_TTL_SECONDS",
@@ -223,6 +252,7 @@ const VARIABLES: [&str; 18] = [
     "RECALL_CHECK_QUERIES",
     "RECALL_CHECK_K",
     "RECALL_CHECK_MIN",
+    "S3_PAYLOAD_SIGNING_ENABLED",
     "MAX_WORKERS",
     "INDEX_SERIALIZATION_MODE",
     "LOG_LEVEL",
@@ -321,6 +351,8 @@ mod tests {
     use std::ffi::OsString;
     use std::time::Duration;
 
+    use knn_store::{PayloadSigning, Settings};
+
     use super::{Config, ConfigError, Credentials, VARIABLES};
     use crate::RecallCheck;
     use crate::cost::CpuThreads;
@@ -357,8 +389,29 @@ mod tests {
             ("LOG_LEVEL", "debug"),
             ("BASIC_AUTH_USERNAME", "admin"),
             ("BASIC_AUTH_PASSWORD", "p:w"),
+            ("S3_PAYLOAD_SIGNING_ENABLED", " True "),
         ])
         .unwrap();
+        assert_eq!(config.payload_signing, PayloadSigning::Always);
+        // The store gets it, with S3's settings as they were read.
+        let s3 = Settings {
+            endpoint_url: Some("http://localhost:4566".to_owned()),
+            region: Some("eu-west-1".to_owned()),
+            payload_signing: PayloadSigning::Never,
+        };
+        assert_eq!(
+            config.store(s3.clone()),
+            Settings {
+                payload_signing: PayloadSigning::Always,
+                ..s3
+            }
+        );
+        assert_eq!(
+            read(&[("S3_PAYLOAD_SIGNING_ENABLED", "false")])
+                .unwrap()
+                .payload_signing,
+            PayloadSigning::Never
+        );
         assert_eq!(config.service.max_jobs, 20);
         assert_eq!(config.service.ttl, Duration::from_secs(60));
         assert_eq!(config.service.gpu_memory_limit, 8e9);
@@ -422,6 +475,14 @@ mod tests {
             ),
             (&[("MAX_WORKERS", "0")], "MAX_WORKERS"),
             (&[("LOG_LEVEL", "LOUD")], "LOG_LEVEL"),
+            (
+                &[("S3_PAYLOAD_SIGNING_ENABLED", "yes")],
+                "S3_PAYLOAD_SIGNING_ENABLED",
+            ),
+            (
+                &[("S3_PAYLOAD_SIGNING_ENABLED", "")],
+                "S3_PAYLOAD_SIGNING_ENABLED",
+            ),
             (&[("BASIC_AUTH_USERNAME", "admin")], "BASIC_AUTH_PASSWORD"),
             (&[("BASIC_AUTH_PASSWORD", "secret")], "BASIC_AUTH_USERNAME"),
             (

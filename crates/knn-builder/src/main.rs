@@ -97,7 +97,7 @@ async fn main() -> ExitCode {
             return ExitCode::FAILURE;
         }
     };
-    let store = Store::new(&Settings::from_env(), Transfers::default()).await;
+    let store = Store::new(&config.store(Settings::from_env()), Transfers::default()).await;
     let service = Arc::new(Service::start(store, builder, config.service).with_gpu_meter(meter));
     tracing::info!(
         version = env!("CARGO_PKG_VERSION"),

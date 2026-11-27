@@ -18,5 +18,5 @@ mod upload;
 
 pub use download::Cancel;
 pub use error::Error;
-pub use store::{Blob, Settings, Store, Transfers};
+pub use store::{Blob, PayloadSigning, Settings, Store, Transfers};
 pub use upload::Upload;

@@ -69,6 +69,9 @@ AWS_SECRET_ACCESS_KEY and AWS_SESSION_TOKEN from this environment, or,
 those unset, finds credentials by the SDKs' default chain (an instance
 role, if the instance metadata service answers containers);
 S3_ENDPOINT_URL, set, names an S3-compatible endpoint instead of AWS's.
+S3_PAYLOAD_SIGNING_ENABLED in this environment reaches knn-builder as it
+is, on either S3, and run.json records it: true has it sign every upload's
+body, as it did before it left them unsigned over HTTPS.
 The host reads and deletes the jobs' files through the s3 service of
 docker-compose.yml, which signs with boto3, so it still needs no AWS
 library.
@@ -256,8 +259,11 @@ class Service:
         # `down` with both profiles, so a run takes down what a run before
         # left, whichever S3 it had.
         self.down_env = {**self.env, "COMPOSE_PROFILES": "localstack,s3"}
-        self.url = f"http://localhost:{self.env['SERVICE_PORT']}"
-        self.s3 = f"http://localhost:{self.env['S3_PORT']}"
+        # 127.0.0.1, where the compose file publishes the ports: Windows
+        # tries localhost's ::1 first, and a refused connection there costs
+        # each request 2 s.
+        self.url = f"http://127.0.0.1:{self.env['SERVICE_PORT']}"
+        self.s3 = f"http://127.0.0.1:{self.env['S3_PORT']}"
         self.log = out / "service.log"
         self.log.write_bytes(b"")
         self.settings = None
@@ -647,6 +653,7 @@ class Bench:
                 "project_link_to_base_layer": args.project,
                 "recall_check_queries": args.recall_queries,
                 "recall_check_k": args.recall_k,
+                "s3_payload_signing_enabled": os.environ.get("S3_PAYLOAD_SIGNING_ENABLED"),
                 "fetch_runs": args.fetch_runs,
                 "gpu_memory_limit_gb": float(gpu_memory_limit()),
                 # Where the bucket was, not its name.

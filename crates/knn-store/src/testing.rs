@@ -1,9 +1,11 @@
 //! Test support: a stand-in for S3 on a local port, for faults LocalStack
 //! cannot make (one object served under every key, HEAD and GET, ranged
 //! or whole, the first GET bodies cut off halfway on demand, PUT taken
-//! and dropped, a bucket in another region than the client's, and a
-//! record of every GET and of every request's path and the region it
-//! was signed for; or a server that reads requests and never answers),
+//! and dropped, a multipart upload started and completed whatever its
+//! parts, a bucket in another region than the client's, and a
+//! record of every GET, of what every PUT says of its body, and of
+//! every request's path and the region it was signed for; or a server
+//! that reads requests and never answers),
 //! and the stores the tests run on it.
 
 use std::io::{BufRead, BufReader, Write};
@@ -30,7 +32,7 @@ pub(crate) fn test_loader() -> ConfigLoader {
 pub(crate) async fn test_store(fake: Option<&FakeS3Server>, transfers: Transfers) -> Store {
     let settings = Settings {
         endpoint_url: fake.map(|fake| fake.endpoint.clone()),
-        region: None,
+        ..Settings::default()
     };
     Store::with_config(&test_loader().load().await, &settings, transfers)
 }
@@ -42,6 +44,15 @@ const E_TAG: &str = "\"fake-e-tag\"";
 pub(crate) struct Get {
     pub(crate) range: Option<String>,
     pub(crate) if_match: Option<String>,
+}
+
+/// What a PUT's headers say of its body, as the fake saw them:
+/// `x-amz-content-sha256`, the body's SHA-256 when the signature covers
+/// it, and `x-amz-checksum-crc32`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Put {
+    pub(crate) payload: Option<String>,
+    pub(crate) crc32: Option<String>,
 }
 
 /// A bucket in another region than the client's: the fake answers a
@@ -72,6 +83,7 @@ pub(crate) struct FakeS3Server {
     /// `http://127.0.0.1:<port>`.
     pub(crate) endpoint: String,
     gets: Arc<Mutex<Vec<Get>>>,
+    puts: Arc<Mutex<Vec<Put>>>,
     signed: Requests,
 }
 
@@ -88,6 +100,7 @@ impl FakeS3Server {
 
     fn serving_from(data: Vec<u8>, cuts: usize, elsewhere: Option<Elsewhere>) -> Self {
         let gets = Arc::new(Mutex::new(Vec::new()));
+        let puts = Arc::new(Mutex::new(Vec::new()));
         let signed = Requests::default();
         let object = Object {
             data,
@@ -95,14 +108,20 @@ impl FakeS3Server {
             elsewhere,
             answered_elsewhere: AtomicUsize::new(0),
             gets: Arc::clone(&gets),
+            puts: Arc::clone(&puts),
             signed: Arc::clone(&signed),
         };
-        Self::start(Some(object), gets, signed)
+        Self::start(Some(object), gets, puts, signed)
     }
 
     /// Reads requests and never answers them.
     pub(crate) fn silent() -> Self {
-        Self::start(None, Arc::default(), Requests::default())
+        Self::start(None, Arc::default(), Arc::default(), Requests::default())
+    }
+
+    /// The PUTs the fake answered so far, in order of arrival.
+    pub(crate) fn puts(&self) -> Vec<Put> {
+        self.puts.lock().unwrap().clone()
     }
 
     /// The GETs so far, in order of arrival.
@@ -115,7 +134,12 @@ impl FakeS3Server {
         self.signed.lock().unwrap().clone()
     }
 
-    fn start(object: Option<Object>, gets: Arc<Mutex<Vec<Get>>>, signed: Requests) -> Self {
+    fn start(
+        object: Option<Object>,
+        gets: Arc<Mutex<Vec<Get>>>,
+        puts: Arc<Mutex<Vec<Put>>>,
+        signed: Requests,
+    ) -> Self {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let endpoint = format!("http://{}", listener.local_addr().unwrap());
         let object = object.map(Arc::new);
@@ -129,6 +153,7 @@ impl FakeS3Server {
         Self {
             endpoint,
             gets,
+            puts,
             signed,
         }
     }
@@ -142,6 +167,7 @@ struct Object {
     /// Answers given for the wrong region so far.
     answered_elsewhere: AtomicUsize,
     gets: Arc<Mutex<Vec<Get>>>,
+    puts: Arc<Mutex<Vec<Put>>>,
     signed: Requests,
 }
 
@@ -182,7 +208,27 @@ impl Object {
                 return out.write_all(head.as_bytes()).is_ok();
             }
         }
+        if request.method == "POST" {
+            // A multipart upload's start, which names it, or its end.
+            let starts = request.query.split('&').any(|field| field == "uploads");
+            let body = if starts {
+                "<InitiateMultipartUploadResult><UploadId>fake-upload</UploadId>\
+                 </InitiateMultipartUploadResult>"
+            } else {
+                "<CompleteMultipartUploadResult></CompleteMultipartUploadResult>"
+            };
+            let head = format!(
+                "HTTP/1.1 200 OK\r\ncontent-type: application/xml\r\n\
+                 content-length: {}\r\n\r\n{body}",
+                body.len()
+            );
+            return out.write_all(head.as_bytes()).is_ok();
+        }
         if request.method == "PUT" {
+            self.puts.lock().unwrap().push(Put {
+                payload: request.header("x-amz-content-sha256").map(str::to_owned),
+                crc32: request.header("x-amz-checksum-crc32").map(str::to_owned),
+            });
             let head = format!("HTTP/1.1 200 OK\r\ncontent-length: 0\r\netag: {E_TAG}\r\n\r\n");
             return out.write_all(head.as_bytes()).is_ok();
         }
@@ -239,6 +285,8 @@ struct Request {
     method: String,
     /// Without the query.
     path: String,
+    /// What follows the path's `?`; empty without one.
+    query: String,
     /// Names in lowercase.
     headers: Vec<(String, String)>,
 }
@@ -331,7 +379,9 @@ fn read_request(reader: &mut impl BufRead) -> Option<Request> {
     }
     let mut words = line.split_whitespace();
     let method = words.next()?.to_owned();
-    let path = words.next()?.split('?').next()?.to_owned();
+    let target = words.next()?;
+    let (path, query) = target.split_once('?').unwrap_or((target, ""));
+    let (path, query) = (path.to_owned(), query.to_owned());
     let mut headers = Vec::new();
     loop {
         let mut line = String::new();
@@ -343,6 +393,7 @@ fn read_request(reader: &mut impl BufRead) -> Option<Request> {
             let request = Request {
                 method,
                 path,
+                query,
                 headers,
             };
             drop_body(reader, &request)?;
