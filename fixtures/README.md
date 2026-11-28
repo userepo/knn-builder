@@ -145,3 +145,12 @@ Without the projection the two services build alike: a component a cluster on th
 - `environment.json`: the host and the versions.
 
 The upstream service ran its two workers through every phase without the crash it has under WSL2. The burst was not run: two of its four float inputs take longer than its 90 s to build alone on this host. The `gpu.csv` samples and the services' logs are left out, as in `bench/`.
+
+`ea7db9f/bench-cloud-g5/` holds the same benchmark on a second cloud host: an EC2 g5.2xlarge (NVIDIA A10G, 24 GB), with the same two images and `GPU_MEMORY_LIMIT=24`. Its layout is that of `bench-cloud/`.
+
+- `single/`: the single builds of the 17 inputs, five of each. All 170 builds completed.
+- `load/`: the concurrent rounds and the burst (`--phases concurrent,burst`). All 240 concurrent jobs completed. Of each burst's 48 jobs, knn-builder built 5 (binary), 7 (float) and 10 (byte) and refused or dropped the rest; the upstream service built 4, 3 and 10, and the rest timed out.
+- `upload-signing/`: the 1.4.0 image's three single builds of each of the same three float inputs, as it is (`unsigned/`) and with `S3_PAYLOAD_SIGNING_ENABLED=true` (`signed/`), on a processor with SHA extensions. The median uploads of cohere-768, gist-960 and sift-128 took 5.9, 7.2 and 1.6 s unsigned and 6.5, 8.1 and 1.8 s signed. Each `run.json` records the setting as `s3_payload_signing_enabled`.
+- `environment.json`: the host and the versions.
+
+The hour of sustained jobs was not run on this host. The `gpu.csv` samples, the metrics pages and the services' logs are left out.

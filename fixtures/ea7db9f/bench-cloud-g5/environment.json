@@ -1,0 +1,104 @@
+{
+ "host": {
+  "instance": "EC2 g5.2xlarge, us-east-2c, AMI ami-00190236a21f16738",
+  "cpu": "AMD EPYC 7R32, 8 vCPUs, all with SHA extensions",
+  "memory_gb": 32,
+  "os": "Ubuntu 24.04.4 LTS, kernel 6.17.0-1020-aws",
+  "gpu": "NVIDIA A10G, 23028 MiB",
+  "driver": "595.91.07"
+ },
+ "docker": {
+  "engine": "Docker 29.7.2 on the host, Compose 5.5.0",
+  "gpu": "NVIDIA container toolkit 1.20.0, --gpus all"
+ },
+ "services": {
+  "knn-builder": {
+   "image": "userepo/knn-builder:1.4.0",
+   "image_id": "sha256:853f84eb0323af9b19de61c302c10dc955e27025646344a7d8e2eb40896dbf0a",
+   "commit": "ff64090",
+   "libcuvs": "26.08.01",
+   "cuda": "12.9",
+   "max_workers": "2, read and ignored: one build at a time on the GPU, the next job downloading and the last uploading meanwhile",
+   "note": "pulled from Docker Hub and tagged knn-builder:dev on the host, the image the run.json files name"
+  },
+  "upstream": {
+   "image": "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "commit": "ea7db9f",
+   "libcuvs": "26.08.01",
+   "faiss": "1.14.3",
+   "cuda": "12.9",
+   "python": "3.11.15",
+   "max_workers": 2,
+   "note": "its default two workers: no crash on this host, in any phase"
+  },
+  "upload-signing": {
+   "image": "userepo/knn-builder:1.4.0",
+   "note": "the release's image: unsigned/ as it is, signed/ with S3_PAYLOAD_SIGNING_ENABLED=true, which each run.json records as s3_payload_signing_enabled"
+  }
+ },
+ "s3": "a bucket in us-east-2, through the instance's role; no LocalStack",
+ "settings": {
+  "gpu_memory_limit_gb": 24,
+  "single": {
+   "phases": [
+    "single"
+   ],
+   "runs": 5
+  },
+  "load": {
+   "phases": [
+    "concurrent",
+    "burst"
+   ],
+   "rounds": 5,
+   "concurrent": 8,
+   "burst_jobs": 48,
+   "burst_timeout_seconds": 90
+  },
+  "upload-signing": {
+   "phases": [
+    "single"
+   ],
+   "runs": 3,
+   "inputs": [
+    "cohere-ip-1000000x768",
+    "gist-ip-1000000x960",
+    "sift-l2-1000000x128"
+   ]
+  }
+ },
+ "runs": {
+  "single/knn-builder": {
+   "started": "2026-11-28T02:36:32.981289+00:00",
+   "ended": "2026-11-28T03:05:32.991888+00:00"
+  },
+  "single/upstream": {
+   "started": "2026-11-28T03:05:35.446751+00:00",
+   "ended": "2026-11-28T03:42:11.744290+00:00"
+  },
+  "load/knn-builder": {
+   "started": "2026-11-28T03:46:17.817140+00:00",
+   "ended": "2026-11-28T04:20:00.284347+00:00"
+  },
+  "load/upstream": {
+   "started": "2026-11-28T04:20:00.388381+00:00",
+   "ended": "2026-11-28T05:00:01.557676+00:00"
+  },
+  "upload-signing/unsigned": {
+   "started": "2026-11-28T05:21:45.682811+00:00",
+   "ended": "2026-11-28T05:28:12.068097+00:00"
+  },
+  "upload-signing/signed": {
+   "started": "2026-11-28T05:28:12.169673+00:00",
+   "ended": "2026-11-28T05:34:11.503829+00:00"
+  }
+ },
+ "recall": {
+  "tool": "knn-inspect 0.18.0",
+  "queries": 100,
+  "k": 10,
+  "seed": 1
+ },
+ "runner": "tools/bench of knn-builder at 1ce7ce0"
+}

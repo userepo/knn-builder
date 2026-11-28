@@ -1,0 +1,4006 @@
+{
+ "service": "knn-builder",
+ "image": "knn-builder:dev",
+ "image_id": "sha256:853f84eb0323af9b19de61c302c10dc955e27025646344a7d8e2eb40896dbf0a",
+ "max_workers": 2,
+ "gpu": {
+  "name": "NVIDIA A10G",
+  "driver": "595.91.07",
+  "memory_mib": 23028
+ },
+ "started": "2026-11-28T03:46:17.817140+00:00",
+ "settings": {
+  "runs": 5,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 0,
+  "recall_check_k": 10,
+  "s3_payload_signing_enabled": null,
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 24.0,
+  "s3": {
+   "store": "s3",
+   "region": "us-east-2",
+   "endpoint": "aws"
+  }
+ },
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": {
+   "dir": "target/bench/inputs/cohere-hamming-1000000x768-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "gist-ip-1000000x960": {
+   "dir": "target/bench/inputs/gist-ip-1000000x960",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "gist-l2-1000000x960": {
+   "dir": "target/bench/inputs/gist-l2-1000000x960",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-hamming-1000000x384-binary": {
+   "dir": "target/bench/inputs/ms-marco-hamming-1000000x384-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "sift-hamming-1000000x128-binary": {
+   "dir": "target/bench/inputs/sift-hamming-1000000x128-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-hamming-1000000x768-binary",
+   "index": 0,
+   "job_id": "3b6e80b2d8527d2369328fd1261842943688c5458dd9928f9b791a86af07516d",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 21.2,
+   "start": "2026-11-28T03:47:44.675107+00:00",
+   "end": "2026-11-28T03:48:05.874718+00:00",
+   "host_peak_bytes": 2673500160,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 0.415524137,
+    "build": 19.714321127,
+    "upload": 1.004187155
+   },
+   "device_samples": 422,
+   "device_held_bytes": 271581184,
+   "device_peak_bytes": 497025024
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 1,
+   "job_id": "30af14eeed7dfd8cca25701e8e468c8266c65c7a041398697340659fbff4b2c4",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 28.01,
+   "start": "2026-11-28T03:48:06.257964+00:00",
+   "end": "2026-11-28T03:48:34.268205+00:00",
+   "host_peak_bytes": 4303503360,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 5.529536005,
+    "build": 15.744254937000001,
+    "upload": 6.301664973
+   },
+   "device_samples": 558,
+   "device_held_bytes": 273678336,
+   "device_peak_bytes": 996147200
+  },
+  {
+   "input": "cohere-ip-1000000x768-byte",
+   "index": 2,
+   "job_id": "bacc2d69552f29eaea2f5a4b248bc3690b120899f98f411341023e7f219796b0",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 16.902,
+   "start": "2026-11-28T03:48:34.632076+00:00",
+   "end": "2026-11-28T03:48:51.533904+00:00",
+   "host_peak_bytes": 2013876224,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 1.458697694,
+    "build": 12.565770947,
+    "upload": 2.689935551
+   },
+   "device_samples": 337,
+   "device_held_bytes": 445644800,
+   "device_peak_bytes": 668991488
+  },
+  {
+   "input": "cohere-hamming-1000000x768-binary",
+   "index": 0,
+   "job_id": "fb240ab9f1fdd8249c7399570caa6c5cbc4461beae44358331da8852f3522d30",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 21.201,
+   "start": "2026-11-28T04:14:47.544915+00:00",
+   "end": "2026-11-28T04:15:08.746415+00:00",
+   "host_peak_bytes": 2681389056,
+   "file_name": "vectors.faiss",
+   "phase": "burst",
+   "process": 2,
+   "seconds": {
+    "download": 0.394673028,
+    "build": 19.657890122,
+    "upload": 0.933989827
+   },
+   "device_samples": 423,
+   "device_held_bytes": 271581184,
+   "device_peak_bytes": 492830720
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 1,
+   "job_id": "9fc6652d7d8a0904b4859878174ace69f1cb488f7cbbfc6ca944613b2b6d35a0",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 27.005,
+   "start": "2026-11-28T04:16:30.489502+00:00",
+   "end": "2026-11-28T04:16:57.494755+00:00",
+   "host_peak_bytes": 4224143360,
+   "file_name": "vectors.faiss",
+   "phase": "burst",
+   "process": 3,
+   "seconds": {
+    "download": 5.271707206,
+    "build": 15.179977361,
+    "upload": 6.185317233
+   },
+   "device_samples": 538,
+   "device_held_bytes": 271581184,
+   "device_peak_bytes": 996147200
+  },
+  {
+   "input": "cohere-ip-1000000x768-byte",
+   "index": 2,
+   "job_id": "0ba7fc4f9c41c2407e223bdac99dd137f0a032016aaa45a732cfab4a9740aed4",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 16.914,
+   "start": "2026-11-28T04:18:15.710715+00:00",
+   "end": "2026-11-28T04:18:32.625106+00:00",
+   "host_peak_bytes": 1896697856,
+   "file_name": "vectors.faiss",
+   "phase": "burst",
+   "process": 4,
+   "seconds": {
+    "download": 1.424310394,
+    "build": 12.831698353,
+    "upload": 2.5058998900000002
+   },
+   "device_samples": 337,
+   "device_held_bytes": 271581184,
+   "device_peak_bytes": 847249408
+  }
+ ],
+ "scrapes": [
+  {
+   "process": 1,
+   "file": "metrics/process-1.txt",
+   "at": "2026-11-28T04:14:43.850895+00:00"
+  },
+  {
+   "process": 2,
+   "file": "metrics/process-2.txt",
+   "at": "2026-11-28T04:16:28.682168+00:00"
+  },
+  {
+   "process": 3,
+   "file": "metrics/process-3.txt",
+   "at": "2026-11-28T04:18:13.848225+00:00"
+  },
+  {
+   "process": 4,
+   "file": "metrics/process-4.txt",
+   "at": "2026-11-28T04:19:49.209633+00:00"
+  }
+ ],
+ "concurrent": {
+  "binary": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7fa77d639e76cddd941dbcea2a23517db414f0f2bb95910332c5d26de3c4d152",
+     "post_seconds": 0.007126068000616215,
+     "outcome": "built",
+     "seen_after": 113.32593534999978,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.407638887,
+      "build": 19.697282817,
+      "upload": 1.022062513
+     }
+    },
+    {
+     "index": 9,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "869e55810f25f1d7f8e1bf755f05417156023c23503b3f384b368bb6dce6f682",
+     "post_seconds": 0.005394098999204289,
+     "outcome": "built",
+     "seen_after": 32.85361146899959,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.23307107,
+      "build": 14.041418529,
+      "upload": 1.10725501
+     }
+    },
+    {
+     "index": 10,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9f286b38f80aa4305874ca93e66276a5f4c3fd551e668c27448d011af51d30a7",
+     "post_seconds": 0.0069344849998742575,
+     "outcome": "built",
+     "seen_after": 94.039217302,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.295555002,
+      "build": 12.137870417,
+      "upload": 0.866426866
+     }
+    },
+    {
+     "index": 11,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "1625d7ccecdcf0892dbe9be94a59e601da0eb5ba5c16802c7accf61e7d89e400",
+     "post_seconds": 0.006266353999308194,
+     "outcome": "built",
+     "seen_after": 81.33701333299996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.410154063,
+      "build": 19.633291425,
+      "upload": 1.030347263
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "43480be24cdc7fe76f38212f7f35ba9b58eabd21767dc02c47b68d18ee38181e",
+     "post_seconds": 0.0056995939994521905,
+     "outcome": "built",
+     "seen_after": 18.56541092899988,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.254891561,
+      "build": 14.06817764,
+      "upload": 0.959760939
+     }
+    },
+    {
+     "index": 13,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9c7f64b1c5ab4e0accf4dda018f0ad59f4151b6d32d854ce745732929126f505",
+     "post_seconds": 0.005657374000293203,
+     "outcome": "built",
+     "seen_after": 42.88584118699964,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.317982978,
+      "build": 12.101452501,
+      "upload": 0.93268086
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "77c559611c807dd483dc11e64c2494828207825798a4837d766d1b4e4a07f4d6",
+     "post_seconds": 0.00535379900065891,
+     "outcome": "built",
+     "seen_after": 64.76949996099938,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.536307274,
+      "build": 19.653932993,
+      "upload": 1.045710876
+     }
+    },
+    {
+     "index": 15,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d88df478daa5a9550fda15fbafc4c9f63a93d7016bc87978b6dae1391dea3772",
+     "post_seconds": 0.0058818070001507294,
+     "outcome": "built",
+     "seen_after": 127.29992889699952,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.338545375,
+      "build": 14.048798909,
+      "upload": 0.853693842
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c7db9ded74cea51f6c80df69367be29eace4b8462ea0e5103fa8e6c32b9127f1",
+     "post_seconds": 0.006084818999624986,
+     "outcome": "built",
+     "seen_after": 68.09488072500062,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.425265657,
+      "build": 19.684635424,
+      "upload": 1.008219165
+     }
+    },
+    {
+     "index": 17,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "5573405de975c8ce0eb658bea808ae6e0a6b821fcdd9c17877d343dd821c81d8",
+     "post_seconds": 0.005917005999435787,
+     "outcome": "built",
+     "seen_after": 82.29336266200062,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.313862829,
+      "build": 14.048706868,
+      "upload": 1.04167959
+     }
+    },
+    {
+     "index": 18,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d6e9ad623faf8d034e16a5da0a24417c2423897ca7904077fb44b2a8fa453bc8",
+     "post_seconds": 0.004909067999506078,
+     "outcome": "built",
+     "seen_after": 36.89474607200009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.290089681,
+      "build": 12.07233764,
+      "upload": 0.921353812
+     }
+    },
+    {
+     "index": 19,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d8fc309d85cbd669622a0f90176725e8d0325d98bd5136e7b55875b2be97aab1",
+     "post_seconds": 0.0070002660004320205,
+     "outcome": "built",
+     "seen_after": 102.77195890700023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.472752571,
+      "build": 19.637309092,
+      "upload": 1.064978803
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "06440cd95ccd37b9318f18db9af809507fe080951f55532a3398bbc601c9ca4b",
+     "post_seconds": 0.006780832000004011,
+     "outcome": "built",
+     "seen_after": 114.67477147699992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.320841203,
+      "build": 14.066958484,
+      "upload": 0.98013388
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6b61763854d60c4f84b552805f44374e3b90559ebe962f21bc404c9967045f5b",
+     "post_seconds": 0.005861734999598411,
+     "outcome": "built",
+     "seen_after": 45.80247833000067,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.325100025,
+      "build": 12.073362293,
+      "upload": 0.875937563
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7156d8259d10a123d8ff1243d1d93a80f2ec9b52f5ea7d06be0ba39c170ca3ee",
+     "post_seconds": 0.00540930599981948,
+     "outcome": "built",
+     "seen_after": 23.91580632700061,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.349155289,
+      "build": 19.580349524,
+      "upload": 0.950741099
+     }
+    },
+    {
+     "index": 23,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "480e8fc85e8797e5c59b0048de04f6b42c7af5e55dbe6bb6fb79c904c39d92bb",
+     "post_seconds": 0.004607251999914297,
+     "outcome": "built",
+     "seen_after": 128.17953711000064,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.332744193,
+      "build": 14.027778908,
+      "upload": 0.883793787
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "1619c9c00803a3b716c917bac6470c2a6608e7a6025dabc995bd9e1cc078f622",
+     "post_seconds": 0.006047199000022374,
+     "outcome": "built",
+     "seen_after": 70.0406829829999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.36635528,
+      "build": 19.650673825,
+      "upload": 1.109075132
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8893ca4e4ddddb2a892210bb58f558cb11b9c9d12e37984c20cc2e23d35a3095",
+     "post_seconds": 0.004128753999793844,
+     "outcome": "built",
+     "seen_after": 19.918683399000656,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.203209784,
+      "build": 13.912714786,
+      "upload": 1.072360689
+     }
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c3df3b1b9cff66b40a7c1e61df3c7a79dca0f10e805dfdbc63ad7e341bd3facd",
+     "post_seconds": 0.0059614379997583455,
+     "outcome": "built",
+     "seen_after": 117.4654697800006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.3211097,
+      "build": 12.034059451,
+      "upload": 0.89139501
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "aefdf1453d0e91589f312f00726c1ef3e659aa2771743b5a60f771b687b99f4c",
+     "post_seconds": 0.006632530000388215,
+     "outcome": "built",
+     "seen_after": 51.29629835100059,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.456923343,
+      "build": 19.704579541,
+      "upload": 0.996995153
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "544d78457703d318599d49153f419c11b7610ea8afae61c08ba47067b93e6d4e",
+     "post_seconds": 0.00688347400046041,
+     "outcome": "built",
+     "seen_after": 83.36046686600002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.275313199,
+      "build": 14.028900528,
+      "upload": 0.929280576
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "e447ce0c1264f537e58c1541d00097df2ee9fdd4f3add0fc83bd95af26fb0633",
+     "post_seconds": 0.005072261999885086,
+     "outcome": "built",
+     "seen_after": 28.745500308999908,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.284735597,
+      "build": 12.068077635,
+      "upload": 0.855684582
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e0445a9061bd71aa0c41fe57c5066e802ab81d5474374c436bc1c9fa7c3f1518",
+     "post_seconds": 0.006655470000623609,
+     "outcome": "built",
+     "seen_after": 102.8721598760003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.420910476,
+      "build": 19.681663324,
+      "upload": 1.067791452
+     }
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "16ca67d0e34051b223db96bc72e81e22c9c69ccd3f603cd334fc4eafa0be19c0",
+     "post_seconds": 0.007203359999948589,
+     "outcome": "built",
+     "seen_after": 127.57159169999977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.326311636,
+      "build": 14.042266536,
+      "upload": 1.01162006
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "248f87abc32ba047dc9c84860d30b3c9c62723956d6e4a023ae5a777e3a1accf",
+     "post_seconds": 0.006769771999643126,
+     "outcome": "built",
+     "seen_after": 86.18772219699986,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.419709609,
+      "build": 19.6510936,
+      "upload": 0.991965556
+     }
+    },
+    {
+     "index": 33,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "5ffb120c6764fa768ebf2496fc5ea3df13e40dde071f216e9074d9391b03a8da",
+     "post_seconds": 0.006661829999757174,
+     "outcome": "built",
+     "seen_after": 65.2971225020001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.288449962,
+      "build": 13.948583136,
+      "upload": 0.943132583
+     }
+    },
+    {
+     "index": 34,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "2beb729890dc537038a18d653b45b16f346cd5a21df9d1102b672883b5d0b4f0",
+     "post_seconds": 0.0063806949992795126,
+     "outcome": "built",
+     "seen_after": 96.88034781900024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.338882897,
+      "build": 12.066143824,
+      "upload": 0.83042341
+     }
+    },
+    {
+     "index": 35,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "2330d7e80fa04d1e16329792143af1f9b0f5812278d94a56b30f9e06775706a1",
+     "post_seconds": 0.0052303340007711085,
+     "outcome": "built",
+     "seen_after": 37.43309769700045,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.406901601,
+      "build": 19.652994778,
+      "upload": 0.975247617
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3c2f36c7a811006f61a8dd547c5ac361b121309d526c5dd948feba3d8646c52a",
+     "post_seconds": 0.00662657999964722,
+     "outcome": "built",
+     "seen_after": 50.54815073500049,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.257556674,
+      "build": 14.030367791,
+      "upload": 1.001807424
+     }
+    },
+    {
+     "index": 37,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "b5f7654955990ac136e6e27bce7c3a34996bae93b0f5580456cbaef2325137a2",
+     "post_seconds": 0.006211522000739933,
+     "outcome": "built",
+     "seen_after": 111.4782184880005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.283075939,
+      "build": 12.113704943,
+      "upload": 0.810797559
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e2d1d21f75f1c79c030bd700dccb35a1e2c3ef04b52a38125881cd50d0d178d8",
+     "post_seconds": 0.006672049999906449,
+     "outcome": "built",
+     "seen_after": 129.60308901900044,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.401586613,
+      "build": 19.689107078,
+      "upload": 0.894105357
+     }
+    },
+    {
+     "index": 39,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d163bbb7f22a150877deefe7c1654f1822808f6fd6c35689db8c0bd4c0cfc21b",
+     "post_seconds": 0.004964239999935671,
+     "outcome": "built",
+     "seen_after": 16.644148501000018,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.199761774,
+      "build": 13.94219467,
+      "upload": 0.973505802
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "b95e7ab2e82139eb42fc4528c1522c1f1747a5c965fdc228f2842e84419e3121",
+     "post_seconds": 0.006984646000091743,
+     "outcome": "built",
+     "seen_after": 62.12315093899997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.432224945,
+      "build": 19.675431736,
+      "upload": 1.017712619
+     }
+    },
+    {
+     "index": 41,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "45ed0ed5d9b1e7da38fb9cccceb72ccae84a7c22a2d2d840627dc485d2c17eda",
+     "post_seconds": 0.00738700300007622,
+     "outcome": "built",
+     "seen_after": 128.21511577799993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.284063099,
+      "build": 14.003153509,
+      "upload": 0.898112165
+     }
+    },
+    {
+     "index": 42,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "8fe44d7bbec18922b308cede5e2c50b61a9a4790bc04369093e74c70532bfb9c",
+     "post_seconds": 0.005501829999957408,
+     "outcome": "built",
+     "seen_after": 28.08131092199983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.29178491,
+      "build": 12.108897311,
+      "upload": 0.944760699
+     }
+    },
+    {
+     "index": 43,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e5cb49a42edd7de995b0832a2d25998f6363083b170026683f539fbbd226cec1",
+     "post_seconds": 0.006770753000637342,
+     "outcome": "built",
+     "seen_after": 114.86200716999974,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.436852942,
+      "build": 19.659777109,
+      "upload": 0.964672576
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "41e87170435bc08213fc339033b49d496916998c3c002cd7c72ad983267466fa",
+     "post_seconds": 0.0064181959996858495,
+     "outcome": "built",
+     "seen_after": 42.194264204999854,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.289926574,
+      "build": 14.041442699,
+      "upload": 1.041495364
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6c5815b69ab6d84ccc174de642c2bff694c317320ff56637097c138c3a4d7789",
+     "post_seconds": 0.006400595999366487,
+     "outcome": "built",
+     "seen_after": 92.6889971820001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.322546961,
+      "build": 12.103921749,
+      "upload": 0.868876684
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "4d0b45ce3cc8793017ea76a80504f1ba7b40af0e21a9683cd530de747a3a0aaa",
+     "post_seconds": 0.006370994999997492,
+     "outcome": "built",
+     "seen_after": 83.677692493,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.351174957,
+      "build": 19.662755828999998,
+      "upload": 1.05586596
+     }
+    },
+    {
+     "index": 47,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3589aa6ef9cf56851fae387f528acb6c6ba111e949031961a9a2da1ec1ce4a01",
+     "post_seconds": 0.0068606639997597085,
+     "outcome": "built",
+     "seen_after": 17.76960392899946,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.194773688,
+      "build": 13.899076594,
+      "upload": 0.99975057
+     }
+    }
+   ]
+  },
+  "float": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "21dfc0b694efb9cb8b5635456584a7aec665fdd2959e67f75b8da04aa7dc75ce",
+     "post_seconds": 0.006349173999296909,
+     "outcome": "built",
+     "seen_after": 58.35146587999952,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.061874643,
+      "build": 14.007093829,
+      "upload": 6.47096127
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "e79e99679a7fb1b088d186e0ecfc0090c341ec7c4d1908c8687b6cfa187e1111",
+     "post_seconds": 0.007297471000129008,
+     "outcome": "built",
+     "seen_after": 107.21000667299995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.695099445,
+      "build": 13.600488769,
+      "upload": 6.074208288
+     }
+    },
+    {
+     "index": 10,
+     "input": "gist-ip-1000000x960",
+     "job_id": "a19a3f242fee8643a6196f610a31fdd055ffdda17a8cc862403bda95078496fd",
+     "post_seconds": 0.0059681869997803005,
+     "outcome": "built",
+     "seen_after": 43.01668759799941,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 6.743335451,
+      "build": 16.548056204,
+      "upload": 8.646308087
+     }
+    },
+    {
+     "index": 11,
+     "input": "gist-l2-1000000x960",
+     "job_id": "47d1b9eb38cf768ed45d6c81871350a406d5063d7bc193ed66e6a4988c97967f",
+     "post_seconds": 0.005881915999452758,
+     "outcome": "built",
+     "seen_after": 87.31764932399983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 6.983207318,
+      "build": 18.084383752,
+      "upload": 7.55065383
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "350df600d20ab206d86ed7d66725f993504e7313c4a98b912837a0a7f1ec54b5",
+     "post_seconds": 0.0059747569994215155,
+     "outcome": "built",
+     "seen_after": 14.408551345999513,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.702618601,
+      "build": 7.178004127,
+      "upload": 3.515960428
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "d129b39141c3dd3f6519d998a932aa294f915643857cbc09353059cc1d2b6db2",
+     "post_seconds": 0.005995468000037363,
+     "outcome": "built",
+     "seen_after": 62.74962956999934,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.96054301,
+      "build": 10.734036892,
+      "upload": 3.5380336850000003
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-ip-1000000x128",
+     "job_id": "eac37e1dffe2b6972c3389e807a995ef80294b07c5ebac9b94b822f6fc10cb8c",
+     "post_seconds": 0.005270075000225916,
+     "outcome": "built",
+     "seen_after": 18.667283640999813,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.060279179,
+      "build": 4.059498954,
+      "upload": 1.5978586259999998
+     }
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "5a72d14cef792ea8dedd68d7de5694c6354c3da9eacd0108748a3c9e19f60116",
+     "post_seconds": 0.0061836109998694155,
+     "outcome": "built",
+     "seen_after": 88.10349442199913,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.165094544,
+      "build": 3.987354572,
+      "upload": 1.845358203
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "42d13c3a3c5ea13f39cdd83cdcc30c87c786d3da5c4d049df5761a1a1becbe09",
+     "post_seconds": 0.005744121000134328,
+     "outcome": "built",
+     "seen_after": 72.2089323629998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 5.320205516,
+      "build": 14.256598415,
+      "upload": 6.342302952
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "ae77c5b68ebb15fe4304475760095185ba20049df4190b4ecf814ac0867f2484",
+     "post_seconds": 0.006990513999880932,
+     "outcome": "built",
+     "seen_after": 87.31263073099944,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 5.64479895,
+      "build": 14.104673432,
+      "upload": 6.330694686
+     }
+    },
+    {
+     "index": 18,
+     "input": "gist-ip-1000000x960",
+     "job_id": "08b5ccdc79c084a7e3960c4b1d2c22c9152814bee9465af65a012e785406cfa4",
+     "post_seconds": 0.006140128999504668,
+     "outcome": "built",
+     "seen_after": 32.749676133999856,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 6.766431269,
+      "build": 16.572955541,
+      "upload": 7.5860842139999995
+     }
+    },
+    {
+     "index": 19,
+     "input": "gist-l2-1000000x960",
+     "job_id": "57186439b511c355e1673f1b2e15f8ad2171bc68e39a0c2ccb6c001e94442fc6",
+     "post_seconds": 0.005316124000273703,
+     "outcome": "built",
+     "seen_after": 59.86168690199975,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 6.988834124,
+      "build": 18.517999758,
+      "upload": 7.630773328
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "2f59030798485b6384ec9abd6b37b68e8c555d9d03317990cfe2b20e34e55429",
+     "post_seconds": 0.004972147999978915,
+     "outcome": "built",
+     "seen_after": 37.52051768000001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.7686652880000002,
+      "build": 8.303756075999999,
+      "upload": 3.547720997
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "a4369a83f6d8c086d75f86b9167eb7587899a900e64c035148ea5c1fc8125c0f",
+     "post_seconds": 0.0071051059994715615,
+     "outcome": "built",
+     "seen_after": 100.29508725100004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.895185566,
+      "build": 7.371202117,
+      "upload": 3.445054533
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128",
+     "job_id": "8c39ca09ee75fe0b483bbefe4656fad72bcbc89761cefda04970adc4e2deafc4",
+     "post_seconds": 0.0060265069996603415,
+     "outcome": "built",
+     "seen_after": 94.7379252869996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.105227036,
+      "build": 3.5840744129999997,
+      "upload": 1.6632918669999999
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "f8a9eff79dafe4b2b0673cb41b7ef79ae086f2b532ce855ef91accc163ce617a",
+     "post_seconds": 0.006056788000023516,
+     "outcome": "built",
+     "seen_after": 89.71681747399998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.157304173,
+      "build": 3.798746123,
+      "upload": 1.69045429
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "aeebe569dfc943c7f5af099c0d3ec7c76644047fc9155a4fc8d4b1136297f7c1",
+     "post_seconds": 0.007261318999553623,
+     "outcome": "built",
+     "seen_after": 99.80102669899952,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 5.490967244,
+      "build": 13.431495738,
+      "upload": 5.940246853
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "06af9e562e1f7eb201cba30f7e7c86443d322e82310db4201724958c3850cf80",
+     "post_seconds": 0.005722732000322139,
+     "outcome": "built",
+     "seen_after": 49.1896306689996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 5.677572919,
+      "build": 14.343111854,
+      "upload": 6.132243356
+     }
+    },
+    {
+     "index": 26,
+     "input": "gist-ip-1000000x960",
+     "job_id": "a29bfb3517020284c2fcfefea982cfee391820ada10e5a9b616fe21c9793922f",
+     "post_seconds": 0.005701910999960091,
+     "outcome": "built",
+     "seen_after": 35.835325422000096,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 7.22841142,
+      "build": 17.254499427,
+      "upload": 7.590522482
+     }
+    },
+    {
+     "index": 27,
+     "input": "gist-l2-1000000x960",
+     "job_id": "76d23bb4f7195a4493c4cc953d63734b4b5fce98cdc8386b675d0da11eada59b",
+     "post_seconds": 0.006550906000484247,
+     "outcome": "built",
+     "seen_after": 87.44009945699963,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 7.034286839,
+      "build": 18.70013262,
+      "upload": 7.437305173
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "01d69b88ca10fef9bc56224486dd81ec58fc787038a8e424c9f9fbdaf326e162",
+     "post_seconds": 0.006266192000111914,
+     "outcome": "built",
+     "seen_after": 65.29768596099984,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.883783717,
+      "build": 7.884009232,
+      "upload": 3.618029302
+     }
+    },
+    {
+     "index": 29,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "96647cdf8c2c7fe1595b365aeb5021515edf154c8e6acf8d230b176d6f3713ce",
+     "post_seconds": 0.006098559000747628,
+     "outcome": "built",
+     "seen_after": 52.6528208969994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.924599985,
+      "build": 7.758306899,
+      "upload": 3.5670596
+     }
+    },
+    {
+     "index": 30,
+     "input": "sift-ip-1000000x128",
+     "job_id": "4180430a00a9390cf65729121fd2621f995e571dda97c3873480d564aef07337",
+     "post_seconds": 0.006370553000124346,
+     "outcome": "built",
+     "seen_after": 57.27371339599995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.114321808,
+      "build": 3.90022996,
+      "upload": 1.7830196809999999
+     }
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "28df0efbb2ddf58a0d07e3d061c485ca15b3292cf4b96c495f4c8a49050b7107",
+     "post_seconds": 0.004153463999500673,
+     "outcome": "built",
+     "seen_after": 17.58417369400013,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.034506602,
+      "build": 3.781321576,
+      "upload": 1.671869689
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "c478d8cbc0e46243cc3d8ecac98412ff8b4eb1091b41bafea345c74497ad1ecc",
+     "post_seconds": 0.006376793999152142,
+     "outcome": "built",
+     "seen_after": 61.36424429199997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 5.807286712,
+      "build": 13.740507547,
+      "upload": 6.232237234
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "84a468e467814c46ef9bf6719ef01451691987523781cf142909765343e57b86",
+     "post_seconds": 0.004455020000023069,
+     "outcome": "built",
+     "seen_after": 26.906633116000194,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 5.221437615,
+      "build": 13.582593672,
+      "upload": 6.3685319400000004
+     }
+    },
+    {
+     "index": 34,
+     "input": "gist-ip-1000000x960",
+     "job_id": "7359cc40e6a2434e8cfb30ecbd2d0e2754cab66b193070ded5236e57b6c11469",
+     "post_seconds": 0.007357970999692043,
+     "outcome": "built",
+     "seen_after": 102.5826747330002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 7.059509731,
+      "build": 17.644124462,
+      "upload": 7.497903062
+     }
+    },
+    {
+     "index": 35,
+     "input": "gist-l2-1000000x960",
+     "job_id": "9280e17ecd6483e063dee48c93204e2c6f5b82be80bd898013343d8d38aba069",
+     "post_seconds": 0.006776290999368939,
+     "outcome": "built",
+     "seen_after": 82.19026969399965,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 6.650906832,
+      "build": 18.951977376,
+      "upload": 7.664384044
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "227fcb8289cf37f719bfdb6e4e8eb0d0a3ce8a1f971914016f34a41f5a9064e7",
+     "post_seconds": 0.006826631999501842,
+     "outcome": "built",
+     "seen_after": 41.111620181000035,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.813448505,
+      "build": 7.46135721,
+      "upload": 3.5507336609999998
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "401fa66f1aaa23f1059b194b40c769b3b41c1316b01c4ae9abb0e3e1ea87a806",
+     "post_seconds": 0.006193500000335916,
+     "outcome": "built",
+     "seen_after": 106.37231333,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.948178939,
+      "build": 8.141317524,
+      "upload": 3.41202302
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-ip-1000000x128",
+     "job_id": "734b13428b082161a98d34cf6725eafc7eac8cfe7f627ad76d709e9d497e4405",
+     "post_seconds": 0.006338332999803242,
+     "outcome": "built",
+     "seen_after": 27.396207019999565,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.059431964,
+      "build": 3.913924619,
+      "upload": 1.809963082
+     }
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "f2a8f00a8fec41a98a43f05feb6a1d0625778da0cf8a111c64fe5271e40dd942",
+     "post_seconds": 0.006125238999629801,
+     "outcome": "built",
+     "seen_after": 39.05479216200001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.143358168,
+      "build": 4.057896123,
+      "upload": 1.692604755
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "73aaf54521e276bd5b9e5f02ba5281232ebd383233eb4237d287c0017c4221f5",
+     "post_seconds": 0.007237999000608397,
+     "outcome": "built",
+     "seen_after": 106.74298468300003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.805488622,
+      "build": 13.819792549,
+      "upload": 6.081579054
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "9581543675e8314609e2f06521cd513bcad5ea2579661f4cd71fe6c458e98ff0",
+     "post_seconds": 0.0032579379994785995,
+     "outcome": "built",
+     "seen_after": 26.727418022000165,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.227490391,
+      "build": 14.081748066,
+      "upload": 6.148516811
+     }
+    },
+    {
+     "index": 42,
+     "input": "gist-ip-1000000x960",
+     "job_id": "26fd3f237b76d04aeeef5d4a196cf85564adc1dc73f5e0be904cd4f96040539c",
+     "post_seconds": 0.006259990999751608,
+     "outcome": "built",
+     "seen_after": 83.91408564499943,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 6.971514715,
+      "build": 16.851671363,
+      "upload": 7.676717262
+     }
+    },
+    {
+     "index": 43,
+     "input": "gist-l2-1000000x960",
+     "job_id": "a6c6500b2ff3870590962c4aead08eb608aa770b081a68dcf76dd3ecd6316614",
+     "post_seconds": 0.005368334999729996,
+     "outcome": "built",
+     "seen_after": 49.85853150100047,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 6.78638795,
+      "build": 18.323704846,
+      "upload": 7.631413777
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "f2349a819e70f94eac13f710cc6b3692386e1e49e44a760299ede8671392c78d",
+     "post_seconds": 0.0067158789997847634,
+     "outcome": "built",
+     "seen_after": 86.54334338800072,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 3.015731394,
+      "build": 8.314236548,
+      "upload": 3.502958175
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "2245a4a90854663b91b765e382bc2fd655d5429dfbff45f9eab90ec18c5a2395",
+     "post_seconds": 0.007033994999801507,
+     "outcome": "built",
+     "seen_after": 60.80569231300069,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 2.820983893,
+      "build": 7.82278125,
+      "upload": 3.608096188
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128",
+     "job_id": "4fc05fe5ddd809027944a0e5f5ed90265d7fa14be5e15acb1ed5cfe0605f7aa7",
+     "post_seconds": 0.006005086999721243,
+     "outcome": "built",
+     "seen_after": 56.30689637700016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.16577556,
+      "build": 3.569816923,
+      "upload": 1.732736721
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "10fb8fc311671e2732e03471cd15af5d4fa0844204bb95de82147ec6676a1b5c",
+     "post_seconds": 0.006614367999645765,
+     "outcome": "built",
+     "seen_after": 47.4767291499993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.172356109,
+      "build": 3.520223408,
+      "upload": 1.691614443
+     }
+    }
+   ]
+  },
+  "byte": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "0aea0c8bc1692fbdcc1bdf87740e5f126ad34b826a92af0ff1c09516d7ae98ee",
+     "post_seconds": 0.006855052999526379,
+     "outcome": "built",
+     "seen_after": 73.21565190699948,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.513852334,
+      "build": 12.715143553,
+      "upload": 2.521133904
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "886e81cde70036decbf84f618911750e5404c920f46cf4932311b425452f720b",
+     "post_seconds": 0.006871223999041831,
+     "outcome": "built",
+     "seen_after": 56.39616642100009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.438038465,
+      "build": 13.051250117,
+      "upload": 2.70903986
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "e97dbbe2fd8aee74e73f4c23b5379fa7561b2a43e04a7b0158a93d8a974b17b5",
+     "post_seconds": 0.005779284001619089,
+     "outcome": "built",
+     "seen_after": 23.467720590999306,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.806583501,
+      "build": 6.834998592,
+      "upload": 1.9284164320000001
+     }
+    },
+    {
+     "index": 11,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "36350b61040731c3fded7701434d9806b7868803b1df6a05c0479c7873a74191",
+     "post_seconds": 0.006536757999128895,
+     "outcome": "built",
+     "seen_after": 75.94171128199923,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.867691468,
+      "build": 6.971810811,
+      "upload": 1.646917299
+     }
+    },
+    {
+     "index": 12,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "d6a9415ea1e4f89bfc7308f66a258268cc49e0f135f8107f5fe4a46585b75e87",
+     "post_seconds": 0.006602469000426936,
+     "outcome": "built",
+     "seen_after": 58.49648015800085,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.444657951,
+      "build": 3.397917833,
+      "upload": 1.03575952
+     }
+    },
+    {
+     "index": 13,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "91899e79df1a994e664eb82ee426970813cfdd9d9ae15eaab7e112efc82cd938",
+     "post_seconds": 0.005412706999777583,
+     "outcome": "built",
+     "seen_after": 26.667700309000793,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.412686684,
+      "build": 3.243891586,
+      "upload": 1.07873037
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "62e64efa16e6e24c3af34b9bae32e6f769f0f6a270a204c5016691362dded680",
+     "post_seconds": 0.006879403999846545,
+     "outcome": "built",
+     "seen_after": 44.82334654099941,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.450306722,
+      "build": 12.825120957,
+      "upload": 2.735976195
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "15e5bea5bbf91be9ef8436751b530b6fc1af0f3a820cf6a3f5f7bde41ac746dd",
+     "post_seconds": 0.0036763260013685795,
+     "outcome": "built",
+     "seen_after": 22.120918442000402,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.447096678,
+      "build": 12.878102852,
+      "upload": 2.464804002
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "dc49a45bcb3db3f6a06d8c3b830ff72c2de7d4599349b19cf8f38e239d8bac01",
+     "post_seconds": 0.0057013019995793,
+     "outcome": "built",
+     "seen_after": 17.429152229000465,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.423546037,
+      "build": 12.674611783,
+      "upload": 2.490082587
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "64dc3ba2e67302a6485c1486e542bebddb05ac5f67fb927201a4eea5082180f9",
+     "post_seconds": 0.006728919999659411,
+     "outcome": "built",
+     "seen_after": 47.47253800999897,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.443869778,
+      "build": 12.92162417,
+      "upload": 2.844761345
+     }
+    },
+    {
+     "index": 18,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "6c378fe92acc857715cec8bfd33c359e68dae4d131d9b2439e4ffb4a376f9aab",
+     "post_seconds": 0.006256241998926271,
+     "outcome": "built",
+     "seen_after": 32.750894075999895,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.876180801,
+      "build": 6.879193881,
+      "upload": 1.757537957
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "1ea4d2ea9588bd2610c9f63c47f4a6ac4eff2dda395ed0b403852596ade0eedc",
+     "post_seconds": 0.005039519999627373,
+     "outcome": "built",
+     "seen_after": 22.879884609999863,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.835249556,
+      "build": 7.043934365,
+      "upload": 1.580181711
+     }
+    },
+    {
+     "index": 20,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "f1b799f8c6b820447d1d6a6f78db16eaaa086b9830a04a97beb08e29feab7f2a",
+     "post_seconds": 0.006308083000476472,
+     "outcome": "built",
+     "seen_after": 52.61071041200012,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.397872081,
+      "build": 3.307188149,
+      "upload": 1.136810271
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "98978a894623cb9e2aa532c9d26e9d2f91b7674d6006089b97c40b4e3ed4e442",
+     "post_seconds": 0.006895243999679224,
+     "outcome": "built",
+     "seen_after": 36.95991395099918,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.417263366,
+      "build": 3.291714437,
+      "upload": 1.028272721
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "e92e1a2571ac8673123f0825b093b1f7e29711fa82c434d3d42e7a16c75988b8",
+     "post_seconds": 0.006107469000198762,
+     "outcome": "built",
+     "seen_after": 68.65295417599918,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.417120718,
+      "build": 12.746717314,
+      "upload": 2.802734877
+     }
+    },
+    {
+     "index": 23,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "a5ff5f8576e41f2b75c74bdb291c2e81ad043363013db1f3d985e398811d9c95",
+     "post_seconds": 0.007064645998980268,
+     "outcome": "built",
+     "seen_after": 78.7647040769989,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.5214575,
+      "build": 12.970473507,
+      "upload": 2.724829481
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "1db1cf73ae49c34fe4318d88379476281961559cea31a72b67fb293fd859d942",
+     "post_seconds": 0.006823304000135977,
+     "outcome": "built",
+     "seen_after": 75.80658662399946,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.572594884,
+      "build": 12.658977376,
+      "upload": 2.542702872
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "0e6804bb7fc3b342b2f587570f8b60fea5ccf5144acc30a056178364b83177af",
+     "post_seconds": 0.006833163999544922,
+     "outcome": "built",
+     "seen_after": 39.3837619370006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.506769168,
+      "build": 13.082987332,
+      "upload": 2.779056933
+     }
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "22c2110a8df16c93e48aa35a10ed5d8d306b2faa77b816b5fd256b6d8a035904",
+     "post_seconds": 0.004737396000564331,
+     "outcome": "built",
+     "seen_after": 12.783672551000564,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.834862567,
+      "build": 7.001930953,
+      "upload": 1.7278971319999998
+     }
+    },
+    {
+     "index": 27,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "ec3f46401453af76c7427c05d39083a5e8d48bf4daa37c6532041567893a645c",
+     "post_seconds": 0.006664819999059546,
+     "outcome": "built",
+     "seen_after": 46.273861306999606,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.895655096,
+      "build": 6.964326368,
+      "upload": 1.81983849
+     }
+    },
+    {
+     "index": 28,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "06b452c222c531dbabf59243f8a746ddd4a7e4f945ae139dc7cdfb4af58d4958",
+     "post_seconds": 0.00637624500086531,
+     "outcome": "built",
+     "seen_after": 48.03673869799968,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.417208411,
+      "build": 3.281989539,
+      "upload": 1.113152586
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "e211e0485269a7743206136b95fb760421178ae37956d0ae6a4bc8ac21033775",
+     "post_seconds": 0.005306705999828409,
+     "outcome": "built",
+     "seen_after": 13.480949557999338,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.408626625,
+      "build": 3.05569061,
+      "upload": 1.092139936
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "d31297c962edf82372b06881ed59000ce10a15ee41702678b4b1755313c5c2a1",
+     "post_seconds": 0.0059362270003475714,
+     "outcome": "built",
+     "seen_after": 26.769471517000056,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.480565555,
+      "build": 12.872448278,
+      "upload": 2.724969588
+     }
+    },
+    {
+     "index": 31,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "99633548e8952c6b2e8fd2a2edad47002990e93247028e8114e2e7630cdd3123",
+     "post_seconds": 0.007191380000222125,
+     "outcome": "built",
+     "seen_after": 66.35628688299948,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.501559881,
+      "build": 13.028172531,
+      "upload": 2.638667515
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "bcbac5b5fe44bee1db8a00147a2c74b3abf80c50111d14ad5f41767c70771b92",
+     "post_seconds": 0.0056680210000195075,
+     "outcome": "built",
+     "seen_after": 25.000730084999304,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.4677116080000001,
+      "build": 12.952177537,
+      "upload": 2.607447344
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "98cd39d211b731e266a91088f37d2a049b9b7ff7c7704f944272e3fd151d167e",
+     "post_seconds": 0.0070129359992279205,
+     "outcome": "built",
+     "seen_after": 52.39579393599888,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.4472186009999999,
+      "build": 13.056773323,
+      "upload": 2.454597498
+     }
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "aad5c846fe451ba9698abc2ef4c39cac72d05e449c92dbc5b3d41784045f1c7b",
+     "post_seconds": 0.0049276080007985,
+     "outcome": "built",
+     "seen_after": 16.557788900998275,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.839421325,
+      "build": 6.897345223,
+      "upload": 1.786168896
+     }
+    },
+    {
+     "index": 35,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "a2cfb05e51b0da994b6808b4084249fdd93084c2b1022e7e2de6ff114fcd5639",
+     "post_seconds": 0.006594188998860773,
+     "outcome": "built",
+     "seen_after": 77.85936135799966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.837501913,
+      "build": 6.851780751,
+      "upload": 1.579283939
+     }
+    },
+    {
+     "index": 36,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "14a21199bb5b1798c820feb7fd2f59b3ada0c739a4a33f3d5e46963feea95fc6",
+     "post_seconds": 0.005915496001762222,
+     "outcome": "built",
+     "seen_after": 55.05972476899842,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.41953206,
+      "build": 3.369133683,
+      "upload": 1.044522795
+     }
+    },
+    {
+     "index": 37,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "007217aa704d2b1156d4e176ef0da86742523350e96b5750b93b620910fe5b17",
+     "post_seconds": 0.006820282000262523,
+     "outcome": "built",
+     "seen_after": 58.48973310399924,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.43321021,
+      "build": 3.249432745,
+      "upload": 1.036470331
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "e220ebc2e82311ce887cad5e95856327b3cc2f6119f3b5939741e543117c9822",
+     "post_seconds": 0.004952059000061126,
+     "outcome": "built",
+     "seen_after": 37.25336116199833,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.281250458,
+      "build": 12.920901884,
+      "upload": 2.531851892
+     }
+    },
+    {
+     "index": 39,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "d0b881a570efdb20f2118ec6db3baebe7e10f5e19b5bdb86b168f575903ec6d2",
+     "post_seconds": 0.006914204001077451,
+     "outcome": "built",
+     "seen_after": 70.524796366999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.444856347,
+      "build": 12.957178354,
+      "upload": 2.33815403
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "1128118157d15d751bef0bf8f07ddf21d5effa067faf84ed164430292a64c490",
+     "post_seconds": 0.005941006000284688,
+     "outcome": "built",
+     "seen_after": 78.54617862899977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.46444443,
+      "build": 12.689033713,
+      "upload": 2.653037511
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "94843881f038d2588ace4b79d4393ce22c248f7d910463b36d67c624d73b6dab",
+     "post_seconds": 0.006349204000798636,
+     "outcome": "built",
+     "seen_after": 45.0646120220008,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.466671951,
+      "build": 13.175654088,
+      "upload": 2.644595226
+     }
+    },
+    {
+     "index": 42,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "cd3a0e952d10c35c8351082752caf9016e75f584fa3fd15174cef4f9f229d741",
+     "post_seconds": 0.006341763999444083,
+     "outcome": "built",
+     "seen_after": 67.93052149300092,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.878508101,
+      "build": 6.924370304,
+      "upload": 1.804325536
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "84534137609e761979204dc25c8c8ca6fc3e86498d940ae1a5d10fd92571a479",
+     "post_seconds": 0.004745705000459566,
+     "outcome": "built",
+     "seen_after": 25.72232126200106,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.831676445,
+      "build": 6.9925682479999995,
+      "upload": 1.868082445
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "a7412b99ed6baaaa259a0f164e859cc9a8f123f8dcf912440af78e4948f00639",
+     "post_seconds": 0.00590858599935018,
+     "outcome": "built",
+     "seen_after": 26.43400945400026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.433637512,
+      "build": 3.327842431,
+      "upload": 1.064099996
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "78aedc994390f0e7b826df1f5de448b479214adc833a45e7b7a33ba9ec103982",
+     "post_seconds": 0.007181529001172748,
+     "outcome": "built",
+     "seen_after": 56.7667696110002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.393199927,
+      "build": 3.32950006,
+      "upload": 1.18083571
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "4c129ef65c530e5e95b816add836fd68a356d583a3098ac11cf4108d715ccf71",
+     "post_seconds": 0.007264170999405906,
+     "outcome": "built",
+     "seen_after": 56.29940797299969,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.450197045,
+      "build": 12.83856083,
+      "upload": 2.5197652919999998
+     }
+    },
+    {
+     "index": 47,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "15a7665e1a4b5329222181cb1e79598b4231c96ee003ed054ec2e144f54fd163",
+     "post_seconds": 0.0063542839998262934,
+     "outcome": "built",
+     "seen_after": 17.768873700000768,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.340186492,
+      "build": 12.916690462,
+      "upload": 2.7669031139999998
+     }
+    }
+   ]
+  }
+ },
+ "burst": {
+  "binary": {
+   "jobs": 48,
+   "inputs": [
+    "cohere-hamming-1000000x768-binary",
+    "ms-marco-hamming-1000000x384-binary",
+    "sift-hamming-1000000x128-binary"
+   ],
+   "timeout_seconds": 90,
+   "poll_seconds": 5,
+   "outcomes": {
+    "refused": 42,
+    "built": 5,
+    "failed": 1
+   },
+   "to_cpu": 43,
+   "cpu_wait_seconds": 36.1,
+   "built_seen_after_max": 79.6,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 2706daf7962f38f6c9b4ab4b4187b0f10d369a0afab9f08d3dc5153c30eeb952 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03881954200005566,
+     "process": 2
+    },
+    {
+     "index": 1,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fac316d01bf253d3e7c4f49488662dc6fe9ff93b61e1e713ef617c3a7ceaecc9 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.042097800000192365,
+     "process": 2
+    },
+    {
+     "index": 2,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "45dc3b55e40908fcb54a938164fbc1e80a0014f71a9cafbe620ba7d48634c870",
+     "post_seconds": 0.029108978000294883,
+     "outcome": "built",
+     "seen_after": 35.785072435000984,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": {
+      "download": 0.296092551,
+      "build": 12.059280361,
+      "upload": 0.85251277
+     }
+    },
+    {
+     "index": 3,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 2bba2ed6a9ef223e61bf2d9c038dca17437c71e2b8fd251dc0b72993829b62bc with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03437025200037169,
+     "process": 2
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job ad652c3a5a0bb4a5f4eddcc174024b437faa93c32f89bab9446599d4789be3f4 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.042818113000976155,
+     "process": 2
+    },
+    {
+     "index": 5,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 82bd2bef24e3cc21fe9bde199dfaff017d4fd17db7ce74f6097a2217f770c96d with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03399993600032758,
+     "process": 2
+    },
+    {
+     "index": 6,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job ee0dac58a902ef89b2ca5456107f03c281db46f739f4cf75c645567aaf32bf89 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.034189568999863695,
+     "process": 2
+    },
+    {
+     "index": 7,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 88d5a37c4e3509dedf1ad4bd5b507e298933768250b0a34485b83d125b89a476 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03705283999988751,
+     "process": 2
+    },
+    {
+     "index": 8,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job f655e6852935138836fab5e87166790e300114d83d38714d905eb2bbe1e9c0af with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04176583400112577,
+     "process": 2
+    },
+    {
+     "index": 9,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 93a371a1f68358109eba63ce18ab046df27174cfdba9964a3fabb7426ddddb13 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 103 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.033568828001079964,
+     "process": 2
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 58b6e70e4f669393d2d999f27d7e38408587e9b13baea7431d3309ed3e4caa56 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03445819400076289,
+     "process": 2
+    },
+    {
+     "index": 11,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 339b90907d6a96df50a4e9dd936f783671d9d92c6ba5971394e94c61050ef86a with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04263321899998118,
+     "process": 2
+    },
+    {
+     "index": 12,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 6ad8322c6e7ab2c34df95e5f6f5a87485609830eb25523280eacb57c4e4b2d9f with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.036667613001554855,
+     "process": 2
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c16a4f53fd4138f74e4bafe7894d51daccdbe9cf71f68976123c3fdbf298f23c with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03597495100075321,
+     "process": 2
+    },
+    {
+     "index": 14,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "100e6927fa14c276a9bc7503ae7f72b677dacba19b974feaf26e7223b5be1572",
+     "post_seconds": 0.02542174299924227,
+     "outcome": "built",
+     "seen_after": 79.58549122000113,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": {
+      "download": 0.288094958,
+      "build": 12.043145765,
+      "upload": 0.864304376
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 6e5c16409d87efe05bdc239ff9f15de89f1b39bc6f2c15528b8bc7f1187db600 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.02511809800125775,
+     "process": 2
+    },
+    {
+     "index": 16,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job add6d9d55c7b78dea6d5442a58b16b6e58c6b4b6eb16c52d58b5917ee9282fde with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04023648700058402,
+     "process": 2
+    },
+    {
+     "index": 17,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job bce1eccb1bf84461b9c77196da4e765182b18c83e0f59581cfe3c55e35d778a9 with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.02806444000088959,
+     "process": 2
+    },
+    {
+     "index": 18,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "848b28b2d102ae991a4955fd2c5ad0faf433457346e8a2a500c0237d288cb012",
+     "post_seconds": 0.024212890999478986,
+     "outcome": "built",
+     "seen_after": 55.64949916600017,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": {
+      "download": 0.423733579,
+      "build": 19.685542788,
+      "upload": 0.999189192
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 7cc3af7383fe542191b98192b9976d9821c411053a9bfeb4dbb051a4a68138d5 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03876351100007014,
+     "process": 2
+    },
+    {
+     "index": 20,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "20b3ba9e98e5cd1b0e2d93f21fab82a241a52544c9e49dcf8e113318c15d210f",
+     "post_seconds": 0.021902110000155517,
+     "outcome": "built",
+     "seen_after": 65.51635089600131,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": {
+      "download": 0.318813063,
+      "build": 12.068075216,
+      "upload": 0.834471468
+     }
+    },
+    {
+     "index": 21,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 053daec4b5ad123c3f04bb4eea89cb441aad66d2998d2efb38747189da2aed4a with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03992253100113885,
+     "process": 2
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b1b0a3f4d62f065320f1cce4690f8f2d44b345c17ae3b10edfea7d11b657ff70",
+     "post_seconds": 0.01978362199952244,
+     "outcome": "failed",
+     "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+     "cpu_after": 34.56677680299981,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 23,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job aeee65efbc86886b9ae7b7a4a609cc866620394e6474057834b77818ce5542b4 with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04215792100148974,
+     "process": 2
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 176b973d7fe5f3defe5814791ef6af77141c5966d45aeb742cc3a5f1a3972164 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03897760400104744,
+     "process": 2
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job ca59e3e6acc41d597f94bc957d6f0f2d3f974ee35b0ce7bcc76b993f2d46c7ed with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03891065300012997,
+     "process": 2
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 12563d219457a9b4f10cd1e504857779839994ed8c5a7be0996f127490d613fe with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03379898200000753,
+     "process": 2
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c8d10a7a028637c830e759aa5770043ed7dfac40314aebfe412f95c7d8b72fe0 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03869959900112008,
+     "process": 2
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job f9563bca788de5066baf878f906cda39d56cf8ed5cd72132449371fea86334dd with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04247320700051205,
+     "process": 2
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 8c78827c8116ed03245002bc283cd7467fc26d0a400f7e0ccbf728cb2a9b2032 with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03858938700068393,
+     "process": 2
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 5e8d4d696b13ba0a8899cea70353794c6ad17231ec029dddb7dde01862f7c0d4 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04074905600100465,
+     "process": 2
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 87ea06ad20b93a2360f356dadee1a1fdf51f8b91bee6e4eb69cb8132b81166a8 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03684147600142751,
+     "process": 2
+    },
+    {
+     "index": 32,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 1a85820bde2afa391d8f07201edc0e119d990d705de7c5f409665662c39a6f9b with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03834204300073907,
+     "process": 2
+    },
+    {
+     "index": 33,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 53fb19aa21e905bec93a3e4e4c09ded92115e93b07a66f0bf3d590393a53bcec with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.028464157001508283,
+     "process": 2
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 83a2a98957b3cdb3e310cd63154e72196da1ab93dc842ee506ad48cacc32af0a with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04225344299993594,
+     "process": 2
+    },
+    {
+     "index": 35,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job bf6191f91af149604c321b1df82c97c0269dc60fb4581fb97f0e1e5223627de8 with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03711468100118509,
+     "process": 2
+    },
+    {
+     "index": 36,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job f3fbaeede62ee082d52bb451f2a8a796278a8c112a85b5a8423924e25609f290 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03726772400113987,
+     "process": 2
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 76bb33b60883b1a0d42afb109d77b90bcd8bb5fd1281b43927f93643fb7440b3 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.0352390980006021,
+     "process": 2
+    },
+    {
+     "index": 38,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job aeb5d20131afa3831695b2a04f6278ff07f38101ed92fff6ce495681b02f811a with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03490417200009688,
+     "process": 2
+    },
+    {
+     "index": 39,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 8b51463b083e06f0fe3806cc31725be8fe3dcb9b9ed4829a9616f15aa3f75f50 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.039241999000296346,
+     "process": 2
+    },
+    {
+     "index": 40,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 7c2da35696dcc3286344a4830eb5088e9cf775851e41d6e6691748b69f09719a with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04157469100027811,
+     "process": 2
+    },
+    {
+     "index": 41,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 0d0de283f21472a6948c5d92a7ae9372c08040680263f6343bd18e4d7ad1450f with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03410315800101671,
+     "process": 2
+    },
+    {
+     "index": 42,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c0d53ea43d14bdece79ccc79c05956438de9eacca21180dc89ea8ba928743a0f",
+     "post_seconds": 0.03311119999852963,
+     "outcome": "built",
+     "seen_after": 23.594419858000037,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": {
+      "download": 0.35273613,
+      "build": 19.609964871,
+      "upload": 1.016795622
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 77e30daa64c878a00836bc1b436c56526c505a082fb0a1597d933a5b1115f788 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04184638500009896,
+     "process": 2
+    },
+    {
+     "index": 44,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 66d2eda591c29662a3d8f55ec544e2db34504583cae4f5aa4789f7cd0222f6a6 with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03140179900037765,
+     "process": 2
+    },
+    {
+     "index": 45,
+     "input": "cohere-hamming-1000000x768-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job e34c6ccd682451534ff2354afa199e2e64a22a99224746188e5da9e6db5da8e0 with vector path cohere-hamming-1000000x768-binary/vectors.knnvec would be seen ended in about 117 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03392303400141827,
+     "process": 2
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job d1a915253875872cdbcd7f3c67a4f6921efcd41da29a5077f3b51210ede5a8d3 with vector path ms-marco-hamming-1000000x384-binary/vectors.knnvec would be seen ended in about 104 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04256627799986745,
+     "process": 2
+    },
+    {
+     "index": 47,
+     "input": "sift-hamming-1000000x128-binary",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fca53384ee4b2cb2682b0d23dd9b0f035e96b1cbd0f7492bec9b3b7f02d65d49 with vector path sift-hamming-1000000x128-binary/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03269501199974911,
+     "process": 2
+    }
+   ]
+  },
+  "float": {
+   "jobs": 48,
+   "inputs": [
+    "cohere-l2-1000000x768",
+    "gist-l2-1000000x960",
+    "ms-marco-l2-1000000x384",
+    "sift-l2-1000000x128"
+   ],
+   "timeout_seconds": 90,
+   "poll_seconds": 5,
+   "outcomes": {
+    "refused": 40,
+    "built": 7,
+    "failed": 1
+   },
+   "to_cpu": 41,
+   "cpu_wait_seconds": 19.3,
+   "built_seen_after_max": 76.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 2cf68503b901477ba9359d0467b89be9ff08e40e9d9ce27cd1fd2f7e2d49e0c1 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04128039000170247,
+     "process": 3
+    },
+    {
+     "index": 1,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 28c2dc9d232d67e525b22c4b88cd5e73e4226c6a2fa5b43558bfb15cad39c576 with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.036027386000569095,
+     "process": 3
+    },
+    {
+     "index": 2,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 3b07da06deff08752e289ab7b44c52a988c67995b721a2c16f65672907041189 with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04036910400100169,
+     "process": 3
+    },
+    {
+     "index": 3,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job f3d68f5b13c0d3333a9e297f0c0c203e11cb7e5fdfed113888e0f67891311a7d with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.027864740000950405,
+     "process": 3
+    },
+    {
+     "index": 4,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job cd28aeaae9a106f3bd91ee8e2270fd14ffc1d43b5ecbb7a827c98804da0350ef with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.035176821000277414,
+     "process": 3
+    },
+    {
+     "index": 5,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 9c5c7721cc62f0eaba31d71832cee7721422eb7a7ff3c26b846e0600f6b3f5fa with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03481755400025577,
+     "process": 3
+    },
+    {
+     "index": 6,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "03b5cc43aebfa44ef8cb2485a69775989caf4ebb5cbf4b0d27c21685a459edbf",
+     "post_seconds": 0.013589762998890365,
+     "outcome": "built",
+     "seen_after": 17.360187471000245,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 2.766143796,
+      "build": 9.747382342,
+      "upload": 3.592742162
+     }
+    },
+    {
+     "index": 7,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 370ec903aaf8f701ad4b266cf0f8c1c1928a7ddb3a66ce7a129505b101d9c006 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.039581218999956036,
+     "process": 3
+    },
+    {
+     "index": 8,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 803b8633fd3176ea68df5e8cd3198192536dcb77c21ce6f6d10bf0e8c90e6010 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04144127300060063,
+     "process": 3
+    },
+    {
+     "index": 9,
+     "input": "gist-l2-1000000x960",
+     "job_id": "2d8a5af4b2213bae940959e09f5f21f12882842f055c22f88fe1358e7c67f26b",
+     "post_seconds": 0.019091582000328344,
+     "outcome": "built",
+     "seen_after": 42.09113854499992,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 6.831234079,
+      "build": 18.439102126,
+      "upload": 7.708060794
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 62c9d0927ace25c6f3c336f669202d5fc470ae543ffbd16ecbf434993c4c1dbb with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.039450457001294126,
+     "process": 3
+    },
+    {
+     "index": 11,
+     "input": "sift-l2-1000000x128",
+     "job_id": "d6eab25ce902f5ce53fcc1f5d366770c8c5f3129cb49389016833b8e025226c6",
+     "post_seconds": 0.023797646001185058,
+     "outcome": "built",
+     "seen_after": 75.962855623,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 1.174468306,
+      "build": 3.564787579,
+      "upload": 1.601049053
+     }
+    },
+    {
+     "index": 12,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 5354c04c45c96c71ff8f81ea2de5cbf2cf2e3d577e6c739ae79253bd15a7fcef with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04177691900076752,
+     "process": 3
+    },
+    {
+     "index": 13,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job efbf6de6d6793a563421ddedf77455f358faa4dda417a3623291d63090dae55f with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.0293070860006992,
+     "process": 3
+    },
+    {
+     "index": 14,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 25cb499a651d1c5a37393fd65f901a8d5861d2cc07a50c014e163e807184d4ed with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03874187400106166,
+     "process": 3
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fd77b12fe7fe3576db4c38298bf72b125a7b246688c1738048b2a47f54b2ec0f with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.02763625500119815,
+     "process": 3
+    },
+    {
+     "index": 16,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 0e7a7174d44b48267e912add18042d239362a7ba401950c93b80a847e9d432e6 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.028348168001684826,
+     "process": 3
+    },
+    {
+     "index": 17,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 6e052ac4b8cbec09f98693a0faf265303d722779f1af3e2230bceaf69f358d3e with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.041580525001336355,
+     "process": 3
+    },
+    {
+     "index": 18,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "25b9a82d407ecc0594f23d8e4aeadf6203c3f8f0a237a721684e705d90da0746",
+     "post_seconds": 0.023945248998643365,
+     "outcome": "built",
+     "seen_after": 75.84549491899998,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 2.642963058,
+      "build": 7.671246614,
+      "upload": 3.6431055519999997
+     }
+    },
+    {
+     "index": 19,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job ff83843ddef042f7dca54adb90e6ed472e653485376740ef3ba285d5351a4a53 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03569530999993731,
+     "process": 3
+    },
+    {
+     "index": 20,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c3895ecfbc75cdf053edef92a8a5602ad38268187eb0c7652bcc6da57bd94a78 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.041912741000487586,
+     "process": 3
+    },
+    {
+     "index": 21,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job edc2ce26a9e28504c203c3a57c2b3dbfd507d381dcb386c67e7bd2cf7861368f with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.042220337001708685,
+     "process": 3
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c2bc9bed2ece7c5e2c674d7c3322462ca31c2f2b1c7b9b3559bc98a207cb0e47 with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03897960900030739,
+     "process": 3
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 168d74a63c717930197e8188e77486e5957de2bc0346cde35a00bed4971696f0 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03951549800149223,
+     "process": 3
+    },
+    {
+     "index": 24,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c71ea6a894473816397db153dea0e848304b50f5acd0f674df865411cd5c2068 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04198765300134255,
+     "process": 3
+    },
+    {
+     "index": 25,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job b00485a9551945f32d954db2b2a52a888d35e6a50c5bcef5e54a5915751bad34 with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03812865300096746,
+     "process": 3
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c435b5c7981909214eb15e0c0145e5f447dc6c077036d8f2a590668e739d8726 with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03997380700093345,
+     "process": 3
+    },
+    {
+     "index": 27,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job d4444b17f012612ef1f1ab2962626d6f4e3e64c1e1c206e8f9fcfe29eaee1a87 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03642484300144133,
+     "process": 3
+    },
+    {
+     "index": 28,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job f6f1b0a455a6f0c36e9501d4645297825c999e0da346d51cd71976edeba863d7 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03494408600090537,
+     "process": 3
+    },
+    {
+     "index": 29,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 324850c5a1af48e3178a74df6e5a4b88607931e8381bd4db0e1fec9d1abca989 with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03636633200039796,
+     "process": 3
+    },
+    {
+     "index": 30,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 81f0da6d088c2bcea26cabf7c08033c4d75450a7f73ff451c4ee32539886deb3 with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03905010000016773,
+     "process": 3
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 6f5145625ecdb892705002a5abd2cdd5ede5e36718deaf1e74be1cc6407845c3 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03867804300170974,
+     "process": 3
+    },
+    {
+     "index": 32,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 7239f81daaae9a34ff95c46530947601c6ee2497d6aed98cd8ed20d578ece0c9 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03623877000063658,
+     "process": 3
+    },
+    {
+     "index": 33,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 4660a19291c70e86b9a5216735c25d6a652aa276c6310f583327d89479226ac3 with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03454879900164087,
+     "process": 3
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "d003bd9b112e79dd438c354034dfbbc2bf118c48a3a4190d1567a50d63aa2520",
+     "post_seconds": 0.021748319999460364,
+     "outcome": "built",
+     "seen_after": 51.69585085000108,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 2.802581859,
+      "build": 8.091325006,
+      "upload": 3.478919334
+     }
+    },
+    {
+     "index": 35,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c295ddd91e2b64776f4c881e1129821bb77fcf7f57b65effadc520f517963540 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03829601600045862,
+     "process": 3
+    },
+    {
+     "index": 36,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 0630b987a16bf76ec179899c78bb5a289f01cd86316e082e55cfd8d9aac32af5 with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.040845192001143005,
+     "process": 3
+    },
+    {
+     "index": 37,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job bcfedb02412586d7263792ffb21ba95c8403dfcfd0e63c42e6264c5dad7399ce with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.039394766001350945,
+     "process": 3
+    },
+    {
+     "index": 38,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job e5289531ffa0ba570973ffc57fde05e155790ee05e9c63d32bb16666da54bc66 with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.0412023990011221,
+     "process": 3
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 5e6c6d2970af23118d8201c0f5644bdfdb312cfffb20f36f89449e7e8c035f37 with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03804489200047101,
+     "process": 3
+    },
+    {
+     "index": 40,
+     "input": "cohere-l2-1000000x768",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 9462fa8dff17673ce06694ad558ecb9e4a068b9c2d73285e1be0efa9d13091da with vector path cohere-l2-1000000x768/vectors.knnvec would be seen ended in about 113 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04150204400139046,
+     "process": 3
+    },
+    {
+     "index": 41,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job b04f907739b7eb65de9ecd7374573f828f86be59374e1d746c77630516534582 with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03797819100145716,
+     "process": 3
+    },
+    {
+     "index": 42,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "2c85dc4b079e415286dd7e150502ecfd04b7bf13d91d6e9969416be4f683c408",
+     "post_seconds": 0.022417662001316785,
+     "outcome": "built",
+     "seen_after": 47.40913699500015,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 2.804135456,
+      "build": 8.389343367,
+      "upload": 3.681290941
+     }
+    },
+    {
+     "index": 43,
+     "input": "sift-l2-1000000x128",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job a4fba6109a9db478470eaa51a9549e4049ce67f6e023696e2d7e0239b16e4f4d with vector path sift-l2-1000000x128/vectors.knnvec would be seen ended in about 92 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03790661900166015,
+     "process": 3
+    },
+    {
+     "index": 44,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "9bc200dda6ab09bc327958f16c8689beefb6bdf6a74f037ea6a77eebe9882de3",
+     "post_seconds": 0.017976092000026256,
+     "outcome": "built",
+     "seen_after": 71.16518225000073,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 5.553443961,
+      "build": 14.170899354,
+      "upload": 6.174400282
+     }
+    },
+    {
+     "index": 45,
+     "input": "gist-l2-1000000x960",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fb07ed683d22f97fac67e2838d8056f999ce474d86c042e9f9dc3e312ddd4c00 with vector path gist-l2-1000000x960/vectors.knnvec would be seen ended in about 119 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.0373898800007737,
+     "process": 3
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-l2-1000000x384",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 4471795920cde500812ce08c1b7dbeb0fd42b06e9147535f7acdd67030590ecc with vector path ms-marco-l2-1000000x384/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03695504200004507,
+     "process": 3
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "efdbe828e7d62a50d3da770fddde65228f2742b4826acfa36c616036c34ca46d",
+     "post_seconds": 0.02418346299964469,
+     "outcome": "failed",
+     "detail": "the job was dropped: forecast again as jobs ended, it would end past the data node's timeout of 90 s",
+     "cpu_after": 17.79176406100123,
+     "process": 3,
+     "seconds": null
+    }
+   ]
+  },
+  "byte": {
+   "jobs": 48,
+   "inputs": [
+    "cohere-l2-1000000x768-byte",
+    "ms-marco-l2-1000000x384-byte",
+    "sift-l2-1000000x128-byte"
+   ],
+   "timeout_seconds": 90,
+   "poll_seconds": 5,
+   "outcomes": {
+    "refused": 38,
+    "built": 10
+   },
+   "to_cpu": 38,
+   "cpu_wait_seconds": 1.4,
+   "built_seen_after_max": 76.2,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fe26275c0ed6ed36a08ab9c21d34fdecf13f4523e36669b442972dcaa7badcfb with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.040841254998667864,
+     "process": 4
+    },
+    {
+     "index": 1,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job bdd558e097a42da05e89f5ed1053d97b97cbb84137d85d9034e32497b2f76203 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.041413314998862916,
+     "process": 4
+    },
+    {
+     "index": 2,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 3ce33ab8d05ae965667a18e02a78d013d44083bb0b4bf02866f6dac2b8c82b21 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03813007600001583,
+     "process": 4
+    },
+    {
+     "index": 3,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job ee2176a0a613776925750e27a1a0d7c147ca7dce145924cb9eab2c6c27ce5c5c with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03417917499973555,
+     "process": 4
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "afb2f9a60d31acabfd2b6a9c97a231b583b44e8903a7b83d927d685350959332",
+     "post_seconds": 0.024878548001652234,
+     "outcome": "built",
+     "seen_after": 46.363754280999274,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.804057495,
+      "build": 7.015457872,
+      "upload": 1.60737866
+     }
+    },
+    {
+     "index": 5,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job c3ca36abbd2a7d4805a11328e1cd33a491c0ac260cb8f7a5083e6e9bb105c8f9 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.035626200999104185,
+     "process": 4
+    },
+    {
+     "index": 6,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job f39b00ac2d92e80808c5baf9c5148b16808b64c3852633fc7440587365add54d with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03869220599881373,
+     "process": 4
+    },
+    {
+     "index": 7,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 91873581ace29e4c18c39371725b5b76d9f233a508a707cc56f81740263a8707 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03742161300033331,
+     "process": 4
+    },
+    {
+     "index": 8,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fbcbb926afd787259ff5e1ad56f9ad264cc90fcc52e80267f1a4ef12f1d318d0 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04043509700022696,
+     "process": 4
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job d2c8e89d7f4f9fd23b923c9f8d36415f69945608c8618ec96e36d08f5f29c525 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.037211668999589165,
+     "process": 4
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 0b31fa94ebf0c5d145a00568bdd5e805a22dcc93b434965c78ec5a357cb59f15 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03502085999934934,
+     "process": 4
+    },
+    {
+     "index": 11,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 3c7b5f6d5b2844c0dee2f0021bd0488aab506aeb516defca58b0696f0cdbc5ab with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03989889799959201,
+     "process": 4
+    },
+    {
+     "index": 12,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job de935d36432204412d2a87e678a8a6912181ec33b0baf3f730300ebabf8cd2ab with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04181377199893177,
+     "process": 4
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 04129dc5adaf2404275433c43e3a0c3b26aca02c22ea3977b6e45d299549455a with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03854409299856343,
+     "process": 4
+    },
+    {
+     "index": 14,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job e08903124a8cdbda974d8c6c49a49e893b6ae3d8a5de6bd4411117522c230fd3 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04056100999878254,
+     "process": 4
+    },
+    {
+     "index": 15,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 57692eb29b1ce404a1794c6dc6408561fffbe8151aea63613feae0d4cef6ca36 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.0325770459985506,
+     "process": 4
+    },
+    {
+     "index": 16,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "9a83c37d81674fbb35d56f54e433bbf7b0df03dc3f8754bb4558bedf73ca228a",
+     "post_seconds": 0.030141811999783386,
+     "outcome": "built",
+     "seen_after": 56.78191701299875,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.781128931,
+      "build": 6.940283053,
+      "upload": 1.808217769
+     }
+    },
+    {
+     "index": 17,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "6727c19224ae28ac0647991c4ae67c2f879c3018b29a5f9839eb223f57ba7cc5",
+     "post_seconds": 0.031359063999843784,
+     "outcome": "built",
+     "seen_after": 62.1308182089997,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.303747207,
+      "build": 3.128442739,
+      "upload": 1.0957914579999999
+     }
+    },
+    {
+     "index": 18,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "f9aa3324ecd7061f1fedf01bead559f163701ac0cde846f743d90e8e9d28db17",
+     "post_seconds": 0.019670143999974243,
+     "outcome": "built",
+     "seen_after": 21.36372062099872,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 1.402220087,
+      "build": 13.063678852,
+      "upload": 2.841104232
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 1d90fcd7edf64c90a77493e36aa3c175510a99cd1e336b729b16050034421caf with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03638091399989207,
+     "process": 4
+    },
+    {
+     "index": 20,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 87b39f1aa9566d41aa0fcef1fc5848e898d9a5bad7f5459d60d3a50037dfbf19 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03766391799945268,
+     "process": 4
+    },
+    {
+     "index": 21,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 839483f97b9b6d4a2bd1f9fd8d9c8d9748faa423f5a3a82cc099dc88bc0fd002 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03528239499974006,
+     "process": 4
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job bf405cfbfd2f54e7b732152d31311006292621dadca265f42526af2b3f13ede5 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03800292399864702,
+     "process": 4
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job b5790803cfc79d27a177ad30d21425054d366fe74030e0dcd89a471584625f6a with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03536992599947553,
+     "process": 4
+    },
+    {
+     "index": 24,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "3ae4012363c0133f77c2c90d5e2b75a6490be1c67b6005c8ee6d01f5d4d8bc66",
+     "post_seconds": 0.028034035000018775,
+     "outcome": "built",
+     "seen_after": 75.83936154299954,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 1.482501406,
+      "build": 12.91851614,
+      "upload": 2.295033849
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 1dcf923ae8437546a52ccad437ebc11b30b1b476f4edd394c0d2ad73492ea508 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03396852100013348,
+     "process": 4
+    },
+    {
+     "index": 26,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "8682bb19bd547cc01c7f3e15e3a021d48aeded5e08f8159cf34873aed33eee50",
+     "post_seconds": 0.03668880000077479,
+     "outcome": "built",
+     "seen_after": 46.39698695399966,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.422318258,
+      "build": 3.160292363,
+      "upload": 1.075107476
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 2515b88a403e08a6d0a6e9d35e3b953bdfacf971644b9705ceb5d45eb1f012e1 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.036784141999305575,
+     "process": 4
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job a6ed0500a4658cf8369e06bc14259f6006e66ea214d7be2dff8617df2c1808de with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.035938286999225966,
+     "process": 4
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 76cb3a57dfbfa0b3640c666aaa7d117ee07088b94635f29c924dfff6428102de with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03602375799891888,
+     "process": 4
+    },
+    {
+     "index": 30,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 323fcfdb6f33120a883ebd70d2a0cc4b23bd50f4840100827d61ce8d30caa648 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.034536981000201195,
+     "process": 4
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 37f4279ac6d7f384455667a16d43b027ba2f1a9a339a87d88d08ee7bdfc3d252 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03829958899950725,
+     "process": 4
+    },
+    {
+     "index": 32,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 68b6c13264981935fb97131f127279c10be3e34ec3fbd060fafe7a4d64ee1901 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03861425499962934,
+     "process": 4
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job b093844ab26cf945cd92aef3cfb07cf231f723e37fed87174deae2df3c5ef006 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.0382071169988194,
+     "process": 4
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 85cb7ccedff958238e61f3c463d1cd64a3c96979a457399161561d42c71524e6 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04037457599952177,
+     "process": 4
+    },
+    {
+     "index": 35,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 210aacc0f298a44f7b083385a2a53fb86cb6b2273923a8a2cacb1435a12ad0fe with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04119785100010631,
+     "process": 4
+    },
+    {
+     "index": 36,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "c438d3f211fd72b646afb5b54eb895362b42aa12944e7c03fb85c37886e620b3",
+     "post_seconds": 0.013034825000431738,
+     "outcome": "built",
+     "seen_after": 36.225211248998676,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 1.135024988,
+      "build": 13.166048187,
+      "upload": 2.768611367
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job cfec5e6534635fe5634100c358a2be35e27668e5ab746afa98f2ef6d844202e6 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03544532799969602,
+     "process": 4
+    },
+    {
+     "index": 38,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 3eda318350160a9157438427baef92ba89b9eb93eaf6475573b2d0b001df9ae0 with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03339537099964218,
+     "process": 4
+    },
+    {
+     "index": 39,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 8bd9f5568867a89ec327e3289ff55a8a26e044205902ccbab631d7cfd443dea4 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04128397299973585,
+     "process": 4
+    },
+    {
+     "index": 40,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job e452ee4ccf998021c62e847e8e9e8fc8106b660d8162de3ab12b93a3a5e697f1 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 95 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.03664781899897207,
+     "process": 4
+    },
+    {
+     "index": 41,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "aaf1140728207daa4949eddbb3b937a672e06ead43477d7cd3b31d339f880024",
+     "post_seconds": 0.035092550999252126,
+     "outcome": "built",
+     "seen_after": 57.910336093000296,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.370234055,
+      "build": 3.1715894860000002,
+      "upload": 1.092730241
+     }
+    },
+    {
+     "index": 42,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job ff95eef1803ab54b8d13ca85250f0e67466fc0d1fa5ca5bc9cc9661ad58287f3 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.040918025999417296,
+     "process": 4
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "a2f281ffd82002f5e6e1500c59c74307142740b759899e8bb95ffc064657ee37",
+     "post_seconds": 0.023727206998955808,
+     "outcome": "built",
+     "seen_after": 41.311770432999765,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.863360974,
+      "build": 7.174871641,
+      "upload": 1.750401706
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-l2-1000000x128-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job fcf0e05e6da4a055fbc08f81589d096d52f600156dfeaaa9b4d69c7c308f870b with vector path sift-l2-1000000x128-byte/vectors.knnvec would be seen ended in about 93 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.034926657999676536,
+     "process": 4
+    },
+    {
+     "index": 45,
+     "input": "cohere-l2-1000000x768-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job df63182b10f2dfbf5f1dac3debb909ab45a8ed4368d2483a6d9dc72d357e1ec3 with vector path cohere-l2-1000000x768-byte/vectors.knnvec would be seen ended in about 107 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.041641869000159204,
+     "process": 4
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "outcome": "refused",
+     "status": 507,
+     "detail": {
+      "detail": "Job 6712f63044e7e3c4f92e25d0ba98fce75c9bfdb0bae3eed5a3f803915bc7e124 with vector path ms-marco-l2-1000000x384-byte/vectors.knnvec would be seen ended in about 99 s, past the data node's timeout of 90 s"
+     },
+     "cpu_after": 0.04049513899917656,
+     "process": 4
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "db4e45ef0d41da851a91e5050c82d930ccbf12f09f46b5ad8d401e94e031f162",
+     "post_seconds": 0.02752733600027568,
+     "outcome": "built",
+     "seen_after": 76.15301102800004,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.301712019,
+      "build": 3.213371799,
+      "upload": 1.07861747
+     }
+    }
+   ]
+  }
+ },
+ "service_starts": [
+  "2026-11-28T03:46:18.619077+00:00",
+  "2026-11-28T04:14:46.348207+00:00",
+  "2026-11-28T04:16:29.297485+00:00",
+  "2026-11-28T04:18:14.513595+00:00"
+ ],
+ "ended": "2026-11-28T04:20:00.284347+00:00"
+}

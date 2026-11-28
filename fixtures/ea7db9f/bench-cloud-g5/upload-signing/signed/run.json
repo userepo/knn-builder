@@ -1,0 +1,291 @@
+{
+ "service": "knn-builder",
+ "image": "knn-builder:dev",
+ "image_id": "sha256:853f84eb0323af9b19de61c302c10dc955e27025646344a7d8e2eb40896dbf0a",
+ "max_workers": 2,
+ "gpu": {
+  "name": "NVIDIA A10G",
+  "driver": "595.91.07",
+  "memory_mib": 23028
+ },
+ "started": "2026-11-28T05:28:12.169673+00:00",
+ "settings": {
+  "runs": 3,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 0,
+  "recall_check_k": 10,
+  "s3_payload_signing_enabled": "true",
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 24.0,
+  "s3": {
+   "store": "s3",
+   "region": "us-east-2",
+   "endpoint": "aws"
+  }
+ },
+ "inputs": {
+  "gist-ip-1000000x960": {
+   "dir": "target/bench/inputs/gist-ip-1000000x960",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 0,
+   "job_id": "e9efb39cf8d817a537f4c2facdf2c79334297466411cdbc301efb9d993376230",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 27.642,
+   "start": "2026-11-28T05:28:42.775235+00:00",
+   "end": "2026-11-28T05:29:10.417561+00:00",
+   "host_peak_bytes": 4219838464,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 5.111542447,
+    "build": 15.712313335,
+    "upload": 6.503863825
+   },
+   "device_samples": 551,
+   "device_held_bytes": 271581184,
+   "device_peak_bytes": 996147200
+  }
+ ],
+ "scrapes": [
+  {
+   "process": 1,
+   "file": "metrics/process-1.txt",
+   "at": "2026-11-28T05:34:00.815954+00:00"
+  }
+ ],
+ "single": [
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 3,
+   "job_id": "a4f5954e11c12621a7fa07b2f8bab05966da20a7845319597d1b772861f33602",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 25.241,
+   "start": "2026-11-28T05:29:10.801579+00:00",
+   "end": "2026-11-28T05:29:36.042772+00:00",
+   "host_peak_bytes": 4239200256,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "process": 1,
+   "size": 3352129561,
+   "seconds": {
+    "download": 5.140050465,
+    "build": 13.1738848,
+    "upload": 6.553213265
+   },
+   "device_samples": 504,
+   "device_held_bytes": 445644800,
+   "device_peak_bytes": 819986432
+  },
+  {
+   "input": "gist-ip-1000000x960",
+   "index": 4,
+   "job_id": "84acb1a91f8cbd7f699dfc0faefb82560d63ad0a0c30605dcebb62a4e74e6289",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 31.314,
+   "start": "2026-11-28T05:30:17.811701+00:00",
+   "end": "2026-11-28T05:30:49.126109+00:00",
+   "host_peak_bytes": 5011132416,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "process": 1,
+   "size": 4120129561,
+   "seconds": {
+    "download": 6.519111481,
+    "build": 16.164530899,
+    "upload": 8.076549584
+   },
+   "device_samples": 625,
+   "device_held_bytes": 441450496,
+   "device_peak_bytes": 1019215872
+  },
+  {
+   "input": "sift-l2-1000000x128",
+   "index": 5,
+   "job_id": "a5c933c78d86e3264af312293e4a9fc9175fa00c6fe3164586b228f504e1df63",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 7.871,
+   "start": "2026-11-28T05:31:37.461165+00:00",
+   "end": "2026-11-28T05:31:45.331959+00:00",
+   "host_peak_bytes": 1719308288,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "process": 1,
+   "size": 792129561,
+   "seconds": {
+    "download": 0.996434714,
+    "build": 4.916133042,
+    "upload": 1.7773898030000002
+   },
+   "device_samples": 157,
+   "device_held_bytes": 437256192,
+   "device_peak_bytes": 394264576
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 6,
+   "job_id": "0603500cf5e883f2c55b8e353603827022b37a3c4abf0c585ee85f8cdc0d4bc0",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 25.042,
+   "start": "2026-11-28T05:31:53.624719+00:00",
+   "end": "2026-11-28T05:32:18.667064+00:00",
+   "host_peak_bytes": 4283961344,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "process": 1,
+   "seconds": {
+    "download": 5.002969404,
+    "build": 13.174250664,
+    "upload": 6.448128308
+   },
+   "device_samples": 499,
+   "device_held_bytes": 435159040,
+   "device_peak_bytes": 819986432
+  },
+  {
+   "input": "gist-ip-1000000x960",
+   "index": 7,
+   "job_id": "af3d44922e1d1b36cb97a8dae1a1a22d39969a62c27d8bf55d5b48e3274cadf1",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 31.26,
+   "start": "2026-11-28T05:32:19.027934+00:00",
+   "end": "2026-11-28T05:32:50.287691+00:00",
+   "host_peak_bytes": 5065310208,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "process": 1,
+   "seconds": {
+    "download": 6.700706781,
+    "build": 16.067872896,
+    "upload": 7.945601402
+   },
+   "device_samples": 623,
+   "device_held_bytes": 430964736,
+   "device_peak_bytes": 765460480
+  },
+  {
+   "input": "sift-l2-1000000x128",
+   "index": 8,
+   "job_id": "98301924ced421798b426983017e2b2a9aa7aabce22b750e0eb3b2b87357384c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 6.261,
+   "start": "2026-11-28T05:32:50.666941+00:00",
+   "end": "2026-11-28T05:32:56.928261+00:00",
+   "host_peak_bytes": 1737723904,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "process": 1,
+   "seconds": {
+    "download": 1.07496386,
+    "build": 3.154995109,
+    "upload": 1.7598378110000001
+   },
+   "device_samples": 125,
+   "device_held_bytes": 424673280,
+   "device_peak_bytes": 392167424
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 9,
+   "job_id": "bb34e2f01efaee8aad8dfde34ac801e2e589ae40e65ddde14926897808fb03bf",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 25.464,
+   "start": "2026-11-28T05:32:57.293031+00:00",
+   "end": "2026-11-28T05:33:22.757467+00:00",
+   "host_peak_bytes": 4294758400,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "process": 1,
+   "seconds": {
+    "download": 5.4184556950000005,
+    "build": 13.105424463,
+    "upload": 6.464156247
+   },
+   "device_samples": 508,
+   "device_held_bytes": 420478976,
+   "device_peak_bytes": 819986432
+  },
+  {
+   "input": "gist-ip-1000000x960",
+   "index": 10,
+   "job_id": "b9e62ff1be870424c2c528f27c81154f0d9a0bee622c3246e7d5691f2587489e",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 31.051,
+   "start": "2026-11-28T05:33:23.123022+00:00",
+   "end": "2026-11-28T05:33:54.173948+00:00",
+   "host_peak_bytes": 5083594752,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "process": 1,
+   "seconds": {
+    "download": 6.468246935,
+    "build": 16.094376397,
+    "upload": 8.054415274
+   },
+   "device_samples": 619,
+   "device_held_bytes": 416284672,
+   "device_peak_bytes": 1019215872
+  },
+  {
+   "input": "sift-l2-1000000x128",
+   "index": 11,
+   "job_id": "3708317b5edd84a908ef1ebed8e696e8c437c3b077701b5e5d45fa5a409ccf5d",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 6.053,
+   "start": "2026-11-28T05:33:54.567102+00:00",
+   "end": "2026-11-28T05:34:00.620128+00:00",
+   "host_peak_bytes": 1755615232,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "process": 1,
+   "seconds": {
+    "download": 0.998734642,
+    "build": 3.157215393,
+    "upload": 1.769798168
+   },
+   "device_samples": 120,
+   "device_held_bytes": 412090368,
+   "device_peak_bytes": 392167424
+  }
+ ],
+ "service_starts": [
+  "2026-11-28T05:28:12.866834+00:00"
+ ],
+ "ended": "2026-11-28T05:34:11.503829+00:00"
+}

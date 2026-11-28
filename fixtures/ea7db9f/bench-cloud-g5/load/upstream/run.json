@@ -1,0 +1,3934 @@
+{
+ "service": "upstream",
+ "image": "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+ "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+ "max_workers": 2,
+ "gpu": {
+  "name": "NVIDIA A10G",
+  "driver": "595.91.07",
+  "memory_mib": 23028
+ },
+ "started": "2026-11-28T04:20:00.388381+00:00",
+ "settings": {
+  "runs": 5,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 0,
+  "recall_check_k": 10,
+  "s3_payload_signing_enabled": null,
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 24.0,
+  "s3": {
+   "store": "s3",
+   "region": "us-east-2",
+   "endpoint": "aws"
+  }
+ },
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": {
+   "dir": "target/bench/inputs/cohere-hamming-1000000x768-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "gist-ip-1000000x960": {
+   "dir": "target/bench/inputs/gist-ip-1000000x960",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "gist-l2-1000000x960": {
+   "dir": "target/bench/inputs/gist-l2-1000000x960",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-hamming-1000000x384-binary": {
+   "dir": "target/bench/inputs/ms-marco-hamming-1000000x384-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "sift-hamming-1000000x128-binary": {
+   "dir": "target/bench/inputs/sift-hamming-1000000x128-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-hamming-1000000x768-binary",
+   "index": 0,
+   "job_id": "7376bbaef953c1188206e26dd092db8cd5eff84a9ebdcdde6e30f55e264e237a",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 28.555,
+   "start": "2026-11-28T04:21:16.958686+00:00",
+   "end": "2026-11-28T04:21:45.514199+00:00",
+   "host_peak_bytes": 3072819200,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 0.88,
+    "build": 25.69,
+    "conversion": 0.76,
+    "write": 0.17,
+    "upload": 0.71
+   },
+   "device_samples": 569,
+   "device_held_bytes": 0,
+   "device_peak_bytes": 896532480
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 1,
+   "job_id": "717d8193f4a0dfb54cb8643e5e55cfc11ad32fc124abf60d04d0973eceda1e9c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 35.744,
+   "start": "2026-11-28T04:21:45.897046+00:00",
+   "end": "2026-11-28T04:22:21.640594+00:00",
+   "host_peak_bytes": 8262656000,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 11.58,
+    "build": 15.59,
+    "conversion": 2.23,
+    "write": 1.33,
+    "upload": 4.54
+   },
+   "device_samples": 712,
+   "device_held_bytes": 273678336,
+   "device_peak_bytes": 1004535808
+  },
+  {
+   "input": "cohere-ip-1000000x768-byte",
+   "index": 2,
+   "job_id": "231fffba0c3b4eb7015028510e507f96e513e94ce8656dcee5fd741e8c86e6ca",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 19.759,
+   "start": "2026-11-28T04:22:22.028358+00:00",
+   "end": "2026-11-28T04:22:41.786977+00:00",
+   "host_peak_bytes": 3675168768,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 2.85,
+    "build": 12.69,
+    "conversion": 1.84,
+    "write": 0.42,
+    "upload": 1.68
+   },
+   "device_samples": 394,
+   "device_held_bytes": 405798912,
+   "device_peak_bytes": 717225984
+  },
+  {
+   "input": "cohere-hamming-1000000x768-binary",
+   "index": 0,
+   "job_id": "c9b88564e22df58a5aff0907ae46d76328faa2c6e28cc41c07baa2cf36d223ef",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 28.343,
+   "start": "2026-11-28T04:53:17.806962+00:00",
+   "end": "2026-11-28T04:53:46.149798+00:00",
+   "host_peak_bytes": 3076059136,
+   "file_name": "vectors.faiss",
+   "phase": "burst",
+   "process": 2,
+   "seconds": {
+    "download": 0.91,
+    "build": 25.54,
+    "conversion": 0.77,
+    "write": 0.15,
+    "upload": 0.7
+   },
+   "device_samples": 565,
+   "device_held_bytes": 0,
+   "device_peak_bytes": 896532480
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 1,
+   "job_id": "d5f96ff5277f8202559ee459a7aaad26a428e40419101792d411eef94e4352ac",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 37.148,
+   "start": "2026-11-28T04:55:27.678522+00:00",
+   "end": "2026-11-28T04:56:04.826856+00:00",
+   "host_peak_bytes": 8220409856,
+   "file_name": "vectors.faiss",
+   "phase": "burst",
+   "process": 3,
+   "seconds": {
+    "download": 12.98,
+    "build": 15.33,
+    "conversion": 2.22,
+    "write": 1.32,
+    "upload": 4.59
+   },
+   "device_samples": 741,
+   "device_held_bytes": 0,
+   "device_peak_bytes": 1276116992
+  },
+  {
+   "input": "cohere-ip-1000000x768-byte",
+   "index": 2,
+   "job_id": "41ad062fa49115be11d7b236f7d115521f5492c75cc409975820197831771b26",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 20.742,
+   "start": "2026-11-28T04:57:53.040874+00:00",
+   "end": "2026-11-28T04:58:13.782725+00:00",
+   "host_peak_bytes": 3581255680,
+   "file_name": "vectors.faiss",
+   "phase": "burst",
+   "process": 4,
+   "seconds": {
+    "download": 3.45,
+    "build": 13.0,
+    "conversion": 1.85,
+    "write": 0.42,
+    "upload": 1.71
+   },
+   "device_samples": 413,
+   "device_held_bytes": 0,
+   "device_peak_bytes": 1127219200
+  }
+ ],
+ "scrapes": [],
+ "concurrent": {
+  "binary": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "75b67eba355bcb5d5d6ae2fcec22fa2f18c3ee95398a940bd5cb1e2650c0096a",
+     "post_seconds": 0.014648312999270274,
+     "outcome": "built",
+     "seen_after": 68.58773355099947,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 9,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "9a11b22a2f2cc8274324a2045e1d44326f00774e97323947fa232698e8381952",
+     "post_seconds": 0.016241649998846697,
+     "outcome": "built",
+     "seen_after": 95.76118334899911,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 10,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9c0b8f1ef85219c615a566f104f4b9c8e0a3450b22b2c29ec56b253e6c24e753",
+     "post_seconds": 0.015258204000929254,
+     "outcome": "built",
+     "seen_after": 94.0662478969989,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.45,
+      "build": 22.97,
+      "conversion": 0.74,
+      "write": 0.15,
+      "upload": 0.67
+     }
+    },
+    {
+     "index": 11,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "06f5758ff49859c1e4698d9517ced720b6c79687e1558f2d413febe4abddea86",
+     "post_seconds": 0.013400702000581077,
+     "outcome": "built",
+     "seen_after": 33.41832187899854,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4c37769c8f6ce78df457a36d39d97c36ee2df9e3063a5c128266ff565a738538",
+     "post_seconds": 0.016216420001001097,
+     "outcome": "built",
+     "seen_after": 121.0311932629993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 13,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "11a32524dc8e66ba5bbbc88bc9cdfc2d0957a963baf5d6b244a29d51a727461e",
+     "post_seconds": 0.013112755999827641,
+     "outcome": "built",
+     "seen_after": 32.36964637999881,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.42,
+      "build": 27.08,
+      "conversion": 0.76,
+      "write": 0.12,
+      "upload": 0.66
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "8f33d27c132cdd1e6aee60b88f01cdff62704073ed419082cf6b059a5cd39fda",
+     "post_seconds": 0.01369249700110231,
+     "outcome": "built",
+     "seen_after": 69.0356064439984,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 15,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "a01bf7ef60428047d19edc92000f6c5477006e7640c86b084a32f0ca0c827346",
+     "post_seconds": 0.016810131000966066,
+     "outcome": "built",
+     "seen_after": 121.62771738799893,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 16,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "8c21c36d00ef042c4861f2126b1adc67642ef808d37daeac828c7b416af7d8b0",
+     "post_seconds": 0.012287714000194683,
+     "outcome": "built",
+     "seen_after": 32.69233790999897,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.9,
+      "build": 26.99,
+      "conversion": 0.89,
+      "write": 0.15,
+      "upload": 0.71
+     }
+    },
+    {
+     "index": 17,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "bbb7449ad143869ab2758003e6386503f249a15ff3deeace30573d822ae4f027",
+     "post_seconds": 0.013586737000878202,
+     "outcome": "built",
+     "seen_after": 62.13650258099915,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 18,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a82d569f826ab333c0c178902206fe5e0953ffeb23ac26dadf0277e573a0d23c",
+     "post_seconds": 0.012112061000152607,
+     "outcome": "built",
+     "seen_after": 32.76477032399998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.41,
+      "build": 27.07,
+      "conversion": 0.76,
+      "write": 0.12,
+      "upload": 0.64
+     }
+    },
+    {
+     "index": 19,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "80b3d8c15a12cd0cff1592959243e8caf00d01011fc19ddcd2658dcfeed48900",
+     "post_seconds": 0.014984002000346663,
+     "outcome": "built",
+     "seen_after": 87.56731075799871,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d911fe304141eea1eabd957594168c21c2e90e7e47d61d8ac38518da1de43f29",
+     "post_seconds": 0.015932659000100102,
+     "outcome": "built",
+     "seen_after": 119.44663367999965,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.01,
+      "build": 28.94,
+      "conversion": 1.0,
+      "write": 0.14,
+      "upload": 1.1
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d84e3ee9e47ade25f9340309b92d8e354945a3b88d5393053365d90a69f7c20a",
+     "post_seconds": 0.015198297000097227,
+     "outcome": "built",
+     "seen_after": 90.42150376999962,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.4,
+      "build": 27.09,
+      "conversion": 0.78,
+      "write": 0.12,
+      "upload": 0.66
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a571a7afec785936b44566ec8d695b9d424857611091a30cb2e5789a0e06152b",
+     "post_seconds": 0.016683552999893436,
+     "outcome": "built",
+     "seen_after": 121.59104147299877,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 23,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "dd037144337608e55b9a28d83b9f3504aa832275d0704e161d7e448a39fd91e2",
+     "post_seconds": 0.013942953999503516,
+     "outcome": "built",
+     "seen_after": 58.32666286199856,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "db821179075d13fc4d5a27940b93d5aef66f52fa0e54e6ae792577dd8971e842",
+     "post_seconds": 0.007071777999954065,
+     "outcome": "built",
+     "seen_after": 35.309926832998826,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.75,
+      "build": 29.49,
+      "conversion": 0.96,
+      "write": 0.16,
+      "upload": 1.04
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "aa907a3901ac4fe90d8861373274798b83700c688f97c4aee837139c8fbf9cb8",
+     "post_seconds": 0.014227528999981587,
+     "outcome": "built",
+     "seen_after": 90.28482292199988,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.82,
+      "build": 29.2,
+      "conversion": 0.94,
+      "write": 0.13,
+      "upload": 1.14
+     }
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "30d790bbdb6617f80e64c7467571274dc45d0d55e602abcfda47190c24fb87ea",
+     "post_seconds": 0.013053958000455168,
+     "outcome": "built",
+     "seen_after": 61.052847822998956,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": null
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a789b07f62f3cc6fa60c5c1a4d165cb3ee85726986e5a1fec2101cadb7c42f87",
+     "post_seconds": 0.015525462998994044,
+     "outcome": "built",
+     "seen_after": 126.81442082799913,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.73,
+      "build": 29.61,
+      "conversion": 0.96,
+      "write": 0.16,
+      "upload": 1.0
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8b7b0f2c0718a2b611dd07d36d500857368b03835815f8e9a6eb6ace061a1af7",
+     "post_seconds": 0.015183475999947404,
+     "outcome": "built",
+     "seen_after": 123.26575609700012,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.21,
+      "build": 29.13,
+      "conversion": 0.85,
+      "write": 0.14,
+      "upload": 1.08
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c0ec82c736f21db88fc291b7274a76b06c2d1ef6c8db1d7592f9f0b410c46bec",
+     "post_seconds": 0.014125626001259661,
+     "outcome": "built",
+     "seen_after": 57.63783154999874,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": null
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "1d73586418086adb153c509f9f428520188720d9c431946d2230c8c5cceab40e",
+     "post_seconds": 0.015266387999872677,
+     "outcome": "built",
+     "seen_after": 91.65854731000036,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.91,
+      "build": 29.21,
+      "conversion": 0.83,
+      "write": 0.15,
+      "upload": 1.09
+     }
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "73f94eeb91ae54a7435b62865d8ad09ca3a33937031fa61cff4d7a5f48704f98",
+     "post_seconds": 0.01245024699892383,
+     "outcome": "built",
+     "seen_after": 37.4364802479995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.11,
+      "build": 29.07,
+      "conversion": 0.85,
+      "write": 0.14,
+      "upload": 1.04
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "9bff97223319b49e0e44aad03c99492827abb01342d4ca76ee892f0a10a89622",
+     "post_seconds": 0.011877416000061203,
+     "outcome": "built",
+     "seen_after": 39.456650932999764,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 33,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d401d8f4b1474cadddf523ee89c8f14a51d45e535189f0d2ba91d0d121a083ea",
+     "post_seconds": 0.013931683000919293,
+     "outcome": "built",
+     "seen_after": 98.27647602999969,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 34,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "5492ccb274bd983443c4b340246726c2deadfb00f1a4ae7a58a077f5930787e7",
+     "post_seconds": 0.013150669001333881,
+     "outcome": "built",
+     "seen_after": 67.91388105199985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.41,
+      "build": 27.08,
+      "conversion": 0.77,
+      "write": 0.12,
+      "upload": 0.6
+     }
+    },
+    {
+     "index": 35,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "2aa9fea6899f7321a602ff3022176e7d5cc76b673703fa0d1c0b74a35e4c8885",
+     "post_seconds": 0.010869857000216143,
+     "outcome": "built",
+     "seen_after": 42.05390206999982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "0c59c5abac7bd4bfb4f335ffa282e6e1b5499d89814ce8596b03bd098e094b7a",
+     "post_seconds": 0.014404982999622007,
+     "outcome": "built",
+     "seen_after": 124.5046227060011,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 37,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "1c871addccbd0fa663d37164a46201861053601c8412bb3deb373a1ba4d3718e",
+     "post_seconds": 0.014951651999581372,
+     "outcome": "built",
+     "seen_after": 121.74566873100048,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.41,
+      "build": 23.1,
+      "conversion": 0.77,
+      "write": 0.12,
+      "upload": 0.65
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "339afe15b03a9a2da4043093b9df9ca6b81d3fa02b6c419c888c88fb2b471676",
+     "post_seconds": 0.01249768799971207,
+     "outcome": "built",
+     "seen_after": 68.31850305400076,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 39,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3d9f92fbaa97da33299876f51d84dcbe79ba414ba67936213f818d8ce4d78d23",
+     "post_seconds": 0.013999675000377465,
+     "outcome": "built",
+     "seen_after": 96.01444986000024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 40,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "33ae2bba1a5a8e8b3ff798a777bc301f9cf01b860e57e9387410e1d309261fea",
+     "post_seconds": 0.012705383000138681,
+     "outcome": "built",
+     "seen_after": 67.81433837400073,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": null
+    },
+    {
+     "index": 41,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "11237079a78243b025445782d3c5409f0d0a27df803d8aac1c8b81c0f516b77d",
+     "post_seconds": 0.01238116800050193,
+     "outcome": "built",
+     "seen_after": 36.31862096199984,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.21,
+      "build": 29.05,
+      "conversion": 0.85,
+      "write": 0.14,
+      "upload": 1.21
+     }
+    },
+    {
+     "index": 42,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "272cf6411c8b6821a1575d5df0e3684c0c51c25cb48944b4b66ef8d587e53977",
+     "post_seconds": 0.01294308800061117,
+     "outcome": "built",
+     "seen_after": 62.34992895799951,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.39,
+      "build": 27.1,
+      "conversion": 0.76,
+      "write": 0.12,
+      "upload": 0.76
+     }
+    },
+    {
+     "index": 43,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "62e2426eb3a57e0687ed229acef58b663d20b2d2fef10444f469c8cad3e9893b",
+     "post_seconds": 0.012393197999699623,
+     "outcome": "built",
+     "seen_after": 36.239319645999785,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": null
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "02471987c93e8a4a50ceaa08f8e2e5b8f51560228b362a6e227aa90774901943",
+     "post_seconds": 0.014147728999887477,
+     "outcome": "built",
+     "seen_after": 91.3473582459992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.17,
+      "build": 22.26,
+      "conversion": 0.82,
+      "write": 0.14,
+      "upload": 0.68
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c8bbf2cc15b691bd256fc1646b808acd91a83dc0ea6a0fa1c5fe4e927cf22bbc",
+     "post_seconds": 0.013570469000114826,
+     "outcome": "built",
+     "seen_after": 87.11494939799923,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.51,
+      "build": 23.0,
+      "conversion": 0.77,
+      "write": 0.12,
+      "upload": 0.66
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7a128720f3a68de85577b8d68294f97c1893a034239e22ce83d53091dfe11882",
+     "post_seconds": 0.0147670209989883,
+     "outcome": "built",
+     "seen_after": 120.83796773199902,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.83,
+      "build": 29.54,
+      "conversion": 0.87,
+      "write": 0.16,
+      "upload": 1.1
+     }
+    },
+    {
+     "index": 47,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4e630386b8fc5dec5a440994e1eeafe4a3593a48b6e67fc1e8e4b7a576ae7a9a",
+     "post_seconds": 0.015175997999904212,
+     "outcome": "built",
+     "seen_after": 121.38319694100028,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.8,
+      "build": 29.12,
+      "conversion": 1.0,
+      "write": 0.13,
+      "upload": 1.05
+     }
+    }
+   ]
+  },
+  "float": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "3af8a308af8f5b39d3b256e09d92b133e233677abfa5c1ee6b6625b06d2cc2fa",
+     "post_seconds": 0.010691695999412332,
+     "outcome": "built",
+     "seen_after": 58.672644031001255,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 14.22,
+      "build": 16.58,
+      "conversion": 2.71,
+      "write": 1.47,
+      "upload": 4.91
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "4c0e43e1a3962a50ab6591af078beba1e5570be0a02ddc0e270bf36dbf8d8d91",
+     "post_seconds": 0.010399210999821662,
+     "outcome": "built",
+     "seen_after": 46.996075848001055,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 18.17,
+      "build": 15.21,
+      "conversion": 2.54,
+      "write": 1.4,
+      "upload": 4.61
+     }
+    },
+    {
+     "index": 10,
+     "input": "gist-ip-1000000x960",
+     "job_id": "bd3b5f8cdabf907fac1ef7426ef49c7e840927b026bb91c8e6e54bc4bcd8e4ef",
+     "post_seconds": 0.015498144999583019,
+     "outcome": "built",
+     "seen_after": 140.94640709100167,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 14.57,
+      "build": 15.83,
+      "conversion": 2.73,
+      "write": 4.63,
+      "upload": 6.49
+     }
+    },
+    {
+     "index": 11,
+     "input": "gist-l2-1000000x960",
+     "job_id": "6435c21f5eb27e3972f2c1c8dc4ad3d235fda5c0dfdda8b8613902affc8b174d",
+     "post_seconds": 0.013787984000373399,
+     "outcome": "built",
+     "seen_after": 117.31534500000089,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 22.0,
+      "build": 24.96,
+      "conversion": 3.08,
+      "write": 5.24,
+      "upload": 5.65
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "63246f71be62a3da8cbecbb75f5c129c1db8d49458458418ccae91e0ecbe4152",
+     "post_seconds": 0.01345560700065107,
+     "outcome": "built",
+     "seen_after": 64.63761070100009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 7.23,
+      "build": 7.67,
+      "conversion": 1.83,
+      "write": 0.84,
+      "upload": 3.81
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "c4dd23a929316f33d7446ec2d0b6c107a78bd6db12dff1431e09eb1b188e03b3",
+     "post_seconds": 0.014211200999852736,
+     "outcome": "built",
+     "seen_after": 94.48857255700023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 12.28,
+      "build": 10.5,
+      "conversion": 1.47,
+      "write": 0.74,
+      "upload": 2.73
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-ip-1000000x128",
+     "job_id": "94be8c00936c7d43552fce7093b31e0e7eee90b190f4abdce36d488c429aece7",
+     "post_seconds": 0.015716339001301094,
+     "outcome": "built",
+     "seen_after": 133.827807175001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.94,
+      "build": 6.91,
+      "conversion": 1.02,
+      "write": 3.89,
+      "upload": 2.35
+     }
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "cd371baa5a577c4e590f7e59960b424f271177baa15f69db9c8aec5e2cebad18",
+     "post_seconds": 0.009038015999976778,
+     "outcome": "built",
+     "seen_after": 16.329163708000124,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.56,
+      "build": 6.04,
+      "conversion": 1.06,
+      "write": 0.36,
+      "upload": 1.54
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "8db36df159ffe4dfd2602b2c53f1bb49132bc53087d163d4a4cbd1d6129fb56f",
+     "post_seconds": 0.016218685999774607,
+     "outcome": "built",
+     "seen_after": 156.39698527899964,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 18.83,
+      "build": 13.27,
+      "conversion": 2.22,
+      "write": 1.33,
+      "upload": 4.47
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "82a5c4e773c19c408c4d47ecf91a3cde6b73942abcb0f6527709afd40f20677e",
+     "post_seconds": 0.009545226999762235,
+     "outcome": "built",
+     "seen_after": 47.52620598499925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 18.47,
+      "build": 15.26,
+      "conversion": 2.26,
+      "write": 1.34,
+      "upload": 4.66
+     }
+    },
+    {
+     "index": 18,
+     "input": "gist-ip-1000000x960",
+     "job_id": "8d068607701eee59e304deb6c3595c1577025ec5e4f6e154c344ce3367bbb384",
+     "post_seconds": 0.011780209999415092,
+     "outcome": "built",
+     "seen_after": 100.18836801999896,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 26.19,
+      "build": 16.51,
+      "conversion": 2.59,
+      "write": 4.37,
+      "upload": 5.48
+     }
+    },
+    {
+     "index": 19,
+     "input": "gist-l2-1000000x960",
+     "job_id": "29e7fd6fef87009c233e5ddd9885ab53e934ffc83009726ebb9c5db5e7e62aaf",
+     "post_seconds": 0.011212718998649507,
+     "outcome": "built",
+     "seen_after": 118.5888596299992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 26.34,
+      "build": 27.37,
+      "conversion": 2.86,
+      "write": 3.56,
+      "upload": 7.97
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "8155c40c8fcf7c50b7e95e6f2bef161e648a5105d270959729f481a8a76d32b7",
+     "post_seconds": 0.009099127999434131,
+     "outcome": "built",
+     "seen_after": 27.775316373999885,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 12.76,
+      "build": 7.96,
+      "conversion": 1.47,
+      "write": 0.75,
+      "upload": 2.78
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "90740e5f6792285419bc8b70555a907fe3e103a05bb464a0e7c8d090d5c0047b",
+     "post_seconds": 0.010402862999399076,
+     "outcome": "built",
+     "seen_after": 51.46773747400039,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 6.38,
+      "build": 8.34,
+      "conversion": 2.05,
+      "write": 0.83,
+      "upload": 3.81
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128",
+     "job_id": "585d2cbcfd1c5e1c2e18a47480fdaf6bae18e134d5e40e39da2af343c2791fa2",
+     "post_seconds": 0.01540541100075643,
+     "outcome": "built",
+     "seen_after": 116.35433984299925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.37,
+      "build": 3.6,
+      "conversion": 1.03,
+      "write": 3.1,
+      "upload": 2.42
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "d5d94a44af796b44501595dc763800095f6e38eb3a4e774b9af85290eed23ca4",
+     "post_seconds": 0.01639898000030371,
+     "outcome": "built",
+     "seen_after": 128.5480663340004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 3.78,
+      "build": 3.59,
+      "conversion": 1.09,
+      "write": 0.34,
+      "upload": 1.56
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "db25b932c1e7964a16694abad94000d68d4498b311063b152ab6bd8c8253b2cd",
+     "post_seconds": 0.014593116999094491,
+     "outcome": "built",
+     "seen_after": 110.77588954500061,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 25.89,
+      "build": 17.2,
+      "conversion": 2.56,
+      "write": 1.32,
+      "upload": 4.53
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "4aec0dcd19bd0537f6a931df89006db17579904c0e8a312da03bf0c83e05279e",
+     "post_seconds": 0.01317628100150614,
+     "outcome": "built",
+     "seen_after": 55.07975760699992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 15.61,
+      "build": 15.77,
+      "conversion": 2.27,
+      "write": 1.34,
+      "upload": 5.02
+     }
+    },
+    {
+     "index": 26,
+     "input": "gist-ip-1000000x960",
+     "job_id": "b66e6584addc753785a383f34f192a8534add1ffc5bcf5d147c410dfb2b5ea56",
+     "post_seconds": 0.015681206999943242,
+     "outcome": "built",
+     "seen_after": 129.2180019940006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 22.79,
+      "build": 29.04,
+      "conversion": 3.1,
+      "write": 3.35,
+      "upload": 7.9
+     }
+    },
+    {
+     "index": 27,
+     "input": "gist-l2-1000000x960",
+     "job_id": "6fd837d4532e074a4eadc7b4e2c2e0c95f50609e9f0403000b13212a1db34093",
+     "post_seconds": 0.015329599998949561,
+     "outcome": "built",
+     "seen_after": 153.85110262600028,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 19.18,
+      "build": 16.46,
+      "conversion": 2.6,
+      "write": 2.18,
+      "upload": 5.35
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "a8c241a210647488eebdc2d0069f275f1e13ef9e120ab42ea9c105cb777bd640",
+     "post_seconds": 0.012674061999859987,
+     "outcome": "built",
+     "seen_after": 61.07215436899969,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 6.12,
+      "build": 8.28,
+      "conversion": 2.13,
+      "write": 0.73,
+      "upload": 3.44
+     }
+    },
+    {
+     "index": 29,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "112cd5c197ab950508f2507dd50b1e3e90f3962838904b2ccc4c56b7bec1135b",
+     "post_seconds": 0.011932318999242852,
+     "outcome": "built",
+     "seen_after": 37.44691024399981,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 12.59,
+      "build": 8.11,
+      "conversion": 1.47,
+      "write": 0.75,
+      "upload": 2.76
+     }
+    },
+    {
+     "index": 30,
+     "input": "sift-ip-1000000x128",
+     "job_id": "5a35cee1417be2719e167b89d22e388b6ec0674251126f5fbb572be81582a6db",
+     "post_seconds": 0.011319467001158046,
+     "outcome": "built",
+     "seen_after": 16.33326639200095,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 4.0,
+      "build": 6.4,
+      "conversion": 1.13,
+      "write": 0.36,
+      "upload": 1.59
+     }
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "7ef0237d7e3cf581a25805fe29750781f22c062cf9612b4c17ccc52c4ac84bca",
+     "post_seconds": 0.006642821999776061,
+     "outcome": "built",
+     "seen_after": 17.588893701000416,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 3.51,
+      "build": 5.06,
+      "conversion": 0.97,
+      "write": 0.33,
+      "upload": 1.35
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "9b45fa975b2a21ea00e54d69c23b097592df1f8c0574c11ce9c5f8a21025b650",
+     "post_seconds": 0.009585631998561439,
+     "outcome": "built",
+     "seen_after": 49.9427345389995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 22.97,
+      "build": 15.56,
+      "conversion": 2.21,
+      "write": 1.36,
+      "upload": 4.62
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "915d7d695fe274ef176b3a0778e45dc4f8201a9853ac47c1ec5145f921622baf",
+     "post_seconds": 0.016645878000417724,
+     "outcome": "built",
+     "seen_after": 161.75643498799946,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 13.53,
+      "build": 13.5,
+      "conversion": 2.22,
+      "write": 1.32,
+      "upload": 4.57
+     }
+    },
+    {
+     "index": 34,
+     "input": "gist-ip-1000000x960",
+     "job_id": "ba1d115ec7cb3bf1894637004acafd7dd787343dcbda47518eb461b2581b91d3",
+     "post_seconds": 0.009568252000462962,
+     "outcome": "built",
+     "seen_after": 72.99924183599978,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 26.35,
+      "build": 26.49,
+      "conversion": 2.74,
+      "write": 4.09,
+      "upload": 7.9
+     }
+    },
+    {
+     "index": 35,
+     "input": "gist-l2-1000000x960",
+     "job_id": "98d213dc49442b7681c29c75ed88e54c8e8229e65868ca6d93a3085eccacd595",
+     "post_seconds": 0.01514137199956167,
+     "outcome": "built",
+     "seen_after": 121.46786496700042,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 24.65,
+      "build": 19.77,
+      "conversion": 2.64,
+      "write": 3.25,
+      "upload": 5.77
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "b262926ecceea06d710843e06c8c8156ddb498e3771b83d2ed0adae82b6519c0",
+     "post_seconds": 0.014902986999004497,
+     "outcome": "built",
+     "seen_after": 97.63306791499963,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 12.44,
+      "build": 7.85,
+      "conversion": 1.48,
+      "write": 0.72,
+      "upload": 2.79
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "d2ceb789fac415493efd42f39c15251d07c9f950640448d2068efc8668392fba",
+     "post_seconds": 0.016299672999593895,
+     "outcome": "built",
+     "seen_after": 126.59652020400063,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 5.77,
+      "build": 14.02,
+      "conversion": 1.96,
+      "write": 4.43,
+      "upload": 3.61
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-ip-1000000x128",
+     "job_id": "40437bb5f5e459e134fc945353e97acff6043911f6c74ffa8aacf542618883d6",
+     "post_seconds": 0.01551561799897172,
+     "outcome": "built",
+     "seen_after": 134.36595883500013,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 4.7,
+      "build": 3.77,
+      "conversion": 1.16,
+      "write": 0.36,
+      "upload": 1.59
+     }
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "db24b473dfad2857aa488a4faddc93f36fd552f777ad62c8df78b22786f7c4e6",
+     "post_seconds": 0.013581504001194844,
+     "outcome": "built",
+     "seen_after": 65.10217405799995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.57,
+      "build": 6.02,
+      "conversion": 1.02,
+      "write": 3.43,
+      "upload": 2.4
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "2765acae9dd26848488fff378fc294590396930deaa934e25f97915ea990f0ab",
+     "post_seconds": 0.014834278001217172,
+     "outcome": "built",
+     "seen_after": 140.6931163549998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 15.66,
+      "build": 19.92,
+      "conversion": 2.33,
+      "write": 1.35,
+      "upload": 4.48
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "33c6cb05a4016a83473f7476767ec79dfe6fbe4d5c72cde476f1ed08a098fb4e",
+     "post_seconds": 0.014779117000216502,
+     "outcome": "built",
+     "seen_after": 99.18099085199901,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 16.1,
+      "build": 13.76,
+      "conversion": 2.59,
+      "write": 1.51,
+      "upload": 6.2
+     }
+    },
+    {
+     "index": 42,
+     "input": "gist-ip-1000000x960",
+     "job_id": "5de1039b75c6a65eaad0636ea4f2044ba454e18f38067c7445639f0905e70fb4",
+     "post_seconds": 0.014885979999235133,
+     "outcome": "built",
+     "seen_after": 132.48258942400025,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 24.83,
+      "build": 16.49,
+      "conversion": 2.84,
+      "write": 4.04,
+      "upload": 5.74
+     }
+    },
+    {
+     "index": 43,
+     "input": "gist-l2-1000000x960",
+     "job_id": "73270a1e4db6ab8e42c6a43271546b0bcaa001f07b5af4057dde8a8484371857",
+     "post_seconds": 0.00968529499914439,
+     "outcome": "built",
+     "seen_after": 54.23906979499952,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 19.45,
+      "build": 19.02,
+      "conversion": 2.64,
+      "write": 3.12,
+      "upload": 5.96
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "476601cf36caaa8fc0526ed87bfa01d9a35a4f8888536b91778a6a2759d0bfe7",
+     "post_seconds": 0.01338320200011367,
+     "outcome": "built",
+     "seen_after": 56.66396293899925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.65,
+      "build": 14.63,
+      "conversion": 1.9,
+      "write": 4.6,
+      "upload": 3.44
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "1c3e90100dc7cf28897ef05cc275cbb5ba202a5fbb780dca8c5b5e4f71658462",
+     "post_seconds": 0.01403707499957818,
+     "outcome": "built",
+     "seen_after": 81.94136813299883,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 13.18,
+      "build": 7.84,
+      "conversion": 1.46,
+      "write": 0.74,
+      "upload": 2.82
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128",
+     "job_id": "242aa308be854006ec1ba02e750b9b77362d543c5a533481f8b7f9a63a5c6094",
+     "post_seconds": 0.012503876001574099,
+     "outcome": "built",
+     "seen_after": 25.88436351999917,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.18,
+      "build": 4.38,
+      "conversion": 0.96,
+      "write": 0.31,
+      "upload": 1.31
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "7e0eb31a30650fe6d30ed64d074fa63a3ff1e03e6a4d33bd7c8c529ca20324c4",
+     "post_seconds": 0.009322088999397238,
+     "outcome": "built",
+     "seen_after": 17.78310471399891,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.13,
+      "build": 3.57,
+      "conversion": 1.23,
+      "write": 0.39,
+      "upload": 1.71
+     }
+    }
+   ]
+  },
+  "byte": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "987b12acfe1a40756bc3180b95facf9a9119c3183b86b6d5d28b7bbbdc75995f",
+     "post_seconds": 0.012323529999775928,
+     "outcome": "built",
+     "seen_after": 41.961069450999275,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 6.15,
+      "build": 25.93,
+      "conversion": 2.01,
+      "write": 0.46,
+      "upload": 2.88
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "3f1774bf80d7c452484952189021bff1b4c521d312246af6ea6ffea19fa501bc",
+     "post_seconds": 0.011734989999240497,
+     "outcome": "built",
+     "seen_after": 42.09128645999954,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.97,
+      "build": 25.97,
+      "conversion": 2.0,
+      "write": 0.54,
+      "upload": 2.92
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "edfb6bb209efc821d89152c55257dc7cf90d49d7adebd71a1753c323a9847d80",
+     "post_seconds": 0.015990437001164537,
+     "outcome": "built",
+     "seen_after": 94.05177887500031,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.81,
+      "build": 12.81,
+      "conversion": 1.29,
+      "write": 0.27,
+      "upload": 1.16
+     }
+    },
+    {
+     "index": 11,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "0510c4828b855d76b1926c06aa8f1aa0a5bbb0299c1108d68f8096a723401507",
+     "post_seconds": 0.016245291000814177,
+     "outcome": "built",
+     "seen_after": 75.96579239600032,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 3.41,
+      "build": 7.71,
+      "conversion": 1.34,
+      "write": 0.27,
+      "upload": 1.21
+     }
+    },
+    {
+     "index": 12,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "464a851cabeaf464b7037d8bc043b1f303205c0ebfc06ccde6ad920875cb6b32",
+     "post_seconds": 0.014262896000218461,
+     "outcome": "built",
+     "seen_after": 64.51077752499987,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 11.59,
+      "conversion": 1.19,
+      "write": 0.19,
+      "upload": 0.85
+     }
+    },
+    {
+     "index": 13,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "4fad8ab576e37bdedc6cf28ca6810a8c901ad35c0032bd460b328a4e0afd9403",
+     "post_seconds": 0.013827757000399288,
+     "outcome": "built",
+     "seen_after": 47.82547419599905,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.52,
+      "build": 3.97,
+      "conversion": 0.91,
+      "write": 0.16,
+      "upload": 0.74
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "23aa233c4b9132cf400188778907af4b32e1a7ce23ffe0acd616ccb3a0883101",
+     "post_seconds": 0.013829728000928299,
+     "outcome": "built",
+     "seen_after": 64.83937718599918,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 3.9,
+      "build": 14.46,
+      "conversion": 1.92,
+      "write": 0.49,
+      "upload": 2.06
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "745d0d1e6246d90fc897f9634c2fe2678df57097121de809d15277ff22e82368",
+     "post_seconds": 0.01505159999942407,
+     "outcome": "built",
+     "seen_after": 88.19059981600003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 4.79,
+      "build": 18.2,
+      "conversion": 1.86,
+      "write": 0.42,
+      "upload": 1.75
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "bcc5c731fb4c2ace0a987eb6c5570f1a7ed56b908d7824515d25e3aab6fff756",
+     "post_seconds": 0.015558709999822895,
+     "outcome": "built",
+     "seen_after": 96.37905988100101,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "213269cb37b9e1d7a5dd8bbb29e7a6330757739e1cbe3c10ef9cf9979cbc430a",
+     "post_seconds": 0.00982096699954127,
+     "outcome": "built",
+     "seen_after": 41.97162899000068,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 18,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "2c87cd9823281f546c7690cf1bd8125c7dc0cb15c05b37658e12d58547ae3aa5",
+     "post_seconds": 0.012023695999232586,
+     "outcome": "built",
+     "seen_after": 55.63883699500002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.16,
+      "build": 10.42,
+      "conversion": 1.28,
+      "write": 0.27,
+      "upload": 1.2
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "8cdcfa752b6da8513d8380ce6370b89807fb18a550dd73f7565ea215ccd5bf94",
+     "post_seconds": 0.01503700000102981,
+     "outcome": "built",
+     "seen_after": 72.66945334400043,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.86,
+      "build": 9.21,
+      "conversion": 1.34,
+      "write": 0.27,
+      "upload": 1.33
+     }
+    },
+    {
+     "index": 20,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "6a3878c4008dafea458672d1342a4d02362b57711b009e5c0941da13fd555b9f",
+     "post_seconds": 0.013600255000710604,
+     "outcome": "built",
+     "seen_after": 47.01218851500016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.07,
+      "build": 5.08,
+      "conversion": 0.93,
+      "write": 0.16,
+      "upload": 0.73
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "3ace70b39cfcdbe5a0a9bb17702ea85a45529f9309dafbc2542042751bda3993",
+     "post_seconds": 0.014014341999427415,
+     "outcome": "built",
+     "seen_after": 56.714003685001444,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.82,
+      "build": 5.14,
+      "conversion": 1.17,
+      "write": 0.22,
+      "upload": 0.92
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "cb4130b2d96f747c568db71339f402e0862e4d6bb124d2a5c6c30fbcee525495",
+     "post_seconds": 0.014581982000891003,
+     "outcome": "built",
+     "seen_after": 85.36412328900042,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 23,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "f5c897351b437500849279fe9e92555b9ce5a415bd8f683553ad8fb67b20a412",
+     "post_seconds": 0.012244809999174322,
+     "outcome": "built",
+     "seen_after": 37.98294477499985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "aaafc53617a62269128a60e2e740f9ba95e5794e5b144cfcb9918fd9a5dae7d4",
+     "post_seconds": 0.011453617000370286,
+     "outcome": "built",
+     "seen_after": 40.36886324599982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 5.34,
+      "build": 26.06,
+      "conversion": 2.05,
+      "write": 0.44,
+      "upload": 2.85
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "36d72f08c10b9c194016441f9d992c6d6663b627c58c4965efc2fdacd05b8165",
+     "post_seconds": 0.01152343700050551,
+     "outcome": "built",
+     "seen_after": 39.40496890800023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 5.51,
+      "build": 25.73,
+      "conversion": 1.98,
+      "write": 0.44,
+      "upload": 2.94
+     }
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "faa4381e37fca85d9254606dfc5ce87f83af58b0a48adf86e156ac9ee4be0951",
+     "post_seconds": 0.013971890999528114,
+     "outcome": "built",
+     "seen_after": 50.6933535950011,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 3.27,
+      "build": 7.45,
+      "conversion": 1.28,
+      "write": 0.27,
+      "upload": 1.19
+     }
+    },
+    {
+     "index": 27,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "ae527188f65735c7a1fc932d84d5465ab8f99f73d08d3744f2d458338eeb3889",
+     "post_seconds": 0.0131014859998686,
+     "outcome": "built",
+     "seen_after": 72.56122705300004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.83,
+      "build": 13.55,
+      "conversion": 1.29,
+      "write": 0.27,
+      "upload": 1.17
+     }
+    },
+    {
+     "index": 28,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "2ceb724f725386d908f7940c6afe1cea18b33eace7aef98f0831aed4dac3be5c",
+     "post_seconds": 0.01354264399924432,
+     "outcome": "built",
+     "seen_after": 74.439932366,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.8,
+      "build": 4.31,
+      "conversion": 1.06,
+      "write": 0.16,
+      "upload": 0.71
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "5a060ae2c53bdc211ae20dcf667557eb211724d50c5f2d83824ec3f2ecf24663",
+     "post_seconds": 0.01409070400040946,
+     "outcome": "built",
+     "seen_after": 77.13728233300026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.85,
+      "build": 3.89,
+      "conversion": 1.01,
+      "write": 0.16,
+      "upload": 0.74
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "88ecbc3fad59c0130e96a888d9eb4eb2399447fde1a2b06828008d9635bcb8db",
+     "post_seconds": 0.014058472999749938,
+     "outcome": "built",
+     "seen_after": 91.7849296000004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.83,
+      "build": 12.98,
+      "conversion": 1.83,
+      "write": 0.41,
+      "upload": 1.72
+     }
+    },
+    {
+     "index": 31,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "a9cec6fdc93e97498cc8e0be32d93e2836cff31b84460965b0e5c44fb3dfb3b7",
+     "post_seconds": 0.012709758999335463,
+     "outcome": "built",
+     "seen_after": 66.44841500999974,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 4.85,
+      "build": 17.67,
+      "conversion": 1.86,
+      "write": 0.42,
+      "upload": 1.75
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "e8034e1e9897c3d8c5c0a90c661558e9ddbbaab3570e62c951235c7352b1cdb1",
+     "post_seconds": 0.013106705999234691,
+     "outcome": "built",
+     "seen_after": 49.94416425399868,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "4b51457d5feefa09d6b683f389b1404a845e23e84e37eb86bd8fdbe8a58852c6",
+     "post_seconds": 0.0121451180002623,
+     "outcome": "built",
+     "seen_after": 26.899026751998463,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 3.21,
+      "build": 15.5,
+      "conversion": 2.03,
+      "write": 0.42,
+      "upload": 1.69
+     }
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "96202231754f8537a78be9de8fbff03dacde8111b3ab891111bf6ce21d75e187",
+     "post_seconds": 0.014155734001178644,
+     "outcome": "built",
+     "seen_after": 51.690236682999966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.44,
+      "build": 12.36,
+      "conversion": 1.29,
+      "write": 0.27,
+      "upload": 1.15
+     }
+    },
+    {
+     "index": 35,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "952a6f0c606fd19cfe32d3f9114ed01f4b3180a9ec5c20101682f8454c206643",
+     "post_seconds": 0.015100370999789448,
+     "outcome": "built",
+     "seen_after": 62.39081959899886,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.45,
+      "build": 7.47,
+      "conversion": 1.3,
+      "write": 0.27,
+      "upload": 1.23
+     }
+    },
+    {
+     "index": 36,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "c6c6730d9877bd26e13671cb0c565c323d7f67d2aec361e184fb92e23460a27e",
+     "post_seconds": 0.010063469999295194,
+     "outcome": "built",
+     "seen_after": 14.58689232100005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.57,
+      "build": 4.13,
+      "conversion": 0.9,
+      "write": 0.16,
+      "upload": 0.72
+     }
+    },
+    {
+     "index": 37,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "bd159960ff50c4002b1ad2c10cabc9d0df9eda27f05d8bc64029cd208272f575",
+     "post_seconds": 0.01684464300160471,
+     "outcome": "built",
+     "seen_after": 63.10384870300004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.8,
+      "build": 6.06,
+      "conversion": 1.06,
+      "write": 0.26,
+      "upload": 1.04
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "4570e862fe62d565deff4a4e2077862875c494f9ea4e2267b7615075821110e8",
+     "post_seconds": 0.011324352999508847,
+     "outcome": "built",
+     "seen_after": 37.298912722999376,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 39,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "17769f8169c9dddce3a893a2911ebeb30f7ae1458e9b9cee09d592d7926b9863",
+     "post_seconds": 0.015428417000293848,
+     "outcome": "built",
+     "seen_after": 81.10932282499925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 3.29,
+      "build": 12.87,
+      "conversion": 1.85,
+      "write": 0.42,
+      "upload": 1.81
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "b9e8a47f07784da4057d6d4e5a41f0f16984a29d8b5d0c8a8f44af176c592b28",
+     "post_seconds": 0.013464263000059873,
+     "outcome": "built",
+     "seen_after": 51.183539251000184,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.82,
+      "build": 25.75,
+      "conversion": 1.96,
+      "write": 0.44,
+      "upload": 2.83
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "c8c9a4e0ffce82c31933592563414a589458de6311184060655cfd2bf03f68d1",
+     "post_seconds": 0.016775692000010167,
+     "outcome": "built",
+     "seen_after": 89.26406686799965,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 3.41,
+      "build": 17.67,
+      "conversion": 1.86,
+      "write": 0.42,
+      "upload": 1.77
+     }
+    },
+    {
+     "index": 42,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "34aa0ad5eb3c6b08c04f649c11b55def3abde11faacd5390da94ebde3adcafdf",
+     "post_seconds": 0.015707522999946377,
+     "outcome": "built",
+     "seen_after": 94.16747521999969,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.78,
+      "build": 12.06,
+      "conversion": 1.28,
+      "write": 0.27,
+      "upload": 1.17
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "460c1b304736fa3c3eca8518d5881bd19b4e2f3c0a880893ce9fca41afad4498",
+     "post_seconds": 0.013152258001355221,
+     "outcome": "built",
+     "seen_after": 63.97641356399981,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 3.3,
+      "build": 7.44,
+      "conversion": 1.28,
+      "write": 0.27,
+      "upload": 1.25
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "6405605cfe2bb5d777703435abfc38f38afcc8fe78f19d9b350f8e7888f0411b",
+     "post_seconds": 0.012724349999189144,
+     "outcome": "built",
+     "seen_after": 15.670252171999891,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.9,
+      "build": 5.99,
+      "conversion": 0.99,
+      "write": 0.19,
+      "upload": 1.17
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "d745c95f071a8292a082ac8df25342042d7363315bdabf81505dbe9af4adf15a",
+     "post_seconds": 0.008481812999889371,
+     "outcome": "built",
+     "seen_after": 14.956644107000102,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.08,
+      "build": 5.67,
+      "conversion": 1.04,
+      "write": 0.21,
+      "upload": 1.23
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "3cc1b5eba5bea8dfd6954d2f6a6a18ac6fdd5c9258ee5b192d7afec341ea33e4",
+     "post_seconds": 0.015676572000302258,
+     "outcome": "built",
+     "seen_after": 78.52630359999966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 4.8,
+      "build": 17.51,
+      "conversion": 1.9,
+      "write": 0.42,
+      "upload": 1.7
+     }
+    },
+    {
+     "index": 47,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "3a3de64ed4233c16460fd68acd987bcea7291bb6d0af6f28a1a1b61d81296331",
+     "post_seconds": 0.013402241998846876,
+     "outcome": "built",
+     "seen_after": 47.48787212900061,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.69,
+      "build": 26.16,
+      "conversion": 1.96,
+      "write": 0.48,
+      "upload": 2.76
+     }
+    }
+   ]
+  }
+ },
+ "burst": {
+  "binary": {
+   "jobs": 48,
+   "inputs": [
+    "cohere-hamming-1000000x768-binary",
+    "ms-marco-hamming-1000000x384-binary",
+    "sift-hamming-1000000x128-binary"
+   ],
+   "timeout_seconds": 90,
+   "poll_seconds": 5,
+   "outcomes": {
+    "timed_out": 44,
+    "built": 4
+   },
+   "to_cpu": 44,
+   "cpu_wait_seconds": 4090.8,
+   "built_seen_after_max": 71.8,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "3963c4496bd55c784b76d2c2d5a7746a29316a7c587765fd56363646f5345bdf",
+     "post_seconds": 0.05454956700123148,
+     "outcome": "timed_out",
+     "cpu_after": 90.9163098379995,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 1,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b7201efdaf6029861c619765d0c26f64aa2d1f6f9fce2101d1cfe104d156315d",
+     "post_seconds": 0.07815284099888231,
+     "outcome": "timed_out",
+     "cpu_after": 94.69825261799997,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 2,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "247b6bf033b7982a12bd57f2b8e0126ee950d77bf486d8564f68056b28c4ea1e",
+     "post_seconds": 0.07958124600008887,
+     "outcome": "timed_out",
+     "cpu_after": 92.85699867899893,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 3,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "b71cb41d561e192352d29886b0b534f183b3cefc04391ef1ef9f36f1cbeeef64",
+     "post_seconds": 0.04005004700047721,
+     "outcome": "timed_out",
+     "cpu_after": 93.29014043200004,
+     "process": 2,
+     "seconds": {
+      "download": 0.76,
+      "build": 29.74,
+      "conversion": 0.94,
+      "write": 0.15
+     }
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "65f7127dba1c9e6007b13074060db82c3f7462babb0663801606f2171edf8667",
+     "post_seconds": 0.053413036999700125,
+     "outcome": "timed_out",
+     "cpu_after": 94.24843745699945,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 5,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "67decdfe5ad14fa145eeda3ddc07994c6fe57af3ddbde3c11fd965cfb0bc96c4",
+     "post_seconds": 0.08898164399943198,
+     "outcome": "timed_out",
+     "cpu_after": 91.71381032099998,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 6,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "fe4096c5ec3022f293efe462dc27b2f6854a85a24dd5eb5d429c2637042a4c5b",
+     "post_seconds": 0.055724878000546596,
+     "outcome": "timed_out",
+     "cpu_after": 94.54196705699906,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 7,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "e2417ca24d3e718d720d7020674cdb217a0351bdf1a5fe4bdc4794ff7bcfb37e",
+     "post_seconds": 0.0454753840003832,
+     "outcome": "timed_out",
+     "cpu_after": 92.24445131099856,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 8,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c502c4b684d1190983b260811d6a60c1e51b11812e4f1b2024d1129958e8ee78",
+     "post_seconds": 0.07965551699999196,
+     "outcome": "timed_out",
+     "cpu_after": 94.08761234399935,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 9,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d17718902cf7eb0ef36e397a2c7329a48aa700db38b56e5e9c5f64c84dd40aa6",
+     "post_seconds": 0.06112937499892723,
+     "outcome": "timed_out",
+     "cpu_after": 91.72961922399918,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "7d57bd61161f8067a20e2832c679d910bf7f5aca7e3a83072868c9036a19ec6e",
+     "post_seconds": 0.08923048900032882,
+     "outcome": "timed_out",
+     "cpu_after": 94.13320150099935,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 11,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "160526054d7e1d3352932375bf09e9e66ebdb21d15285470d744698a37251ca3",
+     "post_seconds": 0.08584017800058064,
+     "outcome": "timed_out",
+     "cpu_after": 91.54246614999829,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 12,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "cdafc3c0c471ad50b0d4a7a2dc503780ba57815afdaa7ed9b3b3a545b12e6514",
+     "post_seconds": 0.07299862800027768,
+     "outcome": "timed_out",
+     "cpu_after": 95.10366805400008,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "63c5c67ed51638813e7af49114c5ddce66282610d89546d3c4c87f0c5d27c6f7",
+     "post_seconds": 0.07566443600080675,
+     "outcome": "timed_out",
+     "cpu_after": 94.55531046599936,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 14,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "ceaf18e571e9e697cb53fa718c1371ecbeae2237991c41bfb65eda31568ba28f",
+     "post_seconds": 0.09103872100058652,
+     "outcome": "timed_out",
+     "cpu_after": 93.77092956899833,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 15,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d511d5874d74d39c2383158dd1b6fa6ff7e02158c3e4dc7a0cca23f19e7aa048",
+     "post_seconds": 0.06135549000100582,
+     "outcome": "timed_out",
+     "cpu_after": 92.84450100499998,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 16,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3a3b0633d7760627c90040eb7568bc363d8fcad3d34c2bc6447dd743ecfc6be3",
+     "post_seconds": 0.05723189499985892,
+     "outcome": "timed_out",
+     "cpu_after": 91.60877747799896,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 17,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "3fd33eb42cb81b43f589ed4094c3bb9df0c11b4cb6fa9c223b1b922a0a5780a4",
+     "post_seconds": 0.03403090999927372,
+     "outcome": "built",
+     "seen_after": 31.362935503999324,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": {
+      "download": 0.42,
+      "build": 27.12,
+      "conversion": 0.79,
+      "write": 0.12,
+      "upload": 0.59
+     }
+    },
+    {
+     "index": 18,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "5062b47a108c757da31a9a92bf431d3367aac05fda502793ad618c88ae3a3c25",
+     "post_seconds": 0.08391691299948434,
+     "outcome": "timed_out",
+     "cpu_after": 95.64960497899847,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d536b3621e388b7e0d2911cbdd0bd95124db38236ff7634b36cb1a9d8f52d40e",
+     "post_seconds": 0.08324326200090582,
+     "outcome": "timed_out",
+     "cpu_after": 91.98682981399907,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 20,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "43d871889bc1bb8c91a54cba0cbec9a62b79394474fbd67619252957f2ab27d3",
+     "post_seconds": 0.064433284000188,
+     "outcome": "timed_out",
+     "cpu_after": 94.97754614399855,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 21,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "bb3252551896e239c0f032a992debb1d793aab0af5b9f66d7c09bafe4743bb12",
+     "post_seconds": 0.0383708570007002,
+     "outcome": "built",
+     "seen_after": 71.84080749099849,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "f8bdbcc278e5a2c57bb14c1973dfae00eef1659325f1d18fc5bf458c5a99fe36",
+     "post_seconds": 0.08389325300049677,
+     "outcome": "timed_out",
+     "cpu_after": 90.31656715899953,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 23,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "e290f03d3b4188aeb5b16a58a37e3be0c8b4c9868c2ce672476479ffe230ffa2",
+     "post_seconds": 0.08598273999996309,
+     "outcome": "timed_out",
+     "cpu_after": 94.88647119199959,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "0be330961d6d8b337c797a23fed2152c5795217cbc095d4e2e2580ee42b6b626",
+     "post_seconds": 0.09009264400083339,
+     "outcome": "timed_out",
+     "cpu_after": 90.15590277999945,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3188affa1599a32817d9bd74700f4f28c2bcdf0b071af05db72fe6abef348b63",
+     "post_seconds": 0.0639530360003846,
+     "outcome": "timed_out",
+     "cpu_after": 90.32287474199984,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "4ce8eed8434833d648e57597319152a406993891764f1ffc07ad48a1e046a2af",
+     "post_seconds": 0.08723207299954083,
+     "outcome": "timed_out",
+     "cpu_after": 91.84739336499842,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "647d826e85310a116c17e10995c75a11bdad46218eddc6e73b5af186bbd52789",
+     "post_seconds": 0.053892505000476376,
+     "outcome": "timed_out",
+     "cpu_after": 91.54029002099924,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "87f5ad06942f10b2883195c2fec212c1fa0561f6f497d70d1f01dfbe1d0dbd2c",
+     "post_seconds": 0.03962409999985539,
+     "outcome": "timed_out",
+     "cpu_after": 93.25084079699991,
+     "process": 2,
+     "seconds": {
+      "download": 1.4,
+      "build": 29.13,
+      "conversion": 0.89,
+      "write": 0.13
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "29c03fee29d8d573412c6776849d8e417f85e84360ce8de4a8f5e7f3e6e189f8",
+     "post_seconds": 0.055979183000090416,
+     "outcome": "timed_out",
+     "cpu_after": 91.845043153,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7156e2ffd0a4b550bd0c3eb2d7f654dfb5ec21066bb049063df672cf7757e626",
+     "post_seconds": 0.0799779929984652,
+     "outcome": "timed_out",
+     "cpu_after": 91.73192933499922,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b28e2fb957ee37fef54a4da1177b55fb4bc117400cfab6480f38280d5eab873c",
+     "post_seconds": 0.06789773700074875,
+     "outcome": "timed_out",
+     "cpu_after": 93.74942605299839,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 32,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "631144f1a17e4a618b9e9b95fd7a9573f000493dec90489a3f9dacdaa2033ff3",
+     "post_seconds": 0.07764953100013372,
+     "outcome": "timed_out",
+     "cpu_after": 91.21397740299835,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 33,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e2f399ac0932fdacc869adb3a456adc19813917dddf5c8f20e767852f83c72d1",
+     "post_seconds": 0.08607223199942382,
+     "outcome": "timed_out",
+     "cpu_after": 94.24241983899992,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "c275d7b5915d7444f9df61b7841d2eb677efd29bc2617276fee75759437c747a",
+     "post_seconds": 0.0824707669999043,
+     "outcome": "timed_out",
+     "cpu_after": 92.2197765689998,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 35,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9736b8e0c0c27f01071d9f4042984fc9516e8a890266f30d3e721c7867cbed1a",
+     "post_seconds": 0.08076309700118145,
+     "outcome": "timed_out",
+     "cpu_after": 92.77617381099844,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 36,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "5294d8b2a37406dc3eee9324c7fe02ade9f26eb2b67b3678e3e0e39d6ad9817b",
+     "post_seconds": 0.03348904099948413,
+     "outcome": "built",
+     "seen_after": 30.463683238998783,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "9e9c975493b986ee2c644290f73916f934e74e4252cf7b25f3b8e23f67a7f2a7",
+     "post_seconds": 0.048198163998677046,
+     "outcome": "timed_out",
+     "cpu_after": 94.78715241200007,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 38,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c7872f6225b406405b46c8cce18462981cbc69130b3017058babf1e284717770",
+     "post_seconds": 0.08035729000039282,
+     "outcome": "timed_out",
+     "cpu_after": 93.50190248699982,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 39,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "aac9886bf2f7c6d05a81503f57c491482117394dfbc4a8084f407a9e62ec9627",
+     "post_seconds": 0.05197621099978278,
+     "outcome": "timed_out",
+     "cpu_after": 91.71570164500008,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 40,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3d329f482ea8fa9efd567879df8ae0c868f6b4cb553be22dda4c47cf6a6a878b",
+     "post_seconds": 0.06874152199998207,
+     "outcome": "timed_out",
+     "cpu_after": 92.42937190499833,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 41,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "158915f0b6f81a156271e77ec1e10542b2f9c5b0b297e068bc6c984124a0eb4e",
+     "post_seconds": 0.06200940099915897,
+     "outcome": "timed_out",
+     "cpu_after": 95.05999129099837,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 42,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c179757a9401c0202cf5af05ef0e8ce611bf3222cb76b51094c610849965ecf8",
+     "post_seconds": 0.06479770099940652,
+     "outcome": "timed_out",
+     "cpu_after": 94.48003206699832,
+     "process": 2,
+     "seconds": {}
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3ea4b13c9617f7384057f8b7d6812eb2b10efde0f0ea2a4040a392e8bb282147",
+     "post_seconds": 0.05166182499851857,
+     "outcome": "timed_out",
+     "cpu_after": 94.8431596749997,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 44,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "0efa9805268f071a324b933c8c89c019beae5fd9205a66d527487176880bb8be",
+     "post_seconds": 0.05786204700052622,
+     "outcome": "timed_out",
+     "cpu_after": 91.36383234799905,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 45,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "082e6e932601dc0259e8af247b0bf122396f88f179c25365750a1f438f63e4e8",
+     "post_seconds": 0.030410015000597923,
+     "outcome": "built",
+     "seen_after": 70.88185697199879,
+     "file_name": "vectors.faiss",
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "a25b6316d52f181dcc8c446cd318ae405c264186e2b2b49957547da6488346df",
+     "post_seconds": 0.0839536040002713,
+     "outcome": "timed_out",
+     "cpu_after": 94.41804371599937,
+     "process": 2,
+     "seconds": null
+    },
+    {
+     "index": 47,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "50eea5915bc0c00156eee9f55f600270a5a4138ca609983076977f65028d4da4",
+     "post_seconds": 0.06771197300076892,
+     "outcome": "timed_out",
+     "cpu_after": 91.55882428299992,
+     "process": 2,
+     "seconds": {}
+    }
+   ]
+  },
+  "float": {
+   "jobs": 48,
+   "inputs": [
+    "cohere-l2-1000000x768",
+    "gist-l2-1000000x960",
+    "ms-marco-l2-1000000x384",
+    "sift-l2-1000000x128"
+   ],
+   "timeout_seconds": 90,
+   "poll_seconds": 5,
+   "outcomes": {
+    "timed_out": 45,
+    "built": 3
+   },
+   "to_cpu": 45,
+   "cpu_wait_seconds": 4156.3,
+   "built_seen_after_max": 89.8,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "87071831b0946c39d7d857c581805a999efc13025435e4891e0a7eac10da1978",
+     "post_seconds": 0.07586536199960392,
+     "outcome": "timed_out",
+     "cpu_after": 91.03603321099945,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 1,
+     "input": "gist-l2-1000000x960",
+     "job_id": "b06be1b2e3da9566f723bbdcad56cc5123ae79e132c4309015c023f8a892a262",
+     "post_seconds": 0.06618824899851461,
+     "outcome": "timed_out",
+     "cpu_after": 94.70000875900041,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 2,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "7290e76d9bb4654d8ff6d040083a944df0188b5995b8bd777935c4e78b28badb",
+     "post_seconds": 0.04512447399974917,
+     "outcome": "timed_out",
+     "cpu_after": 92.90827347999948,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 3,
+     "input": "sift-l2-1000000x128",
+     "job_id": "c087c79a5136a3ab5e3a20a3a1a2e45465559803b4ee0c4aecf3389cd3014524",
+     "post_seconds": 0.09653070999956981,
+     "outcome": "timed_out",
+     "cpu_after": 93.36442921600064,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 4,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "2d68d59428abb9f8e6b5fad20e439b5b6504b2353a97b19144c5fbb9b30da1d9",
+     "post_seconds": 0.03582833899963589,
+     "outcome": "built",
+     "seen_after": 75.29542738500095,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 5,
+     "input": "gist-l2-1000000x960",
+     "job_id": "4f512697354fe8d99aa844ab88077c92abaee71564f20f72bff8348ceffce305",
+     "post_seconds": 0.05080488599924138,
+     "outcome": "timed_out",
+     "cpu_after": 92.31787470000017,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 6,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "4d7f254e356f57c3ce7bdbe2988614500e3e70d2da3fdb943f86f5e2668e3b90",
+     "post_seconds": 0.05084571599945775,
+     "outcome": "timed_out",
+     "cpu_after": 94.59756146700056,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 7,
+     "input": "sift-l2-1000000x128",
+     "job_id": "1d0cdae895146729a16e94ff8f82da1f000db7e9cac148d7c915b83c3ca330ac",
+     "post_seconds": 0.08587541099950613,
+     "outcome": "timed_out",
+     "cpu_after": 92.2988169780001,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 8,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "eed7ff7a24763d9faee845fe66f66a704ca7e75eb4860eb346ef155cfb2ba0d1",
+     "post_seconds": 0.06426443499913148,
+     "outcome": "timed_out",
+     "cpu_after": 94.07429087499986,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 9,
+     "input": "gist-l2-1000000x960",
+     "job_id": "31860369eca767a9bae43757a734f7cb76f2b9da6e17cbde2fde7ce3e3e5ef34",
+     "post_seconds": 0.044437782000386505,
+     "outcome": "timed_out",
+     "cpu_after": 91.74841901400032,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "ed3c84785410ccc4f11dc6ac8b03ac31c7d6ded9dfb0cc32f40a6712acecc4d5",
+     "post_seconds": 0.07704552299946954,
+     "outcome": "timed_out",
+     "cpu_after": 90.42767129800086,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 11,
+     "input": "sift-l2-1000000x128",
+     "job_id": "73268f5b3e5a9ad891002c52df8ee8de18f3c447eb092ea53cc308e2a2e94620",
+     "post_seconds": 0.057123067999782506,
+     "outcome": "timed_out",
+     "cpu_after": 91.58498290100033,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 12,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "465309063dd19c09d14cd3ca851cecc7f8af831feb33dc5a99af5140627f5a40",
+     "post_seconds": 0.07584458199926303,
+     "outcome": "timed_out",
+     "cpu_after": 95.18628810799964,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 13,
+     "input": "gist-l2-1000000x960",
+     "job_id": "63909defe553409a2dfbfd3c408f29c64f4b2f963c318d7d085a6ebb37177e43",
+     "post_seconds": 0.11554297900147503,
+     "outcome": "timed_out",
+     "cpu_after": 94.59016267900006,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 14,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "966f7e9466f3ee261a3511bbf946962d697d5b36ec3126ebe5f4984a98e15168",
+     "post_seconds": 0.09860611699878064,
+     "outcome": "timed_out",
+     "cpu_after": 93.89768943300078,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "70ec6157b6fe3d7e15b7516e67b2c6d1c72a1ef29cf15488f62ee471d6b0479c",
+     "post_seconds": 0.05658901899914781,
+     "outcome": "timed_out",
+     "cpu_after": 93.16946046399971,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 16,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "3384bcf92c5beb75d4d7f3c15a5ac3475189fc20f61818bd285e476772f37d53",
+     "post_seconds": 0.06581765199916845,
+     "outcome": "timed_out",
+     "cpu_after": 91.63464245400064,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 17,
+     "input": "gist-l2-1000000x960",
+     "job_id": "3381457eb30b3ed8b7636f5269fbb63e59606d5bc56446701dd87c6ad1e4bcfb",
+     "post_seconds": 0.04607219100034854,
+     "outcome": "timed_out",
+     "cpu_after": 92.47827356000016,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 18,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "c7e5a343e49e4ba3eace13353b0d29a9d8170299716ea5d5b3971c3a12fec3c3",
+     "post_seconds": 0.08521713899972383,
+     "outcome": "timed_out",
+     "cpu_after": 90.14390395200098,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 19,
+     "input": "sift-l2-1000000x128",
+     "job_id": "1f4dc7bb27e196be1fad8f836d5fd95929bf491e4c2420cc1991eb48cb56cfa6",
+     "post_seconds": 0.06243507300132478,
+     "outcome": "timed_out",
+     "cpu_after": 92.31539618600073,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 20,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "a6f8b4c2b7a746e633e18e1606e245a7227ee6409281c25f1bfa722844ee3101",
+     "post_seconds": 0.03392155400069896,
+     "outcome": "built",
+     "seen_after": 70.39768347800054,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 21,
+     "input": "gist-l2-1000000x960",
+     "job_id": "4e2b5396828528a05c143248bca39e035880df6169377ff8e53ae064982c5621",
+     "post_seconds": 0.06280275899916887,
+     "outcome": "timed_out",
+     "cpu_after": 90.45799440600058,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "10baa67bf0095c92eaeab69cc598548bbf87e017673a894c8898aed0225b3de0",
+     "post_seconds": 0.051241352999568335,
+     "outcome": "timed_out",
+     "cpu_after": 90.78510959599953,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "2dfeb66648c97641c65105639d445d02873ae5333a83bac4cf8f408cc1ac998d",
+     "post_seconds": 0.061116709000998526,
+     "outcome": "timed_out",
+     "cpu_after": 90.2935186550003,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 24,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "bc2258390be98f65e67760e4d066a70c2cb3a643d9454a62f0f62a6f4f73830f",
+     "post_seconds": 0.06637706299989077,
+     "outcome": "timed_out",
+     "cpu_after": 90.21535381499962,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 25,
+     "input": "gist-l2-1000000x960",
+     "job_id": "cb9d3caa754f532708629f7eb414e74cb9551ad4a6b1b52266c78f8170c9220d",
+     "post_seconds": 0.052435155001148814,
+     "outcome": "timed_out",
+     "cpu_after": 90.38051064799947,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "449c7d42ed748eb3e2e414548e0e9fee083a16b96d9a305618f47fa29e20d4b8",
+     "post_seconds": 0.03860513799918408,
+     "outcome": "timed_out",
+     "cpu_after": 91.77964077700017,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 27,
+     "input": "sift-l2-1000000x128",
+     "job_id": "22a508d1305bcb587d38347728bdc62a245df6d986ea8e2485ac02b60e27f002",
+     "post_seconds": 0.0871399730003759,
+     "outcome": "timed_out",
+     "cpu_after": 91.58684074300072,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 28,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "fb78932922f6b475b0f0dea05f339edaf4dc11da369b1e7bae4c4c6d5d487ccb",
+     "post_seconds": 0.0475351570003113,
+     "outcome": "timed_out",
+     "cpu_after": 93.28444030500032,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 29,
+     "input": "gist-l2-1000000x960",
+     "job_id": "b25078b87884b59a57bdc38e6e1875f69f08c1a067e9356f7d94a3117c05036d",
+     "post_seconds": 0.049266948000877164,
+     "outcome": "timed_out",
+     "cpu_after": 91.65248740500101,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 30,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "cab4e97b015b381548318a669cc7d2c8612beb83e2f90057f4f9cd0d8302b2ac",
+     "post_seconds": 0.11075252299997373,
+     "outcome": "timed_out",
+     "cpu_after": 91.94711260000076,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "56b0e5625440d553940bc902ebadc97d785d158dcd11d8bec42072ab817dea97",
+     "post_seconds": 0.06598541499988642,
+     "outcome": "timed_out",
+     "cpu_after": 93.75798771200061,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 32,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "988b43aeea577b9725d7c7ca8ed257de61629d3478eff672956fb9267dd0a2c2",
+     "post_seconds": 0.059646042000167654,
+     "outcome": "timed_out",
+     "cpu_after": 91.25346922400058,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 33,
+     "input": "gist-l2-1000000x960",
+     "job_id": "3fdccb30c8ea20ebf6dd1adc1a00a13bc9d4e45d5ffa56979195d419531d39a4",
+     "post_seconds": 0.053565194000839256,
+     "outcome": "timed_out",
+     "cpu_after": 94.30286020099993,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "4605ecc30b4f7ffa303db6de94ba66495fd0dbd16addb0f7d604d88037e270b8",
+     "post_seconds": 0.10073531499983801,
+     "outcome": "timed_out",
+     "cpu_after": 92.4933916230002,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 35,
+     "input": "sift-l2-1000000x128",
+     "job_id": "b25bc516262d07154af0a180271a55232a3e58060407b8007c2248d2406fddc7",
+     "post_seconds": 0.10486397800013947,
+     "outcome": "timed_out",
+     "cpu_after": 92.84263435799949,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 36,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "f5d6009d384c28a95b4a1e66b1738223ef41f999316674b79ce25ed3c992b34d",
+     "post_seconds": 0.11594639600116352,
+     "outcome": "timed_out",
+     "cpu_after": 92.04813671699958,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 37,
+     "input": "gist-l2-1000000x960",
+     "job_id": "9f878dca430cd5fc03333187c3c4b46dca6a72e6b368a779c5a16b7d8574a27e",
+     "post_seconds": 0.06003805000000284,
+     "outcome": "timed_out",
+     "cpu_after": 90.53751118900072,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 38,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "c3d29054a707996722ae1f3d4e0a74ec424c5cd75fac860a0a126a2f78cbd3f9",
+     "post_seconds": 0.11789032999877236,
+     "outcome": "timed_out",
+     "cpu_after": 94.09042283500094,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "ab2ce6f01ec4da499de002fce9e40fbdd33fe7fb9037ac83427f060af470085a",
+     "post_seconds": 0.08924991099956969,
+     "outcome": "timed_out",
+     "cpu_after": 92.24281440400046,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 40,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "993f42ba6bd7b23dfec8d45fc09f4550ba2b260b869ef3cf9e2c16f7f44c6a16",
+     "post_seconds": 0.036991589000535896,
+     "outcome": "timed_out",
+     "cpu_after": 92.63458174900006,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 41,
+     "input": "gist-l2-1000000x960",
+     "job_id": "a222949c3be8215dbf94fbd6f4d7b14a0a481be174376067b93d9ff7952083db",
+     "post_seconds": 0.041984358000263455,
+     "outcome": "timed_out",
+     "cpu_after": 90.05237429000044,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 42,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "f6e14de08a5c05a1822e10a5f1afdb6a55c24439f88a6325de5e989388b6f66d",
+     "post_seconds": 0.10801905500011344,
+     "outcome": "timed_out",
+     "cpu_after": 94.37366031199963,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 43,
+     "input": "sift-l2-1000000x128",
+     "job_id": "065afcd9e1bb5094dc0632f4144a077104d8bfa07ae65a998e74a2158f5d7cf5",
+     "post_seconds": 0.04097835100037628,
+     "outcome": "built",
+     "seen_after": 89.75976730000002,
+     "file_name": "vectors.faiss",
+     "process": 3,
+     "seconds": {
+      "download": 5.77,
+      "build": 3.65,
+      "conversion": 1.06,
+      "write": 0.35,
+      "upload": 1.59
+     }
+    },
+    {
+     "index": 44,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "b450ea545d568c3ae238257f959a783a6bab73565eda633ad8299bbf1258e8bb",
+     "post_seconds": 0.05282346099920687,
+     "outcome": "timed_out",
+     "cpu_after": 91.3621469539994,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 45,
+     "input": "gist-l2-1000000x960",
+     "job_id": "ae8ee3a8e71e088727ae4303bea2b9c9ce6d94632dd6f20b2763ed0b24e1f297",
+     "post_seconds": 0.0942753300005279,
+     "outcome": "timed_out",
+     "cpu_after": 92.84279087100003,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "8a0abf8eb3d778f47e8950d4c44285b458773e402561a54d42d061e5242b689e",
+     "post_seconds": 0.1063992360013799,
+     "outcome": "timed_out",
+     "cpu_after": 95.02453323500049,
+     "process": 3,
+     "seconds": null
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "7121f610b439c0a601f8e5ee523c6a554c26e9e70cef0c6dcf5928b23e303398",
+     "post_seconds": 0.06408816200018919,
+     "outcome": "timed_out",
+     "cpu_after": 91.59198936199937,
+     "process": 3,
+     "seconds": null
+    }
+   ]
+  },
+  "byte": {
+   "jobs": 48,
+   "inputs": [
+    "cohere-l2-1000000x768-byte",
+    "ms-marco-l2-1000000x384-byte",
+    "sift-l2-1000000x128-byte"
+   ],
+   "timeout_seconds": 90,
+   "poll_seconds": 5,
+   "outcomes": {
+    "timed_out": 38,
+    "built": 10
+   },
+   "to_cpu": 38,
+   "cpu_wait_seconds": 3532.1,
+   "built_seen_after_max": 77.8,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "77b44485f6cfcf6c1b51da7050a713af58f929f09f281ea0ccd9f3e752517621",
+     "post_seconds": 0.0646112609992997,
+     "outcome": "timed_out",
+     "cpu_after": 90.92481585000132,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 1,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "4a52d744fdac8e95e48151f64d5dedf175a07ddb18efff5a00ff5be8a27833fb",
+     "post_seconds": 0.06335553800090565,
+     "outcome": "built",
+     "seen_after": 77.77458226400086,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 3.0,
+      "build": 8.01,
+      "conversion": 1.47,
+      "write": 0.27,
+      "upload": 1.21
+     }
+    },
+    {
+     "index": 2,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "d5afd04da1f1e0199fc68419d41c61f6262b368d6993c324d117e96307d8db73",
+     "post_seconds": 0.10434448799969687,
+     "outcome": "timed_out",
+     "cpu_after": 92.88343256799999,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 3,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "73a0bb145a857b2c4492677d8488dee94a419d926b2f7f132f5d845a2786cd9f",
+     "post_seconds": 0.06796233100067184,
+     "outcome": "timed_out",
+     "cpu_after": 93.34565306400145,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "9ee7db16c844b75e058d69b4a8bfee76137ec681334d1eb524b0895f1edbaee0",
+     "post_seconds": 0.08968033699966327,
+     "outcome": "timed_out",
+     "cpu_after": 94.41344052900058,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 5,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "8e1900be794f09a9665a12bbce0eb4c08d33fb9b6f272d462ba0934839461d0c",
+     "post_seconds": 0.06887480600016715,
+     "outcome": "timed_out",
+     "cpu_after": 91.67524610100008,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 6,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "f1e392db8dc9003b558dcf4ff7bce6063beeaefaf94337e8df34991876a6b5c9",
+     "post_seconds": 0.10122852300082741,
+     "outcome": "timed_out",
+     "cpu_after": 94.59622533600123,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 7,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "c7317c58860081744e50e281004c6ad9fc62402b44b5e121f1f0892cde5219da",
+     "post_seconds": 0.06929300400042848,
+     "outcome": "timed_out",
+     "cpu_after": 92.31912933300009,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 8,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "ed7c58135a7adee2e576e8078429e609da4305de55b3efbde8a39eb94bbf6760",
+     "post_seconds": 0.10286703100064187,
+     "outcome": "timed_out",
+     "cpu_after": 94.10600275100114,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "c55aae6a89aa128a07510f3148b499e067430a45bf16719bbbf90b4e915b5e65",
+     "post_seconds": 0.08914791799907107,
+     "outcome": "timed_out",
+     "cpu_after": 91.98832986900015,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "10c205d0423a4eeec859f85e090f0156b7ae4c9a70b21d5ee1a010d8dbbcd744",
+     "post_seconds": 0.05479834600009781,
+     "outcome": "built",
+     "seen_after": 48.03676867300055,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 2.75,
+      "build": 9.35,
+      "conversion": 1.39,
+      "write": 0.27,
+      "upload": 1.18
+     }
+    },
+    {
+     "index": 11,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "d0f2c9755ab35401769045167595d8ed3892019465b22f84a8dfd8d86a1bd46b",
+     "post_seconds": 0.04891476100056025,
+     "outcome": "built",
+     "seen_after": 17.658628634000706,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 12,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "35795b2ac5095952d5ed0f03c1187c66fb1e7259d38cf6a851a16e0485104f4d",
+     "post_seconds": 0.06530698300048243,
+     "outcome": "timed_out",
+     "cpu_after": 95.12519589100157,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "56af265167c3ae89b5f1f100726be5b08fd4f6d216fad9a28bf8b921482d8541",
+     "post_seconds": 0.05071204299929377,
+     "outcome": "built",
+     "seen_after": 17.222646896001606,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 2.4,
+      "build": 10.02,
+      "conversion": 1.29,
+      "write": 0.27,
+      "upload": 1.21
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "1f040e577e867f8ebfa2e72b7d4e68daf89b671ea3ec76557d85ea1b7f21c217",
+     "post_seconds": 0.04992438900080742,
+     "outcome": "built",
+     "seen_after": 24.393067733000862,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 15,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "2387d31b94ad734073681973aa724e043968949bf7462895652bcabeaa593fd5",
+     "post_seconds": 0.09471598699929018,
+     "outcome": "timed_out",
+     "cpu_after": 92.88036310300049,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 16,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "95e607ab187cef8209ef83c376cd3119f2c545c40f5c571eda502286a05febe0",
+     "post_seconds": 0.08059752600092907,
+     "outcome": "timed_out",
+     "cpu_after": 91.65158460900057,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 17,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "a1180562ac59183ac32b4d76be8353174587c475212ec606707f82274b372cbc",
+     "post_seconds": 0.0877370329999394,
+     "outcome": "timed_out",
+     "cpu_after": 92.2959761810016,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 18,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "dc944a662c59b5f02d2cdd5b3d38449243dfda0e96ef22975350f8bf3d8400d0",
+     "post_seconds": 0.0790216679997684,
+     "outcome": "timed_out",
+     "cpu_after": 95.64872682900022,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "56b668c77caa7d2546edbee475a1c41641cf4a6a88490c99a457f2fd132216ba",
+     "post_seconds": 0.09154161999867938,
+     "outcome": "timed_out",
+     "cpu_after": 92.01334381500055,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 20,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "b6d69c89c562c9e4206794f98f6583dddd02fb2c0d54d41c6eacbfbaaffffb45",
+     "post_seconds": 0.1032406379999884,
+     "outcome": "timed_out",
+     "cpu_after": 95.15173451400005,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 21,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "bb6bb9bb829a321086b6f7e65202c59722e947463eb372307eec374a8ceaaf51",
+     "post_seconds": 0.0826937519996136,
+     "outcome": "timed_out",
+     "cpu_after": 90.56954859000143,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "9e58665fa202a95a10f85c1ffba3ee1616a9979f72c37b4179acffb44ca6e0e2",
+     "post_seconds": 0.046803033001197036,
+     "outcome": "built",
+     "seen_after": 34.601006325001435,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 1.53,
+      "build": 7.94,
+      "conversion": 1.29,
+      "write": 0.26,
+      "upload": 1.28
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "8ed66b75b7928508e108fbebbf2f96104795fe6b9fcc17685fe847356b073b6e",
+     "post_seconds": 0.04991557900029875,
+     "outcome": "built",
+     "seen_after": 33.331383955001,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.66,
+      "build": 6.87,
+      "conversion": 0.99,
+      "write": 0.19,
+      "upload": 1.06
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "1788cb3d0efaf4c74f31a7090428b1eea29e701592b0180ab9847f89fd1020a1",
+     "post_seconds": 0.050814584999898216,
+     "outcome": "built",
+     "seen_after": 64.48458440100148,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 5.12,
+      "build": 19.9,
+      "conversion": 1.97,
+      "write": 0.5,
+      "upload": 2.18
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "79674c4e80ebaf0d4f848a43d01f1b0444995377b8fc17a87d5b866a419a6d09",
+     "post_seconds": 0.08569831599925237,
+     "outcome": "timed_out",
+     "cpu_after": 90.35324519599999,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 26,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "3087b2f8c27d9f6835cd1fdffc86a374eadfb19308b5c23d452f1e7b78f798cb",
+     "post_seconds": 0.020718149000458652,
+     "outcome": "built",
+     "seen_after": 12.80173583800024,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 2.14,
+      "build": 4.72,
+      "conversion": 0.92,
+      "write": 0.16,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "959ecdfab172cb5656317a13a920fbea80f8406fc5ce97f9d1ae2006e1b61d07",
+     "post_seconds": 0.10172975200111978,
+     "outcome": "timed_out",
+     "cpu_after": 91.86136122700009,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "3fba39fed5917f393d4217714b064e616805e6b2820fc437d505d651af0bdc10",
+     "post_seconds": 0.06093001499903039,
+     "outcome": "timed_out",
+     "cpu_after": 93.33380639200004,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "a404870a3c0b80fef24353a550fac8cdcc7f4cc7f13cd24585dcd83fd50d09d0",
+     "post_seconds": 0.09165362200110394,
+     "outcome": "timed_out",
+     "cpu_after": 91.61863657200047,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 30,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "c520cab484357b31513c0cd96a701bf199f75861b74902f2b10a8ac1a9634820",
+     "post_seconds": 0.06514124999921478,
+     "outcome": "timed_out",
+     "cpu_after": 91.78246490099991,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "b6f9c73cba4189d68124f3fa67e793b07888c9813f52d74f5c445be7286d1fee",
+     "post_seconds": 0.06711072500002047,
+     "outcome": "timed_out",
+     "cpu_after": 93.7422393600009,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 32,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "b038c0a57b79c708e06a3f65f5377bb526e6ab1688b69ce6ff455852d149a18e",
+     "post_seconds": 0.10253291499975603,
+     "outcome": "timed_out",
+     "cpu_after": 91.23538657300014,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "4a2a045dcc0aee053089ae208e79b7600cc7ebfb02663904d565babd513883d6",
+     "post_seconds": 0.0992485980004858,
+     "outcome": "timed_out",
+     "cpu_after": 94.39610658000129,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "3e7d03e7b98c64b3324e510dca04be1e5e0b094fec407ef836c9532eb074b1d6",
+     "post_seconds": 0.08299117800015665,
+     "outcome": "timed_out",
+     "cpu_after": 92.24981880800078,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 35,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "7b47ad568fdc92bb0f2b3d3bad873670edcfe23b0b85f290c3949ef9f4552c02",
+     "post_seconds": 0.06027102299958642,
+     "outcome": "built",
+     "seen_after": 62.44528838699989,
+     "file_name": "vectors.faiss",
+     "process": 4,
+     "seconds": {
+      "download": 0.65,
+      "build": 9.78,
+      "conversion": 1.15,
+      "write": 0.2,
+      "upload": 0.95
+     }
+    },
+    {
+     "index": 36,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "35b9f39835835f57833958b9d41ee22a025136544d26aebdd50d0fc0875da86f",
+     "post_seconds": 0.10039883799981908,
+     "outcome": "timed_out",
+     "cpu_after": 92.35083169800055,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "836e9c49d17d50c5236128ca73961160607d22b07711c5d545d16d201eca6574",
+     "post_seconds": 0.10403688299993519,
+     "outcome": "timed_out",
+     "cpu_after": 94.82969538600082,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 38,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "337f3092057746e46f8f9612380c2af7e3f2f8a93698f3787c2cdcd6ba063707",
+     "post_seconds": 0.08781394400102727,
+     "outcome": "timed_out",
+     "cpu_after": 93.51393026200094,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 39,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "192c2ba1de386ff7e6820cbb52a6461007cac7e215a802c2f0ee071a0fb769e6",
+     "post_seconds": 0.055098381999414414,
+     "outcome": "timed_out",
+     "cpu_after": 91.81107293100104,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 40,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "8c4741fa8436e71001affa21667ad2864b5cab7d6fa47190081843dd7e872e28",
+     "post_seconds": 0.08205230100065819,
+     "outcome": "timed_out",
+     "cpu_after": 92.4777799600015,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 41,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "ad740f6cc44c7e2717fbb3fe2ded8e19b63f28aeecdcdeedcdd0729b062fc67e",
+     "post_seconds": 0.09261740999863832,
+     "outcome": "timed_out",
+     "cpu_after": 95.50530107300074,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 42,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "db73c1d1b786b1c958a12537571de11fea894d4cda718255cdbf27b9566c85c9",
+     "post_seconds": 0.0964627979992656,
+     "outcome": "timed_out",
+     "cpu_after": 94.47931887300001,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "ef442c0efe363f384641dca015f638e480d49e6a75779488b50bca8d1da7ea13",
+     "post_seconds": 0.0734356579996529,
+     "outcome": "timed_out",
+     "cpu_after": 94.74244763100069,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 44,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "42cd74faae232d663f8b2d9172c2b8d4b38428abff2fc531b346f5e7f7b08929",
+     "post_seconds": 0.0932432110002992,
+     "outcome": "timed_out",
+     "cpu_after": 91.38858682300088,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 45,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "7a76d600029ec78835437883db2e643607b5a421637d41b101c8b3490bf9cd4b",
+     "post_seconds": 0.0901320550001401,
+     "outcome": "timed_out",
+     "cpu_after": 92.78700238000056,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "386f60926b49b5a95b7cd3f6032f329dd13aee4b21e61697196bd465dae6771b",
+     "post_seconds": 0.09484489900023618,
+     "outcome": "timed_out",
+     "cpu_after": 94.42132735000087,
+     "process": 4,
+     "seconds": null
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "9666e3c5fe170e7566c973174de19f85859a7d1f834160999aec8eb03b64e704",
+     "post_seconds": 0.07603808400017442,
+     "outcome": "timed_out",
+     "cpu_after": 91.63818689000072,
+     "process": 4,
+     "seconds": null
+    }
+   ]
+  }
+ },
+ "service_starts": [
+  "2026-11-28T04:20:01.236086+00:00",
+  "2026-11-28T04:53:15.597481+00:00",
+  "2026-11-28T04:55:26.477220+00:00",
+  "2026-11-28T04:57:51.834182+00:00"
+ ],
+ "ended": "2026-11-28T05:00:01.557676+00:00"
+}
