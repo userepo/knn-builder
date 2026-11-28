@@ -1,0 +1,5749 @@
+{
+ "service": "upstream",
+ "image": "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+ "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+ "max_workers": 2,
+ "gpu": {
+  "name": "Tesla T4",
+  "driver": "595.91.07",
+  "memory_mib": 15360
+ },
+ "started": "2026-11-27T02:29:19.964736+00:00",
+ "settings": {
+  "runs": 5,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 0,
+  "recall_check_k": 10,
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 16.0,
+  "s3": {
+   "store": "s3",
+   "region": "us-east-2",
+   "endpoint": "aws"
+  }
+ },
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": {
+   "dir": "target/bench/inputs/cohere-hamming-1000000x768-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "gist-ip-1000000x960": {
+   "dir": "target/bench/inputs/gist-ip-1000000x960",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "gist-l2-1000000x960": {
+   "dir": "target/bench/inputs/gist-l2-1000000x960",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-hamming-1000000x384-binary": {
+   "dir": "target/bench/inputs/ms-marco-hamming-1000000x384-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "sift-hamming-1000000x128-binary": {
+   "dir": "target/bench/inputs/sift-hamming-1000000x128-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-hamming-1000000x768-binary",
+   "index": 0,
+   "job_id": "7376bbaef953c1188206e26dd092db8cd5eff84a9ebdcdde6e30f55e264e237a",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 84.666,
+   "start": "2026-11-27T02:31:25.442140+00:00",
+   "end": "2026-11-27T02:32:50.108028+00:00",
+   "host_peak_bytes": 3070279680,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 0.91,
+    "build": 81.53,
+    "conversion": 0.92,
+    "write": 0.16,
+    "upload": 0.73
+   },
+   "device_samples": 1689,
+   "device_held_bytes": 0,
+   "device_peak_bytes": 735051776
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 1,
+   "job_id": "717d8193f4a0dfb54cb8643e5e55cfc11ad32fc124abf60d04d0973eceda1e9c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 105.995,
+   "start": "2026-11-27T02:32:50.499092+00:00",
+   "end": "2026-11-27T02:34:36.494108+00:00",
+   "host_peak_bytes": 8214548480,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 8.37,
+    "build": 88.19,
+    "conversion": 3.22,
+    "write": 1.35,
+    "upload": 4.37
+   },
+   "device_samples": 2116,
+   "device_held_bytes": 112197632,
+   "device_peak_bytes": 1004535808
+  },
+  {
+   "input": "cohere-ip-1000000x768-byte",
+   "index": 2,
+   "job_id": "231fffba0c3b4eb7015028510e507f96e513e94ce8656dcee5fd741e8c86e6ca",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 92.619,
+   "start": "2026-11-27T02:34:36.887888+00:00",
+   "end": "2026-11-27T02:36:09.507014+00:00",
+   "host_peak_bytes": 3624640512,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 2.38,
+    "build": 85.53,
+    "conversion": 2.4,
+    "write": 0.43,
+    "upload": 1.72
+   },
+   "device_samples": 1849,
+   "device_held_bytes": 244318208,
+   "device_peak_bytes": 715128832
+  }
+ ],
+ "scrapes": [],
+ "concurrent": {
+  "binary": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "75b67eba355bcb5d5d6ae2fcec22fa2f18c3ee95398a940bd5cb1e2650c0096a",
+     "post_seconds": 0.01250107600208139,
+     "outcome": "built",
+     "seen_after": 113.33597969399852,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 9,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "9a11b22a2f2cc8274324a2045e1d44326f00774e97323947fa232698e8381952",
+     "post_seconds": 0.01080283299961593,
+     "outcome": "built",
+     "seen_after": 111.35432406499967,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.88,
+      "build": 105.02,
+      "conversion": 1.4,
+      "write": 0.14,
+      "upload": 0.78
+     }
+    },
+    {
+     "index": 10,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9c0b8f1ef85219c615a566f104f4b9c8e0a3450b22b2c29ec56b253e6c24e753",
+     "post_seconds": 0.013234210997325135,
+     "outcome": "built",
+     "seen_after": 211.51979445699908,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.46,
+      "build": 93.63,
+      "conversion": 0.87,
+      "write": 0.12,
+      "upload": 0.65
+     }
+    },
+    {
+     "index": 11,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "06f5758ff49859c1e4698d9517ced720b6c79687e1558f2d413febe4abddea86",
+     "post_seconds": 0.013926714997069212,
+     "outcome": "built",
+     "seen_after": 303.1676294860008,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.81,
+      "build": 93.28,
+      "conversion": 1.09,
+      "write": 0.16,
+      "upload": 0.84
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4c37769c8f6ce78df457a36d39d97c36ee2df9e3063a5c128266ff565a738538",
+     "post_seconds": 0.015285022000171011,
+     "outcome": "built",
+     "seen_after": 382.49453445199833,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 13,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "11a32524dc8e66ba5bbbc88bc9cdfc2d0957a963baf5d6b244a29d51a727461e",
+     "post_seconds": 0.014523992998874746,
+     "outcome": "built",
+     "seen_after": 302.5492152459992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.51,
+      "build": 94.04,
+      "conversion": 0.84,
+      "write": 0.13,
+      "upload": 0.68
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "8f33d27c132cdd1e6aee60b88f01cdff62704073ed419082cf6b059a5cd39fda",
+     "post_seconds": 0.012083087000064552,
+     "outcome": "built",
+     "seen_after": 206.31850200600093,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 15,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "a01bf7ef60428047d19edc92000f6c5477006e7640c86b084a32f0ca0c827346",
+     "post_seconds": 0.014673009998659836,
+     "outcome": "built",
+     "seen_after": 381.5292492260014,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": null
+    },
+    {
+     "index": 16,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "8c21c36d00ef042c4861f2126b1adc67642ef808d37daeac828c7b416af7d8b0",
+     "post_seconds": 0.01256177100003697,
+     "outcome": "built",
+     "seen_after": 225.91638600700026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.92,
+      "build": 107.34,
+      "conversion": 1.11,
+      "write": 0.16,
+      "upload": 1.26
+     }
+    },
+    {
+     "index": 17,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "bbb7449ad143869ab2758003e6386503f249a15ff3deeace30573d822ae4f027",
+     "post_seconds": 0.01519935300166253,
+     "outcome": "built",
+     "seen_after": 290.7813042859998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 18,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a82d569f826ab333c0c178902206fe5e0953ffeb23ac26dadf0277e573a0d23c",
+     "post_seconds": 0.01568474700252409,
+     "outcome": "built",
+     "seen_after": 385.4866041759997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.38,
+      "build": 93.01,
+      "conversion": 1.04,
+      "write": 0.13,
+      "upload": 0.75
+     }
+    },
+    {
+     "index": 19,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "80b3d8c15a12cd0cff1592959243e8caf00d01011fc19ddcd2658dcfeed48900",
+     "post_seconds": 0.011149382997245993,
+     "outcome": "built",
+     "seen_after": 113.18245003300035,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.81,
+      "build": 106.95,
+      "conversion": 1.11,
+      "write": 0.16,
+      "upload": 1.29
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d911fe304141eea1eabd957594168c21c2e90e7e47d61d8ac38518da1de43f29",
+     "post_seconds": 0.01269826299903798,
+     "outcome": "built",
+     "seen_after": 224.05270185100017,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": null
+    },
+    {
+     "index": 21,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d84e3ee9e47ade25f9340309b92d8e354945a3b88d5393053365d90a69f7c20a",
+     "post_seconds": 0.015270713000063552,
+     "outcome": "built",
+     "seen_after": 289.49935391500185,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.36,
+      "build": 65.0,
+      "conversion": 1.02,
+      "write": 0.12,
+      "upload": 0.99
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a571a7afec785936b44566ec8d695b9d424857611091a30cb2e5789a0e06152b",
+     "post_seconds": 0.015488100001675775,
+     "outcome": "built",
+     "seen_after": 387.7060591070003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.79,
+      "build": 94.32,
+      "conversion": 0.91,
+      "write": 0.16,
+      "upload": 0.68
+     }
+    },
+    {
+     "index": 23,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "dd037144337608e55b9a28d83b9f3504aa832275d0704e161d7e448a39fd91e2",
+     "post_seconds": 0.011390768999262946,
+     "outcome": "built",
+     "seen_after": 114.59264829099993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.16,
+      "build": 106.87,
+      "conversion": 0.92,
+      "write": 0.15,
+      "upload": 1.23
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "db821179075d13fc4d5a27940b93d5aef66f52fa0e54e6ae792577dd8971e842",
+     "post_seconds": 0.012874131996795768,
+     "outcome": "built",
+     "seen_after": 110.60023831299986,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.88,
+      "build": 106.96,
+      "conversion": 1.09,
+      "write": 0.16,
+      "upload": 1.27
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "aa907a3901ac4fe90d8861373274798b83700c688f97c4aee837139c8fbf9cb8",
+     "post_seconds": 0.01348003999737557,
+     "outcome": "built",
+     "seen_after": 181.1492281360006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.83,
+      "build": 64.81,
+      "conversion": 0.9,
+      "write": 0.14,
+      "upload": 1.13
+     }
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "30d790bbdb6617f80e64c7467571274dc45d0d55e602abcfda47190c24fb87ea",
+     "post_seconds": 0.012943763002112973,
+     "outcome": "built",
+     "seen_after": 181.8925795849973,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.45,
+      "build": 65.04,
+      "conversion": 1.0,
+      "write": 0.13,
+      "upload": 1.05
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a789b07f62f3cc6fa60c5c1a4d165cb3ee85726986e5a1fec2101cadb7c42f87",
+     "post_seconds": 0.014300324000942055,
+     "outcome": "built",
+     "seen_after": 387.0003258059987,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.87,
+      "build": 94.41,
+      "conversion": 0.92,
+      "write": 0.16,
+      "upload": 0.7
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8b7b0f2c0718a2b611dd07d36d500857368b03835815f8e9a6eb6ace061a1af7",
+     "post_seconds": 0.013362601999688195,
+     "outcome": "built",
+     "seen_after": 289.8223380799973,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.99,
+      "build": 106.77,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 1.17
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c0ec82c736f21db88fc291b7274a76b06c2d1ef6c8db1d7592f9f0b410c46bec",
+     "post_seconds": 0.014507702999253524,
+     "outcome": "built",
+     "seen_after": 387.5599248239996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.38,
+      "build": 93.05,
+      "conversion": 1.03,
+      "write": 0.13,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "1d73586418086adb153c509f9f428520188720d9c431946d2230c8c5cceab40e",
+     "post_seconds": 0.012817466998967575,
+     "outcome": "built",
+     "seen_after": 291.6958787349977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.8,
+      "build": 106.87,
+      "conversion": 1.09,
+      "write": 0.16,
+      "upload": 1.24
+     }
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "73f94eeb91ae54a7435b62865d8ad09ca3a33937031fa61cff4d7a5f48704f98",
+     "post_seconds": 0.00855194600080722,
+     "outcome": "built",
+     "seen_after": 113.42319641399808,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.14,
+      "build": 106.99,
+      "conversion": 0.9,
+      "write": 0.15,
+      "upload": 1.24
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "9bff97223319b49e0e44aad03c99492827abb01342d4ca76ee892f0a10a89622",
+     "post_seconds": 0.014997162998042768,
+     "outcome": "built",
+     "seen_after": 386.2725874610005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 33,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d401d8f4b1474cadddf523ee89c8f14a51d45e535189f0d2ba91d0d121a083ea",
+     "post_seconds": 0.011317748001602013,
+     "outcome": "built",
+     "seen_after": 81.11791465100032,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 34,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "5492ccb274bd983443c4b340246726c2deadfb00f1a4ae7a58a077f5930787e7",
+     "post_seconds": 0.013456824999593664,
+     "outcome": "built",
+     "seen_after": 244.9396564669987,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.43,
+      "build": 93.16,
+      "conversion": 1.04,
+      "write": 0.13,
+      "upload": 0.74
+     }
+    },
+    {
+     "index": 35,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "2aa9fea6899f7321a602ff3022176e7d5cc76b673703fa0d1c0b74a35e4c8885",
+     "post_seconds": 0.014872640000248794,
+     "outcome": "built",
+     "seen_after": 383.7273847539982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "0c59c5abac7bd4bfb4f335ffa282e6e1b5499d89814ce8596b03bd098e094b7a",
+     "post_seconds": 0.012514095000369707,
+     "outcome": "built",
+     "seen_after": 149.61455271199884,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 37,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "1c871addccbd0fa663d37164a46201861053601c8412bb3deb373a1ba4d3718e",
+     "post_seconds": 0.013545638998039067,
+     "outcome": "built",
+     "seen_after": 150.52843221500007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.39,
+      "build": 64.97,
+      "conversion": 1.0,
+      "write": 0.13,
+      "upload": 1.02
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "339afe15b03a9a2da4043093b9df9ca6b81d3fa02b6c419c888c88fb2b471676",
+     "post_seconds": 0.014489606001006905,
+     "outcome": "built",
+     "seen_after": 246.24884179400033,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 39,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3d9f92fbaa97da33299876f51d84dcbe79ba414ba67936213f818d8ce4d78d23",
+     "post_seconds": 0.012076022998371627,
+     "outcome": "built",
+     "seen_after": 81.08114044600006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": null
+    },
+    {
+     "index": 40,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "33ae2bba1a5a8e8b3ff798a777bc301f9cf01b860e57e9387410e1d309261fea",
+     "post_seconds": 0.015836194001167314,
+     "outcome": "built",
+     "seen_after": 382.38880210700154,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.79,
+      "build": 101.87,
+      "conversion": 0.91,
+      "write": 0.16,
+      "upload": 0.68
+     }
+    },
+    {
+     "index": 41,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "11237079a78243b025445782d3c5409f0d0a27df803d8aac1c8b81c0f516b77d",
+     "post_seconds": 0.01227927199943224,
+     "outcome": "built",
+     "seen_after": 204.78267197700188,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.01,
+      "build": 105.0,
+      "conversion": 1.33,
+      "write": 0.14,
+      "upload": 0.76
+     }
+    },
+    {
+     "index": 42,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "272cf6411c8b6821a1575d5df0e3684c0c51c25cb48944b4b66ef8d587e53977",
+     "post_seconds": 0.011095604997535702,
+     "outcome": "built",
+     "seen_after": 98.78152036400206,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.45,
+      "build": 93.22,
+      "conversion": 0.92,
+      "write": 0.13,
+      "upload": 0.67
+     }
+    },
+    {
+     "index": 43,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "62e2426eb3a57e0687ed229acef58b663d20b2d2fef10444f469c8cad3e9893b",
+     "post_seconds": 0.011538909002410946,
+     "outcome": "built",
+     "seen_after": 98.96088754100128,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.02,
+      "build": 94.24,
+      "conversion": 0.9,
+      "write": 0.16,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "02471987c93e8a4a50ceaa08f8e2e5b8f51560228b362a6e227aa90774901943",
+     "post_seconds": 0.016003103002731223,
+     "outcome": "built",
+     "seen_after": 376.07964738699957,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": null
+    },
+    {
+     "index": 45,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c8bbf2cc15b691bd256fc1646b808acd91a83dc0ea6a0fa1c5fe4e927cf22bbc",
+     "post_seconds": 0.013518161998945288,
+     "outcome": "built",
+     "seen_after": 272.18245168499925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.42,
+      "build": 63.01,
+      "conversion": 0.85,
+      "write": 0.13,
+      "upload": 0.72
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7a128720f3a68de85577b8d68294f97c1893a034239e22ce83d53091dfe11882",
+     "post_seconds": 0.012417522000760073,
+     "outcome": "built",
+     "seen_after": 207.48921131099996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.86,
+      "build": 105.55,
+      "conversion": 1.06,
+      "write": 0.18,
+      "upload": 0.89
+     }
+    },
+    {
+     "index": 47,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4e630386b8fc5dec5a440994e1eeafe4a3593a48b6e67fc1e8e4b7a576ae7a9a",
+     "post_seconds": 0.015265267000359017,
+     "outcome": "built",
+     "seen_after": 278.00842126600037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": null
+    }
+   ]
+  },
+  "float": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "3af8a308af8f5b39d3b256e09d92b133e233677abfa5c1ee6b6625b06d2cc2fa",
+     "post_seconds": 0.012199641001643613,
+     "outcome": "built",
+     "seen_after": 118.83398027899966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 18.42,
+      "build": 89.27,
+      "conversion": 3.58,
+      "write": 1.47,
+      "upload": 4.82
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "4c0e43e1a3962a50ab6591af078beba1e5570be0a02ddc0e270bf36dbf8d8d91",
+     "post_seconds": 0.013408104998234194,
+     "outcome": "built",
+     "seen_after": 411.3546305680029,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 8.32,
+      "build": 270.85,
+      "conversion": 3.59,
+      "write": 1.36,
+      "upload": 4.73
+     }
+    },
+    {
+     "index": 10,
+     "input": "gist-ip-1000000x960",
+     "job_id": "bd3b5f8cdabf907fac1ef7426ef49c7e840927b026bb91c8e6e54bc4bcd8e4ef",
+     "post_seconds": 0.015055076997668948,
+     "outcome": "built",
+     "seen_after": 548.5526989440004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 14.8,
+      "build": 55.82,
+      "conversion": 4.16,
+      "write": 2.62,
+      "upload": 6.15
+     }
+    },
+    {
+     "index": 11,
+     "input": "gist-l2-1000000x960",
+     "job_id": "6435c21f5eb27e3972f2c1c8dc4ad3d235fda5c0dfdda8b8613902affc8b174d",
+     "post_seconds": 0.012236638998729177,
+     "outcome": "built",
+     "seen_after": 287.8833902510014,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 21.39,
+      "build": 251.39,
+      "conversion": 4.25,
+      "write": 3.31,
+      "upload": 5.58
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "63246f71be62a3da8cbecbb75f5c129c1db8d49458458418ccae91e0ecbe4152",
+     "post_seconds": 0.013931535999290645,
+     "outcome": "built",
+     "seen_after": 465.07813816400085,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 4.55,
+      "build": 164.88,
+      "conversion": 2.06,
+      "write": 0.77,
+      "upload": 2.86
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "c4dd23a929316f33d7446ec2d0b6c107a78bd6db12dff1431e09eb1b188e03b3",
+     "post_seconds": 0.01501753800039296,
+     "outcome": "built",
+     "seen_after": 596.2290021580011,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.07,
+      "build": 102.94,
+      "conversion": 2.01,
+      "write": 0.77,
+      "upload": 2.8
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-ip-1000000x128",
+     "job_id": "94be8c00936c7d43552fce7093b31e0e7eee90b190f4abdce36d488c429aece7",
+     "post_seconds": 0.013742380000621779,
+     "outcome": "built",
+     "seen_after": 466.38197734700225,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.98,
+      "build": 52.38,
+      "conversion": 1.51,
+      "write": 0.41,
+      "upload": 1.87
+     }
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "cd371baa5a577c4e590f7e59960b424f271177baa15f69db9c8aec5e2cebad18",
+     "post_seconds": 0.01538277600047877,
+     "outcome": "built",
+     "seen_after": 482.313981254003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 4.56,
+      "build": 6.59,
+      "conversion": 1.46,
+      "write": 0.33,
+      "upload": 1.51
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "8db36df159ffe4dfd2602b2c53f1bb49132bc53087d163d4a4cbd1d6129fb56f",
+     "post_seconds": 0.010207022998656612,
+     "outcome": "built",
+     "seen_after": 120.61353125999813,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 19.88,
+      "build": 90.0,
+      "conversion": 3.42,
+      "write": 1.37,
+      "upload": 4.61
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "82a5c4e773c19c408c4d47ecf91a3cde6b73942abcb0f6527709afd40f20677e",
+     "post_seconds": 0.014819449002970941,
+     "outcome": "built",
+     "seen_after": 546.6442351489968,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 9.03,
+      "build": 167.59,
+      "conversion": 3.18,
+      "write": 1.36,
+      "upload": 4.74
+     }
+    },
+    {
+     "index": 18,
+     "input": "gist-ip-1000000x960",
+     "job_id": "8d068607701eee59e304deb6c3595c1577025ec5e4f6e154c344ce3367bbb384",
+     "post_seconds": 0.014526065999234561,
+     "outcome": "built",
+     "seen_after": 601.0919490390006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 10.64,
+      "build": 157.82,
+      "conversion": 3.85,
+      "write": 2.2,
+      "upload": 6.95
+     }
+    },
+    {
+     "index": 19,
+     "input": "gist-l2-1000000x960",
+     "job_id": "29e7fd6fef87009c233e5ddd9885ab53e934ffc83009726ebb9c5db5e7e62aaf",
+     "post_seconds": 0.007529182999860495,
+     "outcome": "built",
+     "seen_after": 291.2858169309984,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 21.83,
+      "build": 250.89,
+      "conversion": 3.8,
+      "write": 2.26,
+      "upload": 7.95
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "8155c40c8fcf7c50b7e95e6f2bef161e648a5105d270959729f481a8a76d32b7",
+     "post_seconds": 0.012634041002456797,
+     "outcome": "built",
+     "seen_after": 418.84797851299663,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 7.93,
+      "build": 114.41,
+      "conversion": 2.26,
+      "write": 0.74,
+      "upload": 2.8
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "90740e5f6792285419bc8b70555a907fe3e103a05bb464a0e7c8d090d5c0047b",
+     "post_seconds": 0.013198235999880126,
+     "outcome": "built",
+     "seen_after": 359.1957876079978,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 10.59,
+      "build": 57.55,
+      "conversion": 2.34,
+      "write": 0.76,
+      "upload": 2.85
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128",
+     "job_id": "585d2cbcfd1c5e1c2e18a47480fdaf6bae18e134d5e40e39da2af343c2791fa2",
+     "post_seconds": 0.010879381999984616,
+     "outcome": "built",
+     "seen_after": 286.9662048930004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.0,
+      "build": 155.99,
+      "conversion": 1.43,
+      "write": 0.9,
+      "upload": 2.63
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "d5d94a44af796b44501595dc763800095f6e38eb3a4e774b9af85290eed23ca4",
+     "post_seconds": 0.01528794600017136,
+     "outcome": "built",
+     "seen_after": 596.1113467469986,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.87,
+      "build": 43.97,
+      "conversion": 1.35,
+      "write": 0.91,
+      "upload": 2.66
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "db25b932c1e7964a16694abad94000d68d4498b311063b152ab6bd8c8253b2cd",
+     "post_seconds": 0.01337887000408955,
+     "outcome": "built",
+     "seen_after": 545.360956493998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 9.98,
+      "build": 144.86,
+      "conversion": 3.63,
+      "write": 1.38,
+      "upload": 4.46
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "4aec0dcd19bd0537f6a931df89006db17579904c0e8a312da03bf0c83e05279e",
+     "post_seconds": 0.01116168199951062,
+     "outcome": "built",
+     "seen_after": 370.7903831549993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 9.67,
+      "build": 270.97,
+      "conversion": 3.23,
+      "write": 1.42,
+      "upload": 6.22
+     }
+    },
+    {
+     "index": 26,
+     "input": "gist-ip-1000000x960",
+     "job_id": "b66e6584addc753785a383f34f192a8534add1ffc5bcf5d147c410dfb2b5ea56",
+     "post_seconds": 0.012742753999191336,
+     "outcome": "built",
+     "seen_after": 465.77364677600417,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 15.3,
+      "build": 67.28,
+      "conversion": 4.35,
+      "write": 3.17,
+      "upload": 5.51
+     }
+    },
+    {
+     "index": 27,
+     "input": "gist-l2-1000000x960",
+     "job_id": "6fd837d4532e074a4eadc7b4e2c2e0c95f50609e9f0403000b13212a1db34093",
+     "post_seconds": 0.010219110001344234,
+     "outcome": "built",
+     "seen_after": 248.23314123100135,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 16.2,
+      "build": 214.2,
+      "conversion": 4.42,
+      "write": 2.92,
+      "upload": 5.55
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "a8c241a210647488eebdc2d0069f275f1e13ef9e120ab42ea9c105cb777bd640",
+     "post_seconds": 0.013586576998932287,
+     "outcome": "built",
+     "seen_after": 599.2601620069981,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 4.85,
+      "build": 125.01,
+      "conversion": 2.04,
+      "write": 0.78,
+      "upload": 2.65
+     }
+    },
+    {
+     "index": 29,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "112cd5c197ab950508f2507dd50b1e3e90f3962838904b2ccc4c56b7bec1135b",
+     "post_seconds": 0.008820643000944983,
+     "outcome": "built",
+     "seen_after": 77.13151943199773,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 9.91,
+      "build": 58.26,
+      "conversion": 2.01,
+      "write": 0.74,
+      "upload": 2.89
+     }
+    },
+    {
+     "index": 30,
+     "input": "sift-ip-1000000x128",
+     "job_id": "5a35cee1417be2719e167b89d22e388b6ec0674251126f5fbb572be81582a6db",
+     "post_seconds": 0.01043039999785833,
+     "outcome": "built",
+     "seen_after": 365.73806996799976,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.07,
+      "build": 113.81,
+      "conversion": 1.63,
+      "write": 0.42,
+      "upload": 2.59
+     }
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "7ef0237d7e3cf581a25805fe29750781f22c062cf9612b4c17ccc52c4ac84bca",
+     "post_seconds": 0.01194570599909639,
+     "outcome": "built",
+     "seen_after": 382.86098402800417,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 3.64,
+      "build": 6.87,
+      "conversion": 1.51,
+      "write": 0.41,
+      "upload": 1.63
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "9b45fa975b2a21ea00e54d69c23b097592df1f8c0574c11ce9c5f8a21025b650",
+     "post_seconds": 0.008675826000398956,
+     "outcome": "built",
+     "seen_after": 120.23392136899929,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 18.98,
+      "build": 88.79,
+      "conversion": 3.48,
+      "write": 1.38,
+      "upload": 4.5
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "915d7d695fe274ef176b3a0778e45dc4f8201a9853ac47c1ec5145f921622baf",
+     "post_seconds": 0.01316372199653415,
+     "outcome": "built",
+     "seen_after": 441.57912699900044,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 21.16,
+      "build": 126.89,
+      "conversion": 3.41,
+      "write": 1.36,
+      "upload": 4.64
+     }
+    },
+    {
+     "index": 34,
+     "input": "gist-ip-1000000x960",
+     "job_id": "ba1d115ec7cb3bf1894637004acafd7dd787343dcbda47518eb461b2581b91d3",
+     "post_seconds": 0.013709668994124513,
+     "outcome": "built",
+     "seen_after": 503.75561490999826,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 20.72,
+      "build": 182.36,
+      "conversion": 4.22,
+      "write": 2.42,
+      "upload": 5.51
+     }
+    },
+    {
+     "index": 35,
+     "input": "gist-l2-1000000x960",
+     "job_id": "98d213dc49442b7681c29c75ed88e54c8e8229e65868ca6d93a3085eccacd595",
+     "post_seconds": 0.011390396997740027,
+     "outcome": "built",
+     "seen_after": 288.86511396499554,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 21.06,
+      "build": 248.25,
+      "conversion": 3.86,
+      "write": 2.3,
+      "upload": 7.86
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "b262926ecceea06d710843e06c8c8156ddb498e3771b83d2ed0adae82b6519c0",
+     "post_seconds": 0.016181689999939408,
+     "outcome": "built",
+     "seen_after": 622.0762330619982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 6.21,
+      "build": 58.87,
+      "conversion": 2.03,
+      "write": 0.79,
+      "upload": 2.65
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "d2ceb789fac415493efd42f39c15251d07c9f950640448d2068efc8668392fba",
+     "post_seconds": 0.01362058400263777,
+     "outcome": "built",
+     "seen_after": 552.2558013239977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 4.42,
+      "build": 100.81,
+      "conversion": 2.08,
+      "write": 0.8,
+      "upload": 3.04
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-ip-1000000x128",
+     "job_id": "40437bb5f5e459e134fc945353e97acff6043911f6c74ffa8aacf542618883d6",
+     "post_seconds": 0.012019547997624613,
+     "outcome": "built",
+     "seen_after": 280.8165861739981,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.98,
+      "build": 154.82,
+      "conversion": 1.46,
+      "write": 0.87,
+      "upload": 2.64
+     }
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "db24b473dfad2857aa488a4faddc93f36fd552f777ad62c8df78b22786f7c4e6",
+     "post_seconds": 0.014586058001441415,
+     "outcome": "built",
+     "seen_after": 555.6233562359994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.94,
+      "build": 47.42,
+      "conversion": 1.46,
+      "write": 0.39,
+      "upload": 1.64
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "2765acae9dd26848488fff378fc294590396930deaa934e25f97915ea990f0ab",
+     "post_seconds": 0.01138555099896621,
+     "outcome": "built",
+     "seen_after": 258.8324398420009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 18.96,
+      "build": 212.39,
+      "conversion": 3.51,
+      "write": 14.63,
+      "upload": 6.05
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "33c6cb05a4016a83473f7476767ec79dfe6fbe4d5c72cde476f1ed08a098fb4e",
+     "post_seconds": 0.013836321006237995,
+     "outcome": "built",
+     "seen_after": 250.33784753200598,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 18.85,
+      "build": 212.29,
+      "conversion": 3.43,
+      "write": 9.95,
+      "upload": 4.48
+     }
+    },
+    {
+     "index": 42,
+     "input": "gist-ip-1000000x960",
+     "job_id": "5de1039b75c6a65eaad0636ea4f2044ba454e18f38067c7445639f0905e70fb4",
+     "post_seconds": 0.014995286001067143,
+     "outcome": "built",
+     "seen_after": 613.6779586750054,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 10.83,
+      "build": 91.95,
+      "conversion": 4.28,
+      "write": 2.54,
+      "upload": 7.71
+     }
+    },
+    {
+     "index": 43,
+     "input": "gist-l2-1000000x960",
+     "job_id": "73270a1e4db6ab8e42c6a43271546b0bcaa001f07b5af4057dde8a8484371857",
+     "post_seconds": 0.01619094300258439,
+     "outcome": "built",
+     "seen_after": 495.30357099500543,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 14.18,
+      "build": 210.82,
+      "conversion": 4.24,
+      "write": 2.45,
+      "upload": 5.51
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "476601cf36caaa8fc0526ed87bfa01d9a35a4f8888536b91778a6a2759d0bfe7",
+     "post_seconds": 0.014726221997989342,
+     "outcome": "built",
+     "seen_after": 549.0315453670046,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 4.1,
+      "build": 210.67,
+      "conversion": 2.0,
+      "write": 0.74,
+      "upload": 2.85
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "1c3e90100dc7cf28897ef05cc275cbb5ba202a5fbb780dca8c5b5e4f71658462",
+     "post_seconds": 0.013692006999917794,
+     "outcome": "built",
+     "seen_after": 327.9945993200017,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 12.01,
+      "build": 58.16,
+      "conversion": 2.01,
+      "write": 0.75,
+      "upload": 2.78
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128",
+     "job_id": "242aa308be854006ec1ba02e750b9b77362d543c5a533481f8b7f9a63a5c6094",
+     "post_seconds": 0.014846710000711028,
+     "outcome": "built",
+     "seen_after": 622.8973810110037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 4.73,
+      "build": 6.28,
+      "conversion": 1.24,
+      "write": 0.34,
+      "upload": 1.2
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "7e0eb31a30650fe6d30ed64d074fa63a3ff1e03e6a4d33bd7c8c529ca20324c4",
+     "post_seconds": 0.01577587400242919,
+     "outcome": "built",
+     "seen_after": 608.8102164360025,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.88,
+      "build": 54.09,
+      "conversion": 1.24,
+      "write": 1.6,
+      "upload": 2.65
+     }
+    }
+   ]
+  },
+  "byte": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "987b12acfe1a40756bc3180b95facf9a9119c3183b86b6d5d28b7bbbdc75995f",
+     "post_seconds": 0.012039337001624517,
+     "outcome": "built",
+     "seen_after": 222.91706636299932,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.27,
+      "build": 203.85,
+      "conversion": 2.5,
+      "write": 0.46,
+      "upload": 1.89
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "3f1774bf80d7c452484952189021bff1b4c521d312246af6ea6ffea19fa501bc",
+     "post_seconds": 0.01031882400275208,
+     "outcome": "built",
+     "seen_after": 141.56954288700217,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.91,
+      "build": 129.17,
+      "conversion": 2.6,
+      "write": 0.46,
+      "upload": 1.84
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "edfb6bb209efc821d89152c55257dc7cf90d49d7adebd71a1753c323a9847d80",
+     "post_seconds": 0.013384215999394655,
+     "outcome": "built",
+     "seen_after": 289.7813867280056,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.34,
+      "build": 59.19,
+      "conversion": 1.99,
+      "write": 0.28,
+      "upload": 1.44
+     }
+    },
+    {
+     "index": 11,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "0510c4828b855d76b1926c06aa8f1aa0a5bbb0299c1108d68f8096a723401507",
+     "post_seconds": 0.013931077002780512,
+     "outcome": "built",
+     "seen_after": 342.47544303400355,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.21,
+      "build": 112.13,
+      "conversion": 1.63,
+      "write": 0.28,
+      "upload": 1.26
+     }
+    },
+    {
+     "index": 12,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "464a851cabeaf464b7037d8bc043b1f303205c0ebfc06ccde6ad920875cb6b32",
+     "post_seconds": 0.013044948005699553,
+     "outcome": "built",
+     "seen_after": 227.86347469400062,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.91,
+      "build": 84.47,
+      "conversion": 1.4,
+      "write": 0.18,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 13,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "4fad8ab576e37bdedc6cf28ca6810a8c901ad35c0032bd460b328a4e0afd9403",
+     "post_seconds": 0.01204751700424822,
+     "outcome": "built",
+     "seen_after": 17.18341002800298,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.94,
+      "build": 7.05,
+      "conversion": 1.11,
+      "write": 0.17,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "23aa233c4b9132cf400188778907af4b32e1a7ce23ffe0acd616ccb3a0883101",
+     "post_seconds": 0.013909152999985963,
+     "outcome": "built",
+     "seen_after": 431.63549621600396,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.49,
+      "build": 134.15,
+      "conversion": 2.63,
+      "write": 0.45,
+      "upload": 1.87
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "745d0d1e6246d90fc897f9634c2fe2678df57097121de809d15277ff22e82368",
+     "post_seconds": 0.014740234000782948,
+     "outcome": "built",
+     "seen_after": 553.4918991500017,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.35,
+      "build": 200.69,
+      "conversion": 2.48,
+      "write": 0.47,
+      "upload": 1.78
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "bcc5c731fb4c2ace0a987eb6c5570f1a7ed56b908d7824515d25e3aab6fff756",
+     "post_seconds": 0.014161325001623482,
+     "outcome": "built",
+     "seen_after": 239.7132773179983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.47,
+      "build": 132.85,
+      "conversion": 2.64,
+      "write": 0.45,
+      "upload": 1.9
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "213269cb37b9e1d7a5dd8bbb29e7a6330757739e1cbe3c10ef9cf9979cbc430a",
+     "post_seconds": 0.015979649004293606,
+     "outcome": "built",
+     "seen_after": 363.4579980240014,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.44,
+      "build": 202.51,
+      "conversion": 2.47,
+      "write": 0.46,
+      "upload": 1.93
+     }
+    },
+    {
+     "index": 18,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "2c87cd9823281f546c7690cf1bd8125c7dc0cb15c05b37658e12d58547ae3aa5",
+     "post_seconds": 0.01700923399766907,
+     "outcome": "built",
+     "seen_after": 430.4231154709996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.5,
+      "build": 59.47,
+      "conversion": 1.63,
+      "write": 0.29,
+      "upload": 1.29
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "8cdcfa752b6da8513d8380ce6370b89807fb18a550dd73f7565ea215ccd5bf94",
+     "post_seconds": 0.013322155995410867,
+     "outcome": "built",
+     "seen_after": 156.60248292399774,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.45,
+      "build": 136.97,
+      "conversion": 1.65,
+      "write": 0.29,
+      "upload": 1.34
+     }
+    },
+    {
+     "index": 20,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "6a3878c4008dafea458672d1342a4d02362b57711b009e5c0941da13fd555b9f",
+     "post_seconds": 0.010114192999026272,
+     "outcome": "built",
+     "seen_after": 17.364362252003048,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.67,
+      "build": 7.1,
+      "conversion": 1.14,
+      "write": 0.18,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "3ace70b39cfcdbe5a0a9bb17702ea85a45529f9309dafbc2542042751bda3993",
+     "post_seconds": 0.016599081995082088,
+     "outcome": "built",
+     "seen_after": 368.5862539689988,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.88,
+      "build": 122.29,
+      "conversion": 1.26,
+      "write": 0.18,
+      "upload": 0.72
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "cb4130b2d96f747c568db71339f402e0862e4d6bb124d2a5c6c30fbcee525495",
+     "post_seconds": 0.012854464002884924,
+     "outcome": "built",
+     "seen_after": 99.75568073300383,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 3.14,
+      "build": 90.66,
+      "conversion": 2.87,
+      "write": 0.45,
+      "upload": 1.79
+     }
+    },
+    {
+     "index": 23,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "f5c897351b437500849279fe9e92555b9ce5a415bd8f683553ad8fb67b20a412",
+     "post_seconds": 0.01691042099992046,
+     "outcome": "built",
+     "seen_after": 551.8594312690038,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.46,
+      "build": 178.39,
+      "conversion": 2.43,
+      "write": 0.45,
+      "upload": 1.77
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "aaafc53617a62269128a60e2e740f9ba95e5794e5b144cfcb9918fd9a5dae7d4",
+     "post_seconds": 0.013124206998327281,
+     "outcome": "built",
+     "seen_after": 99.81252656500146,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 3.11,
+      "build": 89.32,
+      "conversion": 2.88,
+      "write": 0.45,
+      "upload": 1.85
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "36d72f08c10b9c194016441f9d992c6d6663b627c58c4965efc2fdacd05b8165",
+     "post_seconds": 0.014213893002306577,
+     "outcome": "built",
+     "seen_after": 276.36556919600116,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.48,
+      "build": 170.16,
+      "conversion": 2.46,
+      "write": 0.45,
+      "upload": 1.97
+     }
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "faa4381e37fca85d9254606dfc5ce87f83af58b0a48adf86e156ac9ee4be0951",
+     "post_seconds": 0.015240710003126878,
+     "outcome": "built",
+     "seen_after": 344.67992673599656,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.97,
+      "build": 59.18,
+      "conversion": 1.63,
+      "write": 0.28,
+      "upload": 1.28
+     }
+    },
+    {
+     "index": 27,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "ae527188f65735c7a1fc932d84d5465ab8f99f73d08d3744f2d458338eeb3889",
+     "post_seconds": 0.01355033200525213,
+     "outcome": "built",
+     "seen_after": 153.7593624209985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.39,
+      "build": 135.52,
+      "conversion": 1.63,
+      "write": 0.28,
+      "upload": 1.29
+     }
+    },
+    {
+     "index": 28,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "2ceb724f725386d908f7940c6afe1cea18b33eace7aef98f0831aed4dac3be5c",
+     "post_seconds": 0.014339632994960994,
+     "outcome": "built",
+     "seen_after": 278.9476623439987,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.96,
+      "build": 123.01,
+      "conversion": 1.2,
+      "write": 0.2,
+      "upload": 0.88
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "5a060ae2c53bdc211ae20dcf667557eb211724d50c5f2d83824ec3f2ecf24663",
+     "post_seconds": 0.012566960002004635,
+     "outcome": "built",
+     "seen_after": 13.48928886000067,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.82,
+      "build": 7.09,
+      "conversion": 1.12,
+      "write": 0.18,
+      "upload": 0.75
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "88ecbc3fad59c0130e96a888d9eb4eb2399447fde1a2b06828008d9635bcb8db",
+     "post_seconds": 0.01721455199731281,
+     "outcome": "built",
+     "seen_after": 427.5413894439989,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.27,
+      "build": 141.1,
+      "conversion": 2.62,
+      "write": 0.45,
+      "upload": 1.75
+     }
+    },
+    {
+     "index": 31,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "a9cec6fdc93e97498cc8e0be32d93e2836cff31b84460965b0e5c44fb3dfb3b7",
+     "post_seconds": 0.016756655000790488,
+     "outcome": "built",
+     "seen_after": 548.5886355670009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.37,
+      "build": 200.55,
+      "conversion": 2.42,
+      "write": 0.45,
+      "upload": 1.73
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "e8034e1e9897c3d8c5c0a90c661558e9ddbbaab3570e62c951235c7352b1cdb1",
+     "post_seconds": 0.012779195996699855,
+     "outcome": "built",
+     "seen_after": 435.02502999600256,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.16,
+      "build": 135.22,
+      "conversion": 2.66,
+      "write": 0.45,
+      "upload": 1.94
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "4b51457d5feefa09d6b683f389b1404a845e23e84e37eb86bd8fdbe8a58852c6",
+     "post_seconds": 0.010486994993698318,
+     "outcome": "built",
+     "seen_after": 220.58427859900257,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 4.95,
+      "build": 208.04,
+      "conversion": 2.58,
+      "write": 0.45,
+      "upload": 3.2
+     }
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "96202231754f8537a78be9de8fbff03dacde8111b3ab891111bf6ce21d75e187",
+     "post_seconds": 0.011331121997500304,
+     "outcome": "built",
+     "seen_after": 291.5878897500006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.63,
+      "build": 64.29,
+      "conversion": 2.01,
+      "write": 0.29,
+      "upload": 1.26
+     }
+    },
+    {
+     "index": 35,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "952a6f0c606fd19cfe32d3f9114ed01f4b3180a9ec5c20101682f8454c206643",
+     "post_seconds": 0.014041181006177794,
+     "outcome": "built",
+     "seen_after": 348.7177497640005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.25,
+      "build": 109.65,
+      "conversion": 1.68,
+      "write": 0.29,
+      "upload": 1.3
+     }
+    },
+    {
+     "index": 36,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "c6c6730d9877bd26e13671cb0c565c323d7f67d2aec361e184fb92e23460a27e",
+     "post_seconds": 0.011664853998809122,
+     "outcome": "built",
+     "seen_after": 234.40302435099875,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.24,
+      "build": 7.15,
+      "conversion": 1.32,
+      "write": 0.17,
+      "upload": 0.7
+     }
+    },
+    {
+     "index": 37,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "bd159960ff50c4002b1ad2c10cabc9d0df9eda27f05d8bc64029cd208272f575",
+     "post_seconds": 0.014829341998847667,
+     "outcome": "built",
+     "seen_after": 558.2638926090003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.89,
+      "build": 122.44,
+      "conversion": 1.15,
+      "write": 0.18,
+      "upload": 0.7
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "4570e862fe62d565deff4a4e2077862875c494f9ea4e2267b7615075821110e8",
+     "post_seconds": 0.009791717995540239,
+     "outcome": "built",
+     "seen_after": 221.1473493960002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 4.83,
+      "build": 208.38,
+      "conversion": 2.48,
+      "write": 0.44,
+      "upload": 3.26
+     }
+    },
+    {
+     "index": 39,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "17769f8169c9dddce3a893a2911ebeb30f7ae1458e9b9cee09d592d7926b9863",
+     "post_seconds": 0.014616526997997425,
+     "outcome": "built",
+     "seen_after": 555.3429900010015,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.39,
+      "build": 203.2,
+      "conversion": 2.51,
+      "write": 0.46,
+      "upload": 2.12
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "b9e8a47f07784da4057d6d4e5a41f0f16984a29d8b5d0c8a8f44af176c592b28",
+     "post_seconds": 0.01715736400365131,
+     "outcome": "built",
+     "seen_after": 423.111987545999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 2.45,
+      "build": 200.36,
+      "conversion": 2.49,
+      "write": 0.45,
+      "upload": 1.87
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "c8c9a4e0ffce82c31933592563414a589458de6311184060655cfd2bf03f68d1",
+     "post_seconds": 0.01761194299615454,
+     "outcome": "built",
+     "seen_after": 556.3259628739979,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 3.22,
+      "build": 123.17,
+      "conversion": 2.42,
+      "write": 0.44,
+      "upload": 1.75
+     }
+    },
+    {
+     "index": 42,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "34aa0ad5eb3c6b08c04f649c11b55def3abde11faacd5390da94ebde3adcafdf",
+     "post_seconds": 0.015002282001660205,
+     "outcome": "built",
+     "seen_after": 128.20943016099773,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.38,
+      "build": 108.16,
+      "conversion": 1.69,
+      "write": 0.3,
+      "upload": 1.34
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "460c1b304736fa3c3eca8518d5881bd19b4e2f3c0a880893ce9fca41afad4498",
+     "post_seconds": 0.014684189998661168,
+     "outcome": "built",
+     "seen_after": 68.45371029200032,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.9,
+      "build": 62.14,
+      "conversion": 2.03,
+      "write": 0.29,
+      "upload": 1.25
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "6405605cfe2bb5d777703435abfc38f38afcc8fe78f19d9b350f8e7888f0411b",
+     "post_seconds": 0.013817392995406408,
+     "outcome": "built",
+     "seen_after": 15.671631714998512,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.78,
+      "build": 8.49,
+      "conversion": 1.51,
+      "write": 0.18,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "d745c95f071a8292a082ac8df25342042d7363315bdabf81505dbe9af4adf15a",
+     "post_seconds": 0.016987228002108168,
+     "outcome": "built",
+     "seen_after": 424.98014993499964,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.88,
+      "build": 84.04,
+      "conversion": 1.27,
+      "write": 0.21,
+      "upload": 0.89
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "3cc1b5eba5bea8dfd6954d2f6a6a18ac6fdd5c9258ee5b192d7afec341ea33e4",
+     "post_seconds": 0.015494598999794107,
+     "outcome": "built",
+     "seen_after": 217.11176131200045,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 2.44,
+      "build": 137.61,
+      "conversion": 2.66,
+      "write": 0.44,
+      "upload": 1.77
+     }
+    },
+    {
+     "index": 47,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "3a3de64ed4233c16460fd68acd987bcea7291bb6d0af6f28a1a1b61d81296331",
+     "post_seconds": 0.01595470999745885,
+     "outcome": "built",
+     "seen_after": 340.3228008189981,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 2.44,
+      "build": 202.42,
+      "conversion": 2.62,
+      "write": 0.45,
+      "upload": 1.9
+     }
+    }
+   ]
+  }
+ },
+ "sustained": {
+  "binary": {
+   "queue": 4,
+   "seconds": 3600,
+   "completed_within": 78,
+   "jobs_per_hour": 78.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "47a2531bd825ec5b8f41c4e750460fd8c5607bbef34c9725617130389816dd73",
+     "post_seconds": 0.004525265998381656,
+     "outcome": "built",
+     "seen_after": 142.52681641399977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": null
+    },
+    {
+     "index": 1,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "99fbd2f1ebbc6e492d5a46a49511fdf5acaf9610f37a65bb72cf3bf64e79196f",
+     "post_seconds": 0.00620202100253664,
+     "outcome": "built",
+     "seen_after": 212.94058664300246,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": null
+    },
+    {
+     "index": 2,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "7644d11914646830ce5e6332323d3f583f156095f4d78d31406a2bb54ea1802e",
+     "post_seconds": 0.005521616003534291,
+     "outcome": "built",
+     "seen_after": 205.2385400150015,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.44,
+      "build": 63.22,
+      "conversion": 0.88,
+      "write": 0.13,
+      "upload": 0.7
+     }
+    },
+    {
+     "index": 3,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a0d19c41f8bf4f1deee9ed55eb42b6d1faf847eb2416c3f2b3672ecd575b4e22",
+     "post_seconds": 0.003800354003033135,
+     "outcome": "built",
+     "seen_after": 140.7268750910007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": null
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "ac7e2a79407e9f28a5a237338c172174d9bb749336e83a77bb1294ae701221fe",
+     "post_seconds": 0.001872579006885644,
+     "outcome": "built",
+     "seen_after": 269.46566554900346,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": null
+    },
+    {
+     "index": 5,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "3b0ff62e32b6464291d0b265fa5bf827990059e1e22eccad09306a1639318ff0",
+     "post_seconds": 0.002233596002042759,
+     "outcome": "built",
+     "seen_after": 289.36754729600216,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.38,
+      "build": 68.39,
+      "conversion": 5.96,
+      "write": 0.15,
+      "upload": 0.92
+     }
+    },
+    {
+     "index": 6,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "bb1fe6e6716bc36e9305f11e8667e4f366963300b502afc8a40dd4b1a03c5fef",
+     "post_seconds": 0.002165318001061678,
+     "outcome": "built",
+     "seen_after": 381.53093166799954,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.84,
+      "build": 104.16,
+      "conversion": 0.94,
+      "write": 0.17,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 7,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "617da80cbad0597d4fd4064cb6f15f15a73553edb486d3d27189cc0a5b4a835e",
+     "post_seconds": 0.0021008339972468093,
+     "outcome": "built",
+     "seen_after": 391.09997140100313,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.01,
+      "build": 98.69,
+      "conversion": 2.2,
+      "write": 0.16,
+      "upload": 0.92
+     }
+    },
+    {
+     "index": 8,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d243d9e0e30c54397fed16bc78ce151e0def509d987b4330f4d79177a21dd6c1",
+     "post_seconds": 0.001894941000500694,
+     "outcome": "built",
+     "seen_after": 468.21778474799794,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.46,
+      "build": 88.07,
+      "conversion": 2.26,
+      "write": 0.17,
+      "upload": 0.92
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "df0ffa54491a3d9d4bdcd3b209da3368a5d10c95dd233b438707732dbc374b44",
+     "post_seconds": 0.0020450770025490783,
+     "outcome": "built",
+     "seen_after": 490.9554819190016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.88,
+      "build": 94.94,
+      "conversion": 3.52,
+      "write": 0.19,
+      "upload": 0.98
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b75ebfc4951e70e75f2555f49128183bb710e56e20925194730003582055d168",
+     "post_seconds": 0.002069191999908071,
+     "outcome": "built",
+     "seen_after": 538.8153345719984,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.86,
+      "build": 64.81,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 0.78
+     }
+    },
+    {
+     "index": 11,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "7b42ee0b0c481f48c6c308c3410aa752a2326206219d12bf98e0a61a28c632f8",
+     "post_seconds": 0.0023531570041086525,
+     "outcome": "built",
+     "seen_after": 572.4366041920002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41,
+      "build": 74.62,
+      "conversion": 6.02,
+      "write": 0.14,
+      "upload": 0.89
+     }
+    },
+    {
+     "index": 12,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "2010d682e9e88b123e7c0b30b7175c736943a03628c03c4ab5f3f0de23b40d60",
+     "post_seconds": 0.001902573996630963,
+     "outcome": "built",
+     "seen_after": 647.5313631270037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83,
+      "build": 105.97,
+      "conversion": 0.94,
+      "write": 0.17,
+      "upload": 0.85
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8a232f144c33e8f0f7306221947c698cb999110cd04769e86fa245d7d746baa8",
+     "post_seconds": 0.0019565909969969653,
+     "outcome": "built",
+     "seen_after": 662.4719962160016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.94,
+      "build": 81.3,
+      "conversion": 2.19,
+      "write": 0.16,
+      "upload": 0.95
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "89a6f7628bcbfdf8127b8c0baade67dc58e5e378aedee8d75c75716a2175a8ee",
+     "post_seconds": 0.0022335090034175664,
+     "outcome": "built",
+     "seen_after": 740.0039448829993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.38,
+      "build": 88.1,
+      "conversion": 2.23,
+      "write": 0.17,
+      "upload": 0.87
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "66b1d02e102a594fa26d592cb51e3856ef7c684e5e2ee916f5171d9a4c1ad1b4",
+     "post_seconds": 0.0019331390067236498,
+     "outcome": "built",
+     "seen_after": 760.9725468780016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.99,
+      "build": 94.95,
+      "conversion": 3.56,
+      "write": 0.19,
+      "upload": 1.0
+     }
+    },
+    {
+     "index": 16,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "2428d50362cff683ddd5a389d8db7333784cddd8ad080cf4cde202fc2674d674",
+     "post_seconds": 0.0021083520041429438,
+     "outcome": "built",
+     "seen_after": 809.035973580998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.84,
+      "build": 65.13,
+      "conversion": 0.92,
+      "write": 0.15,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 17,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "b6c0c00ce381eee718330ae7cdf99f87db78331a77c28b4f5d7d9ac22b6ca920",
+     "post_seconds": 0.0018286630001966842,
+     "outcome": "built",
+     "seen_after": 841.3680504590011,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.44,
+      "build": 74.67,
+      "conversion": 5.98,
+      "write": 0.14,
+      "upload": 0.9
+     }
+    },
+    {
+     "index": 18,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "ae3e5e647df2b6f3d5401f044152881c0fc8e9166a1a981a59baf9522fb7642e",
+     "post_seconds": 0.0021402320053311996,
+     "outcome": "built",
+     "seen_after": 915.3615736900028,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.85,
+      "build": 106.07,
+      "conversion": 0.94,
+      "write": 0.17,
+      "upload": 0.87
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "ff0eefdd2c7b888635559aa451bdc14b32e807f3612b207a2083a3f81ca274e4",
+     "post_seconds": 0.0022659189999103546,
+     "outcome": "built",
+     "seen_after": 926.6574524009993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.04,
+      "build": 81.34,
+      "conversion": 2.19,
+      "write": 0.16,
+      "upload": 0.97
+     }
+    },
+    {
+     "index": 20,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "7c912f001e4866ea3be8cfc1fe17bf7077a78efdc7230579ec12dd697f4515c7",
+     "post_seconds": 0.002019801002461463,
+     "outcome": "built",
+     "seen_after": 1009.3355403669993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41,
+      "build": 88.12,
+      "conversion": 2.23,
+      "write": 0.17,
+      "upload": 0.76
+     }
+    },
+    {
+     "index": 21,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "429be2e5e7a7537b61a1fc26ac61c53162a83c5bc4888fcbf13e46f513015658",
+     "post_seconds": 0.0021576630024355836,
+     "outcome": "built",
+     "seen_after": 1030.2603838750001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.88,
+      "build": 94.98,
+      "conversion": 3.55,
+      "write": 0.19,
+      "upload": 1.0
+     }
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "612d9bd4a54581a3841e536cbe3ad88fc1c3d4deebcfd01e6d0f16f4df20c372",
+     "post_seconds": 0.00217627299571177,
+     "outcome": "built",
+     "seen_after": 1075.2429791859977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83,
+      "build": 65.12,
+      "conversion": 0.92,
+      "write": 0.15,
+      "upload": 0.72
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a3ab0d5dde6a0d9e40b77059b54acba6655dfc8da6d47ecbb573b787ddfa0997",
+     "post_seconds": 0.002266790994326584,
+     "outcome": "built",
+     "seen_after": 1112.8066310959985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.43,
+      "build": 74.6,
+      "conversion": 5.99,
+      "write": 0.14,
+      "upload": 0.93
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "942514123b18e94f55b2de602eaeb525cccbc5057a561dbc98c4ff2877fbb089",
+     "post_seconds": 0.002254243998322636,
+     "outcome": "built",
+     "seen_after": 1182.4659659289973,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.86,
+      "build": 106.03,
+      "conversion": 0.96,
+      "write": 0.17,
+      "upload": 0.87
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "105aaa648a40891eb3765b979a1dedc73603070a93122e697af61b3a7d0e2d65",
+     "post_seconds": 0.002026222995482385,
+     "outcome": "built",
+     "seen_after": 1195.4080457969976,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.96,
+      "build": 81.34,
+      "conversion": 2.21,
+      "write": 0.16,
+      "upload": 0.94
+     }
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6e5b6d08c3bd8a2265828c558290531e568fdb14999aa85edf7703ba4f94f042",
+     "post_seconds": 0.0022723200017935596,
+     "outcome": "built",
+     "seen_after": 1275.9402132719988,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41,
+      "build": 88.12,
+      "conversion": 2.23,
+      "write": 0.16,
+      "upload": 0.94
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "b596e9f1ecae2792dcea26c24a0b1309a5e94aa5e089eefec02199e66c6bef49",
+     "post_seconds": 0.004906723996100482,
+     "outcome": "built",
+     "seen_after": 1295.4171145790024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.85,
+      "build": 94.91,
+      "conversion": 3.52,
+      "write": 0.19,
+      "upload": 1.13
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b28f2f8492cb1574049335e3a5f8b002b8da8ca2df342132a2e2fdc52011125e",
+     "post_seconds": 0.0023656729972572066,
+     "outcome": "built",
+     "seen_after": 1345.0319560299977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.96,
+      "build": 64.65,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d51e2c70c8df7ea51398cb2ceb7c79ee8cb0573b74633b60f2196dbddd2a056b",
+     "post_seconds": 0.0047048940032254905,
+     "outcome": "built",
+     "seen_after": 1381.6448287439998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.43,
+      "build": 74.52,
+      "conversion": 5.99,
+      "write": 0.15,
+      "upload": 0.94
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "0c2b05e131a27674a5f1beac87afdbf351667de773d806c7d703ecf0e11fcd9f",
+     "post_seconds": 0.0021843340000486933,
+     "outcome": "built",
+     "seen_after": 1453.6055217760004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.79,
+      "build": 105.96,
+      "conversion": 0.96,
+      "write": 0.17,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "82ce58e873a9e882e74fa19eeec80023f13cb9223635fd5bc6c316c78577070d",
+     "post_seconds": 0.0020946469958289526,
+     "outcome": "built",
+     "seen_after": 1463.384675608002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.97,
+      "build": 81.37,
+      "conversion": 2.19,
+      "write": 0.16,
+      "upload": 0.98
+     }
+    },
+    {
+     "index": 32,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "99b5d7147c2c54b2fc9a33e967a20381568c9cb7ee5e38c26bd3aaa59f9d123f",
+     "post_seconds": 0.0020523560015135445,
+     "outcome": "built",
+     "seen_after": 1545.955393919001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.51,
+      "build": 90.09,
+      "conversion": 2.64,
+      "write": 0.17,
+      "upload": 0.78
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "bd6aa6563a35bcbffc4dc59fce8e0e61bc889217bbd4d48aaa4680648f05ce2a",
+     "post_seconds": 0.0021563859991147183,
+     "outcome": "built",
+     "seen_after": 1568.466861095003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.92,
+      "build": 96.54,
+      "conversion": 3.53,
+      "write": 0.19,
+      "upload": 1.05
+     }
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4cadf81dc092442dad7e8e94f01a3e1e2436534e1cc36dad39c71ea0b47ae807",
+     "post_seconds": 0.003908592996594962,
+     "outcome": "built",
+     "seen_after": 1612.5689941469973,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83,
+      "build": 64.37,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 0.93
+     }
+    },
+    {
+     "index": 35,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "13f76aa9bd4d0c0ddcc873d00269e8d48cd8fba0f829ab046991fa526cf67888",
+     "post_seconds": 0.0020139500047662295,
+     "outcome": "built",
+     "seen_after": 1647.668283166,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.37,
+      "build": 74.82,
+      "conversion": 5.99,
+      "write": 0.15,
+      "upload": 0.96
+     }
+    },
+    {
+     "index": 36,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "5fa50bd483a31263622e0f7fc710a7d2b1722d672c3b31bc42d331aa7a85b56d",
+     "post_seconds": 0.00244381000084104,
+     "outcome": "built",
+     "seen_after": 1722.1099040690024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.82,
+      "build": 106.0,
+      "conversion": 0.95,
+      "write": 0.17,
+      "upload": 0.84
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "9a589ac00294397955be82550be40967c1596c5a75d3e08b4fdfa29bab92e914",
+     "post_seconds": 0.0027084900066256523,
+     "outcome": "built",
+     "seen_after": 1735.6380330020038,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 81.41,
+      "conversion": 2.18,
+      "write": 0.17,
+      "upload": 0.88
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6fdeea3f3b513e8352d9054835ca9ecd45e4cee1a6ee30d1010774a2d5166de6",
+     "post_seconds": 0.002642175000801217,
+     "outcome": "built",
+     "seen_after": 1812.471316682997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.47,
+      "build": 88.12,
+      "conversion": 2.21,
+      "write": 0.17,
+      "upload": 0.78
+     }
+    },
+    {
+     "index": 39,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "58a0bb5ffb9f8e90e110f8342c87fa97c304f34d746b398641860b8d9ce5d192",
+     "post_seconds": 0.0018720080042839982,
+     "outcome": "built",
+     "seen_after": 1837.7172418379996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.81,
+      "build": 94.94,
+      "conversion": 3.55,
+      "write": 0.19,
+      "upload": 1.03
+     }
+    },
+    {
+     "index": 40,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "cec746b0a75fce408be373d6ea5cb37169f48700579f4b6f9f12c2e7c35e5a1d",
+     "post_seconds": 0.0022226599976420403,
+     "outcome": "built",
+     "seen_after": 1882.3211832800007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.0,
+      "build": 64.85,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 0.84
+     }
+    },
+    {
+     "index": 41,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a2216dc526d07164f2219575133a107f1695f37d8544a4572402900a82f126eb",
+     "post_seconds": 0.002224103001935873,
+     "outcome": "built",
+     "seen_after": 1919.6819805350024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.5,
+      "build": 74.65,
+      "conversion": 5.95,
+      "write": 0.15,
+      "upload": 0.96
+     }
+    },
+    {
+     "index": 42,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c3896bab224116d7917a654979ef84e2ee195807d4906761d55025a250fadb0c",
+     "post_seconds": 0.002235813000879716,
+     "outcome": "built",
+     "seen_after": 1990.0001287889972,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.81,
+      "build": 106.06,
+      "conversion": 0.95,
+      "write": 0.17,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "ffea18a0a59d8f61f12ba241c7bf3407cbc3f979aac0930e3b76aa5ac2d78968",
+     "post_seconds": 0.005264752995572053,
+     "outcome": "built",
+     "seen_after": 2002.0837746679972,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.86,
+      "build": 81.44,
+      "conversion": 2.2,
+      "write": 0.16,
+      "upload": 0.87
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "19af0c5020a730d0e4f576a6fcff11deec82c5d796a06bcb0fd64b8b0b35d368",
+     "post_seconds": 0.0021874930025660433,
+     "outcome": "built",
+     "seen_after": 2083.8150557219997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41,
+      "build": 88.2,
+      "conversion": 2.21,
+      "write": 0.17,
+      "upload": 0.85
+     }
+    },
+    {
+     "index": 45,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "995da128a734671165bbcd13cfb5cf48aed7efd65f10c6d6ac4132eef7681706",
+     "post_seconds": 0.003151858996716328,
+     "outcome": "built",
+     "seen_after": 2104.291546628003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.92,
+      "build": 95.02,
+      "conversion": 3.54,
+      "write": 0.19,
+      "upload": 0.99
+     }
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "cfd148c17ea00bb569987c6f09ca2dc22bddf11586dba78a11de0a9077436758",
+     "post_seconds": 0.0023027530041872524,
+     "outcome": "built",
+     "seen_after": 2152.3210897989993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.1,
+      "build": 64.75,
+      "conversion": 0.92,
+      "write": 0.15,
+      "upload": 0.82
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "abb09b14128f1a70e40719a23f2ef08968c45b02a73f96ecbf838230227c43bc",
+     "post_seconds": 0.008345107999048196,
+     "outcome": "built",
+     "seen_after": 2188.630049063002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.44,
+      "build": 74.72,
+      "conversion": 5.96,
+      "write": 0.15,
+      "upload": 0.9
+     }
+    },
+    {
+     "index": 48,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "397de3df9d3a37899760dfb7cc879c56a31f400a9231306837b8a5f6f8bf5d11",
+     "post_seconds": 0.0024285430044983514,
+     "outcome": "built",
+     "seen_after": 2261.117208609001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.8,
+      "build": 106.03,
+      "conversion": 0.95,
+      "write": 0.17,
+      "upload": 0.89
+     }
+    },
+    {
+     "index": 49,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "0cf3946aaaa78cfb8121cce2d2b3f233e7cce490476fe4e046f433921914d9a1",
+     "post_seconds": 0.0029462410020641983,
+     "outcome": "built",
+     "seen_after": 2272.1489235629997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.84,
+      "build": 81.56,
+      "conversion": 2.19,
+      "write": 0.17,
+      "upload": 0.95
+     }
+    },
+    {
+     "index": 50,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "4b01d7a1d08d0692805125fe623802f548507051cb7897bf05755e4b930e9086",
+     "post_seconds": 0.0020373779989313334,
+     "outcome": "built",
+     "seen_after": 2348.9152724700034,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41,
+      "build": 88.24,
+      "conversion": 2.18,
+      "write": 0.17,
+      "upload": 0.82
+     }
+    },
+    {
+     "index": 51,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "9395630c7655bce6cc5b85d9d06f4007be1e591dcfb11574d0fccf9fde183b55",
+     "post_seconds": 0.0023100690013961866,
+     "outcome": "built",
+     "seen_after": 2372.8133743729995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 95.15,
+      "conversion": 3.54,
+      "write": 0.19,
+      "upload": 1.11
+     }
+    },
+    {
+     "index": 52,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "fb4e108b1bc657f5940efc829cc97fe54ae110101dd19b70be007787e4c01df9",
+     "post_seconds": 0.001938759996846784,
+     "outcome": "built",
+     "seen_after": 2421.5094173489997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.0,
+      "build": 65.02,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 0.72
+     }
+    },
+    {
+     "index": 53,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "31484e2cb2ae42e0cc4859ed46baf89c87102b24a89f826ba9ada5d4332beafe",
+     "post_seconds": 0.019310203999339137,
+     "outcome": "built",
+     "seen_after": 2453.498834307,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.4,
+      "build": 74.46,
+      "conversion": 6.0,
+      "write": 0.15,
+      "upload": 0.85
+     }
+    },
+    {
+     "index": 54,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "6166ba8090a3a5b98af95c07fac5caf19824973e272e43ac41a28011fc20d954",
+     "post_seconds": 0.002156844006094616,
+     "outcome": "built",
+     "seen_after": 2527.6215552790018,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.81,
+      "build": 106.01,
+      "conversion": 0.95,
+      "write": 0.16,
+      "upload": 0.84
+     }
+    },
+    {
+     "index": 55,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "feefbf1a61dee32336c703b59174b97e37ee8d4aec9a9189f8a61abc57673a36",
+     "post_seconds": 0.004977340002369601,
+     "outcome": "built",
+     "seen_after": 2543.114046871997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83,
+      "build": 81.55,
+      "conversion": 2.19,
+      "write": 0.17,
+      "upload": 0.88
+     }
+    },
+    {
+     "index": 56,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9d6d6edd8326e22000202ab21f0a6d459995a27569da82780a6455e1153b7d9b",
+     "post_seconds": 0.0020827740008826368,
+     "outcome": "built",
+     "seen_after": 2619.298161589002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.45,
+      "build": 88.16,
+      "conversion": 2.24,
+      "write": 0.17,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 57,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "dbcf56dd043cc609b995d3b6b3a38bf08ab72dd2a1782b308da058b2fa3842ce",
+     "post_seconds": 0.0019566860064514913,
+     "outcome": "built",
+     "seen_after": 2642.3695430709995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.89,
+      "build": 95.11,
+      "conversion": 3.51,
+      "write": 0.2,
+      "upload": 0.99
+     }
+    },
+    {
+     "index": 58,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "5f05c8aec0c7d3d9d5d0b8a648fd1a3ffbf1ab27bee0ccbbac0adeb082246201",
+     "post_seconds": 0.0024734580001677386,
+     "outcome": "built",
+     "seen_after": 2687.1885614720013,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.85,
+      "build": 65.14,
+      "conversion": 0.91,
+      "write": 0.15,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 59,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "4f9e6a4b712aafcc44f084a1a3af500f909ef68877aafcfb6de8a4ab40e6ff11",
+     "post_seconds": 0.0022942979994695634,
+     "outcome": "built",
+     "seen_after": 2723.5216172200016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.44,
+      "build": 74.64,
+      "conversion": 6.0,
+      "write": 0.15,
+      "upload": 0.97
+     }
+    },
+    {
+     "index": 60,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d94f4f750f98ad92219d6ca2de0f9942cc535d4413d2ae98658460da581ead1e",
+     "post_seconds": 0.0024037510011112317,
+     "outcome": "built",
+     "seen_after": 2796.8280294880024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.82,
+      "build": 105.95,
+      "conversion": 0.95,
+      "write": 0.16,
+      "upload": 0.88
+     }
+    },
+    {
+     "index": 61,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "10da51867437e3f5476427fd74ec94bffeadfc14e8d356b95689dbd7e19cc2b4",
+     "post_seconds": 0.0022001569959684275,
+     "outcome": "built",
+     "seen_after": 2810.643858178999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 81.34,
+      "conversion": 2.16,
+      "write": 0.17,
+      "upload": 1.03
+     }
+    },
+    {
+     "index": 62,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "907a3af89d12352d6ea20b4974b04584aa9f8fb548e7b092143da9daa23279fb",
+     "post_seconds": 0.0024146940049831755,
+     "outcome": "built",
+     "seen_after": 2886.4734575559996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.4,
+      "build": 88.22,
+      "conversion": 2.24,
+      "write": 0.17,
+      "upload": 0.82
+     }
+    },
+    {
+     "index": 63,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "9587da6e0f0f4f98ebd347f9383c811c278c644bd9761a2db19b8908978045bb",
+     "post_seconds": 0.001979517001018394,
+     "outcome": "built",
+     "seen_after": 2909.8450986129974,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.95,
+      "build": 95.08,
+      "conversion": 3.55,
+      "write": 0.2,
+      "upload": 0.95
+     }
+    },
+    {
+     "index": 64,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "63f1c17d21f85c5fbf9b6af16df30864d0cccce53b46bfa5e10f2dfd9e60e30a",
+     "post_seconds": 0.0028276020020712167,
+     "outcome": "built",
+     "seen_after": 2954.483917024001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.88,
+      "build": 65.24,
+      "conversion": 0.92,
+      "write": 0.15,
+      "upload": 0.82
+     }
+    },
+    {
+     "index": 65,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "7b1f48fd0ea0ea6dcee99048337355800e772301b8370bc71883b105563839b2",
+     "post_seconds": 0.0066734299980453216,
+     "outcome": "built",
+     "seen_after": 2991.362392862,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.38,
+      "build": 74.8,
+      "conversion": 5.99,
+      "write": 0.15,
+      "upload": 0.89
+     }
+    },
+    {
+     "index": 66,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "107b790da41cc771417034523c1329c7defd5eeae15b1f09383df0b2dbd251e8",
+     "post_seconds": 0.002325024994206615,
+     "outcome": "built",
+     "seen_after": 3067.6040160190023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.82,
+      "build": 105.96,
+      "conversion": 0.95,
+      "write": 0.17,
+      "upload": 0.9
+     }
+    },
+    {
+     "index": 67,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3294ab556983176412c2a19499ab929d5765631a9a79ef9e444dda12ee4a8d44",
+     "post_seconds": 0.00246718500420684,
+     "outcome": "built",
+     "seen_after": 3077.7691335130003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83,
+      "build": 81.48,
+      "conversion": 2.16,
+      "write": 0.17,
+      "upload": 0.87
+     }
+    },
+    {
+     "index": 68,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6166e677588c91b918984222a9e8ab6acea1b2e5d69c4b9b54e2a6b60cb2e4eb",
+     "post_seconds": 0.0023482050019083545,
+     "outcome": "built",
+     "seen_after": 3157.667622120003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.4,
+      "build": 88.18,
+      "conversion": 2.22,
+      "write": 0.17,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 69,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "81731dac849610ab9e5481c799c4b42c5e23b0bd62b9f21073cbe6dc9b7ce60e",
+     "post_seconds": 0.002235180996649433,
+     "outcome": "built",
+     "seen_after": 3179.349724886997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.84,
+      "build": 95.3,
+      "conversion": 3.55,
+      "write": 0.19,
+      "upload": 1.01
+     }
+    },
+    {
+     "index": 70,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "e086fa7a8737ad48496a78b12157eb83cc0589729076b42b1288e11fcfca2f2c",
+     "post_seconds": 0.002335519006010145,
+     "outcome": "built",
+     "seen_after": 3223.905243631001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.86,
+      "build": 65.21,
+      "conversion": 0.91,
+      "write": 0.14,
+      "upload": 0.74
+     }
+    },
+    {
+     "index": 71,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "03fd11eda29afe7527e30064f02d1f3f8f072325015bd358c795b2abe81c8c73",
+     "post_seconds": 0.005807631998322904,
+     "outcome": "built",
+     "seen_after": 3261.1133924489986,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.43,
+      "build": 74.67,
+      "conversion": 5.97,
+      "write": 0.15,
+      "upload": 0.96
+     }
+    },
+    {
+     "index": 72,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "0e92e34344465c141c73595990623aa3fc92d01cef08a88f6666b64cb01a93cd",
+     "post_seconds": 0.0023998670003493316,
+     "outcome": "built",
+     "seen_after": 3334.7491255869973,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 105.97,
+      "conversion": 0.96,
+      "write": 0.17,
+      "upload": 0.88
+     }
+    },
+    {
+     "index": 73,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "26956caec02faab9c712a64deed25ecd5577166c0f1077f6b2ff1bc4a25799e9",
+     "post_seconds": 0.0019610349991125986,
+     "outcome": "built",
+     "seen_after": 3346.746099007003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.99,
+      "build": 81.3,
+      "conversion": 2.21,
+      "write": 0.16,
+      "upload": 0.96
+     }
+    },
+    {
+     "index": 74,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "e38eed509eeef25041fdad7f5b9881eab61f20fcadb71dd9400600a9f06425a6",
+     "post_seconds": 0.0024309149957844056,
+     "outcome": "built",
+     "seen_after": 3425.3094834509975,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.46,
+      "build": 88.13,
+      "conversion": 2.22,
+      "write": 0.17,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 75,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7a35e937fd85cf0104b353b43258bae74630a4e2f8d20db226b50d69cccc1866",
+     "post_seconds": 0.002289075004227925,
+     "outcome": "built",
+     "seen_after": 3449.2952456830026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.86,
+      "build": 95.13,
+      "conversion": 3.55,
+      "write": 0.19,
+      "upload": 0.99
+     }
+    },
+    {
+     "index": 76,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3a868b37ad9e0c15b47e0b8c66a9c961058280c5e65e12d3d9cb81530e479a6e",
+     "post_seconds": 0.004267833006451838,
+     "outcome": "built",
+     "seen_after": 3491.0119563749977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.95,
+      "build": 65.21,
+      "conversion": 0.93,
+      "write": 0.15,
+      "upload": 0.93
+     }
+    },
+    {
+     "index": 77,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c46af5e924f23c5f2ffb9413a7d018e5e045b053019b1b752451bfd64966599c",
+     "post_seconds": 0.002562893001595512,
+     "outcome": "built",
+     "seen_after": 3529.4711352369995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41,
+      "build": 74.84,
+      "conversion": 6.01,
+      "write": 0.15,
+      "upload": 1.0
+     }
+    },
+    {
+     "index": 78,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d6d047b44b5d1873f923dd9ccb2a1876227b6310492c4fbc5e2ea67ad2df6d7a",
+     "post_seconds": 0.0020297380033298396,
+     "outcome": "built",
+     "seen_after": 3604.9994321440026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.78,
+      "build": 105.95,
+      "conversion": 0.96,
+      "write": 0.17,
+      "upload": 0.84
+     }
+    },
+    {
+     "index": 79,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "17585a823f8cf7b6ebc34357f06fa4c1c33d017dddf2b7f17e86e7d258f75056",
+     "post_seconds": 0.001985644004889764,
+     "outcome": "built",
+     "seen_after": 3615.5723656379996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.81,
+      "build": 81.38,
+      "conversion": 2.17,
+      "write": 0.17,
+      "upload": 0.88
+     }
+    },
+    {
+     "index": 80,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "314abdeecbdfbacb48909be6775d82200a57937dc60d09824246831c157e8e49",
+     "post_seconds": 0.002112469999701716,
+     "outcome": "built",
+     "seen_after": 3695.1823050910025,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.4,
+      "build": 88.15,
+      "conversion": 2.26,
+      "write": 0.17,
+      "upload": 0.85
+     }
+    },
+    {
+     "index": 81,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "226d1fd90ad96340d4454d737e2dd0aac7f8fc54924dbc0eb8e3c9609af12b2d",
+     "post_seconds": 0.0019783929965342395,
+     "outcome": "built",
+     "seen_after": 3704.8539241149992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 88.15,
+      "conversion": 0.96,
+      "write": 0.17,
+      "upload": 0.72
+     }
+    }
+   ]
+  },
+  "float": {
+   "queue": 4,
+   "seconds": 3600,
+   "completed_within": 48,
+   "jobs_per_hour": 48.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "c2dc10fa36e0d09a004f78f4344e4214fef9c06a33ef2e6150d51f49cfbaa1cf",
+     "post_seconds": 0.005255049996776506,
+     "outcome": "built",
+     "seen_after": 262.69590462599444,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 19.78,
+      "build": 211.22,
+      "conversion": 3.67,
+      "write": 16.42,
+      "upload": 7.08
+     }
+    },
+    {
+     "index": 1,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "07e7ef2d7c6725e642767f4750cf0a74819a7871b74ad5c0333882dd1a5ee3c8",
+     "post_seconds": 0.005723080001189373,
+     "outcome": "built",
+     "seen_after": 251.79002043500077,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 19.65,
+      "build": 211.12,
+      "conversion": 3.56,
+      "write": 11.31,
+      "upload": 5.1
+     }
+    },
+    {
+     "index": 2,
+     "input": "gist-ip-1000000x960",
+     "job_id": "c9f228449c71911e6d6a5206c942dbc70dd2c4b39819d9cbd1f83efd64591bb1",
+     "post_seconds": 0.007946505000290927,
+     "outcome": "built",
+     "seen_after": 522.2575705029958,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 21.64,
+      "build": 225.15,
+      "conversion": 4.35,
+      "write": 2.82,
+      "upload": 6.63
+     }
+    },
+    {
+     "index": 3,
+     "input": "gist-l2-1000000x960",
+     "job_id": "759ce4a20bd21a388973d0a70e5b4a29ad2b8be44618ff3d4f9037527f8b8e9c",
+     "post_seconds": 0.007516120000218507,
+     "outcome": "built",
+     "seen_after": 464.21178089199384,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 27.0,
+      "build": 169.43,
+      "conversion": 4.39,
+      "write": 3.92,
+      "upload": 6.41
+     }
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "0a5294e57d66ce2e27a4c9446bbf62db17ab5e8569d960ddf25cffea50e011d2",
+     "post_seconds": 0.009162685004412197,
+     "outcome": "built",
+     "seen_after": 572.7708676599941,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.46,
+      "build": 97.05,
+      "conversion": 2.29,
+      "write": 0.8,
+      "upload": 3.14
+     }
+    },
+    {
+     "index": 5,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "3fc0ef299e04aae7ce7302726b1ce2c59192a84693b11788489ea2764532fbe0",
+     "post_seconds": 0.006212801999936346,
+     "outcome": "built",
+     "seen_after": 630.1115236240003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.43,
+      "build": 97.03,
+      "conversion": 2.12,
+      "write": 0.8,
+      "upload": 3.6
+     }
+    },
+    {
+     "index": 6,
+     "input": "sift-ip-1000000x128",
+     "job_id": "3be4861f6314fba9fe6b457a71bbc003cfc50e9cb3fafcd93e2625e8934977f3",
+     "post_seconds": 0.004344340995885432,
+     "outcome": "built",
+     "seen_after": 635.0020497339938,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.09,
+      "build": 53.64,
+      "conversion": 1.47,
+      "write": 0.4,
+      "upload": 1.78
+     }
+    },
+    {
+     "index": 7,
+     "input": "sift-l2-1000000x128",
+     "job_id": "247c20607d1899b5d90ccf77f3fa8cf8490961bf9e318384ab6e2c1002abf0cb",
+     "post_seconds": 0.0043022129975724965,
+     "outcome": "built",
+     "seen_after": 644.470602647998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.67,
+      "build": 6.89,
+      "conversion": 1.51,
+      "write": 0.47,
+      "upload": 1.46
+     }
+    },
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "3f9e3e691747bc834e37178207f1f819289939454fcdaabda0f1a1c0b08105a7",
+     "post_seconds": 0.001842863995989319,
+     "outcome": "built",
+     "seen_after": 745.650325275994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 11.8,
+      "build": 89.16,
+      "conversion": 3.74,
+      "write": 1.41,
+      "upload": 5.52
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "84420d00e143f074ba3ae9623c9e1036b13609b9a53b975590ffb1fbe35d4db4",
+     "post_seconds": 0.0032129489991348237,
+     "outcome": "built",
+     "seen_after": 866.717496196994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.87,
+      "build": 203.46,
+      "conversion": 3.27,
+      "write": 1.41,
+      "upload": 5.4
+     }
+    },
+    {
+     "index": 10,
+     "input": "gist-ip-1000000x960",
+     "job_id": "a59cb6c47812b2322d1c5f4d292af6d25b3c49743ee31a6a493c57d4cbdf711a",
+     "post_seconds": 0.0049557940001250245,
+     "outcome": "built",
+     "seen_after": 940.9025934179954,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 11.82,
+      "build": 170.85,
+      "conversion": 4.25,
+      "write": 4.14,
+      "upload": 6.84
+     }
+    },
+    {
+     "index": 11,
+     "input": "gist-l2-1000000x960",
+     "job_id": "b65f23afa0ff9a3a96c7838341551fd2c6e9903d3e3aae247fe16c9f4fba3a23",
+     "post_seconds": 0.0032695729969418608,
+     "outcome": "built",
+     "seen_after": 1106.5493067849966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 11.37,
+      "build": 209.53,
+      "conversion": 4.25,
+      "write": 2.94,
+      "upload": 7.6
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "59269f31b8e673f1efcdb0921a27416069234a0a3821ec931bfb311e46714337",
+     "post_seconds": 0.00361963299656054,
+     "outcome": "built",
+     "seen_after": 1152.9350649359985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.19,
+      "build": 200.24,
+      "conversion": 2.34,
+      "write": 0.78,
+      "upload": 3.33
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "6ce1d1614e395eac597c040db4d74437efd5799ac60d216a58a8baf95b09c86b",
+     "post_seconds": 0.004391098002088256,
+     "outcome": "built",
+     "seen_after": 1210.5381839429974,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.12,
+      "build": 94.71,
+      "conversion": 2.1,
+      "write": 0.8,
+      "upload": 3.47
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-ip-1000000x128",
+     "job_id": "0d415360eb661ae2fe84b3120d7d6ebe68c4ef046958ace1d0cccf4dcc4ac056",
+     "post_seconds": 0.0018854779991670512,
+     "outcome": "built",
+     "seen_after": 1214.6157915809963,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.86,
+      "build": 53.67,
+      "conversion": 1.52,
+      "write": 0.41,
+      "upload": 2.05
+     }
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "c6f359c48b7aca34dcff400c1427e3d53ce7a9a0978df82375e1cc8083ebdf12",
+     "post_seconds": 0.0023571279962197877,
+     "outcome": "built",
+     "seen_after": 1228.4765604130007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 3.82,
+      "build": 6.94,
+      "conversion": 1.69,
+      "write": 0.43,
+      "upload": 1.74
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "402a3a069ad3787181744a7830e31c1a9d4768ac2f306df82696686765deb022",
+     "post_seconds": 0.0030236509992391802,
+     "outcome": "built",
+     "seen_after": 1324.8571211579983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 11.43,
+      "build": 89.13,
+      "conversion": 3.81,
+      "write": 1.41,
+      "upload": 5.7
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "10c46fa6b75da1ce1ecd2b7f155f4a3a4e39491e4df1109d98b549e47e599bd4",
+     "post_seconds": 0.026912408997304738,
+     "outcome": "built",
+     "seen_after": 1450.9632775599966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 9.98,
+      "build": 203.79,
+      "conversion": 3.27,
+      "write": 1.39,
+      "upload": 5.67
+     }
+    },
+    {
+     "index": 18,
+     "input": "gist-ip-1000000x960",
+     "job_id": "e76d36ea70f3c01158df322611e0477da0722086fa6a9dd5048bd37a27c84f35",
+     "post_seconds": 0.0037503589992411435,
+     "outcome": "built",
+     "seen_after": 1519.2457974999998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 12.36,
+      "build": 159.31,
+      "conversion": 4.16,
+      "write": 8.52,
+      "upload": 6.28
+     }
+    },
+    {
+     "index": 19,
+     "input": "gist-l2-1000000x960",
+     "job_id": "d8626de1624fc6803c512b0920a79fb03a49758fda73460699402f5bdcb41f62",
+     "post_seconds": 0.004305739996198099,
+     "outcome": "built",
+     "seen_after": 1675.7081765409966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 12.5,
+      "build": 197.21,
+      "conversion": 4.32,
+      "write": 5.37,
+      "upload": 6.12
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "44f187edd093d022e170c8920416cffd64637d4c8a8bfde7e6a18a35161a944f",
+     "post_seconds": 0.003681123002024833,
+     "outcome": "built",
+     "seen_after": 1844.4063369169962,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "discard_error": "TimeoutError('timed out')",
+     "seconds": {
+      "download": 5.19,
+      "build": 196.93,
+      "conversion": 2.57,
+      "write": 0.77,
+      "upload": 122.63
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "f6cad0134065f1976409edc50922f5ea0093bac6146d5820220f2a49913de56e",
+     "post_seconds": 0.004581789005897008,
+     "outcome": "built",
+     "seen_after": 1901.6683308819993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.12,
+      "build": 93.14,
+      "conversion": 2.06,
+      "write": 0.79,
+      "upload": 123.46
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128",
+     "job_id": "9b261011ad663dca45e6771403a89972eddbd20e32faa80dbafb64f3de272507",
+     "post_seconds": 0.0037129949996597134,
+     "outcome": "built",
+     "seen_after": 1857.985547958,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.09,
+      "build": 6.31,
+      "conversion": 1.27,
+      "write": 0.34,
+      "upload": 1.3
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "d082f0016b1f34aa6c097957b830e395ac01eaf9fb142d66bb7172622cf98cf8",
+     "post_seconds": 0.0034485880023567006,
+     "outcome": "built",
+     "seen_after": 1866.6789398879991,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.78,
+      "build": 6.25,
+      "conversion": 1.27,
+      "write": 0.35,
+      "upload": 1.36
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "581930ce5c62913284e26dc0aa19bf9745fad88677e44b89282cc30914e346b1",
+     "post_seconds": 0.0018726229973253794,
+     "outcome": "built",
+     "seen_after": 1974.5697872829987,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.11,
+      "build": 87.46,
+      "conversion": 3.6,
+      "write": 1.5,
+      "upload": 5.2
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "8676a18e044b4ec7e2c2307894ff9a5163d392d42e5ef8ba9b754003238fa9ab",
+     "post_seconds": 0.002862754998204764,
+     "outcome": "built",
+     "seen_after": 2100.0398234999957,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 7.68,
+      "build": 178.36,
+      "conversion": 3.26,
+      "write": 1.4,
+      "upload": 5.91
+     }
+    },
+    {
+     "index": 26,
+     "input": "gist-ip-1000000x960",
+     "job_id": "3a9100958008663626f31797435e39719baa2fb0b81effe648d07474f3bb740e",
+     "post_seconds": 0.0036256759995012544,
+     "outcome": "built",
+     "seen_after": 2152.008191793997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 11.55,
+      "build": 149.08,
+      "conversion": 3.81,
+      "write": 4.62,
+      "upload": 5.68
+     }
+    },
+    {
+     "index": 27,
+     "input": "gist-l2-1000000x960",
+     "job_id": "ed220d8e1ed0456387663312a6b6902bbbc1c9565cd621a45ecb4eeeba301bee",
+     "post_seconds": 0.005623304001346696,
+     "outcome": "built",
+     "seen_after": 2314.0710487659962,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 13.08,
+      "build": 186.7,
+      "conversion": 4.24,
+      "write": 2.86,
+      "upload": 5.86
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "1cd23e2a7393ecf50cee909be75d6ab810b62e50e99638774cee5e81527a6bfc",
+     "post_seconds": 0.0028157399938208982,
+     "outcome": "built",
+     "seen_after": 2366.8617254879937,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.78,
+      "build": 202.22,
+      "conversion": 2.54,
+      "write": 0.78,
+      "upload": 2.9
+     }
+    },
+    {
+     "index": 29,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "b3f9907f61a1ade73cc1d4596c0914da91c88fdc12ee708de67713f68b65b3ae",
+     "post_seconds": 0.005158093001227826,
+     "outcome": "built",
+     "seen_after": 2421.723824222994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.88,
+      "build": 96.91,
+      "conversion": 2.08,
+      "write": 0.78,
+      "upload": 3.12
+     }
+    },
+    {
+     "index": 30,
+     "input": "sift-ip-1000000x128",
+     "job_id": "031a24a8bf5e681cf5f82f91960de516a7d6504bddabbd5fd3396a0625551892",
+     "post_seconds": 0.0033010420011123642,
+     "outcome": "built",
+     "seen_after": 2423.0766461509993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.04,
+      "build": 53.66,
+      "conversion": 1.43,
+      "write": 0.4,
+      "upload": 1.87
+     }
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "d9f7cc7039b2f556c5bf5823f2bece72fec19a304bb4930b59e9b78b4d4eda17",
+     "post_seconds": 0.004017131999717094,
+     "outcome": "built",
+     "seen_after": 2433.009415363995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 3.39,
+      "build": 6.68,
+      "conversion": 1.41,
+      "write": 0.38,
+      "upload": 1.4
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "78d6d018b6bfef68500d95afa8fe18f05891509b3cd6d81425f3362d340ae16e",
+     "post_seconds": 0.0018477159974281676,
+     "outcome": "built",
+     "seen_after": 2529.745702149994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.62,
+      "build": 87.57,
+      "conversion": 3.82,
+      "write": 1.38,
+      "upload": 5.12
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "863b5fecb301aef4f46b6260fad026267af7ce82b967863597cb3888d2172916",
+     "post_seconds": 0.0036748809943674132,
+     "outcome": "built",
+     "seen_after": 2656.9039055459943,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.24,
+      "build": 202.15,
+      "conversion": 3.27,
+      "write": 1.41,
+      "upload": 5.08
+     }
+    },
+    {
+     "index": 34,
+     "input": "gist-ip-1000000x960",
+     "job_id": "95d1afb9b2724e767697d238af36762388b647b5fea5a9ef04df9267495c5363",
+     "post_seconds": 0.0037795289972564206,
+     "outcome": "built",
+     "seen_after": 2724.721756490995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 12.35,
+      "build": 166.15,
+      "conversion": 4.14,
+      "write": 4.26,
+      "upload": 5.67
+     }
+    },
+    {
+     "index": 35,
+     "input": "gist-l2-1000000x960",
+     "job_id": "19c59c07707cd0fcadc02636f972184ed08fc49a47c77415c47f680174080af6",
+     "post_seconds": 0.0030533850003848784,
+     "outcome": "built",
+     "seen_after": 2884.8176275959995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 9.92,
+      "build": 207.21,
+      "conversion": 4.23,
+      "write": 2.92,
+      "upload": 5.88
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "9072a5fd1a0c165121a5fd5d006172b273c14203702d99398b7e44082fce3c6b",
+     "post_seconds": 0.014162494000629522,
+     "outcome": "built",
+     "seen_after": 2937.100453685998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.4,
+      "build": 201.71,
+      "conversion": 2.13,
+      "write": 0.76,
+      "upload": 2.73
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "5f5ff36808c329ba7492bd634218fb6be1870f29be45596f3d3b52f1e539d216",
+     "post_seconds": 0.003075394000916276,
+     "outcome": "built",
+     "seen_after": 2994.318816302999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.92,
+      "build": 96.43,
+      "conversion": 2.05,
+      "write": 0.77,
+      "upload": 3.09
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-ip-1000000x128",
+     "job_id": "dc4d83bc8e05630cea87d14a7a611782d2b45f2afd3851b0aacc9e3b08099b7a",
+     "post_seconds": 0.004245297001034487,
+     "outcome": "built",
+     "seen_after": 2995.159940834994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.08,
+      "build": 54.34,
+      "conversion": 1.59,
+      "write": 0.41,
+      "upload": 1.46
+     }
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "e9091ed38cf4df04f6ddc303e025c591f9f76b499ad0ef434fef03197134b726",
+     "post_seconds": 0.0031739149999339134,
+     "outcome": "built",
+     "seen_after": 3005.6238310509943,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.97,
+      "build": 6.89,
+      "conversion": 1.5,
+      "write": 0.36,
+      "upload": 1.33
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "3afb4a79fab71ea54119ad4b0e095a5e2fc65a9c0c1b7d23da21ef8891bf5c6c",
+     "post_seconds": 0.001687011004833039,
+     "outcome": "built",
+     "seen_after": 3101.7209990310002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.41,
+      "build": 87.21,
+      "conversion": 3.55,
+      "write": 1.36,
+      "upload": 4.45
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "c4b85920c7bfe741d9e4735f3e556da64ece73d9bcaec6233c46a963a2670ec1",
+     "post_seconds": 0.003478391998214647,
+     "outcome": "built",
+     "seen_after": 3227.920907734995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.36,
+      "build": 201.57,
+      "conversion": 3.17,
+      "write": 1.36,
+      "upload": 4.58
+     }
+    },
+    {
+     "index": 42,
+     "input": "gist-ip-1000000x960",
+     "job_id": "ab185ebdd53b1e764fe5010de4241522ad38309fb76ae95850b6b7fa97f4a9f1",
+     "post_seconds": 0.0039868039966677316,
+     "outcome": "built",
+     "seen_after": 3284.099309423,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 9.4,
+      "build": 155.49,
+      "conversion": 4.17,
+      "write": 4.48,
+      "upload": 6.01
+     }
+    },
+    {
+     "index": 43,
+     "input": "gist-l2-1000000x960",
+     "job_id": "86e7dfdb6efe5ff2ad19d5280fbc33ae3de72298d1b819e7c51e16005459c973",
+     "post_seconds": 0.004347785004938487,
+     "outcome": "built",
+     "seen_after": 3445.279741045997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 9.49,
+      "build": 194.55,
+      "conversion": 4.24,
+      "write": 2.83,
+      "upload": 5.73
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "45b5f201a0f958bc30e8ea07c8155c57ebe300cc556697899334cc268abfbcc0",
+     "post_seconds": 0.003620555995439645,
+     "outcome": "built",
+     "seen_after": 3492.493387306,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.97,
+      "build": 201.32,
+      "conversion": 2.11,
+      "write": 0.77,
+      "upload": 2.93
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "361c1d39269c3c1818179b7954494df197dacba8683534a6539f8a3e8faa10e3",
+     "post_seconds": 0.0041488909992040135,
+     "outcome": "built",
+     "seen_after": 3551.7153988579958,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.47,
+      "build": 97.24,
+      "conversion": 2.05,
+      "write": 0.78,
+      "upload": 3.09
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128",
+     "job_id": "5b168d5b5e6cad1f852341589fc5360c1b8d15b42d37341044fd68128c98a6c3",
+     "post_seconds": 0.0028980099959881045,
+     "outcome": "built",
+     "seen_after": 3556.2918195159946,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.01,
+      "build": 54.16,
+      "conversion": 1.47,
+      "write": 0.39,
+      "upload": 1.51
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "5af762eebde2b9e6c942372d8c9dc764a97029a6a2b5ad6e48d0f8bb6ceac49a",
+     "post_seconds": 0.001736434998747427,
+     "outcome": "built",
+     "seen_after": 3566.7058638269955,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 3.15,
+      "build": 6.87,
+      "conversion": 1.51,
+      "write": 0.46,
+      "upload": 1.36
+     }
+    },
+    {
+     "index": 48,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "2c1732512b66252e227ed2de880a79f4bf27f6874b20abfc1f2b7d9fca4ff08c",
+     "post_seconds": 0.0023310890028369613,
+     "outcome": "built",
+     "seen_after": 3663.9570536579995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 10.07,
+      "build": 88.98,
+      "conversion": 3.75,
+      "write": 1.35,
+      "upload": 4.59
+     }
+    },
+    {
+     "index": 49,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "8d26f82a8ead7af266c4fa28f16a45a2853807e2794fd26ac96c0aa7bf3d4b93",
+     "post_seconds": 0.002263927999592852,
+     "outcome": "built",
+     "seen_after": 3784.8349376469996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 8.32,
+      "build": 203.72,
+      "conversion": 3.24,
+      "write": 1.39,
+      "upload": 4.84
+     }
+    },
+    {
+     "index": 50,
+     "input": "gist-ip-1000000x960",
+     "job_id": "abd3c84e4324e9ce84c92d24be76bbde5de93cafa1d7a9713df0f385bcf97ea0",
+     "post_seconds": 0.003912474006938282,
+     "outcome": "built",
+     "seen_after": 3841.9475737179964,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 10.69,
+      "build": 154.08,
+      "conversion": 4.05,
+      "write": 4.31,
+      "upload": 5.68
+     }
+    },
+    {
+     "index": 51,
+     "input": "gist-l2-1000000x960",
+     "job_id": "b1eaff840cbb65ec66909855ada1acf26f2850bf118a5a74e323657279fb2166",
+     "post_seconds": 0.003827054999419488,
+     "outcome": "built",
+     "seen_after": 4005.1890325989953,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 10.85,
+      "build": 193.02,
+      "conversion": 3.82,
+      "write": 1.96,
+      "upload": 5.28
+     }
+    }
+   ]
+  },
+  "byte": {
+   "queue": 4,
+   "seconds": 3600,
+   "completed_within": 62,
+   "jobs_per_hour": 62.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "c99e29bac63868f254afcb6f3b44d1a191083666d7afa6be981b452e721d4633",
+     "post_seconds": 0.004672023002058268,
+     "outcome": "built",
+     "seen_after": 219.53291379599978,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.83,
+      "build": 207.68,
+      "conversion": 2.64,
+      "write": 0.46,
+      "upload": 3.36
+     }
+    },
+    {
+     "index": 1,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "adec50f9a65063a510953e884baf171896b13a8c6f11ab5bf7929c362a753fb6",
+     "post_seconds": 0.005765278001490515,
+     "outcome": "built",
+     "seen_after": 222.98496836100094,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.05,
+      "build": 207.67,
+      "conversion": 2.57,
+      "write": 0.47,
+      "upload": 3.29
+     }
+    },
+    {
+     "index": 2,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "68ddb12f6051b57815982e161693a6b7e4dee45d2a73ad062406ad82f23b2c86",
+     "post_seconds": 0.006955652999749873,
+     "outcome": "built",
+     "seen_after": 344.92805341500207,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.48,
+      "build": 113.32,
+      "conversion": 1.74,
+      "write": 0.3,
+      "upload": 2.03
+     }
+    },
+    {
+     "index": 3,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "89b8b02d4c9fac4c16d722b5aaaf811f9c8101229b62ba656cd31a70da99f727",
+     "post_seconds": 0.006014420003339183,
+     "outcome": "built",
+     "seen_after": 339.0143609400038,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.62,
+      "build": 112.84,
+      "conversion": 1.85,
+      "write": 0.29,
+      "upload": 2.14
+     }
+    },
+    {
+     "index": 4,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "14b43638971746fc997b5eaf242f7d074543680645bbe6751a8f724e00e2fc7c",
+     "post_seconds": 0.004680527999880724,
+     "outcome": "built",
+     "seen_after": 358.5938789300053,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.91,
+      "build": 11.28,
+      "conversion": 1.27,
+      "write": 0.18,
+      "upload": 1.41
+     }
+    },
+    {
+     "index": 5,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "6e676c0cd3f777d54fad86c50bb12818ed4e5ec5f5e4ab56af49808a89e16fc4",
+     "post_seconds": 0.0019373679970158264,
+     "outcome": "built",
+     "seen_after": 359.35637336999935,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.98,
+      "build": 11.37,
+      "conversion": 1.18,
+      "write": 0.19,
+      "upload": 1.38
+     }
+    },
+    {
+     "index": 6,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "b9ede0eee6f4850365ac24aab02c43dfcc07759a90afd4cc9e56b46ee6de47ce",
+     "post_seconds": 0.0016775909971329384,
+     "outcome": "built",
+     "seen_after": 575.3768076449996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.56,
+      "build": 208.2,
+      "conversion": 2.58,
+      "write": 0.45,
+      "upload": 3.15
+     }
+    },
+    {
+     "index": 7,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "4d49424658408090599b35d0f001aac70993cc9a62438a1626f7f9962f4e5afc",
+     "post_seconds": 0.001860999000200536,
+     "outcome": "built",
+     "seen_after": 577.7093177230054,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 4.69,
+      "build": 208.19,
+      "conversion": 2.52,
+      "write": 0.46,
+      "upload": 3.33
+     }
+    },
+    {
+     "index": 8,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "d57f5cacc64ba021c146ca3ce22e0e81f314991452c4bfa27da72721e43e28ad",
+     "post_seconds": 0.0019233600032748654,
+     "outcome": "built",
+     "seen_after": 686.1162002760029,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.17,
+      "build": 103.85,
+      "conversion": 2.35,
+      "write": 0.29,
+      "upload": 1.24
+     }
+    },
+    {
+     "index": 9,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "e039087c0378d971148a60230932a1553eac3fb17c35df5ebf3700ae4624a1a2",
+     "post_seconds": 0.0018320629969821312,
+     "outcome": "built",
+     "seen_after": 695.4536132729991,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.2,
+      "build": 113.76,
+      "conversion": 1.69,
+      "write": 0.29,
+      "upload": 1.23
+     }
+    },
+    {
+     "index": 10,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "0fec8ca438a40608afa26c59adeda1a07bb26f4e027ae96a4ddfa7cff430d1c1",
+     "post_seconds": 0.00322018100268906,
+     "outcome": "built",
+     "seen_after": 701.2616855900051,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.88,
+      "build": 11.47,
+      "conversion": 1.14,
+      "write": 0.18,
+      "upload": 0.75
+     }
+    },
+    {
+     "index": 11,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "78fbdd7965083d5f80c8d4baab20ed3ef8b4820ee3ab6be7a0eb281d5bcd7b63",
+     "post_seconds": 0.001976620995264966,
+     "outcome": "built",
+     "seen_after": 705.1713314930021,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.91,
+      "build": 8.12,
+      "conversion": 1.11,
+      "write": 0.17,
+      "upload": 0.75
+     }
+    },
+    {
+     "index": 12,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "5d7822b38cf1adeeb3ac0bc53e0423ba00c012f3289968bb6ee6a5faec9ac578",
+     "post_seconds": 0.001756106001266744,
+     "outcome": "built",
+     "seen_after": 797.208620715006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.27,
+      "build": 87.15,
+      "conversion": 2.61,
+      "write": 0.45,
+      "upload": 1.8
+     }
+    },
+    {
+     "index": 13,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "9ff555854f5d60229268fcaead8299aa75445f7036cea8f19cea746b803d2539",
+     "post_seconds": 0.0020533450006041676,
+     "outcome": "built",
+     "seen_after": 915.1957078660053,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.47,
+      "build": 202.89,
+      "conversion": 2.93,
+      "write": 0.45,
+      "upload": 1.95
+     }
+    },
+    {
+     "index": 14,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "a17c12c2473fbbfb621e3eeef8a90653e5eaf0f7444f66be6ab482939a1a12a9",
+     "post_seconds": 0.0021641589992213994,
+     "outcome": "built",
+     "seen_after": 970.8957988969996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.21,
+      "build": 173.88,
+      "conversion": 1.84,
+      "write": 0.29,
+      "upload": 1.27
+     }
+    },
+    {
+     "index": 15,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "bd721cd0c537d187c006572099d73e7004fa3813fa39821df2b42d41c147adba",
+     "post_seconds": 0.003457468999840785,
+     "outcome": "built",
+     "seen_after": 1028.909137294002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.35,
+      "build": 106.71,
+      "conversion": 1.69,
+      "write": 0.28,
+      "upload": 1.37
+     }
+    },
+    {
+     "index": 16,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "9b7cc2995cb1db50b82676f335226a863fa5c8e994cb9ee5d5e775d9eb81a48c",
+     "post_seconds": 0.0017890210001496598,
+     "outcome": "built",
+     "seen_after": 1032.8628852600013,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.9,
+      "build": 56.44,
+      "conversion": 1.15,
+      "write": 0.18,
+      "upload": 0.75
+     }
+    },
+    {
+     "index": 17,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "5e58f77fba24fc02ebc8286a4c6915dab536cc0610a3dc32930139f0ca9f96ec",
+     "post_seconds": 0.0031618900029570796,
+     "outcome": "built",
+     "seen_after": 1040.2578084090055,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.06,
+      "build": 7.2,
+      "conversion": 1.13,
+      "write": 0.18,
+      "upload": 0.79
+     }
+    },
+    {
+     "index": 18,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "249d3b08dcdbd4f59a2cc7d6ba73abdd183c0ddfe1eccd2c01912dcb90a51441",
+     "post_seconds": 0.0019509089979692362,
+     "outcome": "built",
+     "seen_after": 1126.577992313003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.42,
+      "build": 87.92,
+      "conversion": 2.62,
+      "write": 0.46,
+      "upload": 1.96
+     }
+    },
+    {
+     "index": 19,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "187ae2f8815ab66e3279a1ae3013cad2e842a54451611ca96d4ccb949f456704",
+     "post_seconds": 0.0021356290017138235,
+     "outcome": "built",
+     "seen_after": 1251.5731179710056,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.45,
+      "build": 204.53,
+      "conversion": 2.95,
+      "write": 0.46,
+      "upload": 1.84
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "05bca12fc98ae81c863f14da2840c6da8360ddfc51c4cd5faf1bdfbf6aba5f8f",
+     "post_seconds": 0.001833513000747189,
+     "outcome": "built",
+     "seen_after": 1304.8513023710038,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.39,
+      "build": 174.38,
+      "conversion": 1.82,
+      "write": 0.29,
+      "upload": 1.35
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "9b9a89160b4b90108bd952057fa9a85e8b007282daa2168fc00916a4fa84e1c8",
+     "post_seconds": 0.0017630259972065687,
+     "outcome": "built",
+     "seen_after": 1361.7627089960006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.36,
+      "build": 106.47,
+      "conversion": 1.72,
+      "write": 0.3,
+      "upload": 1.37
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "867ac522caa192a9cd7c00d6051b10ff4f3fb022fdde79dd47696544bf9195c8",
+     "post_seconds": 0.0018495280019124039,
+     "outcome": "built",
+     "seen_after": 1365.085782509006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.95,
+      "build": 56.12,
+      "conversion": 1.15,
+      "write": 0.18,
+      "upload": 0.82
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "842ddbffd995774d365d6986304989393bc52bf5981941b2ac9094ef4883a8f6",
+     "post_seconds": 0.0018437659964547493,
+     "outcome": "built",
+     "seen_after": 1370.9637465080013,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.86,
+      "build": 7.32,
+      "conversion": 1.14,
+      "write": 0.18,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "487d03a6329f7e81fd25a1a2e62915f0c395475ff2b83afadd1e6e92395df1c8",
+     "post_seconds": 0.0021691529982490465,
+     "outcome": "built",
+     "seen_after": 1462.1872874020046,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.32,
+      "build": 87.23,
+      "conversion": 2.59,
+      "write": 0.45,
+      "upload": 1.92
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "768e3a5eb130e305ccbaecca8e717fa686586ce45ca9a099e9047640dca815d3",
+     "post_seconds": 0.0022513329968205653,
+     "outcome": "built",
+     "seen_after": 1585.714536473999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.14,
+      "build": 203.06,
+      "conversion": 2.96,
+      "write": 0.45,
+      "upload": 1.9
+     }
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "255d1f12bb22789c3dd7d05a61588940be8c000be1d11acd48b96248e1de622e",
+     "post_seconds": 0.0029861470029572956,
+     "outcome": "built",
+     "seen_after": 1640.472435732001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.37,
+      "build": 173.56,
+      "conversion": 2.03,
+      "write": 0.29,
+      "upload": 1.33
+     }
+    },
+    {
+     "index": 27,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "c5daff9ca79e129682c34ae889e48d8a60b96763ba35899c99904958175fcaeb",
+     "post_seconds": 0.003377778994035907,
+     "outcome": "built",
+     "seen_after": 1693.5429422520028,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.33,
+      "build": 106.76,
+      "conversion": 1.71,
+      "write": 0.3,
+      "upload": 1.25
+     }
+    },
+    {
+     "index": 28,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "91570785188cbae71bd833db4898046cac125c726e372146be7d5ec08d50899a",
+     "post_seconds": 0.0017130810010712594,
+     "outcome": "built",
+     "seen_after": 1700.4450323199999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.9,
+      "build": 56.14,
+      "conversion": 1.16,
+      "write": 0.18,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "4b1ba0cd0aa921ea306a65e3309c881cb8c142ec595681300f57c02be3eaa71d",
+     "post_seconds": 0.0020083649942534976,
+     "outcome": "built",
+     "seen_after": 1707.4936318990003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.9,
+      "build": 7.3,
+      "conversion": 1.11,
+      "write": 0.18,
+      "upload": 0.76
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "ab03d87f6271c35c2550926f0eac38e49450c4169793c8b7360fa397c9954c38",
+     "post_seconds": 0.0017854130055638961,
+     "outcome": "built",
+     "seen_after": 1793.4178405720013,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.38,
+      "build": 87.85,
+      "conversion": 2.61,
+      "write": 0.46,
+      "upload": 1.82
+     }
+    },
+    {
+     "index": 31,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "1e6fb27f5546d8d0921b3eb471a8821e3d04cc692f2e74e151a047a652ed877b",
+     "post_seconds": 0.002671834998182021,
+     "outcome": "built",
+     "seen_after": 1919.909167265003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.27,
+      "build": 204.65,
+      "conversion": 2.92,
+      "write": 0.45,
+      "upload": 1.81
+     }
+    },
+    {
+     "index": 32,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "c2d70df73ca89266e7030bf1223e497326efb561cc088670a9c7f7be858d9b7a",
+     "post_seconds": 0.0017575749952811748,
+     "outcome": "built",
+     "seen_after": 1975.6867579160025,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.39,
+      "build": 174.43,
+      "conversion": 2.05,
+      "write": 0.29,
+      "upload": 1.42
+     }
+    },
+    {
+     "index": 33,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "046cdb46c2c1d352c0a87fa9d3f5ed3dd36323e9423626ed471e2269ddf2ea9e",
+     "post_seconds": 0.0019265560040366836,
+     "outcome": "built",
+     "seen_after": 2028.6472814010049,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.3,
+      "build": 106.77,
+      "conversion": 1.7,
+      "write": 0.3,
+      "upload": 1.28
+     }
+    },
+    {
+     "index": 34,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "d70ccbbb820fe9224c58e8bb1efb57f3350d022b74273b243317d6515adec54f",
+     "post_seconds": 0.0018039679998764768,
+     "outcome": "built",
+     "seen_after": 2032.7746962930032,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.88,
+      "build": 55.94,
+      "conversion": 1.16,
+      "write": 0.18,
+      "upload": 0.79
+     }
+    },
+    {
+     "index": 35,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "30293aa1c10afb87f237c202fd334b400a86b821077499865425f9b23c35d2fc",
+     "post_seconds": 0.0018704309986787848,
+     "outcome": "built",
+     "seen_after": 2037.3350407960024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.84,
+      "build": 7.28,
+      "conversion": 1.14,
+      "write": 0.18,
+      "upload": 0.81
+     }
+    },
+    {
+     "index": 36,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "4b3d3d7c920902cfc437df316976f546a878eb6fb9cd4de85c859aab54279f9c",
+     "post_seconds": 0.0017531490011606365,
+     "outcome": "built",
+     "seen_after": 2125.591302726003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.27,
+      "build": 87.33,
+      "conversion": 2.62,
+      "write": 0.45,
+      "upload": 1.83
+     }
+    },
+    {
+     "index": 37,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "98be3358d4cc954036f6f5eff26cb7c7998e49b492f990957ff77a1e2a721b2b",
+     "post_seconds": 0.0019591920063248836,
+     "outcome": "built",
+     "seen_after": 2248.1990839390055,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.01,
+      "build": 203.26,
+      "conversion": 2.74,
+      "write": 0.45,
+      "upload": 1.71
+     }
+    },
+    {
+     "index": 38,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "d3bf7571c73a91c6ac3923be1b0dfa5f278f09a0f329b3a5be353d8f491edb9f",
+     "post_seconds": 0.0019870139949489385,
+     "outcome": "built",
+     "seen_after": 2308.849596978005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.38,
+      "build": 173.58,
+      "conversion": 2.03,
+      "write": 0.29,
+      "upload": 1.3
+     }
+    },
+    {
+     "index": 39,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "8c5d47515864762c50a102919ddbb3c52da5fcf0184a3ae0f8071789b82e4b5b",
+     "post_seconds": 0.003120781999314204,
+     "outcome": "built",
+     "seen_after": 2363.7498151860054,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.3,
+      "build": 107.29,
+      "conversion": 1.68,
+      "write": 0.29,
+      "upload": 1.28
+     }
+    },
+    {
+     "index": 40,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "5cfc51b73d106633aa515af8a427f5b25939984dd4dfbc19171ad31e59b9577e",
+     "post_seconds": 0.003716738006914966,
+     "outcome": "built",
+     "seen_after": 2368.18812816,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.85,
+      "build": 56.21,
+      "conversion": 1.15,
+      "write": 0.18,
+      "upload": 0.78
+     }
+    },
+    {
+     "index": 41,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "aee128b1c446cbf152a0ca3866ddae20ace4b1a271d596ee941c22666e378420",
+     "post_seconds": 0.0017907619985635392,
+     "outcome": "built",
+     "seen_after": 2371.671180618003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 7.22,
+      "conversion": 1.13,
+      "write": 0.18,
+      "upload": 0.77
+     }
+    },
+    {
+     "index": 42,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "bcffd5ca22f091aff42b8e38a6dfff9c520c1d18712004f69cccd23e14674a03",
+     "post_seconds": 0.0018083070026477799,
+     "outcome": "built",
+     "seen_after": 2462.500955956006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.35,
+      "build": 87.92,
+      "conversion": 2.62,
+      "write": 0.45,
+      "upload": 1.97
+     }
+    },
+    {
+     "index": 43,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "7965827f8dd595ec23aaea4922b310a7db61a5c05d69bb182ef147a21b32bfc9",
+     "post_seconds": 0.003569490996596869,
+     "outcome": "built",
+     "seen_after": 2584.4997978169995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.16,
+      "build": 204.79,
+      "conversion": 2.91,
+      "write": 0.46,
+      "upload": 1.77
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "f66895c1750d73eff3a5adde2d6335fb3748769d4436bdd5f2ef43eb35ea5942",
+     "post_seconds": 0.012749939000059385,
+     "outcome": "built",
+     "seen_after": 2638.721112513005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.38,
+      "build": 174.18,
+      "conversion": 2.21,
+      "write": 0.29,
+      "upload": 1.24
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "d02b0671dfbddcd5d11027dd1f5cd664c6603ac63a19ad90b9d3317a6375d0fb",
+     "post_seconds": 0.002310315001523122,
+     "outcome": "built",
+     "seen_after": 2695.380008746004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.37,
+      "build": 106.61,
+      "conversion": 1.69,
+      "write": 0.29,
+      "upload": 1.3
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "c2b739c0672960c3bcd89ec7413f6a877b4dcdd16577b0718c06266763ff521a",
+     "post_seconds": 0.0017508880046079867,
+     "outcome": "built",
+     "seen_after": 2697.9766780530044,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83,
+      "build": 56.01,
+      "conversion": 1.17,
+      "write": 0.19,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "23f45d801e9f9c17bbd965d54c635f2fe3dbe9fa7e8f19a5babe8e942755a054",
+     "post_seconds": 0.0016337330016540363,
+     "outcome": "built",
+     "seen_after": 2705.970483529003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.94,
+      "build": 7.13,
+      "conversion": 1.13,
+      "write": 0.18,
+      "upload": 0.8
+     }
+    },
+    {
+     "index": 48,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "28112e9f53dfb476338c1ec19cab64a92e2fe55dcd55ae91439feee7b3a34300",
+     "post_seconds": 0.0017084939972846769,
+     "outcome": "built",
+     "seen_after": 2794.929698688,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.55,
+      "build": 87.42,
+      "conversion": 2.6,
+      "write": 0.45,
+      "upload": 1.77
+     }
+    },
+    {
+     "index": 49,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "2a2430cfe2e2be4d8a1f5375abf7f9330d563b9b68af3ce422fad3aad908f127",
+     "post_seconds": 0.0020220420046825893,
+     "outcome": "built",
+     "seen_after": 2919.0364382789994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.41,
+      "build": 203.54,
+      "conversion": 2.93,
+      "write": 0.45,
+      "upload": 1.8
+     }
+    },
+    {
+     "index": 50,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "69aaa1dc9094d655b742878cff0bc7273aa7ede60c1a2e780cb96dc311015387",
+     "post_seconds": 0.00411025599896675,
+     "outcome": "built",
+     "seen_after": 2973.7824762279997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.3,
+      "build": 173.77,
+      "conversion": 1.84,
+      "write": 0.29,
+      "upload": 1.32
+     }
+    },
+    {
+     "index": 51,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "1d5a7e5b368426001e7c40cd0daacc1b7c2e7003130b8878f7c08d66ab60366f",
+     "post_seconds": 0.0017524520008009858,
+     "outcome": "built",
+     "seen_after": 3025.787308439001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.34,
+      "build": 106.84,
+      "conversion": 1.69,
+      "write": 0.3,
+      "upload": 1.25
+     }
+    },
+    {
+     "index": 52,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "533b672145962424458c6d0dfb45d3ec4991427195055c9752ec9db72e15ecd8",
+     "post_seconds": 0.00182291599776363,
+     "outcome": "built",
+     "seen_after": 3032.336209442001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.84,
+      "build": 56.46,
+      "conversion": 1.16,
+      "write": 0.18,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 53,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "33e35945f88fa5ddf2183dc054d8d89d1d0e70464d613010a30a70e899c20dae",
+     "post_seconds": 0.0017836949991760775,
+     "outcome": "built",
+     "seen_after": 3036.4737246660006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.94,
+      "build": 7.05,
+      "conversion": 1.14,
+      "write": 0.18,
+      "upload": 0.73
+     }
+    },
+    {
+     "index": 54,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "b6d2425b78830afec7b1b65b44625e8bfb502171d713657d8b8555a84b07e3d5",
+     "post_seconds": 0.0017661149977357127,
+     "outcome": "built",
+     "seen_after": 3125.460725198005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.54,
+      "build": 87.92,
+      "conversion": 2.61,
+      "write": 0.45,
+      "upload": 1.87
+     }
+    },
+    {
+     "index": 55,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "d1435b8d3a4faf10f76f2e65ac0f7a9a6bf3ed94130afab47fbf6e71ea31af29",
+     "post_seconds": 0.0023923670014482923,
+     "outcome": "built",
+     "seen_after": 3252.8140153830027,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.4,
+      "build": 205.1,
+      "conversion": 2.95,
+      "write": 0.46,
+      "upload": 1.83
+     }
+    },
+    {
+     "index": 56,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "7dae051ea69bbba2a68368051545f40d6bec7cd3cb54bfa20ea7fb5f638c6ddc",
+     "post_seconds": 0.0018671110010473058,
+     "outcome": "built",
+     "seen_after": 3305.039521648003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.36,
+      "build": 174.37,
+      "conversion": 1.85,
+      "write": 0.29,
+      "upload": 1.26
+     }
+    },
+    {
+     "index": 57,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "8f9e66a5d384d5d63223091ecf3b039393f4b46a946803f5fe6cba9b8942856a",
+     "post_seconds": 0.003347345998918172,
+     "outcome": "built",
+     "seen_after": 3360.022580719,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.41,
+      "build": 106.52,
+      "conversion": 1.69,
+      "write": 0.3,
+      "upload": 1.28
+     }
+    },
+    {
+     "index": 58,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "b365fc100b48522d26dfdae9b490fdabbd55313a996a1c505e60f2a9d466f6b2",
+     "post_seconds": 0.004146831000980455,
+     "outcome": "built",
+     "seen_after": 3365.2477189240017,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.87,
+      "build": 56.33,
+      "conversion": 1.16,
+      "write": 0.18,
+      "upload": 0.78
+     }
+    },
+    {
+     "index": 59,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "290872d928a3b3bc8585ad5e0e3c93aae8b369b317be59be08b47b5c11af3ffd",
+     "post_seconds": 0.0016685800001141615,
+     "outcome": "built",
+     "seen_after": 3369.903035154006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.85,
+      "build": 7.15,
+      "conversion": 1.13,
+      "write": 0.18,
+      "upload": 0.86
+     }
+    },
+    {
+     "index": 60,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "aa674e1442c5aa9733ceb6e6a570ec5fc039df2d459a1c79e9ba33dcdcd9a167",
+     "post_seconds": 0.0019173399996361695,
+     "outcome": "built",
+     "seen_after": 3462.433672555002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.49,
+      "build": 86.95,
+      "conversion": 2.6,
+      "write": 0.46,
+      "upload": 1.91
+     }
+    },
+    {
+     "index": 61,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "fe667b7a53b90d564acc88fd1ce8d4dd452b7092997ea3ca892d048e46f1221d",
+     "post_seconds": 0.002745925994531717,
+     "outcome": "built",
+     "seen_after": 3581.1089433470042,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.25,
+      "build": 203.1,
+      "conversion": 2.95,
+      "write": 0.45,
+      "upload": 1.74
+     }
+    },
+    {
+     "index": 62,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "4289af7c476fca1717046b4a1349a2f761e4c73a2f71743d828224717b38cc6f",
+     "post_seconds": 0.002783752999675926,
+     "outcome": "built",
+     "seen_after": 3639.408674680999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.29,
+      "build": 173.58,
+      "conversion": 1.85,
+      "write": 0.29,
+      "upload": 1.29
+     }
+    },
+    {
+     "index": 63,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "9ebfc4312aac6afa5d0b84c79ceaca61780770305ab698b0f310061fa52e39ab",
+     "post_seconds": 0.0027850609985762276,
+     "outcome": "built",
+     "seen_after": 3694.9193381150035,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.39,
+      "build": 106.78,
+      "conversion": 1.66,
+      "write": 0.28,
+      "upload": 1.25
+     }
+    },
+    {
+     "index": 64,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "dac7bf4783b83dbc895fe5d9ed29b7510b480c2b2083dfe156a59e0f731b9574",
+     "post_seconds": 0.001845525999669917,
+     "outcome": "built",
+     "seen_after": 3699.387640181005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.92,
+      "build": 56.4,
+      "conversion": 1.12,
+      "write": 0.18,
+      "upload": 0.73
+     }
+    },
+    {
+     "index": 65,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "67620dc64211a820fbf978177b12bb2548bd9a42f1f801d41643d4c980c5664b",
+     "post_seconds": 0.0042098949998035096,
+     "outcome": "built",
+     "seen_after": 3701.741172353002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.85,
+      "build": 6.73,
+      "conversion": 1.12,
+      "write": 0.18,
+      "upload": 0.72
+     }
+    }
+   ]
+  }
+ },
+ "service_starts": [
+  "2026-11-27T02:29:26.806347+00:00"
+ ],
+ "ended": "2026-11-27T07:55:37.517060+00:00"
+}

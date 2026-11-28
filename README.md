@@ -128,7 +128,7 @@ Each test creates a bucket of its own and removes it when it passes.
 
 ## Benchmarks
 
-Both services, measured the same way on the same machine over the datasets the upstream `benchmarking/` tool names, 1M vectors each: sift-128, ms-marco-384, cohere-768 and gist-960, as float inputs in L2 and inner product, the first three also as byte inputs (each component scaled over the dataset's range onto -128..127) and as binary inputs in Hamming space (a bit per positive component). The services ran from their container images under Docker Desktop on WSL2 with LocalStack for S3, `GPU_MEMORY_LIMIT=8`, on an NVIDIA GeForce RTX 4070 Laptop GPU (8 GB), an Intel Core i9-14900HX and 32 GB of memory, 15 GB of it the Docker VM's: knn-builder with libcuvs 26.08.01 and CUDA 12.9, the upstream service as its `api-snapshot` image (libcuvs 26.08.01, Faiss 1.14.3, the same CUDA) on `MAX_WORKERS=1`, since two builds at once crashed it under WSL2; knn-builder builds one job on the GPU while the next downloads and the last uploads. Every number is the median of five builds, or counted over five rounds, except the bursts and the hour-long queues, run once.
+Both services, measured the same way on the same machine over the datasets the upstream `benchmarking/` tool names, 1M vectors each: sift-128, ms-marco-384, cohere-768 and gist-960, as float inputs in L2 and inner product, the first three also as byte inputs (each component scaled over the dataset's range onto -128..127) and as binary inputs in Hamming space (a bit per positive component). The services ran from their container images under Docker Desktop on WSL2 with LocalStack for S3, `GPU_MEMORY_LIMIT=8`, on an NVIDIA GeForce RTX 4070 Laptop GPU (8 GB), an Intel Core i9-14900HX and 32 GB of memory, 15 GB of it the Docker VM's: knn-builder with libcuvs 26.08.01 and CUDA 12.9, the upstream service as its `api-snapshot` image (libcuvs 26.08.01, Faiss 1.14.3, the same CUDA) on `MAX_WORKERS=1`, since two builds at once crashed it under WSL2; knn-builder builds one job on the GPU while the next downloads and the last uploads. Every number is the median of five builds, or counted over five rounds, except the bursts and the hour-long queues, run once. The last subsection, On EC2 with S3, repeats the benchmark, without the burst, on a cloud host against S3, with the upstream service on two workers.
 
 The tables hold two rounds of runs. The single builds of the float and byte inputs are the later one: knn-builder at commit 3a4eb45 and the upstream image at digest `e8fecaef…` (commit ea7db9f), on driver 621.24. The binary tables and every row of concurrent, burst and sustained jobs are the earlier one: knn-builder at commit d4af6b8 and the upstream image at digest `78ced9d0…` (commit 3a02e64), on driver 617.42. Between the two, both services came to build float, half_float and byte graphs from the vectors in host memory instead of a copy of them on the GPU, the upstream service at ea7db9f, which knn-builder follows. A float or byte build's device peak fell by up to the size of its vectors (cohere-768 as float, 3.07 GB of them, peaked at 3.70 and 3.74 GB in the earlier round and peaks at 0.82 and 0.87 GB), so those single builds were run again. Binary graphs build as they did, and the jobs under load were not run again: their rows are of the earlier build.
 
@@ -271,6 +271,120 @@ At 100 queries the check takes 3.5 to 3.8 s over cohere-768's vectors, 4.9 s ove
 The check runs beside the upload, but on this machine it added most of its own time to the job. The cohere-768 uploads grew by 2.3 to 4.1 s, the float one's by more than its 3.8 s check, so the write made little headway while the check ran. The check's 32 threads take the whole processor, which the write and LocalStack, receiving the upload, share here; which of the two was held back was not measured. A `skip_stored_vectors` file is the graph alone and uploads in half a second, so that job waits for nearly the whole check. gist-960's uploads ranged from 18 to 34 s from one build to the next, too widely to show what the check added. Over the jobs' steps, the check added 3 to 13%, the most on the byte job, the shortest of the six.
 
 The recalls read higher than the Recall@10 in the float, byte and binary tables (0.987 against 0.964 for cohere-768 as float), since the check's queries are the index's own vectors. `fixtures/ea7db9f/recall-parity/` shows, on other builds of these inputs, that the check's recall equals knn-inspect's `recall --sample` on a file that stores its vectors; `fixtures/ea7db9f/recall-cost/` holds these runs.
+
+### On EC2 with S3
+
+The same benchmark on a cloud host, on Linux without WSL2 and against S3 itself.
+
+- **Host:** an EC2 g4dn.2xlarge in us-east-2: an NVIDIA Tesla T4 (16 GB), 8 vCPUs of an Intel Xeon Platinum 8259CL and 32 GB of memory, with Ubuntu 24.04, driver 595.91.07 and Docker 29.7.2.
+- **S3:** a bucket in the same region, reached through the instance's role.
+- **Services:** knn-builder's 1.4.0 image and the upstream image of the laptop's later round (digest `e8fecaef…`, commit ea7db9f), both at `GPU_MEMORY_LIMIT=16`. The upstream service ran on its default `MAX_WORKERS=2` through every phase without the crash it has under WSL2.
+- **Method:** the inputs, metrics and counts of the laptop's tables: five builds of each input, five rounds of eight concurrent jobs, and four jobs in flight for an hour. Recall is by knn-inspect 0.18.0.
+- **Timing:** the upstream service's single builds ran a day before knn-builder's, on the same instance, which was not stopped in between.
+- **No burst:** a burst job has 90 s, and on this host one build of cohere-768 in L2 (as float or as byte) or of gist-960 in L2 takes longer than that on either service.
+
+**binary**
+
+| Input | Service | Builds | Latency s | Steps s | Download s | Build s | Upload s | Host peak GB | Device peak GB | Recall@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `cohere-hamming-1000000x768-binary` | knn-builder | 5 | 74.1 | 74.0 | 0.3 | 72.7 | 1.0 | 3.13 | 0.49 | 0.967 |
+| `cohere-hamming-1000000x768-binary` | upstream | 5 | 83.8 | 83.6 | 0.8 | 82.1 | 0.8 | 3.61 | 0.62 | 0.966 |
+| `ms-marco-hamming-1000000x384-binary` | knn-builder | 5 | 43.9 | 43.9 | 0.2 | 42.8 | 0.9 | 3.09 | 0.44 | 0.988 |
+| `ms-marco-hamming-1000000x384-binary` | upstream | 5 | 53.8 | 53.7 | 0.8 | 52.0 | 0.8 | 3.58 | 0.57 | 0.988 |
+| `sift-hamming-1000000x128-binary` | knn-builder | 5 | 32.1 | 31.9 | 0.2 | 30.8 | 0.8 | 3.05 | 0.41 | 1.000 |
+| `sift-hamming-1000000x128-binary` | upstream | 5 | 41.5 | 41.4 | 0.4 | 40.3 | 0.7 | 3.55 | 0.54 | 1.000 |
+
+| Service | Concurrent jobs | Built | Latency p50 s | p99 s | Sustained | Jobs per hour |
+| --- | --- | --- | --- | --- | --- | --- |
+| knn-builder | 8 x 5 | 40 of 40 | 236.8 | 414.0 | 4 in flight for 3600 s | 73.0 |
+| upstream | 8 x 5 | 40 of 40 | 225.9 | 387.7 | 4 in flight for 3600 s | 78.0 |
+
+**byte**
+
+| Input | Service | Builds | Latency s | Steps s | Download s | Build s | Upload s | Host peak GB | Device peak GB | Recall@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `cohere-ip-1000000x768-byte` | knn-builder | 5 | 89.3 | 89.2 | 1.4 | 85.3 | 2.4 | 2.13 | 0.67 | 0.947 |
+| `cohere-ip-1000000x768-byte` | upstream | 5 | 92.4 | 92.2 | 2.5 | 88.0 | 1.7 | 3.90 | 0.72 | 0.951 |
+| `cohere-l2-1000000x768-byte` | knn-builder | 5 | 118.0 | 117.9 | 1.4 | 114.2 | 2.3 | 2.13 | 0.67 | 0.956 |
+| `cohere-l2-1000000x768-byte` | upstream | 5 | 130.5 | 130.4 | 2.4 | 126.3 | 1.7 | 3.90 | 0.72 | 0.958 |
+| `ms-marco-ip-1000000x384-byte` | knn-builder | 5 | 60.3 | 60.2 | 0.8 | 57.8 | 1.6 | 1.75 | 0.39 | 0.984 |
+| `ms-marco-ip-1000000x384-byte` | upstream | 5 | 62.6 | 62.5 | 1.3 | 59.9 | 1.2 | 3.13 | 0.56 | 0.978 |
+| `ms-marco-l2-1000000x384-byte` | knn-builder | 5 | 57.9 | 57.7 | 0.8 | 55.3 | 1.6 | 1.74 | 0.39 | 0.990 |
+| `ms-marco-l2-1000000x384-byte` | upstream | 5 | 60.0 | 59.8 | 1.3 | 57.3 | 1.2 | 3.13 | 0.56 | 0.991 |
+| `sift-ip-1000000x128-byte` | knn-builder | 5 | 7.4 | 7.3 | 0.4 | 5.9 | 1.0 | 1.51 | 0.39 | 0.681 |
+| `sift-ip-1000000x128-byte` | upstream | 5 | 9.0 | 8.8 | 0.8 | 7.3 | 0.7 | 2.64 | 0.56 | 0.604 |
+| `sift-l2-1000000x128-byte` | knn-builder | 5 | 7.2 | 7.2 | 0.3 | 5.9 | 1.0 | 1.49 | 0.39 | 0.998 |
+| `sift-l2-1000000x128-byte` | upstream | 5 | 9.0 | 8.8 | 0.8 | 7.2 | 0.7 | 2.64 | 0.56 | 0.996 |
+
+| Service | Concurrent jobs | Built | Latency p50 s | p99 s | Sustained | Jobs per hour |
+| --- | --- | --- | --- | --- | --- | --- |
+| knn-builder | 8 x 5 | 40 of 40 | 306.6 | 552.8 | 4 in flight for 3600 s | 62.0 |
+| upstream | 8 x 5 | 40 of 40 | 278.9 | 558.3 | 4 in flight for 3600 s | 62.0 |
+
+**float**
+
+| Input | Service | Builds | Latency s | Steps s | Download s | Build s | Upload s | Host peak GB | Device peak GB | Recall@10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `cohere-ip-1000000x768` | knn-builder | 5 | 97.6 | 97.4 | 5.2 | 86.1 | 6.1 | 4.43 | 0.82 | 0.948 |
+| `cohere-ip-1000000x768` | upstream | 5 | 104.7 | 104.4 | 9.4 | 90.7 | 4.5 | 8.51 | 0.87 | 0.948 |
+| `cohere-l2-1000000x768` | knn-builder | 5 | 127.9 | 127.6 | 5.1 | 116.4 | 6.0 | 4.43 | 0.82 | 0.970 |
+| `cohere-l2-1000000x768` | upstream | 5 | 143.0 | 142.6 | 8.7 | 129.5 | 4.4 | 8.51 | 0.87 | 0.966 |
+| `gist-ip-1000000x960` | knn-builder | 5 | 72.7 | 72.3 | 6.7 | 58.5 | 7.3 | 5.20 | 1.02 | 0.993 |
+| `gist-ip-1000000x960` | upstream | 5 | 79.6 | 78.9 | 11.5 | 62.3 | 5.2 | 10.05 | 1.07 | 0.986 |
+| `gist-l2-1000000x960` | knn-builder | 5 | 163.7 | 163.3 | 6.4 | 149.5 | 7.3 | 5.20 | 1.02 | 0.953 |
+| `gist-l2-1000000x960` | upstream | 5 | 186.7 | 186.2 | 11.2 | 169.5 | 5.4 | 10.05 | 1.07 | 0.950 |
+| `ms-marco-ip-1000000x384` | knn-builder | 5 | 65.0 | 64.7 | 2.6 | 58.8 | 3.3 | 2.90 | 0.41 | 0.985 |
+| `ms-marco-ip-1000000x384` | upstream | 5 | 69.3 | 68.9 | 4.8 | 61.6 | 2.7 | 5.44 | 0.56 | 0.984 |
+| `ms-marco-l2-1000000x384` | knn-builder | 5 | 62.5 | 62.3 | 2.5 | 56.3 | 3.4 | 2.90 | 0.41 | 0.979 |
+| `ms-marco-l2-1000000x384` | upstream | 5 | 66.9 | 66.6 | 4.8 | 59.3 | 2.7 | 5.44 | 0.56 | 0.983 |
+| `sift-ip-1000000x128` | knn-builder | 5 | 8.9 | 8.8 | 1.0 | 6.2 | 1.6 | 1.88 | 0.39 | 0.989 |
+| `sift-ip-1000000x128` | upstream | 5 | 11.0 | 10.9 | 1.8 | 7.9 | 1.2 | 3.41 | 0.56 | 0.987 |
+| `sift-l2-1000000x128` | knn-builder | 5 | 8.9 | 8.7 | 1.0 | 6.1 | 1.6 | 1.87 | 0.39 | 0.999 |
+| `sift-l2-1000000x128` | upstream | 5 | 10.9 | 10.8 | 1.7 | 7.8 | 1.3 | 3.41 | 0.56 | 0.997 |
+
+| Service | Concurrent jobs | Built | Latency p50 s | p99 s | Sustained | Jobs per hour |
+| --- | --- | --- | --- | --- | --- | --- |
+| knn-builder | 8 x 5 | 40 of 40 | 347.5 | 593.0 | 4 in flight for 3600 s | 49.0 |
+| upstream | 8 x 5 | 40 of 40 | 441.6 | 622.9 | 4 in flight for 3600 s | 48.0 |
+
+**Single builds.** knn-builder finishes all 17 inputs sooner, by 3% (cohere-768 as byte in inner product) to 23% (sift-128 as binary).
+
+- **Build:** 3 to 24% shorter.
+- **Download:** 28 to 60% of the upstream's time.
+- **Upload:** 5 to 39% longer. The widest gap is gist-960's 4.12 GB file, 7.3 s against 5.2 s. The laptop's tables have it the other way, with float indexes of 1.5 GB or more uploaded in 18 to 25% of the upstream's time, but those uploads went to LocalStack on the same machine and these go to S3.
+- **Host memory:** 43 to 48% less on float and byte inputs (5.20 GB against 10.05 GB for gist-960) and 13 to 14% less on binary.
+- **Device memory:** 0.05 GB lower on cohere-768 and gist-960 as float and byte inputs and 0.13 to 0.17 GB lower on the rest, as on the laptop.
+- **Recall:** within 0.007 of the upstream's, except sift-128 as byte in inner product, which is low on both services (0.681 and 0.604), as on the laptop.
+- **Latency and steps** agree, since no status came late: within 0.5 s on each of knn-builder's 85 builds and within 1 s on each of the upstream's.
+
+On this host an L2 build of the larger inputs takes far longer than an inner-product build, which it does not on the laptop. gist-960 takes 149.5 s in L2 against 58.5 s in inner product on knn-builder, and 169.5 s against 62.3 s on the upstream service. cohere-768 as float takes 116.4 s against 86.1 s, and 129.5 s against 90.7 s.
+
+**Under load.** The two services are closer here than on the laptop, where the upstream service had one worker.
+
+- **Float:** knn-builder is ahead. Its rounds of eight jobs end in 569 to 593 s against 596 to 623 s, its p50 is 347.5 s against 441.6 s, and it completes 49 jobs an hour against 48.
+- **Byte:** the two are level. Rounds end in 546 to 553 s against 549 to 558 s, and both complete 62 jobs an hour. The upstream's p50 is lower, 278.9 s against 306.6 s.
+- **Binary:** the upstream service is ahead. Its rounds end in 382 to 388 s against 410 to 414 s, and it completes 78 jobs an hour against 73.
+
+The services use the one GPU differently. knn-builder builds one job at a time, while the next job downloads and the last uploads. The upstream service's two workers build two jobs at once, and each build then takes longer than it does alone: at the median, 254 s against 170 s for gist-960 in L2, and 204 s against 126 s for cohere-768 as byte in L2.
+
+Building two at once pays off for binary inputs only. By the upstream service's single-build medians, a binary round's eight builds take 483 s one after another, and its rounds end within 388 s. A float round's eight take 589 s and a byte round's 560 s, about what those rounds take. On float inputs the two workers save on transfers instead: one worker's transfers run beside the other's build, as knn-builder's run beside its one build. By latency alone, a float round's eight jobs add up to 672 s on the upstream service and 607 s on knn-builder. knn-builder's binary builds are 11 to 24% shorter one at a time, which closes most of the binary gap but not all of it.
+
+**Two speeds for large L2 builds.** Under load, knn-builder's builds take within 2 s of their single-build medians, except those of cohere-768 and gist-960 in L2. It builds those at two speeds on this host:
+
+- The first single build of each took 8 to 10% longer than the four after it: 127.3 s against 114.9 to 116.5 s for cohere-768 as float, and 163.3 s against 148.6 to 149.7 s for gist-960.
+- All 45 of their builds under load took the longer time (medians of 126.1 s and 163.1 s).
+
+The slower builds are the ones that ran while the host was busy. Before each first single build, the runner had just fetched the previous job's file, writing 1.05 to 4.12 GB to the instance's disk; the later single builds follow one another with nothing in between. Under load, other jobs' transfers run beside the build. cohere-768's inner-product builds do not show this: all are within 4 s of one another, single and under load. What on the host slows the L2 builds was not measured. At the slower speed they are within 4% of the upstream service's builds (medians of 129.5 s and 169.5 s), and the upstream service's five single builds of each are within 3 s of one another.
+
+**Upload signing.** Since 1.4.0 knn-builder leaves an upload's body out of the request's signature over HTTPS, as botocore does, the library the upstream service uploads with. Signing the body means hashing it with SHA-256. knn-builder did that on one thread for all of an upload's parts, and this host's processor has no SHA extensions. An image of 1.4.0's code, built before the release, uploaded three files both ways; each time is the median of three builds:
+
+| File | Unsigned s | Signed s (`S3_PAYLOAD_SIGNING_ENABLED=true`) |
+| --- | --- | --- |
+| gist-960, 4.12 GB | 7.3 | 23.1 |
+| cohere-768, 3.35 GB | 6.0 | 18.8 |
+| sift-128, 0.79 GB | 1.8 | 4.7 |
+
+**Records.** They are in `fixtures/ea7db9f/bench-cloud/`: `single/` and `load/` hold each service's `run.json` (with `recall.json` for the single builds), `upload-signing/` holds the two runs of the table above, and `environment.json` describes the host and the versions. `tools/README.md` gives the commands under "On real S3". `report.py` prints the tables from `single/` and from `load/`; the burst's two columns are left out here.
 
 ## License
 

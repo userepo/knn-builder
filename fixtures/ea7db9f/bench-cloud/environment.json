@@ -1,0 +1,103 @@
+{
+ "host": {
+  "instance": "EC2 g4dn.2xlarge, us-east-2c, AMI ami-00190236a21f16738",
+  "cpu": "Intel Xeon Platinum 8259CL, 8 vCPUs, no SHA extensions",
+  "memory_gb": 32,
+  "os": "Ubuntu 24.04.4 LTS, kernel 6.17.0-1020-aws",
+  "gpu": "Tesla T4, 15360 MiB",
+  "driver": "595.91.07"
+ },
+ "docker": {
+  "engine": "Docker 29.7.2 on the host, Compose 5.5.0",
+  "gpu": "NVIDIA container toolkit 1.20.0, --gpus all"
+ },
+ "services": {
+  "knn-builder": {
+   "image": "userepo/knn-builder:1.4.0",
+   "image_id": "sha256:853f84eb0323af9b19de61c302c10dc955e27025646344a7d8e2eb40896dbf0a",
+   "commit": "ff64090",
+   "libcuvs": "26.08.01",
+   "cuda": "12.9",
+   "max_workers": "2, read and ignored: one build at a time on the GPU, the next job downloading and the last uploading meanwhile"
+  },
+  "upstream": {
+   "image": "opensearchstaging/remote-vector-index-builder@sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "image_id": "sha256:e8fecaefc43cfaf4d04f35072f10baedf0ece3a539efac5340e5ab0c095da8bc",
+   "commit": "ea7db9f",
+   "libcuvs": "26.08.01",
+   "faiss": "1.14.3",
+   "cuda": "12.9",
+   "python": "3.11.15",
+   "max_workers": 2,
+   "note": "its default two workers: no crash on this host, in any phase"
+  },
+  "upload-signing": {
+   "image": "userepo/knn-builder:unsigned-test",
+   "image_id": "sha256:fbfdf7803f0da8275d8e446d1fc79ddffd6520763aa00e0fc442017276bf50d3",
+   "note": "1.4.0's code, built before the release; unsigned/ as it is, signed/ with S3_PAYLOAD_SIGNING_ENABLED=true, which the run.py of that day did not yet record in run.json; a test tag, identified here by its id, which Docker Hub may no longer hold"
+  }
+ },
+ "s3": "a bucket in us-east-2, through the instance's role; no LocalStack",
+ "settings": {
+  "gpu_memory_limit_gb": 16,
+  "single": {
+   "phases": [
+    "single"
+   ],
+   "runs": 5
+  },
+  "load": {
+   "phases": [
+    "concurrent",
+    "sustained"
+   ],
+   "rounds": 5,
+   "concurrent": 8,
+   "queue": 4,
+   "sustain_seconds": 3600
+  },
+  "upload-signing": {
+   "phases": [
+    "single"
+   ],
+   "runs": 3,
+   "inputs": [
+    "cohere-ip-1000000x768",
+    "gist-ip-1000000x960",
+    "sift-l2-1000000x128"
+   ]
+  }
+ },
+ "runs": {
+  "single/knn-builder": {
+   "started": "2026-11-27T20:51:34.776934+00:00",
+   "ended": "2026-11-27T22:34:29.423104+00:00"
+  },
+  "single/upstream": {
+   "started": "2026-11-26T21:57:18.151279+00:00",
+   "ended": "2026-11-26T23:50:23.671027+00:00"
+  },
+  "load/knn-builder": {
+   "started": "2026-11-27T14:52:38.500102+00:00",
+   "ended": "2026-11-27T20:17:12.028159+00:00"
+  },
+  "load/upstream": {
+   "started": "2026-11-27T02:29:19.964736+00:00",
+   "ended": "2026-11-27T07:55:37.517060+00:00"
+  },
+  "upload-signing/unsigned": {
+   "started": "2026-11-27T01:47:28.685850+00:00",
+   "ended": "2026-11-27T02:00:54.869820+00:00"
+  },
+  "upload-signing/signed": {
+   "started": "2026-11-27T02:09:17.666053+00:00",
+   "ended": "2026-11-27T02:25:13.928403+00:00"
+  }
+ },
+ "recall": {
+  "tool": "knn-inspect 0.18.0",
+  "queries": 100,
+  "k": 10,
+  "seed": 1
+ }
+}

@@ -1,0 +1,5157 @@
+{
+ "service": "knn-builder",
+ "image": "userepo/knn-builder:1.4.0",
+ "image_id": "sha256:853f84eb0323af9b19de61c302c10dc955e27025646344a7d8e2eb40896dbf0a",
+ "max_workers": 2,
+ "gpu": {
+  "name": "Tesla T4",
+  "driver": "595.91.07",
+  "memory_mib": 15360
+ },
+ "started": "2026-11-27T14:52:38.500102+00:00",
+ "settings": {
+  "runs": 5,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 0,
+  "recall_check_k": 10,
+  "s3_payload_signing_enabled": null,
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 16.0,
+  "s3": {
+   "store": "s3",
+   "region": "us-east-2",
+   "endpoint": "aws"
+  }
+ },
+ "inputs": {
+  "cohere-hamming-1000000x768-binary": {
+   "dir": "target/bench/inputs/cohere-hamming-1000000x768-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "cohere-l2-1000000x768-byte": {
+   "dir": "target/bench/inputs/cohere-l2-1000000x768-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "gist-ip-1000000x960": {
+   "dir": "target/bench/inputs/gist-ip-1000000x960",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "gist-l2-1000000x960": {
+   "dir": "target/bench/inputs/gist-l2-1000000x960",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-hamming-1000000x384-binary": {
+   "dir": "target/bench/inputs/ms-marco-hamming-1000000x384-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-ip-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-ip-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "ms-marco-l2-1000000x384-byte": {
+   "dir": "target/bench/inputs/ms-marco-l2-1000000x384-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 384,
+   "skip_stored_vectors": false
+  },
+  "sift-hamming-1000000x128-binary": {
+   "dir": "target/bench/inputs/sift-hamming-1000000x128-binary",
+   "data_type": "binary",
+   "space_type": "hamming",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-ip-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-ip-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128-byte": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128-byte",
+   "data_type": "byte",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-hamming-1000000x768-binary",
+   "index": 0,
+   "job_id": "3b6e80b2d8527d2369328fd1261842943688c5458dd9928f9b791a86af07516d",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 74.299,
+   "start": "2026-11-27T14:54:45.477926+00:00",
+   "end": "2026-11-27T14:55:59.776646+00:00",
+   "host_peak_bytes": 2696663040,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 0.387632505,
+    "build": 72.822438763,
+    "upload": 0.928494921
+   },
+   "device_samples": 1481,
+   "device_held_bytes": 110100480,
+   "device_peak_bytes": 497025024
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 1,
+   "job_id": "30af14eeed7dfd8cca25701e8e468c8266c65c7a041398697340659fbff4b2c4",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 99.994,
+   "start": "2026-11-27T14:56:00.165013+00:00",
+   "end": "2026-11-27T14:57:40.158570+00:00",
+   "host_peak_bytes": 4282626048,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 5.114496709,
+    "build": 88.461147264,
+    "upload": 6.053516578
+   },
+   "device_samples": 1995,
+   "device_held_bytes": 112197632,
+   "device_peak_bytes": 996147200
+  },
+  {
+   "input": "cohere-ip-1000000x768-byte",
+   "index": 2,
+   "job_id": "bacc2d69552f29eaea2f5a4b248bc3690b120899f98f411341023e7f219796b0",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 89.476,
+   "start": "2026-11-27T14:57:40.573089+00:00",
+   "end": "2026-11-27T14:59:10.048800+00:00",
+   "host_peak_bytes": 1989742592,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 1.377961386,
+    "build": 85.52800416,
+    "upload": 2.330680602
+   },
+   "device_samples": 1785,
+   "device_held_bytes": 284164096,
+   "device_peak_bytes": 668991488
+  }
+ ],
+ "scrapes": [
+  {
+   "process": 1,
+   "file": "metrics/process-1.txt",
+   "at": "2026-11-27T20:16:56.275021+00:00"
+  }
+ ],
+ "concurrent": {
+  "binary": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7fa77d639e76cddd941dbcea2a23517db414f0f2bb95910332c5d26de3c4d152",
+     "post_seconds": 0.0054640339949401096,
+     "outcome": "built",
+     "seen_after": 77.49650647700764,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.363113368,
+      "build": 72.642902986,
+      "upload": 1.046825501
+     }
+    },
+    {
+     "index": 9,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "869e55810f25f1d7f8e1bf755f05417156023c23503b3f384b368bb6dce6f682",
+     "post_seconds": 0.005776428995886818,
+     "outcome": "built",
+     "seen_after": 163.34724293601175,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.347523394,
+      "build": 42.925050812,
+      "upload": 0.880658311
+     }
+    },
+    {
+     "index": 10,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9f286b38f80aa4305874ca93e66276a5f4c3fd551e668c27448d011af51d30a7",
+     "post_seconds": 0.00578507999307476,
+     "outcome": "built",
+     "seen_after": 299.4476885190088,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.302079678,
+      "build": 30.99228151,
+      "upload": 0.839765479
+     }
+    },
+    {
+     "index": 11,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "1625d7ccecdcf0892dbe9be94a59e601da0eb5ba5c16802c7accf61e7d89e400",
+     "post_seconds": 0.005591622990323231,
+     "outcome": "built",
+     "seen_after": 266.87513843800116,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.407515763,
+      "build": 72.71880449,
+      "upload": 1.039282115
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "43480be24cdc7fe76f38212f7f35ba9b58eabd21767dc02c47b68d18ee38181e",
+     "post_seconds": 0.005813122988911346,
+     "outcome": "built",
+     "seen_after": 341.07967073400505,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.346493395,
+      "build": 42.88755419,
+      "upload": 1.019307172
+     }
+    },
+    {
+     "index": 13,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "9c7f64b1c5ab4e0accf4dda018f0ad59f4151b6d32d854ce745732929126f505",
+     "post_seconds": 0.005598738003754988,
+     "outcome": "built",
+     "seen_after": 195.4186913010053,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.358267542,
+      "build": 30.944458828,
+      "upload": 0.810161036
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "77c559611c807dd483dc11e64c2494828207825798a4837d766d1b4e4a07f4d6",
+     "post_seconds": 0.005761098000220954,
+     "outcome": "built",
+     "seen_after": 410.52815665000526,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.429965528,
+      "build": 72.762153698,
+      "upload": 0.991993695
+     }
+    },
+    {
+     "index": 15,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d88df478daa5a9550fda15fbafc4c9f63a93d7016bc87978b6dae1391dea3772",
+     "post_seconds": 0.004224452000926249,
+     "outcome": "built",
+     "seen_after": 121.57545888300228,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.288050266,
+      "build": 42.990965799,
+      "upload": 0.876671519
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c7db9ded74cea51f6c80df69367be29eace4b8462ea0e5103fa8e6c32b9127f1",
+     "post_seconds": 0.0036223289935151115,
+     "outcome": "built",
+     "seen_after": 76.3723228739982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.325456455,
+      "build": 72.620078591,
+      "upload": 1.195570665
+     }
+    },
+    {
+     "index": 17,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "5573405de975c8ce0eb658bea808ae6e0a6b821fcdd9c17877d343dd821c81d8",
+     "post_seconds": 0.005029701002058573,
+     "outcome": "built",
+     "seen_after": 225.29482952099352,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.252167414,
+      "build": 42.926193717,
+      "upload": 1.009495585
+     }
+    },
+    {
+     "index": 18,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d6e9ad623faf8d034e16a5da0a24417c2423897ca7904077fb44b2a8fa453bc8",
+     "post_seconds": 0.0033625999931246042,
+     "outcome": "built",
+     "seen_after": 110.38738090300467,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.243057292,
+      "build": 31.010678039,
+      "upload": 0.866875218
+     }
+    },
+    {
+     "index": 19,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d8fc309d85cbd669622a0f90176725e8d0325d98bd5136e7b55875b2be97aab1",
+     "post_seconds": 0.0037901299947407097,
+     "outcome": "built",
+     "seen_after": 179.9897538350051,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.433050491,
+      "build": 72.757323578,
+      "upload": 1.012497165
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "06440cd95ccd37b9318f18db9af809507fe080951f55532a3398bbc601c9ca4b",
+     "post_seconds": 0.004435924012796022,
+     "outcome": "built",
+     "seen_after": 263.67374435899546,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.381861877,
+      "build": 42.910311681,
+      "upload": 0.8378664
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6b61763854d60c4f84b552805f44374e3b90559ebe962f21bc404c9967045f5b",
+     "post_seconds": 0.005751342992880382,
+     "outcome": "built",
+     "seen_after": 340.5791304089944,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.301864659,
+      "build": 30.995122519,
+      "upload": 1.057801409
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "7156d8259d10a123d8ff1243d1d93a80f2ec9b52f5ea7d06be0ba39c170ca3ee",
+     "post_seconds": 0.004161422999459319,
+     "outcome": "built",
+     "seen_after": 412.14992276899284,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.49069849,
+      "build": 72.740141383,
+      "upload": 0.94952656
+     }
+    },
+    {
+     "index": 23,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "480e8fc85e8797e5c59b0048de04f6b42c7af5e55dbe6bb6fb79c904c39d92bb",
+     "post_seconds": 0.005547116001253016,
+     "outcome": "built",
+     "seen_after": 307.7860086080036,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.314101501,
+      "build": 42.935053818,
+      "upload": 1.131988487
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "1619c9c00803a3b716c917bac6470c2a6608e7a6025dabc995bd9e1cc078f622",
+     "post_seconds": 0.005449082003906369,
+     "outcome": "built",
+     "seen_after": 382.31669215300644,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.439427989,
+      "build": 72.713246284,
+      "upload": 1.02955962
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8893ca4e4ddddb2a892210bb58f558cb11b9c9d12e37984c20cc2e23d35a3095",
+     "post_seconds": 0.005162179993931204,
+     "outcome": "built",
+     "seen_after": 191.31527703799657,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.338604561,
+      "build": 43.002552395,
+      "upload": 1.047463751
+     }
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c3df3b1b9cff66b40a7c1e61df3c7a79dca0f10e805dfdbc63ad7e341bd3facd",
+     "post_seconds": 0.005979850000585429,
+     "outcome": "built",
+     "seen_after": 412.035078824003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.301223332,
+      "build": 30.942374923,
+      "upload": 0.789389973
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "aefdf1453d0e91589f312f00726c1ef3e659aa2771743b5a60f771b687b99f4c",
+     "post_seconds": 0.004859813008806668,
+     "outcome": "built",
+     "seen_after": 149.48325633100467,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.488609736,
+      "build": 72.802030132,
+      "upload": 1.0009135
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "544d78457703d318599d49153f419c11b7610ea8afae61c08ba47067b93e6d4e",
+     "post_seconds": 0.004644893007935025,
+     "outcome": "built",
+     "seen_after": 78.67539161999593,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.30175395,
+      "build": 43.037854787,
+      "upload": 0.956997075
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "e447ce0c1264f537e58c1541d00097df2ee9fdd4f3add0fc83bd95af26fb0633",
+     "post_seconds": 0.0034801420115400106,
+     "outcome": "built",
+     "seen_after": 32.81000711199886,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.274020419,
+      "build": 30.851347412,
+      "upload": 1.221373769
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e0445a9061bd71aa0c41fe57c5066e802ab81d5474374c436bc1c9fa7c3f1518",
+     "post_seconds": 0.005565247003687546,
+     "outcome": "built",
+     "seen_after": 264.95476455699827,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.423818422,
+      "build": 72.774016203,
+      "upload": 1.179715736
+     }
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "16ca67d0e34051b223db96bc72e81e22c9c69ccd3f603cd334fc4eafa0be19c0",
+     "post_seconds": 0.005685177005943842,
+     "outcome": "built",
+     "seen_after": 309.0507942940021,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.363612847,
+      "build": 43.045648276,
+      "upload": 0.891540057
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "248f87abc32ba047dc9c84860d30b3c9c62723956d6e4a023ae5a777e3a1accf",
+     "post_seconds": 0.004091229988262057,
+     "outcome": "built",
+     "seen_after": 76.55360979400575,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.330169885,
+      "build": 72.697901895,
+      "upload": 1.097816423
+     }
+    },
+    {
+     "index": 33,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "5ffb120c6764fa768ebf2496fc5ea3df13e40dde071f216e9074d9391b03a8da",
+     "post_seconds": 0.00609634599823039,
+     "outcome": "built",
+     "seen_after": 340.7246204520052,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.311435368,
+      "build": 42.910219338,
+      "upload": 1.109678181
+     }
+    },
+    {
+     "index": 34,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "2beb729890dc537038a18d653b45b16f346cd5a21df9d1102b672883b5d0b4f0",
+     "post_seconds": 0.005791011994006112,
+     "outcome": "built",
+     "seen_after": 296.74964513200393,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.318680224,
+      "build": 30.864057327,
+      "upload": 0.820948929
+     }
+    },
+    {
+     "index": 35,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "2330d7e80fa04d1e16329792143af1f9b0f5812278d94a56b30f9e06775706a1",
+     "post_seconds": 0.006000711990054697,
+     "outcome": "built",
+     "seen_after": 412.9840675640007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.44916499,
+      "build": 72.743311657,
+      "upload": 0.952941272
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3c2f36c7a811006f61a8dd547c5ac361b121309d526c5dd948feba3d8646c52a",
+     "post_seconds": 0.005299748008837923,
+     "outcome": "built",
+     "seen_after": 190.76408622800955,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.439223449,
+      "build": 42.936657875,
+      "upload": 1.248723951
+     }
+    },
+    {
+     "index": 37,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "b5f7654955990ac136e6e27bce7c3a34996bae93b0f5580456cbaef2325137a2",
+     "post_seconds": 0.00508467698819004,
+     "outcome": "built",
+     "seen_after": 265.95445558600477,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.315936001,
+      "build": 30.887004563,
+      "upload": 0.825070773
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e2d1d21f75f1c79c030bd700dccb35a1e2c3ef04b52a38125881cd50d0d178d8",
+     "post_seconds": 0.004427979001775384,
+     "outcome": "built",
+     "seen_after": 150.28951974600204,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.239451081,
+      "build": 72.867360184,
+      "upload": 1.006394744
+     }
+    },
+    {
+     "index": 39,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "d163bbb7f22a150877deefe7c1654f1822808f6fd6c35689db8c0bd4c0cfc21b",
+     "post_seconds": 0.005127240001456812,
+     "outcome": "built",
+     "seen_after": 236.81294187500316,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.342653992,
+      "build": 42.938462054,
+      "upload": 0.929174202
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "b95e7ab2e82139eb42fc4528c1522c1f1747a5c965fdc228f2842e84419e3121",
+     "post_seconds": 0.005545017993426882,
+     "outcome": "built",
+     "seen_after": 222.06370345100004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.418777538,
+      "build": 72.688249826,
+      "upload": 0.986067189
+     }
+    },
+    {
+     "index": 41,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "45ed0ed5d9b1e7da38fb9cccceb72ccae84a7c22a2d2d840627dc485d2c17eda",
+     "post_seconds": 0.006064336004783399,
+     "outcome": "built",
+     "seen_after": 367.39208390899876,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.261368006,
+      "build": 42.920813063,
+      "upload": 1.094718358
+     }
+    },
+    {
+     "index": 42,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "8fe44d7bbec18922b308cede5e2c50b61a9a4790bc04369093e74c70532bfb9c",
+     "post_seconds": 0.004608214003383182,
+     "outcome": "built",
+     "seen_after": 33.478067377000116,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.205948614,
+      "build": 30.787286384,
+      "upload": 1.143447039
+     }
+    },
+    {
+     "index": 43,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "e5cb49a42edd7de995b0832a2d25998f6363083b170026683f539fbbd226cec1",
+     "post_seconds": 0.005625776000670157,
+     "outcome": "built",
+     "seen_after": 325.0414351990039,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.434363551,
+      "build": 72.735120686,
+      "upload": 1.014915808
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "41e87170435bc08213fc339033b49d496916998c3c002cd7c72ad983267466fa",
+     "post_seconds": 0.003997940992121585,
+     "outcome": "built",
+     "seen_after": 76.54501855399576,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.272323273,
+      "build": 42.960419279,
+      "upload": 0.98090624
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6c5815b69ab6d84ccc174de642c2bff694c317320ff56637097c138c3a4d7789",
+     "post_seconds": 0.004596270999172702,
+     "outcome": "built",
+     "seen_after": 253.10138300500694,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.323128311,
+      "build": 30.8679306,
+      "upload": 0.863094281
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "4d0b45ce3cc8793017ea76a80504f1ba7b40af0e21a9683cd530de747a3a0aaa",
+     "post_seconds": 0.0048094969970406964,
+     "outcome": "built",
+     "seen_after": 151.08669377300248,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.490763702,
+      "build": 72.746314785,
+      "upload": 1.004364757
+     }
+    },
+    {
+     "index": 47,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "3589aa6ef9cf56851fae387f528acb6c6ba111e949031961a9a2da1ec1ce4a01",
+     "post_seconds": 0.0053004279907327145,
+     "outcome": "built",
+     "seen_after": 413.96814196399646,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.324637834,
+      "build": 42.90398065,
+      "upload": 0.856524509
+     }
+    }
+   ]
+  },
+  "float": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "21dfc0b694efb9cb8b5635456584a7aec665fdd2959e67f75b8da04aa7dc75ce",
+     "post_seconds": 0.004426700004842132,
+     "outcome": "built",
+     "seen_after": 283.53879975101154,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.521137863,
+      "build": 87.217974212,
+      "upload": 6.337352426
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "e79e99679a7fb1b088d186e0ecfc0090c341ec7c4d1908c8687b6cfa187e1111",
+     "post_seconds": 0.003984498995123431,
+     "outcome": "built",
+     "seen_after": 141.54638556900318,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 5.275548268,
+      "build": 127.329044566,
+      "upload": 6.400194287
+     }
+    },
+    {
+     "index": 10,
+     "input": "gist-ip-1000000x960",
+     "job_id": "a19a3f242fee8643a6196f610a31fdd055ffdda17a8cc862403bda95078496fd",
+     "post_seconds": 0.00573585600068327,
+     "outcome": "built",
+     "seen_after": 593.0177940200083,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 6.594421645,
+      "build": 70.087647891,
+      "upload": 7.45961695
+     }
+    },
+    {
+     "index": 11,
+     "input": "gist-l2-1000000x960",
+     "job_id": "47d1b9eb38cf768ed45d6c81871350a406d5063d7bc193ed66e6a4988c97967f",
+     "post_seconds": 0.00502767700527329,
+     "outcome": "built",
+     "seen_after": 456.17936459500925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 7.451174356,
+      "build": 163.437092026,
+      "upload": 7.565385358
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "350df600d20ab206d86ed7d66725f993504e7313c4a98b912837a0a7f1ec54b5",
+     "post_seconds": 0.005472951990668662,
+     "outcome": "built",
+     "seen_after": 521.0199903640023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.7234466680000002,
+      "build": 59.031629366,
+      "upload": 3.466901346
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "d129b39141c3dd3f6519d998a932aa294f915643857cbc09353059cc1d2b6db2",
+     "post_seconds": 0.003969609999330714,
+     "outcome": "built",
+     "seen_after": 195.3959077180043,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 2.710038799,
+      "build": 56.820139858,
+      "upload": 3.435218122
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-ip-1000000x128",
+     "job_id": "eac37e1dffe2b6972c3389e807a995ef80294b07c5ebac9b94b822f6fc10cb8c",
+     "post_seconds": 0.0052053120016353205,
+     "outcome": "built",
+     "seen_after": 461.6565291959996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.099700487,
+      "build": 6.8002087,
+      "upload": 1.781542529
+     }
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "5a72d14cef792ea8dedd68d7de5694c6354c3da9eacd0108748a3c9e19f60116",
+     "post_seconds": 0.004452435008715838,
+     "outcome": "built",
+     "seen_after": 289.64922652700625,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.062110015,
+      "build": 6.985885575,
+      "upload": 1.6988817790000001
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "42d13c3a3c5ea13f39cdd83cdcc30c87c786d3da5c4d049df5761a1a1becbe09",
+     "post_seconds": 0.005857577998540364,
+     "outcome": "built",
+     "seen_after": 457.1342283249978,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 5.380331612,
+      "build": 88.463770655,
+      "upload": 6.187367868
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "ae77c5b68ebb15fe4304475760095185ba20049df4190b4ecf814ac0867f2484",
+     "post_seconds": 0.0059669719921657816,
+     "outcome": "built",
+     "seen_after": 583.9115161009977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 5.451543698,
+      "build": 126.13400979,
+      "upload": 6.432496889
+     }
+    },
+    {
+     "index": 18,
+     "input": "gist-ip-1000000x960",
+     "job_id": "08b5ccdc79c084a7e3960c4b1d2c22c9152814bee9465af65a012e785406cfa4",
+     "post_seconds": 0.003911192994564772,
+     "outcome": "built",
+     "seen_after": 75.81935737100139,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 6.751290633,
+      "build": 60.621554912,
+      "upload": 7.571679996
+     }
+    },
+    {
+     "index": 19,
+     "input": "gist-l2-1000000x960",
+     "job_id": "57186439b511c355e1673f1b2e15f8ad2171bc68e39a0c2ccb6c001e94442fc6",
+     "post_seconds": 0.0050631800113478675,
+     "outcome": "built",
+     "seen_after": 370.87730250800087,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 6.958359941,
+      "build": 163.301492423,
+      "upload": 7.61191149
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "2f59030798485b6384ec9abd6b37b68e8c555d9d03317990cfe2b20e34e55429",
+     "post_seconds": 0.004739757001516409,
+     "outcome": "built",
+     "seen_after": 134.53718827699777,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.611588283,
+      "build": 59.187908254,
+      "upload": 3.6277513409999997
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "a4369a83f6d8c086d75f86b9167eb7587899a900e64c035148ea5c1fc8125c0f",
+     "post_seconds": 0.004473616994800977,
+     "outcome": "built",
+     "seen_after": 198.76181272599206,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 2.827465323,
+      "build": 57.166430917,
+      "upload": 3.492102254
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128",
+     "job_id": "8c39ca09ee75fe0b483bbefe4656fad72bcbc89761cefda04970adc4e2deafc4",
+     "post_seconds": 0.005202310989261605,
+     "outcome": "built",
+     "seen_after": 136.48246135699446,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.13724027,
+      "build": 6.522850845,
+      "upload": 1.770689102
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "f8a9eff79dafe4b2b0673cb41b7ef79ae086f2b532ce855ef91accc163ce617a",
+     "post_seconds": 0.00484160499763675,
+     "outcome": "built",
+     "seen_after": 200.74808180099353,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.138714469,
+      "build": 7.052881773,
+      "upload": 1.671559069
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "aeebe569dfc943c7f5af099c0d3ec7c76644047fc9155a4fc8d4b1136297f7c1",
+     "post_seconds": 0.005656025998177938,
+     "outcome": "built",
+     "seen_after": 382.30272226801026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 5.675551594,
+      "build": 87.581384255,
+      "upload": 6.243098365
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "06af9e562e1f7eb201cba30f7e7c86443d322e82310db4201724958c3850cf80",
+     "post_seconds": 0.005092591003631242,
+     "outcome": "built",
+     "seen_after": 504.2076971560018,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 5.295906142,
+      "build": 125.426745181,
+      "upload": 6.116185026
+     }
+    },
+    {
+     "index": 26,
+     "input": "gist-ip-1000000x960",
+     "job_id": "a29bfb3517020284c2fcfefea982cfee391820ada10e5a9b616fe21c9793922f",
+     "post_seconds": 0.0061191389977466315,
+     "outcome": "built",
+     "seen_after": 575.780496516003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 6.765458528,
+      "build": 53.805205758,
+      "upload": 7.489616427
+     }
+    },
+    {
+     "index": 27,
+     "input": "gist-l2-1000000x960",
+     "job_id": "76d23bb4f7195a4493c4cc953d63734b4b5fce98cdc8386b675d0da11eada59b",
+     "post_seconds": 0.004067942005349323,
+     "outcome": "built",
+     "seen_after": 238.28313803300261,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 6.559015863,
+      "build": 164.177080384,
+      "upload": 7.918978538
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "01d69b88ca10fef9bc56224486dd81ec58fc787038a8e424c9f9fbdaf326e162",
+     "post_seconds": 0.0037953020073473454,
+     "outcome": "built",
+     "seen_after": 69.461512615002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.529664561,
+      "build": 59.140688196,
+      "upload": 3.586292967
+     }
+    },
+    {
+     "index": 29,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "96647cdf8c2c7fe1595b365aeb5021515edf154c8e6acf8d230b176d6f3713ce",
+     "post_seconds": 0.005382543007726781,
+     "outcome": "built",
+     "seen_after": 289.815915684012,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 2.866315153,
+      "build": 57.667601221,
+      "upload": 3.525548368
+     }
+    },
+    {
+     "index": 30,
+     "input": "sift-ip-1000000x128",
+     "job_id": "4180430a00a9390cf65729121fd2621f995e571dda97c3873480d564aef07337",
+     "post_seconds": 0.005235931996139698,
+     "outcome": "built",
+     "seen_after": 507.6832752120099,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.181338159,
+      "build": 6.691081422,
+      "upload": 1.72344596
+     }
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "28df0efbb2ddf58a0d07e3d061c485ca15b3292cf4b96c495f4c8a49050b7107",
+     "post_seconds": 0.00538389099529013,
+     "outcome": "built",
+     "seen_after": 516.0392746580037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.085103367,
+      "build": 6.841418599,
+      "upload": 1.653106398
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "c478d8cbc0e46243cc3d8ecac98412ff8b4eb1091b41bafea345c74497ad1ecc",
+     "post_seconds": 0.00527033100661356,
+     "outcome": "built",
+     "seen_after": 349.80921398800274,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 5.580551005,
+      "build": 87.527923918,
+      "upload": 6.17339689
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "84a468e467814c46ef9bf6719ef01451691987523781cf142909765343e57b86",
+     "post_seconds": 0.005981071008136496,
+     "outcome": "built",
+     "seen_after": 202.1476449220063,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 5.631704945,
+      "build": 126.582579305,
+      "upload": 6.363714304
+     }
+    },
+    {
+     "index": 34,
+     "input": "gist-ip-1000000x960",
+     "job_id": "7359cc40e6a2434e8cfb30ecbd2d0e2754cab66b193070ded5236e57b6c11469",
+     "post_seconds": 0.004071706993272528,
+     "outcome": "built",
+     "seen_after": 77.83350368900574,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 7.115194438,
+      "build": 60.100693895,
+      "upload": 7.496878715
+     }
+    },
+    {
+     "index": 35,
+     "input": "gist-l2-1000000x960",
+     "job_id": "9280e17ecd6483e063dee48c93204e2c6f5b82be80bd898013343d8d38aba069",
+     "post_seconds": 0.005761346998042427,
+     "outcome": "built",
+     "seen_after": 510.8141621810064,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 6.950532471,
+      "build": 162.326601384,
+      "upload": 7.534121472
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "227fcb8289cf37f719bfdb6e4e8eb0d0a3ce8a1f971914016f34a41f5a9064e7",
+     "post_seconds": 0.005629138002404943,
+     "outcome": "built",
+     "seen_after": 258.8359567100124,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.80813291,
+      "build": 59.389586872,
+      "upload": 3.5459229949999997
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "401fa66f1aaa23f1059b194b40c769b3b41c1316b01c4ae9abb0e3e1ea87a806",
+     "post_seconds": 0.005793306001578458,
+     "outcome": "built",
+     "seen_after": 567.7633020220092,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 2.808293925,
+      "build": 57.34504457,
+      "upload": 3.497546651
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-ip-1000000x128",
+     "job_id": "734b13428b082161a98d34cf6725eafc7eac8cfe7f627ad76d709e9d497e4405",
+     "post_seconds": 0.005936985995504074,
+     "outcome": "built",
+     "seen_after": 572.6355471860006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.108518847,
+      "build": 6.620221356,
+      "upload": 1.626202593
+     }
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "f2a8f00a8fec41a98a43f05feb6a1d0625778da0cf8a111c64fe5271e40dd942",
+     "post_seconds": 0.006559702000231482,
+     "outcome": "built",
+     "seen_after": 575.6318937190081,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.115828499,
+      "build": 6.269917631,
+      "upload": 1.636302031
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "73aaf54521e276bd5b9e5f02ba5281232ebd383233eb4237d287c0017c4221f5",
+     "post_seconds": 0.010907018004218116,
+     "outcome": "built",
+     "seen_after": 288.0250016350037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.8386644709999995,
+      "build": 86.989115213,
+      "upload": 6.402602935
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "9581543675e8314609e2f06521cd513bcad5ea2579661f4cd71fe6c458e98ff0",
+     "post_seconds": 0.005019792006351054,
+     "outcome": "built",
+     "seen_after": 193.1075382410054,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 5.382362126,
+      "build": 123.853435672,
+      "upload": 6.706333604
+     }
+    },
+    {
+     "index": 42,
+     "input": "gist-ip-1000000x960",
+     "job_id": "26fd3f237b76d04aeeef5d4a196cf85564adc1dc73f5e0be904cd4f96040539c",
+     "post_seconds": 0.01122981301159598,
+     "outcome": "built",
+     "seen_after": 347.4856885920017,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 7.054986376,
+      "build": 55.867082468,
+      "upload": 7.613100397
+     }
+    },
+    {
+     "index": 43,
+     "input": "gist-l2-1000000x960",
+     "job_id": "a6c6500b2ff3870590962c4aead08eb608aa770b081a68dcf76dd3ecd6316614",
+     "post_seconds": 0.011383050994481891,
+     "outcome": "built",
+     "seen_after": 510.21634866899694,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 7.158563828,
+      "build": 162.906956163,
+      "upload": 7.709274926
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "f2349a819e70f94eac13f710cc6b3692386e1e49e44a760299ede8671392c78d",
+     "post_seconds": 0.004907408001599833,
+     "outcome": "built",
+     "seen_after": 66.31526065300568,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 2.618668891,
+      "build": 59.135836588,
+      "upload": 3.615701113
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "2245a4a90854663b91b765e382bc2fd655d5429dfbff45f9eab90ec18c5a2395",
+     "post_seconds": 0.010972636009682901,
+     "outcome": "built",
+     "seen_after": 569.2784830500023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 2.881174121,
+      "build": 57.049597607,
+      "upload": 3.456127742
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128",
+     "job_id": "4fc05fe5ddd809027944a0e5f5ed90265d7fa14be5e15acb1ed5cfe0605f7aa7",
+     "post_seconds": 0.010977118989103474,
+     "outcome": "built",
+     "seen_after": 510.78207100500003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.196360082,
+      "build": 6.973152967,
+      "upload": 1.6642577109999999
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "10fb8fc311671e2732e03471cd15af5d4fa0844204bb95de82147ec6676a1b5c",
+     "post_seconds": 0.0048296210006810725,
+     "outcome": "built",
+     "seen_after": 194.82109773800767,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.125878101,
+      "build": 6.907871353,
+      "upload": 1.743821699
+     }
+    }
+   ]
+  },
+  "byte": {
+   "jobs": 8,
+   "rounds": 5,
+   "records": [
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "0aea0c8bc1692fbdcc1bdf87740e5f126ad34b826a92af0ff1c09516d7ae98ee",
+     "post_seconds": 0.005073271997389384,
+     "outcome": "built",
+     "seen_after": 297.8836406519986,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.5474509699999999,
+      "build": 85.619924628,
+      "upload": 2.440500519
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "886e81cde70036decbf84f618911750e5404c920f46cf4932311b425452f720b",
+     "post_seconds": 0.005837069998960942,
+     "outcome": "built",
+     "seen_after": 544.490136168999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.458456145,
+      "build": 122.097768882,
+      "upload": 2.414938306
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "e97dbbe2fd8aee74e73f4c23b5379fa7561b2a43e04a7b0158a93d8a974b17b5",
+     "post_seconds": 0.005717024992918596,
+     "outcome": "built",
+     "seen_after": 418.31904446500994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.884398523,
+      "build": 58.103224143,
+      "upload": 1.561343702
+     }
+    },
+    {
+     "index": 11,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "36350b61040731c3fded7701434d9806b7868803b1df6a05c0479c7873a74191",
+     "post_seconds": 0.0050847569946199656,
+     "outcome": "built",
+     "seen_after": 362.13228167500347,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.928917502,
+      "build": 55.993788898,
+      "upload": 1.682364
+     }
+    },
+    {
+     "index": 12,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "d6a9415ea1e4f89bfc7308f66a258268cc49e0f135f8107f5fe4a46585b75e87",
+     "post_seconds": 0.00426500900357496,
+     "outcome": "built",
+     "seen_after": 306.5669925020047,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.423298443,
+      "build": 6.1688286,
+      "upload": 1.094259039
+     }
+    },
+    {
+     "index": 13,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "91899e79df1a994e664eb82ee426970813cfdd9d9ae15eaab7e112efc82cd938",
+     "post_seconds": 0.005597108989604749,
+     "outcome": "built",
+     "seen_after": 546.0493222200021,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 0.454407872,
+      "build": 5.976452433,
+      "upload": 1.014962522
+     }
+    },
+    {
+     "index": 14,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "62e64efa16e6e24c3af34b9bae32e6f769f0f6a270a204c5016691362dded680",
+     "post_seconds": 0.0039020069962134585,
+     "outcome": "built",
+     "seen_after": 89.31842926000536,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.440169165,
+      "build": 84.890419735,
+      "upload": 2.531503055
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "15e5bea5bbf91be9ef8436751b530b6fc1af0f3a820cf6a3f5f7bde41ac746dd",
+     "post_seconds": 0.00456605400540866,
+     "outcome": "built",
+     "seen_after": 213.82004541700007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 1,
+     "seconds": {
+      "download": 1.401234582,
+      "build": 123.353631465,
+      "upload": 2.403669968
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "dc49a45bcb3db3f6a06d8c3b830ff72c2de7d4599349b19cf8f38e239d8bac01",
+     "post_seconds": 0.003877390001434833,
+     "outcome": "built",
+     "seen_after": 91.42457743300474,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.385048293,
+      "build": 84.995821105,
+      "upload": 2.298555058
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "64dc3ba2e67302a6485c1486e542bebddb05ac5f67fb927201a4eea5082180f9",
+     "post_seconds": 0.005663300005835481,
+     "outcome": "built",
+     "seen_after": 452.4955958089995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.460469465,
+      "build": 123.26412911,
+      "upload": 2.426721439
+     }
+    },
+    {
+     "index": 18,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "6c378fe92acc857715cec8bfd33c359e68dae4d131d9b2439e4ffb4a376f9aab",
+     "post_seconds": 0.003332926004077308,
+     "outcome": "built",
+     "seen_after": 150.5551585820067,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.797371009,
+      "build": 58.128875702,
+      "upload": 1.716021416
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "1ea4d2ea9588bd2610c9f63c47f4a6ac4eff2dda395ed0b403852596ade0eedc",
+     "post_seconds": 0.004386582993902266,
+     "outcome": "built",
+     "seen_after": 205.4876652230014,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.913127476,
+      "build": 56.153058525,
+      "upload": 1.702191235
+     }
+    },
+    {
+     "index": 20,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "f1b799f8c6b820447d1d6a6f78db16eaaa086b9830a04a97beb08e29feab7f2a",
+     "post_seconds": 0.005392099003074691,
+     "outcome": "built",
+     "seen_after": 453.94206304100226,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.438644794,
+      "build": 6.1131776,
+      "upload": 1.132831454
+     }
+    },
+    {
+     "index": 21,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "98978a894623cb9e2aa532c9d26e9d2f91b7674d6006089b97c40b4e3ed4e442",
+     "post_seconds": 0.005630205996567383,
+     "outcome": "built",
+     "seen_after": 460.8726067259995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 0.439289338,
+      "build": 6.10061323,
+      "upload": 1.015871393
+     }
+    },
+    {
+     "index": 22,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "e92e1a2571ac8673123f0825b093b1f7e29711fa82c434d3d42e7a16c75988b8",
+     "post_seconds": 0.005610031003016047,
+     "outcome": "built",
+     "seen_after": 547.7176226750016,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.5569974549999999,
+      "build": 85.912109031,
+      "upload": 2.456843963
+     }
+    },
+    {
+     "index": 23,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "a5ff5f8576e41f2b75c74bdb291c2e81ad043363013db1f3d985e398811d9c95",
+     "post_seconds": 0.005092398001579568,
+     "outcome": "built",
+     "seen_after": 326.8138438050082,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 2,
+     "seconds": {
+      "download": 1.513804054,
+      "build": 122.490546031,
+      "upload": 2.3798833090000002
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "1db1cf73ae49c34fe4318d88379476281961559cea31a72b67fb293fd859d942",
+     "post_seconds": 0.005218192003667355,
+     "outcome": "built",
+     "seen_after": 327.9603164720029,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.4371496129999999,
+      "build": 85.610734374,
+      "upload": 2.605963993
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "0e6804bb7fc3b342b2f587570f8b60fea5ccf5144acc30a056178364b83177af",
+     "post_seconds": 0.005757217004429549,
+     "outcome": "built",
+     "seen_after": 462.2859659300011,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.637623714,
+      "build": 123.164186075,
+      "upload": 2.528664846
+     }
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "22c2110a8df16c93e48aa35a10ed5d8d306b2faa77b816b5fd256b6d8a035904",
+     "post_seconds": 0.004904761997750029,
+     "outcome": "built",
+     "seen_after": 186.16359888299485,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.777702633,
+      "build": 57.988291683,
+      "upload": 1.7609393500000001
+     }
+    },
+    {
+     "index": 27,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "ec3f46401453af76c7427c05d39083a5e8d48bf4daa37c6532041567893a645c",
+     "post_seconds": 0.005097957997350022,
+     "outcome": "built",
+     "seen_after": 243.7051080599922,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.849271178,
+      "build": 56.09023454,
+      "upload": 1.596482626
+     }
+    },
+    {
+     "index": 28,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "06b452c222c531dbabf59243f8a746ddd4a7e4f945ae139dc7cdfb4af58d4958",
+     "post_seconds": 0.005611408996628597,
+     "outcome": "built",
+     "seen_after": 465.4258523479948,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.389852718,
+      "build": 6.18914422,
+      "upload": 0.9856695
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "e211e0485269a7743206136b95fb760421178ae37956d0ae6a4bc8ac21033775",
+     "post_seconds": 0.005375327993533574,
+     "outcome": "built",
+     "seen_after": 336.8519645819906,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 0.453664673,
+      "build": 6.149412746,
+      "upload": 1.075404713
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "d31297c962edf82372b06881ed59000ce10a15ee41702678b4b1755313c5c2a1",
+     "post_seconds": 0.004703860002337024,
+     "outcome": "built",
+     "seen_after": 552.84387620099,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.503431218,
+      "build": 85.334996925,
+      "upload": 2.277701079
+     }
+    },
+    {
+     "index": 31,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "99633548e8952c6b2e8fd2a2edad47002990e93247028e8114e2e7630cdd3123",
+     "post_seconds": 0.004072263007401489,
+     "outcome": "built",
+     "seen_after": 133.22491049898963,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 3,
+     "seconds": {
+      "download": 1.360565583,
+      "build": 123.871080045,
+      "upload": 2.517739314
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "bcbac5b5fe44bee1db8a00147a2c74b3abf80c50111d14ad5f41767c70771b92",
+     "post_seconds": 0.004846896001254208,
+     "outcome": "built",
+     "seen_after": 101.4097309140052,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.431660626,
+      "build": 86.086567418,
+      "upload": 2.409067307
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "98cd39d211b731e266a91088f37d2a049b9b7ff7c7704f944272e3fd151d167e",
+     "post_seconds": 0.006281412992393598,
+     "outcome": "built",
+     "seen_after": 550.3778507120005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.477270724,
+      "build": 123.22884074,
+      "upload": 2.434288542
+     }
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "aad5c846fe451ba9698abc2ef4c39cac72d05e449c92dbc5b3d41784045f1c7b",
+     "post_seconds": 0.005824436011607759,
+     "outcome": "built",
+     "seen_after": 426.12996432199725,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.834131283,
+      "build": 57.928018059,
+      "upload": 1.501889935
+     }
+    },
+    {
+     "index": 35,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "a2cfb05e51b0da994b6808b4084249fdd93084c2b1022e7e2de6ff114fcd5639",
+     "post_seconds": 0.005239196005277336,
+     "outcome": "built",
+     "seen_after": 244.07979286099726,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.882193405,
+      "build": 56.200832406,
+      "upload": 1.59766488
+     }
+    },
+    {
+     "index": 36,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "14a21199bb5b1798c820feb7fd2f59b3ada0c739a4a33f3d5e46963feea95fc6",
+     "post_seconds": 0.004155934992013499,
+     "outcome": "built",
+     "seen_after": 14.579757740008063,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.355051317,
+      "build": 6.008055448,
+      "upload": 1.107206817
+     }
+    },
+    {
+     "index": 37,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "007217aa704d2b1156d4e176ef0da86742523350e96b5750b93b620910fe5b17",
+     "post_seconds": 0.0031529499974567443,
+     "outcome": "built",
+     "seen_after": 15.291024639998795,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 0.340871698,
+      "build": 5.931378503,
+      "upload": 1.066872256
+     }
+    },
+    {
+     "index": 38,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "e220ebc2e82311ce887cad5e95856327b3cc2f6119f3b5939741e543117c9822",
+     "post_seconds": 0.005436234001535922,
+     "outcome": "built",
+     "seen_after": 190.35560085400357,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.196493534,
+      "build": 85.862587494,
+      "upload": 2.573909468
+     }
+    },
+    {
+     "index": 39,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "d0b881a570efdb20f2118ec6db3baebe7e10f5e19b5bdb86b168f575903ec6d2",
+     "post_seconds": 0.005491378004080616,
+     "outcome": "built",
+     "seen_after": 368.1151271120034,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 4,
+     "seconds": {
+      "download": 1.523822807,
+      "build": 122.659281346,
+      "upload": 2.6030635330000003
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "1128118157d15d751bef0bf8f07ddf21d5effa067faf84ed164430292a64c490",
+     "post_seconds": 0.0038554799975827336,
+     "outcome": "built",
+     "seen_after": 155.90623001099448,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.533456212,
+      "build": 85.38063264,
+      "upload": 2.365635499
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "94843881f038d2588ace4b79d4393ce22c248f7d910463b36d67c624d73b6dab",
+     "post_seconds": 0.005988132004858926,
+     "outcome": "built",
+     "seen_after": 550.1918449590012,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.581894745,
+      "build": 121.965752681,
+      "upload": 2.387402619
+     }
+    },
+    {
+     "index": 42,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "cd3a0e952d10c35c8351082752caf9016e75f584fa3fd15174cef4f9f229d741",
+     "post_seconds": 0.004007030001957901,
+     "outcome": "built",
+     "seen_after": 62.17937656999857,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.724964878,
+      "build": 57.912307263,
+      "upload": 1.785291506
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "84534137609e761979204dc25c8c8ca6fc3e86498d940ae1a5d10fd92571a479",
+     "post_seconds": 0.005349083003238775,
+     "outcome": "built",
+     "seen_after": 295.8535043379961,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.852850495,
+      "build": 56.206442948,
+      "upload": 1.60495955
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "a7412b99ed6baaaa259a0f164e859cc9a8f123f8dcf912440af78e4948f00639",
+     "post_seconds": 0.003462460997980088,
+     "outcome": "built",
+     "seen_after": 66.31363473999954,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.358922546,
+      "build": 6.142447364,
+      "upload": 1.133636859
+     }
+    },
+    {
+     "index": 45,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "78aedc994390f0e7b826df1f5de448b479214adc833a45e7b7a33ba9ec103982",
+     "post_seconds": 0.005679943002178334,
+     "outcome": "built",
+     "seen_after": 424.89739753099275,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 0.457354375,
+      "build": 6.055616299,
+      "upload": 0.984482878
+     }
+    },
+    {
+     "index": 46,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "4c129ef65c530e5e95b816add836fd68a356d583a3098ac11cf4108d715ccf71",
+     "post_seconds": 0.0047945700061973184,
+     "outcome": "built",
+     "seen_after": 241.27704175199324,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.202906291,
+      "build": 85.794282933,
+      "upload": 2.517482701
+     }
+    },
+    {
+     "index": 47,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "15a7665e1a4b5329222181cb1e79598b4231c96ee003ed054ec2e144f54fd163",
+     "post_seconds": 0.0060126059979666024,
+     "outcome": "built",
+     "seen_after": 419.1329575409909,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "round": 5,
+     "seconds": {
+      "download": 1.498354456,
+      "build": 123.12409764,
+      "upload": 2.414215127
+     }
+    }
+   ]
+  }
+ },
+ "sustained": {
+  "binary": {
+   "queue": 4,
+   "seconds": 3600,
+   "completed_within": 73,
+   "jobs_per_hour": 73.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "b262ba28eaa382c6732898fb31a8fe9c7ff31da977c9313e1658f86ca7130681",
+     "post_seconds": 0.002192830012063496,
+     "outcome": "built",
+     "seen_after": 75.27535387899843,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.354997742,
+      "build": 72.651577496,
+      "upload": 0.993130132
+     }
+    },
+    {
+     "index": 1,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "253cdd919e660310c28515b0ab159ca90491df242a4d211f97a03589ddbbfa0b",
+     "post_seconds": 0.0023436829942511395,
+     "outcome": "built",
+     "seen_after": 147.9569942579983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.340139277,
+      "build": 42.922287324,
+      "upload": 0.872642523
+     }
+    },
+    {
+     "index": 2,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c1a4a907275b9ec8fd5846038b8e5726ae811d50b82b9743082085ab75d79103",
+     "post_seconds": 0.002292341014253907,
+     "outcome": "built",
+     "seen_after": 108.44587605800189,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.29510807,
+      "build": 30.995112003,
+      "upload": 1.10397123
+     }
+    },
+    {
+     "index": 3,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "87cdc1886b30f91459f0c5c774d855acef61267de4b19fe5c0a3f7de128eee4a",
+     "post_seconds": 0.0021783100091852248,
+     "outcome": "built",
+     "seen_after": 221.589994725,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.445005006,
+      "build": 72.858632352,
+      "upload": 1.092921462
+     }
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "2dbc94de6d7204dd013731b8a068faa5460c5d790039c5da504f0c446efe18ef",
+     "post_seconds": 0.0010909400007221848,
+     "outcome": "built",
+     "seen_after": 268.50429985200753,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.391375185,
+      "build": 42.932054864,
+      "upload": 0.897639886
+     }
+    },
+    {
+     "index": 5,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "611cea56142f0db33358707f1438d5d71a1d60dc28641c63fa45297fc120b93b",
+     "post_seconds": 0.001184345004730858,
+     "outcome": "built",
+     "seen_after": 298.52890459800255,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.306141124,
+      "build": 30.93283123,
+      "upload": 0.820927958
+     }
+    },
+    {
+     "index": 6,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "24347289672dc5585723a638d6cfaa997083714f2488f337805a332ff94b689e",
+     "post_seconds": 0.001039499999023974,
+     "outcome": "built",
+     "seen_after": 369.73361622200173,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.401389973,
+      "build": 72.768252121,
+      "upload": 1.012513181
+     }
+    },
+    {
+     "index": 7,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b0862a3cfae9d7fac6f6363af74223c390058741d5a81e5a8561f297234f3c0d",
+     "post_seconds": 0.0009115069988183677,
+     "outcome": "built",
+     "seen_after": 412.47749608100276,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.348359791,
+      "build": 42.957838864,
+      "upload": 0.996309311
+     }
+    },
+    {
+     "index": 8,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "3b493688ced4db0079f92a9301614c5959bf1a167eba27d52c725ed31bf28d75",
+     "post_seconds": 0.0011875420022988692,
+     "outcome": "built",
+     "seen_after": 446.15880111500155,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.320019846,
+      "build": 30.982893932,
+      "upload": 1.1324267159999999
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "252f8803a5c5731bded88242556a6e9b6961374047848eeb5e135f84340d3baf",
+     "post_seconds": 0.0009200850035995245,
+     "outcome": "built",
+     "seen_after": 515.4263386759994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.434248208,
+      "build": 72.721980556,
+      "upload": 1.031736686
+     }
+    },
+    {
+     "index": 10,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "c1c1de9855914a82bc6ac2124604e886602ce2df65f0c05e43adaba3b4b5b3f9",
+     "post_seconds": 0.0011371090076863766,
+     "outcome": "built",
+     "seen_after": 560.7666601300007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.338356971,
+      "build": 42.95025268,
+      "upload": 0.946681652
+     }
+    },
+    {
+     "index": 11,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a06dd4111b0fe207945d8b629fc747de54e24daec3a392de55027fd21ca5ca14",
+     "post_seconds": 0.0009645279933465645,
+     "outcome": "built",
+     "seen_after": 588.9144002500107,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.305337016,
+      "build": 30.964213642,
+      "upload": 0.863139266
+     }
+    },
+    {
+     "index": 12,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "622c21339bca4f37af1e15276e103989e4d73ab805624cf0c9b47b156ed16896",
+     "post_seconds": 0.0009268769936170429,
+     "outcome": "built",
+     "seen_after": 664.6707978040067,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.457351234,
+      "build": 72.803631632,
+      "upload": 0.987454277
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "a25b687e8e01246b4ab8e2e53e6c9af263034aae43d0bf8644df64bbb58039a1",
+     "post_seconds": 0.0010503149969736114,
+     "outcome": "built",
+     "seen_after": 705.6677976670035,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.339036934,
+      "build": 42.93534797,
+      "upload": 0.958187676
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "f32c5eb78d02967720904a9cbab708002f45c74a69d2e1b6f0044722e9054738",
+     "post_seconds": 0.000998848001472652,
+     "outcome": "built",
+     "seen_after": 737.9084509130043,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.375825283,
+      "build": 30.92743227,
+      "upload": 0.818538556
+     }
+    },
+    {
+     "index": 15,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "33d953b1cd0d8e1ebf83b4641f32bb342f0ab2ca9482b665b3ea8b164f4a3bc8",
+     "post_seconds": 0.0011305310035822913,
+     "outcome": "built",
+     "seen_after": 808.200818821002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.426852251,
+      "build": 72.702752311,
+      "upload": 1.055154497
+     }
+    },
+    {
+     "index": 16,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "5cbf55c15812631418100c05afcdc9d08c81776e838bcc47ca83f66541e6f96d",
+     "post_seconds": 0.0009187780087813735,
+     "outcome": "built",
+     "seen_after": 852.3975536990038,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.279659721,
+      "build": 43.009017831,
+      "upload": 0.903627769
+     }
+    },
+    {
+     "index": 17,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "5908148a5d48a03bc8bde12e93168c307fa74fb1755d00da6e5c161a6412f2c8",
+     "post_seconds": 0.0008861000096658245,
+     "outcome": "built",
+     "seen_after": 884.5674376120005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.304091132,
+      "build": 30.916256783,
+      "upload": 0.823337123
+     }
+    },
+    {
+     "index": 18,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "f2409f6dbbe8b6e92d7b901fd67ab3242ff8525b37b37b63c3aa81219e373837",
+     "post_seconds": 0.0009900280128931627,
+     "outcome": "built",
+     "seen_after": 956.6038275750034,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.413929703,
+      "build": 72.749109531,
+      "upload": 1.027659895
+     }
+    },
+    {
+     "index": 19,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "bdb4303c990b758530dbfaf20c4aca895fe73ad028b785397c457b9dc1eddc5c",
+     "post_seconds": 0.0009676640038378537,
+     "outcome": "built",
+     "seen_after": 998.895987625001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.324088973,
+      "build": 42.965074593,
+      "upload": 0.947403558
+     }
+    },
+    {
+     "index": 20,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "4cbad5bfe067506b200a34740bca49df88fc6ea17cad12b391ebc43f59cda0a1",
+     "post_seconds": 0.000957622003625147,
+     "outcome": "built",
+     "seen_after": 1032.3253934060049,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.381106834,
+      "build": 30.923228981,
+      "upload": 0.805742754
+     }
+    },
+    {
+     "index": 21,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "44ad1d35b225f554f3ecc3b4889b17f73ef53a6e190bb684f2a7fdc5648873bd",
+     "post_seconds": 0.000905979992239736,
+     "outcome": "built",
+     "seen_after": 1105.591246823009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41031653,
+      "build": 72.772617696,
+      "upload": 1.060733297
+     }
+    },
+    {
+     "index": 22,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "6ed08f133a432d50443d4a1e293bb2b0739abcd88b8c08e1112e8618771f71bf",
+     "post_seconds": 0.0010186110012000427,
+     "outcome": "built",
+     "seen_after": 1146.4501017230068,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.26629989,
+      "build": 43.006833607,
+      "upload": 0.976490562
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "172a4bce77ec4b66206b086295f122e374e21c78555cc45fc3a807509c6387ca",
+     "post_seconds": 0.0009514829871477559,
+     "outcome": "built",
+     "seen_after": 1179.4943870999996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.378020415,
+      "build": 30.946719353,
+      "upload": 0.775427384
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "fa9c499a7d76923df1c99e34ab38d6897e2e47f73a5bceae0971a9ffba2b79d9",
+     "post_seconds": 0.0008854539919411764,
+     "outcome": "built",
+     "seen_after": 1251.0047487600095,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.448172817,
+      "build": 72.794322146,
+      "upload": 1.025065765
+     }
+    },
+    {
+     "index": 25,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "cb1caf64dfc8a19c5d00b44852ec7a02eaf427a16c5d1eb2487d17480873a6c0",
+     "post_seconds": 0.0009285669948440045,
+     "outcome": "built",
+     "seen_after": 1291.660838997006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.405282423,
+      "build": 43.052156465,
+      "upload": 0.98156058
+     }
+    },
+    {
+     "index": 26,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "87a6870fd6e58c86d01af2646704a18e112c31f5877e5c8b8378d5c78a181851",
+     "post_seconds": 0.0009463369933655486,
+     "outcome": "built",
+     "seen_after": 1323.1536681090074,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.394082535,
+      "build": 31.023022715,
+      "upload": 0.780768693
+     }
+    },
+    {
+     "index": 27,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "f34fca59425cafbf517c92e7c11aaf02f6cfc4e2e854d24a0d5692cb234f77a7",
+     "post_seconds": 0.0011551949864951894,
+     "outcome": "built",
+     "seen_after": 1396.8816964270081,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.427925637,
+      "build": 72.772413935,
+      "upload": 0.990280883
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "131aaea06cc4acdb4dbf37b3810483cd847fb55ebc3c372f8d213b744a8e4e60",
+     "post_seconds": 0.0019895139994332567,
+     "outcome": "built",
+     "seen_after": 1440.261404429999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.375089175,
+      "build": 43.047395944,
+      "upload": 0.897833398
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "808207bf08b5b8b0b37f286f01303faf8bbffd639c635bc49f395b64d4e7614a",
+     "post_seconds": 0.0009303440019721165,
+     "outcome": "built",
+     "seen_after": 1468.7501526070118,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.308599133,
+      "build": 31.021723721,
+      "upload": 0.837035977
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a14bf3de8a9e001811f1ab203880638e2b2bd4b5b55120d6bd07dbe0a7ab58f0",
+     "post_seconds": 0.0011676590074785054,
+     "outcome": "built",
+     "seen_after": 1544.2001875510032,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.447354607,
+      "build": 72.793123536,
+      "upload": 0.988978391
+     }
+    },
+    {
+     "index": 31,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "512b7de566d2381636505485c6f4cdcccf9db9e2b5e4d324ec6585ee4df5f3fe",
+     "post_seconds": 0.0009565889922669157,
+     "outcome": "built",
+     "seen_after": 1584.4248963670107,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.336303959,
+      "build": 43.017034284,
+      "upload": 1.017261981
+     }
+    },
+    {
+     "index": 32,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "0829d34cb93c9ac7b6f7c659720e2fd7c160ff091e932413d05a5555c0ec36f4",
+     "post_seconds": 0.0009704039985081181,
+     "outcome": "built",
+     "seen_after": 1616.5105963090027,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.384629132,
+      "build": 30.978279417,
+      "upload": 0.875400005
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "4b50fdfc596fc60918c56ac875aaacda3eaa553e8cf55810f15264138949799a",
+     "post_seconds": 0.0008684960048412904,
+     "outcome": "built",
+     "seen_after": 1689.3678440810036,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.419360476,
+      "build": 72.816561879,
+      "upload": 0.96671115
+     }
+    },
+    {
+     "index": 34,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "0a7b2804e48a83d8f1416ba1c1bfacf65dac1a83b0f736f8b570ed7071a71353",
+     "post_seconds": 0.0009330679895356297,
+     "outcome": "built",
+     "seen_after": 1733.6491338220076,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.362522935,
+      "build": 43.030406943,
+      "upload": 0.903309363
+     }
+    },
+    {
+     "index": 35,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "fc569ba649833d7f747c33f1f6bab96ba0c8f09d59be69257bc9e171446078e7",
+     "post_seconds": 0.000857534003444016,
+     "outcome": "built",
+     "seen_after": 1763.7280892940034,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.303549868,
+      "build": 30.994880114,
+      "upload": 0.876398714
+     }
+    },
+    {
+     "index": 36,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "73a4020462f12b57be722e1427b813a3453cd20acc047c6ef35ebcfa91332538",
+     "post_seconds": 0.000951376001466997,
+     "outcome": "built",
+     "seen_after": 1835.6465962390066,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.431585527,
+      "build": 72.805410842,
+      "upload": 1.028921081
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "bb2182fbf493db9041fb26590308245039a97b3a42fcc06efaba15859fedf5c5",
+     "post_seconds": 0.0009171679994324222,
+     "outcome": "built",
+     "seen_after": 1882.055754728004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.36737096,
+      "build": 42.982000949,
+      "upload": 0.944848075
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "36ef37b86996914f8e83e3bf8b4eca0a87d0b3e19e6f7406f933ae09561ac153",
+     "post_seconds": 0.0009159159963019192,
+     "outcome": "built",
+     "seen_after": 1908.763959412012,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.294137119,
+      "build": 31.000610301,
+      "upload": 0.913184429
+     }
+    },
+    {
+     "index": 39,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "ea678cae1aa791b79a738f32b3b509ba39b9ea1e5fa46ae23c90b81590aaa9f3",
+     "post_seconds": 0.0009353869972983375,
+     "outcome": "built",
+     "seen_after": 1986.0438752909977,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.438950703,
+      "build": 72.763900884,
+      "upload": 1.033221236
+     }
+    },
+    {
+     "index": 40,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "b8b8bf8e690d3cce346e2b938f2abe4a9662ae15fcb1407f042839e2a9871aea",
+     "post_seconds": 0.000940320998779498,
+     "outcome": "built",
+     "seen_after": 2027.4384744620038,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.355536502,
+      "build": 43.017879649,
+      "upload": 0.946279294
+     }
+    },
+    {
+     "index": 41,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "c9b9693f64c4c9d559b3ef98cb1ded104f08b1d13853a03448e5022a63258fb3",
+     "post_seconds": 0.0010874059953493997,
+     "outcome": "built",
+     "seen_after": 2055.7644513340056,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.310430834,
+      "build": 30.972707608,
+      "upload": 0.824529305
+     }
+    },
+    {
+     "index": 42,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "307b7b5f47587cc9d8ea1a9ce98194816bbf8eeb735e2368a4b3d9bdbd0bd11a",
+     "post_seconds": 0.00159062999591697,
+     "outcome": "built",
+     "seen_after": 2132.5931635529996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.455697565,
+      "build": 72.741588834,
+      "upload": 1.019868968
+     }
+    },
+    {
+     "index": 43,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4e39f94ddeeaa8228557d9c03c89ad329602a9238ddc08ed6c44c7cefa6ef2d5",
+     "post_seconds": 0.0009671620064182207,
+     "outcome": "built",
+     "seen_after": 2175.8070967540116,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.357815056,
+      "build": 42.879443017,
+      "upload": 0.946203327
+     }
+    },
+    {
+     "index": 44,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "aecaf9b157eb51618a11e56c82d95c951f145d21b6309fb35ad0f298482bb50c",
+     "post_seconds": 0.001011145010124892,
+     "outcome": "built",
+     "seen_after": 2203.26058313901,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.302949558,
+      "build": 30.930046438,
+      "upload": 0.841263527
+     }
+    },
+    {
+     "index": 45,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "f28b9709b7351863b7171c86efdb1106a100a3518f8d46d3b8ce9124142464f9",
+     "post_seconds": 0.0009078699949895963,
+     "outcome": "built",
+     "seen_after": 2275.988761671004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.422928034,
+      "build": 72.733580145,
+      "upload": 0.988955444
+     }
+    },
+    {
+     "index": 46,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8b092bb0bf5f532fa6b799cb46a6d75d6e1e03a99eb86c415a91ff0d7bf60c34",
+     "post_seconds": 0.0009257019992219284,
+     "outcome": "built",
+     "seen_after": 2319.0749275670096,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.336897194,
+      "build": 42.969277282,
+      "upload": 0.992472108
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "f3ba8e04fc5bcca4673e356e02f2347e214f6ef081ae97fa3b26edc8dce7b1e3",
+     "post_seconds": 0.0009600490011507645,
+     "outcome": "built",
+     "seen_after": 2351.5043840220023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.372005265,
+      "build": 30.973672553,
+      "upload": 0.830557789
+     }
+    },
+    {
+     "index": 48,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "79ad08644cf07c6466f65513187468db93cf37f69e3926204e1d25b5b33aa0d4",
+     "post_seconds": 0.0010708249901654199,
+     "outcome": "built",
+     "seen_after": 2423.0886539030034,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.39557152,
+      "build": 72.751594289,
+      "upload": 0.925889807
+     }
+    },
+    {
+     "index": 49,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "25380081cfc473d2273e29f6d419ec07f9d817333f087d3aa6c5ac5599fba32b",
+     "post_seconds": 0.0009691879968158901,
+     "outcome": "built",
+     "seen_after": 2465.9248348640103,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.271276757,
+      "build": 42.883636234,
+      "upload": 0.895212817
+     }
+    },
+    {
+     "index": 50,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "213489c802b69da6ee3dd587cd75e33f40616f222863b3b5ae04d64f4e66729e",
+     "post_seconds": 0.0010422499908600003,
+     "outcome": "built",
+     "seen_after": 2499.8805766860023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.3124036,
+      "build": 30.99239632,
+      "upload": 0.866772591
+     }
+    },
+    {
+     "index": 51,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "6be62089899597fcf92190a92bc604854fe5ab501d4895cc1f30495a93ba5eb8",
+     "post_seconds": 0.0009279529913328588,
+     "outcome": "built",
+     "seen_after": 2571.4531081070018,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.405256138,
+      "build": 72.789370901,
+      "upload": 1.028279509
+     }
+    },
+    {
+     "index": 52,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "7696eff54b89058296827ff956b039542997ede1601c8d1ec35da70b78c51a88",
+     "post_seconds": 0.0009808419999899343,
+     "outcome": "built",
+     "seen_after": 2614.2544066600094,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.344502635,
+      "build": 42.97638504,
+      "upload": 0.940362877
+     }
+    },
+    {
+     "index": 53,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "6fb8b429ce4f3301da78902f93c114f06f4d0bc77c67355e6973ba661aecff69",
+     "post_seconds": 0.0012706059933407232,
+     "outcome": "built",
+     "seen_after": 2647.268196074001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.368499348,
+      "build": 30.958947386,
+      "upload": 0.851860962
+     }
+    },
+    {
+     "index": 54,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "19e113e0eb267b0725047a629f8c9caa13d0df7d6d23eda672c117a6fe610087",
+     "post_seconds": 0.0011537969985511154,
+     "outcome": "built",
+     "seen_after": 2718.241673151002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.424367289,
+      "build": 72.745503176,
+      "upload": 0.936233921
+     }
+    },
+    {
+     "index": 55,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "0e5ec53f57823b52b23976c88aa718b28a8c1157fd194fa35699f865c29b1a09",
+     "post_seconds": 0.00145569299638737,
+     "outcome": "built",
+     "seen_after": 2761.9558022310084,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.345170564,
+      "build": 42.935430066,
+      "upload": 0.926838474
+     }
+    },
+    {
+     "index": 56,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "41acc352baa89a974495421cbef6723109552b9c16dfca94cfccac81c2fd43c0",
+     "post_seconds": 0.0013621389953186736,
+     "outcome": "built",
+     "seen_after": 2792.895837835007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.297388021,
+      "build": 30.947031225,
+      "upload": 0.817610497
+     }
+    },
+    {
+     "index": 57,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c39311fec671a2a167abaabd6ed7f46132074337e60b722d681ed718795b41c3",
+     "post_seconds": 0.0008927040034905076,
+     "outcome": "built",
+     "seen_after": 2862.3264040030044,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.407776897,
+      "build": 72.760041354,
+      "upload": 1.027647927
+     }
+    },
+    {
+     "index": 58,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "694ca4bdd048090eb5ae950252720a212c69f19b415122a7ebb943691799293b",
+     "post_seconds": 0.0015044230094645172,
+     "outcome": "built",
+     "seen_after": 2909.5756419060053,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.333599559,
+      "build": 42.951369113,
+      "upload": 0.991467737
+     }
+    },
+    {
+     "index": 59,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "105a4e22af2b9c311613eaf8edc44310697023ed3234cd55d42527f4fbd92b1b",
+     "post_seconds": 0.0009070480009540915,
+     "outcome": "built",
+     "seen_after": 2937.837412721012,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.374481385,
+      "build": 30.976739391,
+      "upload": 0.846431081
+     }
+    },
+    {
+     "index": 60,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "d1a445f2574d2a1674a5a811beab5827f93a916cefe3fc07c1cf885f7aa0ec75",
+     "post_seconds": 0.0009210829884978011,
+     "outcome": "built",
+     "seen_after": 3009.2636586959998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.421158441,
+      "build": 72.764556409,
+      "upload": 0.969819263
+     }
+    },
+    {
+     "index": 61,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "8ffb91a0016ea09ca5d284ce578a8066ec6dcdac198c1deaa07bc10a997a8499",
+     "post_seconds": 0.0012041570007568225,
+     "outcome": "built",
+     "seen_after": 3056.6029014649976,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.291619472,
+      "build": 42.925953156,
+      "upload": 0.909270866
+     }
+    },
+    {
+     "index": 62,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a2d02df00f687f9da51a143df9e19be6b9080a5b0fa1c7d986794f104e0f8652",
+     "post_seconds": 0.0013243080029496923,
+     "outcome": "built",
+     "seen_after": 3082.1381819750095,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.285742046,
+      "build": 30.976546862,
+      "upload": 0.869202601
+     }
+    },
+    {
+     "index": 63,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "c5eafde26f6a7ca53ce56c4e497cda79ec0bb0de135df625f722f60d336eadc1",
+     "post_seconds": 0.0009029700013343245,
+     "outcome": "built",
+     "seen_after": 3157.506251758008,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.419218818,
+      "build": 72.714535281,
+      "upload": 0.982852269
+     }
+    },
+    {
+     "index": 64,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "4e937adbf693efde19cfea556f1a16d0c49335c5b1ea741c8ac5e402d944950b",
+     "post_seconds": 0.0008888480078894645,
+     "outcome": "built",
+     "seen_after": 3201.5400533089996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.358672024,
+      "build": 42.881531518,
+      "upload": 0.934990097
+     }
+    },
+    {
+     "index": 65,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "cf273d586d6c16aec8bb62793b3b3abe2d83264cc9c9a8b265dd1b90bc0c902a",
+     "post_seconds": 0.0015271709999069571,
+     "outcome": "built",
+     "seen_after": 3232.849457814009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.35574379,
+      "build": 30.960206095,
+      "upload": 0.787795146
+     }
+    },
+    {
+     "index": 66,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "29f7f96bc7aab4a90864871b3d3d93cf34e0e53c486df4dad8cdbd83efcad7f8",
+     "post_seconds": 0.0012385890004225075,
+     "outcome": "built",
+     "seen_after": 3302.6913610960037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.411271639,
+      "build": 72.757235868,
+      "upload": 0.932458934
+     }
+    },
+    {
+     "index": 67,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "32ba6b97dcf1e351b55e2542d27dbeb38659d899272db2656160b1dfdc878f80",
+     "post_seconds": 0.0008758000039961189,
+     "outcome": "built",
+     "seen_after": 3348.5403799170017,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.385068279,
+      "build": 42.921447324,
+      "upload": 0.891957956
+     }
+    },
+    {
+     "index": 68,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "06aced1c349cfe8655ab9f382a8f3c244c0b8016379e9e31a3e775479d08e67b",
+     "post_seconds": 0.0008993929950520396,
+     "outcome": "built",
+     "seen_after": 3375.4268966009986,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.356826793,
+      "build": 30.978433776,
+      "upload": 0.845476934
+     }
+    },
+    {
+     "index": 69,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "928aa0783c7b1b39b0991f7d9ccec2fd6cd101950342f42184e7d20b0f00c57b",
+     "post_seconds": 0.0009063170000445098,
+     "outcome": "built",
+     "seen_after": 3449.6504859140114,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.432950452,
+      "build": 72.7657803,
+      "upload": 0.959457118
+     }
+    },
+    {
+     "index": 70,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "133f76a495ead47bcc2e70b461b61f5346a9633132c0ee901a1e469f57b9d47e",
+     "post_seconds": 0.0009547740046400577,
+     "outcome": "built",
+     "seen_after": 3495.2239778700023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.354022418,
+      "build": 42.920835959,
+      "upload": 0.95175031
+     }
+    },
+    {
+     "index": 71,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "d8d3a7efecad4ce95c094b24c38465f9b30f4a902ca48add28da77356ab1b86a",
+     "post_seconds": 0.0009135430009337142,
+     "outcome": "built",
+     "seen_after": 3526.24651976701,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.361080334,
+      "build": 30.931129648,
+      "upload": 0.817559179
+     }
+    },
+    {
+     "index": 72,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "2bb406d21cbbb0c5de5b10b36d90e950879833ddbf9e8bed628557d852f3d714",
+     "post_seconds": 0.0022853190021123737,
+     "outcome": "built",
+     "seen_after": 3597.4160603229975,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.425499145,
+      "build": 72.741487529,
+      "upload": 0.990972675
+     }
+    },
+    {
+     "index": 73,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "2eb1c9092c50ebcaec2c68f6fd1f4a2e20527b53e660452dcb6f8ace22b0516d",
+     "post_seconds": 0.0009435079991817474,
+     "outcome": "built",
+     "seen_after": 3641.1660681570065,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.354104092,
+      "build": 42.942965083,
+      "upload": 1.037968713
+     }
+    },
+    {
+     "index": 74,
+     "input": "sift-hamming-1000000x128-binary",
+     "job_id": "a14b437fd2a73332cd6ff050f0dad97e92edc43da09ea69c704f71f70748d3bb",
+     "post_seconds": 0.0009589489927748218,
+     "outcome": "built",
+     "seen_after": 3670.1178243690083,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.422441019,
+      "build": 30.966697133,
+      "upload": 0.934740427
+     }
+    },
+    {
+     "index": 75,
+     "input": "cohere-hamming-1000000x768-binary",
+     "job_id": "a68e20a84b9cc6f892f19b57b7c1132e11519fa858258b28149cd05217123c34",
+     "post_seconds": 0.0008647890063002706,
+     "outcome": "built",
+     "seen_after": 3746.401416788998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.429559278,
+      "build": 72.686576339,
+      "upload": 0.992596535
+     }
+    },
+    {
+     "index": 76,
+     "input": "ms-marco-hamming-1000000x384-binary",
+     "job_id": "83dfb312d27faa3082d8066d723cb1d69dc193e40bdc50f1f7a711f8b2609c9e",
+     "post_seconds": 0.0008844770054565743,
+     "outcome": "built",
+     "seen_after": 3788.6624064339994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.31840388,
+      "build": 42.886648885,
+      "upload": 0.858574033
+     }
+    }
+   ]
+  },
+  "float": {
+   "queue": 4,
+   "seconds": 3600,
+   "completed_within": 49,
+   "jobs_per_hour": 49.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "9bf85f7a81059401bf61cb684c85d54a4ceaa24284b77da6abd078756e086c28",
+     "post_seconds": 0.003034523004316725,
+     "outcome": "built",
+     "seen_after": 446.9165436050098,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.877778161,
+      "build": 86.805182652,
+      "upload": 6.174471802
+     }
+    },
+    {
+     "index": 1,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "9e9a5d4febc8d0241d6bfa176fed3e3973a3fd87abe3be1884954913a4410e04",
+     "post_seconds": 0.002718388001085259,
+     "outcome": "built",
+     "seen_after": 362.519918941005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.471889816,
+      "build": 125.253956791,
+      "upload": 6.2780769
+     }
+    },
+    {
+     "index": 2,
+     "input": "gist-ip-1000000x960",
+     "job_id": "53c7d331b41dd4b03867387f8c7fb7d3888428298f52c3d36979b7efea78ee16",
+     "post_seconds": 0.0024427680036751553,
+     "outcome": "built",
+     "seen_after": 235.9967599280062,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.681850382,
+      "build": 57.756691741,
+      "upload": 7.795379388
+     }
+    },
+    {
+     "index": 3,
+     "input": "gist-l2-1000000x960",
+     "job_id": "15fc7f545f3e2a10f1625a2df07f4ddbca9c25ae20d9e4080de17f06f6c525dd",
+     "post_seconds": 0.0021108970104251057,
+     "outcome": "built",
+     "seen_after": 177.84119634100352,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.509601785,
+      "build": 163.093427773,
+      "upload": 7.823732194
+     }
+    },
+    {
+     "index": 4,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "76ef4d7d94578d73e160431ae8b37e957f4291834be7be712f047e2723600b3d",
+     "post_seconds": 0.0009502749890089035,
+     "outcome": "built",
+     "seen_after": 504.6001054829976,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.679638482,
+      "build": 59.238027089,
+      "upload": 3.7063417789999997
+     }
+    },
+    {
+     "index": 5,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "89ef78a10cb29f118352a70fff41f06fd5f73d0e74e09fb92185602d748c6726",
+     "post_seconds": 0.0009207319963024929,
+     "outcome": "built",
+     "seen_after": 562.0560323969985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.765672216,
+      "build": 57.157923957,
+      "upload": 3.759271064
+     }
+    },
+    {
+     "index": 6,
+     "input": "sift-ip-1000000x128",
+     "job_id": "c64f88364be0370168b23d075415b166a0b47224ad1d463dbee187610a448c16",
+     "post_seconds": 0.0009533179982099682,
+     "outcome": "built",
+     "seen_after": 568.6973045830091,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.103456902,
+      "build": 6.547253957,
+      "upload": 1.728085571
+     }
+    },
+    {
+     "index": 7,
+     "input": "sift-l2-1000000x128",
+     "job_id": "ebc01b29e58297496547d60cb94b8ac7aed0841607378b3e657e1a85b21b06ac",
+     "post_seconds": 0.0009475890110479668,
+     "outcome": "built",
+     "seen_after": 573.5272004800063,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.055202734,
+      "build": 6.70959318,
+      "upload": 1.696339537
+     }
+    },
+    {
+     "index": 8,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "b5a05c4ca68668c3d92c9891de89ea8155bf73d7b87b612b7a061d3c8b7a3b61",
+     "post_seconds": 0.0009276780037907884,
+     "outcome": "built",
+     "seen_after": 664.0104380210105,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.065551678,
+      "build": 86.449755502,
+      "upload": 6.315006679
+     }
+    },
+    {
+     "index": 9,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "30f2c78558e479590105bb410a1be1ff1a3d8a8cdf63acc2d21b08726b0f507e",
+     "post_seconds": 0.00115523899148684,
+     "outcome": "built",
+     "seen_after": 794.045003007006,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.194581584,
+      "build": 125.771403908,
+      "upload": 6.640576866
+     }
+    },
+    {
+     "index": 10,
+     "input": "gist-ip-1000000x960",
+     "job_id": "d58278b74cc9ec1a1106260c194a89827324b0c214c1537be42b3a2c5bbc8bf3",
+     "post_seconds": 0.0008987460023490712,
+     "outcome": "built",
+     "seen_after": 845.1044077100087,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 7.132299178,
+      "build": 51.080309973,
+      "upload": 8.262468225
+     }
+    },
+    {
+     "index": 11,
+     "input": "gist-l2-1000000x960",
+     "job_id": "47f9b50463c2e80ad66ba000e585f18a663fc8232312abc79209563eb9298043",
+     "post_seconds": 0.0010983039974234998,
+     "outcome": "built",
+     "seen_after": 1005.3534409190033,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.799276641,
+      "build": 162.806889705,
+      "upload": 7.544434747
+     }
+    },
+    {
+     "index": 12,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "3344e8c2b3963c1be2aa801516b55fac2abd7892755e955513b038eb810334a3",
+     "post_seconds": 0.000862189001054503,
+     "outcome": "built",
+     "seen_after": 1060.778811753,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.810316459,
+      "build": 59.306425798,
+      "upload": 3.391189049
+     }
+    },
+    {
+     "index": 13,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "5a7e73c7b963991e9fa05e9745dc30a3709b30a522145eaa8e3f7dcf759d5ab9",
+     "post_seconds": 0.0009362520067952573,
+     "outcome": "built",
+     "seen_after": 1118.1462139850046,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.81771081,
+      "build": 57.212309728,
+      "upload": 3.375430071
+     }
+    },
+    {
+     "index": 14,
+     "input": "sift-ip-1000000x128",
+     "job_id": "e1d8b3a7ead5adde9e57210084fba6edb058f052963ac659e8ee5874541c8ec2",
+     "post_seconds": 0.0008680580067448318,
+     "outcome": "built",
+     "seen_after": 1124.4669626420073,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.109996359,
+      "build": 6.424460743,
+      "upload": 1.6348558579999999
+     }
+    },
+    {
+     "index": 15,
+     "input": "sift-l2-1000000x128",
+     "job_id": "49a52d8d0816552ed794c94ac90a24df532ccf69972947d2d0a0fcf796cf4bb8",
+     "post_seconds": 0.0009398149995831773,
+     "outcome": "built",
+     "seen_after": 1126.9747132820048,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.043755939,
+      "build": 6.45597826,
+      "upload": 1.619210246
+     }
+    },
+    {
+     "index": 16,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "8645243bf796d5d329fa445f8fb89b56cee8af5e7d8bb98e643b7007bac81b03",
+     "post_seconds": 0.0009043649915838614,
+     "outcome": "built",
+     "seen_after": 1222.25065129601,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.148164588,
+      "build": 86.439625065,
+      "upload": 6.315489274
+     }
+    },
+    {
+     "index": 17,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "ccca2baf44e7f0cdb57ac41ba654ffffca4eb5b0622ae0effba7b2da0c700ea5",
+     "post_seconds": 0.0032810249977046624,
+     "outcome": "built",
+     "seen_after": 1348.1479334960022,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.086387998,
+      "build": 126.120493236,
+      "upload": 6.387595844
+     }
+    },
+    {
+     "index": 18,
+     "input": "gist-ip-1000000x960",
+     "job_id": "72b6d67c80795000d5014685ad76f61cf14720ce16f0e39c9291262da8dd2707",
+     "post_seconds": 0.0009950720123015344,
+     "outcome": "built",
+     "seen_after": 1402.963966797004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.815545296,
+      "build": 57.639328636,
+      "upload": 7.540322896
+     }
+    },
+    {
+     "index": 19,
+     "input": "gist-l2-1000000x960",
+     "job_id": "36c04b4deec9c7dde15491396406a68389f5da5c9101706754534dbe727e5716",
+     "post_seconds": 0.0011970480118179694,
+     "outcome": "built",
+     "seen_after": 1569.832795741997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.947752874,
+      "build": 162.877037943,
+      "upload": 7.5456261399999995
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "07fa4ea2db213dafdd99e6ba3f87aa47627dc2d4953ccabee0d185105ec1a453",
+     "post_seconds": 0.000984732003416866,
+     "outcome": "built",
+     "seen_after": 1621.258400036997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.80859024,
+      "build": 59.128208007,
+      "upload": 3.693704688
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "461f54b1bb737e2caee9d1acdf7fbb5d61028d9a6aa975c2a94235a4becfd72b",
+     "post_seconds": 0.0009579170000506565,
+     "outcome": "built",
+     "seen_after": 1679.7894111130008,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.774802111,
+      "build": 57.290371318,
+      "upload": 3.609960171
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128",
+     "job_id": "f1201e22ff2674e2570f0926df7ed60fb3165e5ee35c418e33f928ff0f6a8014",
+     "post_seconds": 0.0008565739990444854,
+     "outcome": "built",
+     "seen_after": 1685.4515402830002,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.09088808,
+      "build": 6.426174616,
+      "upload": 1.684653796
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128",
+     "job_id": "5967521e627e4b58003620ff6a64363fd3c8ee8123cf23ced6b851d4ba511aba",
+     "post_seconds": 0.0009585340012563393,
+     "outcome": "built",
+     "seen_after": 1689.2097454660106,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.099912493,
+      "build": 6.53209124,
+      "upload": 1.6611864280000002
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "3a6ec41208f2d621d931955c4222eacf0cca2d3bd422ea5e061c3ec38993e0ed",
+     "post_seconds": 0.0009951750107575208,
+     "outcome": "built",
+     "seen_after": 1783.0760870860104,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.370288273,
+      "build": 86.993884419,
+      "upload": 6.252854299
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "99777e4170e3d9d584cc694e49a1f0678c05760cf7ed42307b78df8952bba1f5",
+     "post_seconds": 0.0009743109985720366,
+     "outcome": "built",
+     "seen_after": 1907.8416997000022,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.406365752,
+      "build": 126.111704018,
+      "upload": 6.167031616
+     }
+    },
+    {
+     "index": 26,
+     "input": "gist-ip-1000000x960",
+     "job_id": "e8ee0ae6b2ab186331ac73f9b4f3b9f20339bfddd1c7eb59ba97d92b0e7014ba",
+     "post_seconds": 0.003767318994505331,
+     "outcome": "built",
+     "seen_after": 1974.0537415610015,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 7.168186673,
+      "build": 62.483004018,
+      "upload": 7.488653915
+     }
+    },
+    {
+     "index": 27,
+     "input": "gist-l2-1000000x960",
+     "job_id": "b16451359f5a3bdb15fad557f8c77a9330a85a2160c4ef2d489cbb08572c7757",
+     "post_seconds": 0.0028832730022259057,
+     "outcome": "built",
+     "seen_after": 2136.498932800998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 7.148395707,
+      "build": 164.56202513,
+      "upload": 7.394500077
+     }
+    },
+    {
+     "index": 28,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "6305e829bd9caee2830c6525bd6c23b0dd6c592484184b48bcffbc222569616f",
+     "post_seconds": 0.0008527229947503656,
+     "outcome": "built",
+     "seen_after": 2192.6554515830067,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.750781633,
+      "build": 59.333705102,
+      "upload": 3.448982409
+     }
+    },
+    {
+     "index": 29,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "81425fab9fa6135b172f4b26b2c617e79510e59b2084367c5f814c898ba17dcc",
+     "post_seconds": 0.0009212220029439777,
+     "outcome": "built",
+     "seen_after": 2250.305857779007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.747938907,
+      "build": 57.041721106,
+      "upload": 3.511831779
+     }
+    },
+    {
+     "index": 30,
+     "input": "sift-ip-1000000x128",
+     "job_id": "7328d0379750c0306a7f82dac4535f273617520f6638e144dd98fc05997cd4f4",
+     "post_seconds": 0.000969311993685551,
+     "outcome": "built",
+     "seen_after": 2255.6347007940058,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.066591693,
+      "build": 6.508364641,
+      "upload": 1.684150762
+     }
+    },
+    {
+     "index": 31,
+     "input": "sift-l2-1000000x128",
+     "job_id": "96cf4cdc0bf9f09d80cfaa12ef7e42b13bf6efaf3198f02115b525306257be13",
+     "post_seconds": 0.0009238359925802797,
+     "outcome": "built",
+     "seen_after": 2259.488245045999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.063393365,
+      "build": 6.540450757,
+      "upload": 1.726466234
+     }
+    },
+    {
+     "index": 32,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "3b93ba5c1d069c195b1c82d74315de872d2387160a55753897b6d61fd3b82a0b",
+     "post_seconds": 0.0009972370025934651,
+     "outcome": "built",
+     "seen_after": 2349.6588090580044,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.313174985,
+      "build": 86.184571716,
+      "upload": 6.192135138
+     }
+    },
+    {
+     "index": 33,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "52affea9b65f0d8cc1e4b87bd47de94dcb52f1afd32c7fbb94c5d922301b8fa8",
+     "post_seconds": 0.0013962220109533519,
+     "outcome": "built",
+     "seen_after": 2475.4955508569983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.296365228,
+      "build": 126.083272103,
+      "upload": 6.339930674
+     }
+    },
+    {
+     "index": 34,
+     "input": "gist-ip-1000000x960",
+     "job_id": "65bf8e7666540a5d70d6a09125c539bb85731b3b2be4a0711666afb41b8c87db",
+     "post_seconds": 0.0009386210003867745,
+     "outcome": "built",
+     "seen_after": 2536.070735827001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.896766325,
+      "build": 55.747712545,
+      "upload": 7.74926597
+     }
+    },
+    {
+     "index": 35,
+     "input": "gist-l2-1000000x960",
+     "job_id": "86be89a9852f206f863c09641df8c9ed6cc9ff5fadaf658ce38ce039f18adf17",
+     "post_seconds": 0.0013092399894958362,
+     "outcome": "built",
+     "seen_after": 2696.512918285007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.90340505,
+      "build": 162.889379107,
+      "upload": 8.269180542
+     }
+    },
+    {
+     "index": 36,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "4e5b1cf0ed00f16a84ae7b19658eee342cd7a0656166ab7e21ed2d243819e268",
+     "post_seconds": 0.0009658159979153425,
+     "outcome": "built",
+     "seen_after": 2751.9307376040088,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.798301399,
+      "build": 59.058179486,
+      "upload": 3.573916176
+     }
+    },
+    {
+     "index": 37,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "7f9f3e62ff16817d9134861065503868c7b749522efbba8c9efcdab3967051a3",
+     "post_seconds": 0.001095999003155157,
+     "outcome": "built",
+     "seen_after": 2807.9802854040026,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.768988293,
+      "build": 57.232458335,
+      "upload": 3.521492382
+     }
+    },
+    {
+     "index": 38,
+     "input": "sift-ip-1000000x128",
+     "job_id": "de3f4661f5b4333d03cc3fd7784a9465c43674f01127b65950ce415e23f8f996",
+     "post_seconds": 0.0009406519966432825,
+     "outcome": "built",
+     "seen_after": 2816.836324377,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.127425057,
+      "build": 6.539543379,
+      "upload": 1.723067758
+     }
+    },
+    {
+     "index": 39,
+     "input": "sift-l2-1000000x128",
+     "job_id": "b948a5923d21797798a08e11817f7655b17088e192cee37ff81838c460a2559a",
+     "post_seconds": 0.001104348004446365,
+     "outcome": "built",
+     "seen_after": 2822.9352092710033,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.072813282,
+      "build": 6.686568129,
+      "upload": 1.678263412
+     }
+    },
+    {
+     "index": 40,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "efb82eef83a0e9b754da4da0a5c3a0dd1c4d286d781f2920670210eff8447b80",
+     "post_seconds": 0.0008968420006567612,
+     "outcome": "built",
+     "seen_after": 2912.0963814660063,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.335937738,
+      "build": 86.37835206,
+      "upload": 6.413782703
+     }
+    },
+    {
+     "index": 41,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "f77941ddf2c8f10b231bacfc5d443a0b058bb263513c34747b229fe740c2cc97",
+     "post_seconds": 0.0010520069918129593,
+     "outcome": "built",
+     "seen_after": 3036.561729023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.2960687570000005,
+      "build": 126.300637652,
+      "upload": 6.293202276
+     }
+    },
+    {
+     "index": 42,
+     "input": "gist-ip-1000000x960",
+     "job_id": "ef6fef8c9dc98f531c010059488ea20ff31a425a69ea44fc151bef41a6dcab7f",
+     "post_seconds": 0.0010294649982824922,
+     "outcome": "built",
+     "seen_after": 3096.033580305011,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.8122130720000005,
+      "build": 55.909390062,
+      "upload": 7.787840274
+     }
+    },
+    {
+     "index": 43,
+     "input": "gist-l2-1000000x960",
+     "job_id": "d615e9a5ca95c05e8bf1a2f90eebdee17e8f39684da98ab985c8f9c099a7047e",
+     "post_seconds": 0.0009393700020154938,
+     "outcome": "built",
+     "seen_after": 3262.1181934909982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 7.4341059210000004,
+      "build": 164.021579559,
+      "upload": 7.572109448
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "73bb940341e84cf2ba90a9eaf0ffc70a2d9b31f67e560622fd24cf3c5c540d2f",
+     "post_seconds": 0.0012711849994957447,
+     "outcome": "built",
+     "seen_after": 3313.804479875005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.850752371,
+      "build": 59.355471865,
+      "upload": 3.544212635
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384",
+     "job_id": "839261c1202bac13ee111f33a8d800c1840944f11db157500668d25340037185",
+     "post_seconds": 0.0013160990056348965,
+     "outcome": "built",
+     "seen_after": 3374.508725192005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.848029791,
+      "build": 57.447597804,
+      "upload": 3.45767608
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128",
+     "job_id": "7fce952861ae77b09a027117baffef17559e82a9447492dc70693389281674fd",
+     "post_seconds": 0.000989738997304812,
+     "outcome": "built",
+     "seen_after": 3377.728142314998,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.07342803,
+      "build": 6.59791429,
+      "upload": 1.7030334040000001
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128",
+     "job_id": "510bc3bbd8f280f0f827d76c0c53da795a988d2109dc55307e6986f98e197188",
+     "post_seconds": 0.0009295260097132996,
+     "outcome": "built",
+     "seen_after": 3383.5186961900035,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.102899628,
+      "build": 6.607819604,
+      "upload": 1.6947754499999999
+     }
+    },
+    {
+     "index": 48,
+     "input": "cohere-ip-1000000x768",
+     "job_id": "8a058904b766b0785093b3f09dbca649d34763be1f74f73202b994efeaf24485",
+     "post_seconds": 0.0010561179951764643,
+     "outcome": "built",
+     "seen_after": 3474.720073894001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.537689827,
+      "build": 87.486195372,
+      "upload": 6.293096048
+     }
+    },
+    {
+     "index": 49,
+     "input": "cohere-l2-1000000x768",
+     "job_id": "16e09818071743519e5a5fd1df9a387b1587c69c3ca4b5c1398dbecfb232d30c",
+     "post_seconds": 0.0011847639980260283,
+     "outcome": "built",
+     "seen_after": 3602.90640172,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 5.537634026,
+      "build": 126.181723781,
+      "upload": 6.151238181
+     }
+    },
+    {
+     "index": 50,
+     "input": "gist-ip-1000000x960",
+     "job_id": "7f4015ba708899829d862a6bbff47259366a1c07fb23c09d184337054fd52444",
+     "post_seconds": 0.0010153839975828305,
+     "outcome": "built",
+     "seen_after": 3657.7281189549976,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 7.422528455,
+      "build": 54.884846548,
+      "upload": 7.458446556
+     }
+    },
+    {
+     "index": 51,
+     "input": "gist-l2-1000000x960",
+     "job_id": "7d2d8df58c99d667c857405380d15cb4534bac1efa20113bd6ea5250c86bd9e2",
+     "post_seconds": 0.0011645320046227425,
+     "outcome": "built",
+     "seen_after": 3821.876414562008,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 6.928816786,
+      "build": 163.087679978,
+      "upload": 7.772696632
+     }
+    },
+    {
+     "index": 52,
+     "input": "ms-marco-ip-1000000x384",
+     "job_id": "8662e00c5257014c53788495373be9e74f7765ae6369763cbd8969cf6657a6fc",
+     "post_seconds": 0.0009264929976779968,
+     "outcome": "built",
+     "seen_after": 3875.037704866001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 2.875306387,
+      "build": 58.961971828,
+      "upload": 3.330757023
+     }
+    }
+   ]
+  },
+  "byte": {
+   "queue": 4,
+   "seconds": 3600,
+   "completed_within": 62,
+   "jobs_per_hour": 62.0,
+   "records": [
+    {
+     "index": 0,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "864b7050eb16fbebeac6752ee5258b28339ebae044b95f137ec242f48e46345d",
+     "post_seconds": 0.0024132799881044775,
+     "outcome": "built",
+     "seen_after": 204.9849491920031,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.602250331,
+      "build": 85.889157825,
+      "upload": 2.449665535
+     }
+    },
+    {
+     "index": 1,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "f2341aedd620d87ecb6da49ccce1b47da4838c1388fe9b006c59b87d9f673c8c",
+     "post_seconds": 0.0028117039910284802,
+     "outcome": "built",
+     "seen_after": 327.4366096110025,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.5218967270000001,
+      "build": 124.026810685,
+      "upload": 2.396717271
+     }
+    },
+    {
+     "index": 2,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "786ac948679fcbcfd1602537871864c55a8d2c354ceb3777b3d8c77fd1680890",
+     "post_seconds": 0.002696390001801774,
+     "outcome": "built",
+     "seen_after": 119.3557185279933,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.775622323,
+      "build": 58.101371353,
+      "upload": 1.8469411820000001
+     }
+    },
+    {
+     "index": 3,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "dddf54f23755dab1e71bbbbbf9ae620178636aeb1deecf5bf080b3c00e8e819a",
+     "post_seconds": 0.0019103860104223713,
+     "outcome": "built",
+     "seen_after": 59.1195544420043,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.805976081,
+      "build": 55.954306951,
+      "upload": 1.818010942
+     }
+    },
+    {
+     "index": 4,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "889a0034701c620917230db971c6749c080d1895efdbcdb88fbcdae62bb803d4",
+     "post_seconds": 0.001050095001119189,
+     "outcome": "built",
+     "seen_after": 333.789838932993,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.435166778,
+      "build": 6.1590234,
+      "upload": 1.097289481
+     }
+    },
+    {
+     "index": 5,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "008c8446fcdb17d2ea239cb2201fe5ca400e249fae9eed961c304287606353f6",
+     "post_seconds": 0.0009428810008103028,
+     "outcome": "built",
+     "seen_after": 339.68233310899814,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.418056098,
+      "build": 6.145236954,
+      "upload": 1.060748614
+     }
+    },
+    {
+     "index": 6,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "97bf123c9b23dbe9d0c7941aefae6262caccbc5c795de8de7fe626be70f8a30f",
+     "post_seconds": 0.0009150050027528778,
+     "outcome": "built",
+     "seen_after": 426.728049931,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.451643148,
+      "build": 85.289287797,
+      "upload": 2.343313496
+     }
+    },
+    {
+     "index": 7,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "76e2ff877459bab53542ca6adccab57150166f7cdaa3d0f08f6d5818df0c1926",
+     "post_seconds": 0.001072913990356028,
+     "outcome": "built",
+     "seen_after": 549.1609399209992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.5097632220000001,
+      "build": 123.631143609,
+      "upload": 2.323376164
+     }
+    },
+    {
+     "index": 8,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "2b4e18916ee3ba7cc4cc73324da6235dacbb8ef3157f2146300218d1193e9fac",
+     "post_seconds": 0.0009015789983095601,
+     "outcome": "built",
+     "seen_after": 608.3623185500037,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.850639569,
+      "build": 58.057220991,
+      "upload": 1.561411535
+     }
+    },
+    {
+     "index": 9,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "7c12ef46596ecbae5d6291b04721e337f35e34c061253024c4efdb4f0c61c723",
+     "post_seconds": 0.000909847003640607,
+     "outcome": "built",
+     "seen_after": 664.9441678580042,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.828638164,
+      "build": 56.046264716,
+      "upload": 1.626516388
+     }
+    },
+    {
+     "index": 10,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "68ab86b8d24ec0778f190096382c3e14a87124c98057a84905f08cc7bc275342",
+     "post_seconds": 0.000936393000301905,
+     "outcome": "built",
+     "seen_after": 669.3860010609933,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.43033839,
+      "build": 6.122795023,
+      "upload": 1.15593633
+     }
+    },
+    {
+     "index": 11,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "eae56e5183b485ddf77e8617c11b2ad70930d828a3af0335c07db985ca16f596",
+     "post_seconds": 0.0009015209943754598,
+     "outcome": "built",
+     "seen_after": 676.6242795059952,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.465302368,
+      "build": 6.065732273,
+      "upload": 1.083853865
+     }
+    },
+    {
+     "index": 12,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "8fc66510688374b76ad21726f14d7d62321027e644a0fba5023dcca37d5d1f0c",
+     "post_seconds": 0.001046671997755766,
+     "outcome": "built",
+     "seen_after": 764.2835089529981,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.477705032,
+      "build": 86.068923247,
+      "upload": 2.456098678
+     }
+    },
+    {
+     "index": 13,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "92193520d87dc0d6ed20c4eb2db225b6da590d9d826f9df5aca59c3a8e68702d",
+     "post_seconds": 0.0008852269966155291,
+     "outcome": "built",
+     "seen_after": 889.4353596779983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.40907246,
+      "build": 124.006180593,
+      "upload": 2.494505556
+     }
+    },
+    {
+     "index": 14,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "551d07ac3f0045388ea3f60a03f5704b38e69de0a38f379e4dc54dffd4c27837",
+     "post_seconds": 0.0011897730000782758,
+     "outcome": "built",
+     "seen_after": 943.0331140509952,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.824139271,
+      "build": 57.857549407,
+      "upload": 1.629766945
+     }
+    },
+    {
+     "index": 15,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "5724ba527c4467bb4f038dc84f78e815bd67e19699fc993b9923bac913d43c42",
+     "post_seconds": 0.0009209179988829419,
+     "outcome": "built",
+     "seen_after": 1000.2212276200007,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.868702724,
+      "build": 55.892273184,
+      "upload": 1.54792223
+     }
+    },
+    {
+     "index": 16,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "3571fae63699bca4b6938bfdc2453fd15b4034c8b9921f63d47c75ae50ced8ec",
+     "post_seconds": 0.000897014993824996,
+     "outcome": "built",
+     "seen_after": 1003.9957645379909,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.451153061,
+      "build": 5.990137915,
+      "upload": 1.055130235
+     }
+    },
+    {
+     "index": 17,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "d21ea9d1d870028d46ecabce801adb11f0587c80ae975be0776163cf121e290f",
+     "post_seconds": 0.0009202390065183863,
+     "outcome": "built",
+     "seen_after": 1009.9083636809955,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.439084294,
+      "build": 6.043579377,
+      "upload": 1.061706296
+     }
+    },
+    {
+     "index": 18,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "d99e4485d57f2061a668c474098f2489be95e62cd12c80b140ce146d2f461ba8",
+     "post_seconds": 0.0009199020132655278,
+     "outcome": "built",
+     "seen_after": 1098.6932421859965,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.414550669,
+      "build": 85.328836648,
+      "upload": 2.393879435
+     }
+    },
+    {
+     "index": 19,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "9a9c813f0de250331127e0ceb11a2e022a53280851cd2da5f4705bd5bcaf66cf",
+     "post_seconds": 0.0008905180002329871,
+     "outcome": "built",
+     "seen_after": 1222.846140996,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.375742394,
+      "build": 123.065593062,
+      "upload": 2.446089017
+     }
+    },
+    {
+     "index": 20,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "fe47ea78b257369e9312d4e85fff3a5fb784379c42da2ea83d733f3450209074",
+     "post_seconds": 0.0009364969882881269,
+     "outcome": "built",
+     "seen_after": 1280.27898275599,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.865417526,
+      "build": 57.979519494,
+      "upload": 1.59238452
+     }
+    },
+    {
+     "index": 21,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "2b144508c0ed7686fb233efda24062983f85802b30ee18aa755b6a07e21a5534",
+     "post_seconds": 0.0009253879979951307,
+     "outcome": "built",
+     "seen_after": 1336.5355608009995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.838789883,
+      "build": 56.01782834,
+      "upload": 1.5683644079999999
+     }
+    },
+    {
+     "index": 22,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "48973205e5560e3c8fe363d4014169efa6a52decaeadde2310b84a05bf93a813",
+     "post_seconds": 0.0009681700030341744,
+     "outcome": "built",
+     "seen_after": 1341.2656138210004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.489175813,
+      "build": 6.032503348,
+      "upload": 1.102533943
+     }
+    },
+    {
+     "index": 23,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "5e0875190f59091ff7e4afa91dc36fd5981e579e4e1f48c7b58472c825cade1c",
+     "post_seconds": 0.0009674440079834312,
+     "outcome": "built",
+     "seen_after": 1346.2945527559932,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.449896888,
+      "build": 6.090821679,
+      "upload": 1.145696209
+     }
+    },
+    {
+     "index": 24,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "c887fd45294a4b9fd187d6bbddbcaa3eb2ef96b803d5123f0dfba4996b39c932",
+     "post_seconds": 0.0009329099993919954,
+     "outcome": "built",
+     "seen_after": 1433.4164930839906,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.457238839,
+      "build": 85.961260915,
+      "upload": 2.47498835
+     }
+    },
+    {
+     "index": 25,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "c27db44c3c2ef4c4274c00e8352681b352d63f2cc00a0589a40b1472e748eebf",
+     "post_seconds": 0.0009787059971131384,
+     "outcome": "built",
+     "seen_after": 1555.2946378089982,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.4970632959999999,
+      "build": 123.855616168,
+      "upload": 2.432088057
+     }
+    },
+    {
+     "index": 26,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "81a2ce7b589896572c540d20e8603fb04426de6551fabeb5b81686cfca702629",
+     "post_seconds": 0.0009510500094620511,
+     "outcome": "built",
+     "seen_after": 1616.5662624190009,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.837262005,
+      "build": 57.978870248,
+      "upload": 1.542014354
+     }
+    },
+    {
+     "index": 27,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "b5e472fd995bfed213e2169ee4921bdba057ae98e6e6661d582ecdd5b355fb57",
+     "post_seconds": 0.0009098209993680939,
+     "outcome": "built",
+     "seen_after": 1668.7887462899962,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83516025,
+      "build": 55.864897849,
+      "upload": 1.624466693
+     }
+    },
+    {
+     "index": 28,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "6dece5554c715dac594fd94fe3d633983ffb3dcd718a92fb0a9a109150a34663",
+     "post_seconds": 0.0009816139936447144,
+     "outcome": "built",
+     "seen_after": 1676.2026216130034,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.476381005,
+      "build": 5.91596504,
+      "upload": 1.077632927
+     }
+    },
+    {
+     "index": 29,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "67d9cd3ed3b5c848a1f0776c3d27636d39715952974f91d9c25a33bd8f2633b9",
+     "post_seconds": 0.0008936810045270249,
+     "outcome": "built",
+     "seen_after": 1682.075084675991,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41912967,
+      "build": 6.034762001,
+      "upload": 1.047367463
+     }
+    },
+    {
+     "index": 30,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "853a220b4ff5841c420802b85c341aba7ea815cc848b4f116bb41c24c72930e9",
+     "post_seconds": 0.0009543280029902235,
+     "outcome": "built",
+     "seen_after": 1769.507261819992,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.4040673240000001,
+      "build": 85.373684289,
+      "upload": 2.425306016
+     }
+    },
+    {
+     "index": 31,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "639e29ac0ec22b639734c88821055f9ad7fadfff764d41b9a8a30f20222cccb1",
+     "post_seconds": 0.0010564050026005134,
+     "outcome": "built",
+     "seen_after": 1889.7362404540036,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.418530832,
+      "build": 122.958370533,
+      "upload": 2.476616537
+     }
+    },
+    {
+     "index": 32,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "cc99b75e8296fab65958b7dc93fb4153de8a8115513b00f37f703387ca3e94b9",
+     "post_seconds": 0.000869586001499556,
+     "outcome": "built",
+     "seen_after": 1951.4013249830023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.832408476,
+      "build": 57.951391877,
+      "upload": 1.6212836240000001
+     }
+    },
+    {
+     "index": 33,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "05845edf288f1bc6838968641bf1a401df699d16355d9488abdecd3d8e6242a6",
+     "post_seconds": 0.000896693003596738,
+     "outcome": "built",
+     "seen_after": 2003.1672257320024,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.828101763,
+      "build": 55.997803685,
+      "upload": 1.5516090500000002
+     }
+    },
+    {
+     "index": 34,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "e6e9624292d342b48bc50158a8732f7eafa78585a8a3b377d6ea44d6c9a5bb17",
+     "post_seconds": 0.0009134139982052147,
+     "outcome": "built",
+     "seen_after": 2008.8322285539907,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.523819839,
+      "build": 5.998565996,
+      "upload": 1.117244085
+     }
+    },
+    {
+     "index": 35,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "29c854181b16f2489a8b8e2f76e95569a06667234100b3cc7c2d5adceb1c295f",
+     "post_seconds": 0.0008610310032963753,
+     "outcome": "built",
+     "seen_after": 2015.4331872710027,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.430272454,
+      "build": 5.95909727,
+      "upload": 1.048881652
+     }
+    },
+    {
+     "index": 36,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "ffb82efc30ad6ed59afba64e29a7350da635d0c736518749bcec49bed7ccd423",
+     "post_seconds": 0.0008859219960868359,
+     "outcome": "built",
+     "seen_after": 2101.0218357760023,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.487229435,
+      "build": 85.946403741,
+      "upload": 2.478047213
+     }
+    },
+    {
+     "index": 37,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "a0fd967d7670a3e84f973befa3771f1a5368a109afe61ff9386b039b30f42e18",
+     "post_seconds": 0.0008449710003333166,
+     "outcome": "built",
+     "seen_after": 2228.4778565110028,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.44575753,
+      "build": 123.910522271,
+      "upload": 2.449299139
+     }
+    },
+    {
+     "index": 38,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "802c8940dc13617da445011aec30de9f2f9bd440f917bec1896fa1f0f50a453b",
+     "post_seconds": 0.000900618004379794,
+     "outcome": "built",
+     "seen_after": 2284.864266056,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.858480532,
+      "build": 57.956693486,
+      "upload": 1.563194339
+     }
+    },
+    {
+     "index": 39,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "0974ddca7ebc09351ae3ef0b00b28a5762e921f43bbc5a7c05c51e88dfb5d447",
+     "post_seconds": 0.0009486269991612062,
+     "outcome": "built",
+     "seen_after": 2341.792493425004,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.863869981,
+      "build": 55.944297533,
+      "upload": 1.594665301
+     }
+    },
+    {
+     "index": 40,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "7e9164f203b5639460febaba245e81cd881f531e86daf1ca94a8d7131cb170c7",
+     "post_seconds": 0.001121394001529552,
+     "outcome": "built",
+     "seen_after": 2343.5653220179956,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.41169014,
+      "build": 6.059415291,
+      "upload": 1.097480302
+     }
+    },
+    {
+     "index": 41,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "9cbe62ca893f929dd2cd3c5d85c20c5ba8d27b75fe925a7f82e67c8c24409dd3",
+     "post_seconds": 0.0009108189988182858,
+     "outcome": "built",
+     "seen_after": 2351.9265219439985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.443002153,
+      "build": 6.061403914,
+      "upload": 1.095800639
+     }
+    },
+    {
+     "index": 42,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "7089ea7d3e075608b6c594dcc6901d40602a1f2c22257a8974b5dd21ec689236",
+     "post_seconds": 0.0009898120042635128,
+     "outcome": "built",
+     "seen_after": 2438.487701538994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.418922075,
+      "build": 85.352927501,
+      "upload": 2.435396985
+     }
+    },
+    {
+     "index": 43,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "ac2c61ead27891a5848f6f4956d19ce960ee472fc4688e88d46141396c594347",
+     "post_seconds": 0.0017595980025362223,
+     "outcome": "built",
+     "seen_after": 2562.3241401449923,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.4692442350000001,
+      "build": 123.047792516,
+      "upload": 2.362791496
+     }
+    },
+    {
+     "index": 44,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "bf73bc50348ad162560ef1f18712856b33798ad1557e0b32e8e0204cc6adea8c",
+     "post_seconds": 0.0008859689987730235,
+     "outcome": "built",
+     "seen_after": 2618.7042728829983,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.878051131,
+      "build": 58.010743342,
+      "upload": 1.555884304
+     }
+    },
+    {
+     "index": 45,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "d39da8af8c8c37e6184775e1e3730088c2c96e7f503fc8626a676660324d24ae",
+     "post_seconds": 0.0009107350051635876,
+     "outcome": "built",
+     "seen_after": 2675.581876055003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.83442962,
+      "build": 56.034004244,
+      "upload": 1.589065859
+     }
+    },
+    {
+     "index": 46,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "fe853eeb940cd541d9237ac1b7364c921f401fb34bdae1dee30f135b3e81aa72",
+     "post_seconds": 0.0009107619989663363,
+     "outcome": "built",
+     "seen_after": 2679.809368394999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.442994314,
+      "build": 6.06431523,
+      "upload": 1.076038371
+     }
+    },
+    {
+     "index": 47,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "3e2b60a844412eec08239769cac030788745aeaf10c38c02032f49e70f330ae2",
+     "post_seconds": 0.001038397997035645,
+     "outcome": "built",
+     "seen_after": 2688.067943096001,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.438237542,
+      "build": 6.0760668429999996,
+      "upload": 1.174846872
+     }
+    },
+    {
+     "index": 48,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "3e09a1a56c7cbbf1a8456f0435634aafd1dd5ac4af7521415945b49fbb8b0892",
+     "post_seconds": 0.000872220000019297,
+     "outcome": "built",
+     "seen_after": 2774.7902966809925,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.429876022,
+      "build": 85.993095386,
+      "upload": 2.631375356
+     }
+    },
+    {
+     "index": 49,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "8004691a207de62ffb1b2e3bf6269fc87933de3fa4617decdde9528e998d83ec",
+     "post_seconds": 0.0008954360091593117,
+     "outcome": "built",
+     "seen_after": 2899.200271169,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.378328764,
+      "build": 123.958646235,
+      "upload": 2.438722643
+     }
+    },
+    {
+     "index": 50,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "e59daeb80fe114ff0027dc629074b89a1efaa698762599e186e8165879453ccc",
+     "post_seconds": 0.00102915900060907,
+     "outcome": "built",
+     "seen_after": 2955.539804782995,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.916511978,
+      "build": 58.058845042,
+      "upload": 1.693009754
+     }
+    },
+    {
+     "index": 51,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "a5858316b472c65c06dd2063914cb6b49fa6c14065e180864399d565b80b0234",
+     "post_seconds": 0.0010418449965072796,
+     "outcome": "built",
+     "seen_after": 3012.2842310179985,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.857664983,
+      "build": 55.896383735,
+      "upload": 1.5910846090000001
+     }
+    },
+    {
+     "index": 52,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "372ca00682d61a9741a2524ae54a28b2aaeac5e7f611625777ca02dc65c5ab56",
+     "post_seconds": 0.0009830179915297776,
+     "outcome": "built",
+     "seen_after": 3016.9919486750005,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.427488911,
+      "build": 6.003072605,
+      "upload": 1.110754662
+     }
+    },
+    {
+     "index": 53,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "fc6017315b523a3fb6bf53d1a398e6d0c99377c80e1349aa08f990e5e25e7358",
+     "post_seconds": 0.0010265330056427047,
+     "outcome": "built",
+     "seen_after": 3020.9081422470044,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.4254152,
+      "build": 5.991902831,
+      "upload": 1.135005175
+     }
+    },
+    {
+     "index": 54,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "398a3fac0a6bab0279de5b7fd9d37f1c11d9da9fca21ef1a414ecec4afbc6245",
+     "post_seconds": 0.0010659699910320342,
+     "outcome": "built",
+     "seen_after": 3107.023528891994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.498311651,
+      "build": 85.295529086,
+      "upload": 2.431626384
+     }
+    },
+    {
+     "index": 55,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "ccac2cfb202b256899f47719f9efe3b5126009fb3a67644a274cc44ffeb9e2f3",
+     "post_seconds": 0.0017975079972529784,
+     "outcome": "built",
+     "seen_after": 3234.346424970994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.5013317800000001,
+      "build": 123.012337832,
+      "upload": 2.6079436449999998
+     }
+    },
+    {
+     "index": 56,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "a1c2e9ddc2c249ab6c1018a0b47cbddfd9e6628318f474e165bf0921e2ef3b52",
+     "post_seconds": 0.0008893650083336979,
+     "outcome": "built",
+     "seen_after": 3289.652404391003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.859845424,
+      "build": 57.885638822,
+      "upload": 1.598300609
+     }
+    },
+    {
+     "index": 57,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "ed9a4047ed39bce1e2459115f700c3dcf60225243019b3456c0aba4f2df46b5d",
+     "post_seconds": 0.0009067539940588176,
+     "outcome": "built",
+     "seen_after": 3344.324007995994,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.882396179,
+      "build": 55.978914129,
+      "upload": 1.619997935
+     }
+    },
+    {
+     "index": 58,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "e9ec7ffb8746e427dee0b9c0c7325daf1fbccab44f07d9320ae0f03dba6b6a2b",
+     "post_seconds": 0.0009029920038301498,
+     "outcome": "built",
+     "seen_after": 3351.385059856999,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.454567476,
+      "build": 6.02461851,
+      "upload": 1.098676289
+     }
+    },
+    {
+     "index": 59,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "62e35837fce3e62ec27287f33a683946227f6c544fe10a7feb910e72d1a12e7a",
+     "post_seconds": 0.0008985160093288869,
+     "outcome": "built",
+     "seen_after": 3356.492628769003,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.413900257,
+      "build": 6.031138921,
+      "upload": 1.103049496
+     }
+    },
+    {
+     "index": 60,
+     "input": "cohere-ip-1000000x768-byte",
+     "job_id": "25ef176b7e97626d4be28b6334e01e64240d5161653b8e2962fe3e93a988a171",
+     "post_seconds": 0.0008922310080379248,
+     "outcome": "built",
+     "seen_after": 3442.421008341,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.400588607,
+      "build": 85.987839426,
+      "upload": 2.326298163
+     }
+    },
+    {
+     "index": 61,
+     "input": "cohere-l2-1000000x768-byte",
+     "job_id": "2e62f297730b2a6b97345b39c44977ca286a467b75d1f4634af9c9b0406dea39",
+     "post_seconds": 0.0008937909879023209,
+     "outcome": "built",
+     "seen_after": 3571.0144962549966,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 1.428213415,
+      "build": 124.017484801,
+      "upload": 2.530060148
+     }
+    },
+    {
+     "index": 62,
+     "input": "ms-marco-ip-1000000x384-byte",
+     "job_id": "6b5bad0f6c3a58d55743989a0f0022c624d26acb3626354159e6785d3ae8573c",
+     "post_seconds": 0.0009228100097971037,
+     "outcome": "built",
+     "seen_after": 3625.4839868919953,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.872549807,
+      "build": 57.922954686,
+      "upload": 1.572739496
+     }
+    },
+    {
+     "index": 63,
+     "input": "ms-marco-l2-1000000x384-byte",
+     "job_id": "39013022cebcd9da8c6f3f18f25d8d7604737fa638485e507628dceff756008b",
+     "post_seconds": 0.0010804479970829561,
+     "outcome": "built",
+     "seen_after": 3681.455654484991,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.88615442,
+      "build": 55.892077849,
+      "upload": 1.603205617
+     }
+    },
+    {
+     "index": 64,
+     "input": "sift-ip-1000000x128-byte",
+     "job_id": "98931c5c6fc81fc5c79752484028e285ce98f4170683564113ee1ef1ef9fd5d2",
+     "post_seconds": 0.0010411480034235865,
+     "outcome": "built",
+     "seen_after": 3689.5919823479926,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.413786686,
+      "build": 5.998612577,
+      "upload": 1.022720963
+     }
+    },
+    {
+     "index": 65,
+     "input": "sift-l2-1000000x128-byte",
+     "job_id": "f8c58064adb1ae3511d65cf041e46eb0564b0f07abb3d81297b14e401db4f0fe",
+     "post_seconds": 0.0009125009964918718,
+     "outcome": "built",
+     "seen_after": 3691.6327861669997,
+     "file_name": "vectors.faiss",
+     "process": 1,
+     "seconds": {
+      "download": 0.466486274,
+      "build": 5.936345746,
+      "upload": 1.00046815
+     }
+    }
+   ]
+  }
+ },
+ "service_starts": [
+  "2026-11-27T14:52:59.555647+00:00"
+ ],
+ "ended": "2026-11-27T20:17:12.028159+00:00"
+}

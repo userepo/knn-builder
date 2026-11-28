@@ -1,0 +1,290 @@
+{
+ "service": "knn-builder",
+ "image": "userepo/knn-builder:unsigned-test",
+ "image_id": "sha256:fbfdf7803f0da8275d8e446d1fc79ddffd6520763aa00e0fc442017276bf50d3",
+ "max_workers": 2,
+ "gpu": {
+  "name": "Tesla T4",
+  "driver": "595.91.07",
+  "memory_mib": 15360
+ },
+ "started": "2026-11-27T02:09:17.666053+00:00",
+ "settings": {
+  "runs": 3,
+  "concurrent": 8,
+  "rounds": 5,
+  "queue": 4,
+  "sustain_seconds": 3600,
+  "burst_jobs": 48,
+  "burst_timeout_seconds": 90,
+  "burst_poll_seconds": 5,
+  "knn_timeout_seconds": 3600,
+  "knn_poll_seconds": 5,
+  "seed": 1,
+  "gpu_sample_ms": 50,
+  "project_link_to_base_layer": false,
+  "recall_check_queries": 0,
+  "recall_check_k": 10,
+  "fetch_runs": 1,
+  "gpu_memory_limit_gb": 16.0,
+  "s3": {
+   "store": "s3",
+   "region": "us-east-2",
+   "endpoint": "aws"
+  }
+ },
+ "inputs": {
+  "gist-ip-1000000x960": {
+   "dir": "target/bench/inputs/gist-ip-1000000x960",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 960,
+   "skip_stored_vectors": false
+  },
+  "cohere-ip-1000000x768": {
+   "dir": "target/bench/inputs/cohere-ip-1000000x768",
+   "data_type": "float",
+   "space_type": "innerproduct",
+   "doc_count": 1000000,
+   "dimension": 768,
+   "skip_stored_vectors": false
+  },
+  "sift-l2-1000000x128": {
+   "dir": "target/bench/inputs/sift-l2-1000000x128",
+   "data_type": "float",
+   "space_type": "l2",
+   "doc_count": 1000000,
+   "dimension": 128,
+   "skip_stored_vectors": false
+  }
+ },
+ "warm_up": [
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 0,
+   "job_id": "e9efb39cf8d817a537f4c2facdf2c79334297466411cdbc301efb9d993376230",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 112.38,
+   "start": "2026-11-27T02:10:16.323916+00:00",
+   "end": "2026-11-27T02:12:08.703926+00:00",
+   "host_peak_bytes": 4183846912,
+   "file_name": "vectors.faiss",
+   "phase": "default",
+   "process": 1,
+   "seconds": {
+    "download": 5.337013743,
+    "build": 88.015198393,
+    "upload": 18.747212985
+   },
+   "device_samples": 2243,
+   "device_held_bytes": 110100480,
+   "device_peak_bytes": 996147200
+  }
+ ],
+ "scrapes": [
+  {
+   "process": 1,
+   "file": "metrics/process-1.txt",
+   "at": "2026-11-27T02:25:03.072882+00:00"
+  }
+ ],
+ "single": [
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 3,
+   "job_id": "a4f5954e11c12621a7fa07b2f8bab05966da20a7845319597d1b772861f33602",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 110.206,
+   "start": "2026-11-27T02:12:09.088506+00:00",
+   "end": "2026-11-27T02:13:59.294276+00:00",
+   "host_peak_bytes": 4191956992,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "process": 1,
+   "size": 3352129561,
+   "seconds": {
+    "download": 5.466141657,
+    "build": 85.377105034,
+    "upload": 19.139007568
+   },
+   "device_samples": 2199,
+   "device_held_bytes": 284164096,
+   "device_peak_bytes": 819986432
+  },
+  {
+   "input": "gist-ip-1000000x960",
+   "index": 4,
+   "job_id": "84acb1a91f8cbd7f699dfc0faefb82560d63ad0a0c30605dcebb62a4e74e6289",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 98.535,
+   "start": "2026-11-27T02:14:52.215151+00:00",
+   "end": "2026-11-27T02:16:30.750594+00:00",
+   "host_peak_bytes": 4964249600,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "process": 1,
+   "size": 4120129561,
+   "seconds": {
+    "download": 7.067042094,
+    "build": 68.076575352,
+    "upload": 23.128223085
+   },
+   "device_samples": 1966,
+   "device_held_bytes": 279969792,
+   "device_peak_bytes": 1019215872
+  },
+  {
+   "input": "sift-l2-1000000x128",
+   "index": 5,
+   "job_id": "a5c933c78d86e3264af312293e4a9fc9175fa00c6fe3164586b228f504e1df63",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 14.078,
+   "start": "2026-11-27T02:17:30.675822+00:00",
+   "end": "2026-11-27T02:17:44.754026+00:00",
+   "host_peak_bytes": 1670934528,
+   "file_name": "vectors.faiss",
+   "run": 1,
+   "process": 1,
+   "size": 792129561,
+   "seconds": {
+    "download": 1.08348584,
+    "build": 8.066137639,
+    "upload": 4.716411291
+   },
+   "device_samples": 281,
+   "device_held_bytes": 275775488,
+   "device_peak_bytes": 392167424
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 6,
+   "job_id": "0603500cf5e883f2c55b8e353603827022b37a3c4abf0c585ee85f8cdc0d4bc0",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 110.167,
+   "start": "2026-11-27T02:17:53.162133+00:00",
+   "end": "2026-11-27T02:19:43.329056+00:00",
+   "host_peak_bytes": 4235186176,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "process": 1,
+   "seconds": {
+    "download": 5.322921152,
+    "build": 85.75110511,
+    "upload": 18.832338497
+   },
+   "device_samples": 2199,
+   "device_held_bytes": 271581184,
+   "device_peak_bytes": 819986432
+  },
+  {
+   "input": "gist-ip-1000000x960",
+   "index": 7,
+   "job_id": "af3d44922e1d1b36cb97a8dae1a1a22d39969a62c27d8bf55d5b48e3274cadf1",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 99.509,
+   "start": "2026-11-27T02:19:43.727100+00:00",
+   "end": "2026-11-27T02:21:23.236328+00:00",
+   "host_peak_bytes": 5003603968,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "process": 1,
+   "seconds": {
+    "download": 6.518896345,
+    "build": 69.795907509,
+    "upload": 22.983882138
+   },
+   "device_samples": 1986,
+   "device_held_bytes": 267386880,
+   "device_peak_bytes": 1021313024
+  },
+  {
+   "input": "sift-l2-1000000x128",
+   "index": 8,
+   "job_id": "98301924ced421798b426983017e2b2a9aa7aabce22b750e0eb3b2b87357384c",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 11.871,
+   "start": "2026-11-27T02:21:23.620337+00:00",
+   "end": "2026-11-27T02:21:35.491514+00:00",
+   "host_peak_bytes": 1675780096,
+   "file_name": "vectors.faiss",
+   "run": 2,
+   "process": 1,
+   "seconds": {
+    "download": 1.018799341,
+    "build": 6.043228602,
+    "upload": 4.717231533
+   },
+   "device_samples": 237,
+   "device_held_bytes": 263192576,
+   "device_peak_bytes": 392167424
+  },
+  {
+   "input": "cohere-ip-1000000x768",
+   "index": 9,
+   "job_id": "bb34e2f01efaee8aad8dfde34ac801e2e589ae40e65ddde14926897808fb03bf",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 110.754,
+   "start": "2026-11-27T02:21:35.856874+00:00",
+   "end": "2026-11-27T02:23:26.610516+00:00",
+   "host_peak_bytes": 4256813056,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "process": 1,
+   "seconds": {
+    "download": 5.453586803,
+    "build": 86.310202279,
+    "upload": 18.764807886
+   },
+   "device_samples": 2210,
+   "device_held_bytes": 258998272,
+   "device_peak_bytes": 819986432
+  },
+  {
+   "input": "gist-ip-1000000x960",
+   "index": 10,
+   "job_id": "b9e62ff1be870424c2c528f27c81154f0d9a0bee622c3246e7d5691f2587489e",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 83.618,
+   "start": "2026-11-27T02:23:27.001717+00:00",
+   "end": "2026-11-27T02:24:50.619755+00:00",
+   "host_peak_bytes": 5025943552,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "process": 1,
+   "seconds": {
+    "download": 6.497741174,
+    "build": 53.580315397,
+    "upload": 23.141093715
+   },
+   "device_samples": 1669,
+   "device_held_bytes": 254803968,
+   "device_peak_bytes": 1019215872
+  },
+  {
+   "input": "sift-l2-1000000x128",
+   "index": 11,
+   "job_id": "3708317b5edd84a908ef1ebed8e696e8c437c3b077701b5e5d45fa5a409ccf5d",
+   "task_status": "COMPLETED_INDEX_BUILD",
+   "wall_seconds": 11.865,
+   "start": "2026-11-27T02:24:51.013345+00:00",
+   "end": "2026-11-27T02:25:02.878678+00:00",
+   "host_peak_bytes": 1757048832,
+   "file_name": "vectors.faiss",
+   "run": 3,
+   "process": 1,
+   "seconds": {
+    "download": 1.028370866,
+    "build": 6.038081655,
+    "upload": 4.667680432
+   },
+   "device_samples": 237,
+   "device_held_bytes": 250609664,
+   "device_peak_bytes": 392167424
+  }
+ ],
+ "service_starts": [
+  "2026-11-27T02:09:18.538934+00:00"
+ ],
+ "ended": "2026-11-27T02:25:13.928403+00:00"
+}
