@@ -3,7 +3,7 @@
 
 use std::io;
 
-use knn_store::{Cancel, Store};
+use knn_store::{Cancel, Store, UploadWaits};
 use knn_write::{IndexFile, IndexSpec};
 
 use crate::load::Dataset;
@@ -14,7 +14,8 @@ use crate::{Job, JobError};
 /// inputs are. The writer's checks run before the upload starts. Once the
 /// file is written, `verdict` says whether to store it, and the upload
 /// completes only then: a verdict against it, or any failure after the
-/// upload starts, aborts the upload, so nothing is stored.
+/// upload starts, aborts the upload, so nothing is stored. Returns how
+/// long the writer waited on the upload.
 pub(crate) fn write_index(
     store: &Store,
     job: &Job,
@@ -23,7 +24,7 @@ pub(crate) fn write_index(
     degree: usize,
     cancel: &Cancel,
     verdict: impl FnOnce() -> Result<(), JobError>,
-) -> Result<(), JobError> {
+) -> Result<UploadWaits, JobError> {
     if cancel.is_canceled() {
         return Err(JobError::Canceled);
     }

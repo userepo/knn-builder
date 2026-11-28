@@ -48,7 +48,8 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use knn_builder::{
-    BuildError, Builder, DataType, GraphParams, Job, Pipeline, RecallCheck, SpaceType, Vectors,
+    BuildError, Builder, DataType, GraphParams, Job, Pipeline, RecallCheck, SpaceType, Timings,
+    Vectors,
 };
 use knn_gpu::{Gpu, Reservation, device_memory};
 use knn_store::{Cancel, Settings, Store, Transfers};
@@ -290,6 +291,7 @@ async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, args: &[S
                         "build": round(t.build.duration().as_secs_f64()),
                         "upload": round(t.upload.duration().as_secs_f64()),
                     },
+                    "upload_waits": upload_waits(&t),
                     "peak_rss_bytes": peak_rss(),
                     "peak_rss_after_gpu_init_bytes": after_init,
                 })
@@ -318,6 +320,15 @@ async fn build(store: &Store, bucket: &str, inputs: &Path, out: &Path, args: &[S
     file.write_all(serde_json::to_string_pretty(&runs).unwrap().as_bytes())
         .unwrap();
     file.write_all(b"\n").unwrap();
+}
+
+/// The writer's waits on the upload, which are within the upload's seconds.
+fn upload_waits(timings: &Timings) -> Value {
+    json!({
+        "part": round(timings.part_wait.as_secs_f64()),
+        "check": round(timings.check_wait.as_secs_f64()),
+        "finish": round(timings.finish_wait.as_secs_f64()),
+    })
 }
 
 fn round(seconds: f64) -> f64 {

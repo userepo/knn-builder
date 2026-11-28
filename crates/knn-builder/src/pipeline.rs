@@ -321,6 +321,12 @@ pub struct Timings {
     /// How long, of `upload`, the written index waited for the recall
     /// check before its upload completed: none when the check ended first.
     pub check_wait: Duration,
+    /// How long, of `upload`, the writer waited for the upload to take a
+    /// part: the requests in flight held the write back.
+    pub part_wait: Duration,
+    /// How long, of `upload`, the upload took to complete once the last
+    /// part was handed over, after any wait for the recall check.
+    pub finish_wait: Duration,
 }
 
 /// A stage's time with a job.
@@ -819,11 +825,11 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
                 }
                 (written, found, waited)
             });
-            written.map(|()| (projection, Span::since(start), found, waited))
+            written.map(|waits| (projection, Span::since(start), found, waited, waits))
         })
         .await;
         let outcome = match written {
-            Ok(Ok((projection, upload, found, check_wait))) => Ok(Built {
+            Ok(Ok((projection, upload, found, check_wait, waits))) => Ok(Built {
                 file_name: queued.job.file_name(),
                 timings: Timings {
                     download,
@@ -832,6 +838,8 @@ async fn uploads(store: Store, mut graphed: mpsc::Receiver<Graphed>) {
                     check: found.map(|(_, span)| span),
                     upload,
                     check_wait,
+                    part_wait: waits.part,
+                    finish_wait: waits.finish,
                 },
                 recall: found.map(|(checked, _)| checked),
             }),

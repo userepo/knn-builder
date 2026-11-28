@@ -215,7 +215,7 @@ impl S3 {
                     break;
                 }
             }
-            upload.finish()
+            upload.finish().map(drop)
         })
         .await
         .unwrap()

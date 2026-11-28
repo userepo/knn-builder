@@ -531,6 +531,8 @@ mod tests {
             check: None,
             upload: span(download + build, download + build + upload),
             check_wait: Duration::ZERO,
+            part_wait: Duration::ZERO,
+            finish_wait: Duration::ZERO,
         }
     }
 

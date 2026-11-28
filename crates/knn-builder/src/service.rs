@@ -717,6 +717,9 @@ fn log_end(job_id: &JobId, vector_path: &str, outcome: &Result<Built, JobError>)
                 projection_s = built.timings.projection.map(seconds),
                 recall_check_s = built.timings.check.map(seconds),
                 upload_s = seconds(built.timings.upload),
+                upload_part_wait_s = built.timings.part_wait.as_secs_f64(),
+                upload_check_wait_s = built.timings.check_wait.as_secs_f64(),
+                upload_finish_wait_s = built.timings.finish_wait.as_secs_f64(),
                 total_s = built
                     .timings
                     .upload
@@ -1079,6 +1082,8 @@ mod tests {
                 check: None,
                 upload: span,
                 check_wait: Duration::ZERO,
+                part_wait: Duration::ZERO,
+                finish_wait: Duration::ZERO,
             },
             recall: None,
         }

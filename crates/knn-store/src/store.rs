@@ -788,6 +788,33 @@ mod tests {
     }
 
     #[test]
+    fn tells_how_long_the_writer_waited() {
+        // Three parts, one request at a time, each held 100 ms.
+        let hold = Duration::from_millis(100);
+        let transfers = Transfers {
+            part_size: 5 * MIB,
+            upload_concurrency: 1,
+            ..Transfers::default()
+        };
+        let fake = FakeS3Server::holding_puts(hold);
+        let runtime = Runtime::new().unwrap();
+        let store = store_on(&runtime, &fake, PayloadSigning::Never, transfers);
+        let size = 10 * MIB + 1;
+        let start = Instant::now();
+        let mut upload = store.upload("bucket", "index.faiss", size as u64, None, &Cancel::new());
+        upload.write_all(&vec![7; size]).unwrap();
+        let waits = upload.finish().unwrap();
+        let took = start.elapsed();
+        // The second part waits behind the first, in flight, so the third
+        // is taken only once the first's request is answered.
+        assert!(waits.part >= hold / 2, "{waits:?}");
+        // The second and third requests end within `finish`.
+        assert!(waits.finish >= hold, "{waits:?}");
+        assert!(waits.part + waits.finish <= took, "{waits:?} of {took:?}");
+        assert_eq!(fake.puts().len(), 3);
+    }
+
+    #[test]
     fn leaves_each_part_out_of_the_signature_when_unsigned() {
         // Two parts: the smallest S3 takes, and one byte.
         let transfers = Transfers {

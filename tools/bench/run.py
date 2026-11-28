@@ -179,6 +179,12 @@ KNN_BUILDER_STEPS = re.compile(
     r"job stage times job_id=(\w+) download_s=([\d.eE+-]+) build_s=([\d.eE+-]+)"
     r"(?: projection_s=([\d.eE+-]+))?(?: recall_check_s=([\d.eE+-]+))? upload_s=([\d.eE+-]+)"
 )
+# How long a job's writer waited, of the upload's seconds: for a part to
+# be taken, for the recall check, and for the upload to complete.
+KNN_BUILDER_WAITS = re.compile(
+    r"job stage times job_id=(\w+) .*?\bupload_part_wait_s=([\d.eE+-]+)"
+    r" upload_check_wait_s=([\d.eE+-]+) upload_finish_wait_s=([\d.eE+-]+)"
+)
 # The upper-level projection's lines in each service's log: whether it
 # ran, the share of the nodes reachable before it, its counts and times.
 UPSTREAM_PROJECTION = re.compile(
@@ -540,6 +546,19 @@ def recalls_from_log(log):
 
 def fields(text):
     return {k: float(v) for k, v in FIELD.findall(text)}
+
+
+def upload_waits_from_log(log):
+    """Each job's waits within its upload step by job id, from
+    knn-builder's log: the seconds its writer waited for the upload to
+    take a part, those the written file waited for the recall check, and
+    those the upload took to complete once the last part was handed over.
+    The rest of the upload's step seconds is the write. A service that
+    does not log them gives none."""
+    return {
+        m[1]: {"part": float(m[2]), "check": float(m[3]), "finish": float(m[4])}
+        for m in KNN_BUILDER_WAITS.finditer(log)
+    }
 
 
 def projections_from_log(log):
@@ -941,9 +960,12 @@ class Bench:
         steps = steps_from_log(log)
         projections = projections_from_log(log)
         recalls = recalls_from_log(log)
+        waits = upload_waits_from_log(log)
         for record in self.record["warm_up"] + self.record.get("single", []):
             if "job_id" in record:
                 record["seconds"] = steps.get(record["job_id"])
+                if record["job_id"] in waits:
+                    record["upload_waits"] = waits[record["job_id"]]
                 if record["job_id"] in projections:
                     record["projection"] = projections[record["job_id"]]
                 if record["job_id"] in recalls:
@@ -953,6 +975,8 @@ class Bench:
                 for record in group["records"]:
                     if "job_id" in record:
                         record["seconds"] = steps.get(record["job_id"])
+                        if record["job_id"] in waits:
+                            record["upload_waits"] = waits[record["job_id"]]
 
     def attach_device_peaks(self, samples):
         starts = self.service.starts

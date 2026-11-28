@@ -1,18 +1,19 @@
 //! Test support: a stand-in for S3 on a local port, for faults LocalStack
 //! cannot make (one object served under every key, HEAD and GET, ranged
 //! or whole, the first GET bodies cut off halfway on demand, PUT taken
-//! and dropped, a multipart upload started and completed whatever its
-//! parts, a bucket in another region than the client's, and a
-//! record of every GET, of what every PUT says of its body, and of
-//! every request's path and the region it was signed for; or a server
-//! that reads requests and never answers),
-//! and the stores the tests run on it.
+//! and dropped, held for a set time on demand, a multipart upload
+//! started and completed whatever its parts, a bucket in another region
+//! than the client's, and a record of every GET, of what every PUT says
+//! of its body, and of every request's path and the region it was signed
+//! for; or a server that reads requests and never answers), and the
+//! stores the tests run on it.
 
 use std::io::{BufRead, BufReader, Write};
 use std::net::{Shutdown, TcpListener, TcpStream};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::Duration;
 
 use aws_config::ConfigLoader;
 use aws_sdk_s3::config::{Credentials, Region};
@@ -90,15 +91,25 @@ pub(crate) struct FakeS3Server {
 impl FakeS3Server {
     /// Serves `data`, cutting the first `cuts` GET bodies off halfway.
     pub(crate) fn serving(data: Vec<u8>, cuts: usize) -> Self {
-        Self::serving_from(data, cuts, None)
+        Self::serving_from(data, cuts, None, Duration::ZERO)
+    }
+
+    /// Takes PUTs, answering each only after `hold`.
+    pub(crate) fn holding_puts(hold: Duration) -> Self {
+        Self::serving_from(Vec::new(), 0, None, hold)
     }
 
     /// Serves `data` from a bucket in `elsewhere`'s region.
     pub(crate) fn serving_elsewhere(data: Vec<u8>, elsewhere: Elsewhere) -> Self {
-        Self::serving_from(data, 0, Some(elsewhere))
+        Self::serving_from(data, 0, Some(elsewhere), Duration::ZERO)
     }
 
-    fn serving_from(data: Vec<u8>, cuts: usize, elsewhere: Option<Elsewhere>) -> Self {
+    fn serving_from(
+        data: Vec<u8>,
+        cuts: usize,
+        elsewhere: Option<Elsewhere>,
+        put_hold: Duration,
+    ) -> Self {
         let gets = Arc::new(Mutex::new(Vec::new()));
         let puts = Arc::new(Mutex::new(Vec::new()));
         let signed = Requests::default();
@@ -106,6 +117,7 @@ impl FakeS3Server {
             data,
             cuts: AtomicUsize::new(cuts),
             elsewhere,
+            put_hold,
             answered_elsewhere: AtomicUsize::new(0),
             gets: Arc::clone(&gets),
             puts: Arc::clone(&puts),
@@ -164,6 +176,8 @@ struct Object {
     /// GET bodies still to cut off.
     cuts: AtomicUsize,
     elsewhere: Option<Elsewhere>,
+    /// How long a PUT waits for its answer.
+    put_hold: Duration,
     /// Answers given for the wrong region so far.
     answered_elsewhere: AtomicUsize,
     gets: Arc<Mutex<Vec<Get>>>,
@@ -229,6 +243,7 @@ impl Object {
                 payload: request.header("x-amz-content-sha256").map(str::to_owned),
                 crc32: request.header("x-amz-checksum-crc32").map(str::to_owned),
             });
+            thread::sleep(self.put_hold);
             let head = format!("HTTP/1.1 200 OK\r\ncontent-length: 0\r\netag: {E_TAG}\r\n\r\n");
             return out.write_all(head.as_bytes()).is_ok();
         }

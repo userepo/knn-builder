@@ -726,6 +726,9 @@ async fn checks_the_recall_before_storing() {
     let (ran, upload) = (reported.timings.check.unwrap(), reported.timings.upload);
     assert!(upload.start <= ran.start && ran.end <= upload.end);
     assert!(reported.timings.check_wait <= upload.duration());
+    // The writer's waits on the upload are within it too, beside that one.
+    let waits = reported.timings.part_wait + reported.timings.finish_wait;
+    assert!(waits + reported.timings.check_wait <= upload.duration());
     assert_eq!((recall.queries, recall.k), (50, 10));
     // The same vectors and graph, though the file leaves them out.
     assert_eq!(found(&next().await.unwrap()).recall, recall.recall);

@@ -2,6 +2,7 @@ use std::fmt;
 use std::io::{self, Write};
 use std::mem;
 use std::pin::pin;
+use std::time::{Duration, Instant};
 
 use aws_sdk_s3::Client;
 use aws_sdk_s3::primitives::ByteStream;
@@ -81,6 +82,7 @@ impl Store {
             written: 0,
             part_size,
             part: Vec::with_capacity(capped(size, part_size)),
+            part_wait: Duration::ZERO,
             state: State::Writing {
                 parts,
                 done,
@@ -124,7 +126,30 @@ pub struct Upload {
     written: u64,
     part_size: usize,
     part: Vec<u8>,
+    /// How long the writer has waited for the task to take a part.
+    part_wait: Duration,
     state: State,
+}
+
+/// How long an upload's writer waited on the upload, from
+/// [`Upload::finish`].
+///
+/// The rest of the time from [`Store::upload`] to the end of `finish` was
+/// the caller's own: producing the file's bytes, and anything it did
+/// before `finish`. The two tell which held the upload back: a writer
+/// that seldom waited for a part was the limit, and one that mostly
+/// waited was ahead of the requests.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct UploadWaits {
+    /// Waiting for the upload to take a full part. The upload holds its
+    /// requests in flight and one part more; the writer waits when both
+    /// are full.
+    pub part: Duration,
+    /// In [`Upload::finish`], from the last part handed over until the
+    /// file was stored: the requests still in flight, then the one that
+    /// completes the upload. A file sent in one request spends that
+    /// request here.
+    pub finish: Duration,
 }
 
 /// Where an upload stands, as its writer sees it.
@@ -145,7 +170,7 @@ enum State {
 
 impl Upload {
     /// Sends the last part, and waits until the file is stored or the
-    /// upload aborted.
+    /// upload aborted. Returns how long the writer waited on the upload.
     ///
     /// # Errors
     ///
@@ -154,13 +179,18 @@ impl Upload {
     /// [`Error::Canceled`] when the upload was canceled;
     /// [`Error::NotAborted`] when aborting failed too; or
     /// [`Error::Stopped`] when the task ended without a result.
-    pub fn finish(mut self) -> Result<(), Error> {
+    pub fn finish(mut self) -> Result<UploadWaits, Error> {
         if self.written == self.size && !self.part.is_empty() {
             // A task that stopped taking parts has failed; `settle` says
             // why.
             self.send();
         }
-        self.settle()
+        let handed_over = Instant::now();
+        self.settle()?;
+        Ok(UploadWaits {
+            part: self.part_wait,
+            finish: handed_over.elapsed(),
+        })
     }
 
     /// Gives the upload up, whatever was written, and waits until it is
@@ -209,7 +239,10 @@ impl Upload {
         };
         let next = capped(self.size.saturating_sub(self.written), self.part_size);
         let part = mem::replace(&mut self.part, Vec::with_capacity(next));
-        parts.blocking_send(part).is_ok()
+        let waiting = Instant::now();
+        let taken = parts.blocking_send(part).is_ok();
+        self.part_wait += waiting.elapsed();
+        taken
     }
 
     /// Gives the task the writer's count and waits for its result, once.
