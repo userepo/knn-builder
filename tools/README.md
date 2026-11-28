@@ -320,6 +320,13 @@ python tools/bench/run.py target/bench/cloud/upstream upstream --s3-bucket my-be
 python tools/bench/report.py ../knn-inspect/target/release/knn-inspect target/bench/cloud/knn-builder target/bench/cloud/upstream
 ```
 
+Two programs time the upload's transfer alone, with no GPU and no index: `knn-store`'s `upload_bench` example sends a buffer through the store's upload with a writer that only copies, and `bench/upload_boto3.py` sends a file the way the upstream service does (`upload_file`, CRC32). Each takes a list of part sizes and of requests in flight, prints a line of JSON per upload, and deletes its object at the end. Here 4 GiB, three times per setting:
+
+```sh
+cargo run --release -p knn-store --example upload_bench -- my-bench-bucket probe/knn-store.bin 4096 8,16,32,50 8,16 3
+python tools/bench/upload_boto3.py my-bench-bucket probe/boto3.bin 4096 8,16,32,50 8,16 3
+```
+
 ### The projection
 
 `--project` sends every build with `project_link_to_base_layer` true, and `--fetch-runs N` keeps the files of the first N single runs rather than the first alone. Each record of the single phase then carries the projection from the service's DEBUG log: whether it ran (or skipped a connected graph, or promoted too few), the share of the nodes reachable before it, the nodes it promoted, the links it added, and its milliseconds. `bench/projection.py` scores each kept file, its level-0 components (`components.py` in the oracle's image) and knn-inspect recall as the mean over five seeds of random entry points, recall@10 at the file's own search settings and recall@100 at ef_search 600 from 32 entry points, into `projection.json` beside `run.json`, and prints a table by input of the mean and range over the builds of each run; `--delete-files` removes each file once scored, `--summary` writes the table's figures as JSON. On the `clustered` set, with and without the projection on each service:
