@@ -60,7 +60,7 @@ impl Pipeline {
     /// graphs and projections, take `host_memory` bytes at most at once,
     /// counted in whole MiB. The transfers' own buffers come on top: the
     /// one upload's parts in memory, up to [`knn_store::Transfers`]'s
-    /// `upload_concurrency` plus two, of `part_size` or more (80 MiB at
+    /// `upload_concurrency` plus two, of `part_size` or more (288 MiB at
     /// least by default).
     ///
     /// # Panics

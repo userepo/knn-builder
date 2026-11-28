@@ -128,7 +128,11 @@ mod tests {
             settings.endpoint_url.is_some(),
             "needs LocalStack: set S3_ENDPOINT_URL and credentials (see the README)"
         );
-        let store = Store::new(&settings, Transfers::default()).await;
+        let transfers = Transfers {
+            part_size: 8 << 20,
+            ..Transfers::default()
+        };
+        let store = Store::new(&settings, transfers).await;
         let client = store.sdk_client().clone();
         let nanos = SystemTime::now()
             .duration_since(UNIX_EPOCH)
